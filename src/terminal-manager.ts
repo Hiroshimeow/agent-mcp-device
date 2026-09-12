@@ -111,7 +111,7 @@ function getShellSpawnArgs(shellPath: string, command: string): ShellSpawnConfig
   if (shellName === 'powershell' || shellName === 'powershell.exe') {
     return { 
       executable: shellPath, 
-      args: ['-Command', command],
+      args: ['-NoProfile', '-NonInteractive', '-Command', command],
       useShellOption: false 
     };
   }
@@ -174,7 +174,7 @@ export class TerminalManager {
     }
   }
   
-  async executeCommand(command: string, timeoutMs: number = DEFAULT_COMMAND_TIMEOUT, shell?: string, collectTiming: boolean = false): Promise<CommandExecutionResult> {
+  async executeCommand(command: string, timeoutMs: number = DEFAULT_COMMAND_TIMEOUT, shell?: string, collectTiming: boolean = false, workingDirectory?: string): Promise<CommandExecutionResult> {
     // Get the shell from config if not specified
     let shellToUse: string | boolean | undefined = shell;
     if (!shellToUse) {
@@ -209,7 +209,8 @@ export class TerminalManager {
           ...process.env,
           TERM: 'xterm-256color'  // Better terminal compatibility
         },
-        windowsHide: true  // Prevent visible console windows on Windows
+        windowsHide: true,  // Prevent visible console windows on Windows
+        ...(workingDirectory ? { cwd: workingDirectory } : {})
       };
 
       // Add shell option if needed (for unknown shells)
@@ -229,7 +230,8 @@ export class TerminalManager {
           ...process.env,
           TERM: 'xterm-256color'
         },
-        windowsHide: true  // Prevent visible console windows on Windows
+        windowsHide: true,  // Prevent visible console windows on Windows
+        ...(workingDirectory ? { cwd: workingDirectory } : {})
       };
     }
 

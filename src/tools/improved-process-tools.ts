@@ -1,6 +1,7 @@
 import { terminalManager, MAX_BUFFERED_OUTPUT_CHARS } from '../terminal-manager.js';
 import { commandManager } from '../command-manager.js';
 import { StartProcessArgsSchema, ReadProcessOutputArgsSchema, InteractWithProcessArgsSchema, ForceTerminateArgsSchema, ListSessionsArgsSchema } from './schemas.js';
+import { validatePath } from './filesystem.js';
 import { capture } from "../utils/capture.js";
 import { ServerResult } from '../types.js';
 import { analyzeProcessState, cleanProcessOutput, formatProcessStateMessage, ProcessState } from '../utils/process-detection.js';
@@ -126,6 +127,9 @@ export async function startProcess(args: unknown): Promise<ServerResult> {
   }
 
   const commandToRun = parsed.data.command;
+  const workingDirectory = parsed.data.working_directory
+    ? await validatePath(parsed.data.working_directory)
+    : undefined;
 
   // Handle node:local - runs Node.js code directly on MCP server
   if (commandToRun.trim() === 'node:local') {
@@ -172,7 +176,8 @@ export async function startProcess(args: unknown): Promise<ServerResult> {
     commandToRun,
     parsed.data.timeout_ms,
     shellUsed,
-    parsed.data.verbose_timing || false
+    parsed.data.verbose_timing || false,
+    workingDirectory
   );
 
   if (result.pid === -1) {

@@ -115,7 +115,8 @@ export class GatewayToolAdapter {
         if (tool === 'start_process') {
             const result = assertSuccess(await this.desktop.callClientTool('start_process', {
                 command: args.command,
-                timeout_ms: Number(args.timeout_ms || 10000)
+                timeout_ms: Number(args.timeout_ms || 10000),
+                ...(args.working_directory ? { working_directory: String(args.working_directory) } : {})
             }), 'start_process');
             return { ...result, pid: parsePid(result), session_id: String(parsePid(result)) };
         }

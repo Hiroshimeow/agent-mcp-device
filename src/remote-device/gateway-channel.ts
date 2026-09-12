@@ -5,6 +5,7 @@ import { GATEWAY_CAPABILITIES, GatewayToolAdapter } from './gateway-tool-adapter
 
 const PROTOCOL_VERSION = 1;
 const HEARTBEAT_MS = 20_000;
+const MAX_OUTBOUND_MESSAGE_BYTES = 56 * 1024;
 
 function gatewaySocketUrl(raw: string): string {
     const url = new URL(raw);
@@ -148,7 +149,10 @@ export class GatewayDeviceChannel {
                 device_id: message.device_id,
                 connection_epoch: message.connection_epoch,
                 timestamp: Date.now(),
-                payload: { message: String(error?.message || error) }
+                payload: {
+                    message: String(error?.message || error),
+                    code: String(error?.code || 'REMOTE_DEVICE_ERROR').slice(0, 64)
+                }
             });
         }
     }
@@ -185,7 +189,13 @@ export class GatewayDeviceChannel {
 
     private send(message: any): void {
         if (!this.socket || this.socket.readyState !== WebSocket.OPEN) throw new Error('Gateway socket is not open');
-        this.socket.send(JSON.stringify(message));
+        const encoded = JSON.stringify(message);
+        if (Buffer.byteLength(encoded, 'utf8') > MAX_OUTBOUND_MESSAGE_BYTES) {
+            const error: any = new Error('Gateway device response exceeds the outbound message limit');
+            error.code = 'DEVICE_OUTPUT_TOO_LARGE';
+            throw error;
+        }
+        this.socket.send(encoded);
     }
 
     private fail(error: Error): void {
