@@ -385,10 +385,17 @@ export class MCPDevice {
 
 // Start device if called directly or as a bin command
 // When installed globally, npm creates a wrapper, so we need to check multiple conditions
-const isMainModule = process.argv[1] && (
-    // Direct execution: node device.js
-    import.meta.url === `file://${process.argv[1]}` ||
-    fileURLToPath(import.meta.url) === process.argv[1] ||
+export function isModuleEntrypoint(moduleUrl: string, argvEntry?: string, pmExecPath?: string): boolean {
+    const moduleEntryPath = path.resolve(fileURLToPath(moduleUrl));
+    const candidates = [argvEntry, pmExecPath]
+        .map(value => value ? path.resolve(value) : '')
+        .filter(Boolean);
+    return candidates.some(candidate => process.platform === 'win32'
+        ? moduleEntryPath.toLowerCase() === candidate.toLowerCase()
+        : moduleEntryPath === candidate);
+}
+
+const isMainModule = isModuleEntrypoint(import.meta.url, process.argv[1], process.env.pm_exec_path) || Boolean(process.argv[1]) && (
     // Global bin execution: desktop-commander-device (npm creates a wrapper)
     process.argv[1].endsWith('desktop-commander-device') ||
     process.argv[1].endsWith('desktop-commander-device.js')

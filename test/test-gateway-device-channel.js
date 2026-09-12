@@ -3,11 +3,13 @@ import { createPublicKey, verify } from 'crypto';
 import fs from 'fs/promises';
 import os from 'os';
 import path from 'path';
+import { pathToFileURL } from 'url';
 import { WebSocketServer } from 'ws';
 
 import { GatewayDeviceChannel } from '../dist/remote-device/gateway-channel.js';
 import { GatewayDeviceIdentity } from '../dist/remote-device/gateway-identity.js';
 import { GatewayToolAdapter } from '../dist/remote-device/gateway-tool-adapter.js';
+import { isModuleEntrypoint } from '../dist/remote-device/device.js';
 
 const waitFor = async (predicate, timeoutMs = 4000) => {
   const deadline = Date.now() + timeoutMs;
@@ -25,6 +27,14 @@ class FakeDesktop {
     if (name === 'start_process') return { content: [{ type: 'text', text: 'Process started with PID 123' }] };
     return { content: [{ type: 'text', text: `${name}:ok` }] };
   }
+}
+
+function testPm2EntrypointDetection() {
+  const modulePath = path.resolve('dist/remote-device/device.js');
+  const moduleUrl = pathToFileURL(modulePath).href;
+  assert.equal(isModuleEntrypoint(moduleUrl, modulePath), true);
+  assert.equal(isModuleEntrypoint(moduleUrl, path.resolve('node_modules/pm2/lib/ProcessContainerFork.js'), modulePath), true);
+  assert.equal(isModuleEntrypoint(moduleUrl, path.resolve('other.js'), path.resolve('different.js')), false);
 }
 
 async function testIdentity() {
@@ -197,6 +207,7 @@ async function testOversizedToolResultReturnsBoundedError() {
   await fs.rm(root, { recursive: true, force: true });
 }
 
+testPm2EntrypointDetection();
 await testIdentity();
 await testAdapterRequiresExplicitLocalRoots();
 await testAdapter();
