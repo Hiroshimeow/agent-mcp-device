@@ -75,6 +75,41 @@ async function testAdapter() {
   assert.equal(desktop.calls.at(-1).name, 'force_terminate');
 }
 
+async function testOperatorPreEnrolledIdentityUsesAuthHello() {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-gateway-preenroll-'));
+  const identity = new GatewayDeviceIdentity(path.join(root, 'identity.json'));
+  const initial = await identity.loadOrCreate();
+  assert.equal(initial.enrolled, false);
+  const wss = new WebSocketServer({ port: 0 });
+  await new Promise(resolve => wss.once('listening', resolve));
+  const address = wss.address();
+  const port = typeof address === 'object' && address ? address.port : 0;
+  let helloType = null;
+  let authenticated = false;
+  wss.on('connection', (ws, request) => {
+    assert.equal(request.headers.authorization, undefined);
+    ws.on('message', raw => {
+      const message = JSON.parse(raw.toString());
+      if (message.type === 'auth_hello') {
+        helloType = message.type;
+        assert.equal(message.payload.public_key_pem, undefined);
+        ws.send(JSON.stringify({ protocol_version: 1, type: 'auth_challenge', device_id: message.device_id, payload: { nonce: 'pre-enrolled' } }));
+      } else if (message.type === 'auth_response') {
+        authenticated = true;
+        ws.send(JSON.stringify({ protocol_version: 1, type: 'auth_ok', device_id: message.device_id, connection_epoch: 1, payload: { accepted: true } }));
+      }
+    });
+  });
+  const channel = new GatewayDeviceChannel({ gatewayUrl: `ws://127.0.0.1:${port}/device`, identity, adapter: { async call() { return {}; } }, agentVersion: 'test' });
+  await channel.start();
+  await waitFor(() => authenticated);
+  assert.equal(helloType, 'auth_hello');
+  assert.equal((await identity.loadOrCreate()).enrolled, true);
+  await channel.stop();
+  await new Promise(resolve => wss.close(resolve));
+  await fs.rm(root, { recursive: true, force: true });
+}
+
 async function testChannelEnrollmentToolAndReconnect() {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-gateway-channel-'));
   const identity = new GatewayDeviceIdentity(path.join(root, 'identity.json'));
@@ -165,6 +200,7 @@ async function testOversizedToolResultReturnsBoundedError() {
 await testIdentity();
 await testAdapterRequiresExplicitLocalRoots();
 await testAdapter();
+await testOperatorPreEnrolledIdentityUsesAuthHello();
 await testChannelEnrollmentToolAndReconnect();
 await testOversizedToolResultReturnsBoundedError();
 console.log('âœ… Gateway identity, adapter, enrollment, tool routing, and reconnect tests passed');

@@ -85,15 +85,16 @@ export class GatewayDeviceChannel {
 
     private async sendHello(): Promise<void> {
         const record = await this.identity.loadOrCreate();
+        const enrolling = !record.enrolled && Boolean(this.options.enrollmentToken);
         this.send({
             protocol_version: PROTOCOL_VERSION,
-            type: record.enrolled ? 'auth_hello' : 'enroll_hello',
+            type: enrolling ? 'enroll_hello' : 'auth_hello',
             device_id: record.deviceId,
             timestamp: Date.now(),
             payload: {
                 agent_version: this.options.agentVersion || 'desktop-commander-gateway-1',
                 capabilities: [...GATEWAY_CAPABILITIES],
-                ...(record.enrolled ? {} : { public_key_pem: record.publicKeyPem })
+                ...(enrolling ? { public_key_pem: record.publicKeyPem } : {})
             }
         });
     }
