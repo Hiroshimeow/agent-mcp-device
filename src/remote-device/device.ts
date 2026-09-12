@@ -3,6 +3,8 @@
 import { RemoteChannel } from './remote-channel.js';
 import { DeviceAuthenticator } from './device-authenticator.js';
 import { DesktopCommanderIntegration } from './desktop-commander-integration.js';
+import { GatewayDeviceChannel } from './gateway-channel.js';
+import { GatewayToolAdapter } from './gateway-tool-adapter.js';
 import { fileURLToPath } from 'url';
 import os from 'os';
 import fs from 'fs/promises';
@@ -21,6 +23,7 @@ export class MCPDevice {
     private configPath: string;
     private persistSession: boolean;
     private desktop: DesktopCommanderIntegration;
+    private gatewayChannel?: GatewayDeviceChannel;
 
     constructor(options: MCPDeviceOptions = {}) {
         this.baseServerUrl = process.env.MCP_SERVER_URL || 'https://mcp.desktopcommander.app';
@@ -97,6 +100,15 @@ export class MCPDevice {
 
             // Initialize desktop integration
             await this.desktop.initialize();
+
+            const gatewayUrl = String(process.env.MCP_GATEWAY_URL || '').trim();
+            if (gatewayUrl) {
+                console.log(`⏳ Connecting directly to MCP Gateway ${gatewayUrl}`);
+                this.gatewayChannel = new GatewayDeviceChannel({ gatewayUrl, enrollmentToken: String(process.env.MCP_GATEWAY_ENROLLMENT_TOKEN || process.env.MCP_DEVICE_ENROLLMENT_TOKEN || '').trim() || undefined, adapter: new GatewayToolAdapter(this.desktop), agentVersion: process.env.npm_package_version });
+                await this.gatewayChannel.start();
+                console.log('✅ Device ready through direct Gateway channel');
+                return;
+            }
 
             console.log(`⏳ Connecting to Remote MCP ${this.baseServerUrl}`);
             const { supabaseUrl, anonKey } = await this.fetchSupabaseConfig();
@@ -330,6 +342,15 @@ export class MCPDevice {
         console.debug('[DEBUG] Shutdown initiated for device:', this.deviceId);
 
         try {
+            if (this.gatewayChannel) {
+                console.log('  → Closing direct Gateway channel...');
+                await this.gatewayChannel.stop();
+                this.gatewayChannel = undefined;
+                await this.desktop.shutdown();
+                console.log('✓ Device shutdown complete');
+                return;
+            }
+
             // Stop heartbeat first to prevent new operations
             console.log('  → Stopping heartbeat...');
             console.debug('[DEBUG] Calling stopHeartbeat()');
