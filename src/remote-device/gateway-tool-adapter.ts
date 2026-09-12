@@ -1,5 +1,6 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import path from 'path';
 
 import { commandManager } from '../command-manager.js';
 import { configManager } from '../config-manager.js';
@@ -17,7 +18,27 @@ export const GATEWAY_CAPABILITIES = [
     'read_process_output',
     'interact_with_process',
     'terminate_process'
-] as const;
+ ] as const;
+
+export interface GatewayToolAdapterOptions {
+    allowedRoots?: string[];
+    pathValidator?: (requestedPath: string) => Promise<string>;
+}
+
+function configuredGatewayRoots(): string[] {
+    const raw = String(process.env.MCP_GATEWAY_ALLOWED_ROOTS || '').trim();
+    if (!raw) return [];
+    let parsed: unknown;
+    try { parsed = JSON.parse(raw); }
+    catch { throw new Error('MCP_GATEWAY_ALLOWED_ROOTS must be a JSON array of absolute paths'); }
+    if (!Array.isArray(parsed)) throw new Error('MCP_GATEWAY_ALLOWED_ROOTS must be a JSON array of absolute paths');
+    return [...new Set(parsed.map(value => String(value).trim()).filter(Boolean))];
+}
+
+function isWithinRoot(candidate: string, root: string): boolean {
+    const relative = path.relative(root, candidate);
+    return relative === '' || (!relative.startsWith(`..${path.sep}`) && relative !== '..' && !path.isAbsolute(relative));
+}
 
 function textFromResult(result: any): string {
     return (result?.content || [])
@@ -89,12 +110,34 @@ async function runShell(args: any) {
     }
 }
 export class GatewayToolAdapter {
-    constructor(private desktop: DesktopCommanderIntegration) {}
+    private allowedRoots: string[];
+    private pathValidator: (requestedPath: string) => Promise<string>;
+    private canonicalRoots?: Promise<string[]>;
+
+    constructor(private desktop: DesktopCommanderIntegration, options: GatewayToolAdapterOptions = {}) {
+        this.allowedRoots = options.allowedRoots ?? configuredGatewayRoots();
+        this.pathValidator = options.pathValidator ?? validatePath;
+        if (!this.allowedRoots.length) {
+            throw new Error('Direct Gateway mode requires MCP_GATEWAY_ALLOWED_ROOTS with at least one explicit root');
+        }
+    }
+
+    private async guardPath(requestedPath: unknown): Promise<string> {
+        const value = String(requestedPath || '').trim();
+        if (!value) throw new Error('Remote device path/working_directory is required');
+        const candidate = await this.pathValidator(value);
+        this.canonicalRoots ??= Promise.all(this.allowedRoots.map(root => this.pathValidator(root)));
+        const roots = await this.canonicalRoots;
+        if (!roots.some(root => isWithinRoot(candidate, root))) {
+            throw new Error('Remote device path is outside MCP_GATEWAY_ALLOWED_ROOTS');
+        }
+        return candidate;
+    }
 
     async call(tool: string, args: any = {}): Promise<any> {
         if (tool === 'read_text_file') {
             if (args.head !== undefined && args.tail !== undefined) throw new Error('Use either head or tail, not both');
-            const mapped: any = { path: args.path };
+            const mapped: any = { path: await this.guardPath(args.path) };
             if (args.head !== undefined) {
                 mapped.offset = 0;
                 mapped.length = Number(args.head);
@@ -105,18 +148,19 @@ export class GatewayToolAdapter {
         }
         if (tool === 'write_file') {
             return assertSuccess(await this.desktop.callClientTool('write_file', {
-                path: args.path,
+                path: await this.guardPath(args.path),
                 content: args.content,
                 mode: 'rewrite'
             }), 'write_file');
         }
-        if (tool === 'edit_file') return await this.editFile(args);
-        if (tool === 'shell_execute') return await runShell(args);
+        if (tool === 'edit_file') return await this.editFile({ ...args, path: await this.guardPath(args.path) });
+        if (tool === 'shell_execute') return await runShell({ ...args, working_directory: await this.guardPath(args.working_directory) });
         if (tool === 'start_process') {
+            const workingDirectory = await this.guardPath(args.working_directory);
             const result = assertSuccess(await this.desktop.callClientTool('start_process', {
                 command: args.command,
                 timeout_ms: Number(args.timeout_ms || 10000),
-                ...(args.working_directory ? { working_directory: String(args.working_directory) } : {})
+                working_directory: workingDirectory
             }), 'start_process');
             return { ...result, pid: parsePid(result), session_id: String(parsePid(result)) };
         }

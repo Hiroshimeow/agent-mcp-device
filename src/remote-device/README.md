@@ -99,6 +99,12 @@ npm run device:start
 
 *(Or direct from `src/remote-device`: `npm run device`)*
 
+### Direct Agent MCP Gateway
+
+Set `MCP_GATEWAY_URL` to the central gateway to use the direct WebSocket/Ed25519 device path instead of the hosted relay. First enrollment also needs `MCP_GATEWAY_ENROLLMENT_TOKEN`; reconnects use the persisted Ed25519 identity at `MCP_GATEWAY_DEVICE_IDENTITY_PATH`.
+
+Direct Gateway mode is fail-closed locally: `MCP_GATEWAY_ALLOWED_ROOTS` is required and must be a JSON array of explicit absolute roots (for example `["C:\\work\\project"]` on Windows or `["/home/user/project"]` on Linux). File paths and process working directories are canonicalized and must stay inside those roots before the local Desktop Commander engine runs the tool.
+
 ### 2. Authenticate
 
 On first run, the device uses the **OAuth 2.0 Device Authorization Flow** for secure authentication:
