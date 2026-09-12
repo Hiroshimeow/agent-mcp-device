@@ -1,4 +1,4 @@
-import { exec } from 'child_process';
+import { exec, execFile } from 'child_process';
 import { promisify } from 'util';
 import path from 'path';
 
@@ -8,6 +8,7 @@ import { validatePath } from '../tools/filesystem.js';
 import { DesktopCommanderIntegration } from './desktop-commander-integration.js';
 
 const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 
 export const GATEWAY_CAPABILITIES = [
     'read_text_file',
@@ -71,14 +72,19 @@ async function runShell(args: any) {
     }
     const started = Date.now();
     try {
-        const { stdout, stderr } = await execAsync(command, {
+        const shell = config.defaultShell || undefined;
+        const shellName = shell ? path.basename(shell).toLowerCase() : '';
+        const options = {
             cwd,
-            shell: config.defaultShell || undefined,
             timeout: timeoutMs,
             windowsHide: true,
             maxBuffer: 1024 * 1024,
-            encoding: 'utf8'
-        });
+            encoding: 'utf8' as BufferEncoding
+        };
+        const result = shellName === 'powershell' || shellName === 'powershell.exe' || shellName === 'pwsh' || shellName === 'pwsh.exe'
+            ? await execFileAsync(shell!, ['-NoProfile', '-NonInteractive', '-Command', command], options)
+            : await execAsync(command, { ...options, shell });
+        const { stdout, stderr } = result;
         return {
             workingDirectoryResolved: cwd,
             exitCode: 0,
