@@ -102,6 +102,7 @@ async function testImprovedSearchTruncation() {
         
     } catch (error) {
         console.error('Test failed:', error);
+        throw error;
     }
 }
 

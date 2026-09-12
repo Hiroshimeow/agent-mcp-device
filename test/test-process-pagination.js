@@ -173,7 +173,7 @@ async function testInteractTruncation() {
   
   // Start a Python REPL
   const startResult = await startProcess({
-    command: 'python3 -i',
+    command: process.platform === 'win32' ? 'python -i' : 'python3 -i',
     timeout_ms: 3000
   });
   

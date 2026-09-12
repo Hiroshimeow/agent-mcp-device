@@ -6,11 +6,13 @@
 import { spawn } from 'child_process';
 import path from 'path';
 import fs from 'fs/promises';
+import os from 'os';
 import { fileURLToPath } from 'url';
 
 // Get directory name
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const testConfigRoot = path.join(os.tmpdir(), `desktop-commander-test-config-${process.pid}`);
 
 // Colors for console output
 const colors = {
@@ -59,10 +61,12 @@ function runTestFile(testFile) {
     console.log(`\n${colors.cyan}Running test module: ${testFile}${colors.reset}`);
     
     const startTime = Date.now();
+    const configDir = path.join(testConfigRoot, path.basename(testFile, '.js'));
     const proc = spawn('node', [testFile], {
       cwd: __dirname,
       stdio: 'inherit',
-      shell: false
+      shell: false,
+      env: { ...process.env, DESKTOP_COMMANDER_CONFIG_DIR: configDir }
     });
     
     proc.on('close', (code) => {
@@ -230,6 +234,8 @@ async function main() {
     const overallDuration = Date.now() - overallStartTime;
     console.log(`${colors.blue}Total execution time: ${overallDuration}ms (${(overallDuration / 1000).toFixed(1)}s)${colors.reset}`);
     
+    // Remove per-test config sandboxes before exiting.
+    await fs.rm(testConfigRoot, { recursive: true, force: true }).catch(() => {});
     // Exit with appropriate code
     process.exit(testResult.success ? 0 : 1);
     
@@ -239,6 +245,7 @@ async function main() {
     if (error.stack) {
       console.error(`${colors.red}${error.stack}${colors.reset}`);
     }
+    await fs.rm(testConfigRoot, { recursive: true, force: true }).catch(() => {});
     process.exit(1);
   }
 }

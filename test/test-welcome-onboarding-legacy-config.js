@@ -42,6 +42,7 @@ class ExistingConfigClaudeCodeMigrationTest {
           ...process.env,
           HOME: this.home,
           USERPROFILE: this.home,
+          DESKTOP_COMMANDER_CONFIG_DIR: path.dirname(this.configPath),
           DC_FLAG_URL: 'http://127.0.0.1:9/',
         },
         stdio: ['pipe', 'pipe', 'pipe'],

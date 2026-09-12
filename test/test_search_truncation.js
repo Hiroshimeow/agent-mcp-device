@@ -1,5 +1,5 @@
 // Test script to verify search result behavior using new streaming API
-import { handleStartSearch, handleGetMoreSearchResults } from '../dist/handlers/search-handlers.js';
+import { handleStartSearch, handleGetMoreSearchResults, handleStopSearch } from '../dist/handlers/search-handlers.js';
 
 /**
  * Helper function to wait for search completion and get all results
@@ -89,6 +89,7 @@ async function testSearchTruncation() {
         
     } catch (error) {
         console.error('Test failed:', error);
+        throw error;
     }
 }
 
