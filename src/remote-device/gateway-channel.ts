@@ -33,12 +33,16 @@ export class GatewayDeviceChannel {
     private readyReject?: (error: Error) => void;
     private reconnectTimer?: NodeJS.Timeout;
     private reconnectAttempt = 0;
+    private authenticatedDeviceId?: string;
+    private connectionEpoch?: string | number;
 
     constructor(private options: GatewayChannelOptions) {
         this.identity = options.identity || new GatewayDeviceIdentity();
     }
 
     async start(): Promise<void> {
+        this.authenticatedDeviceId = undefined;
+        this.connectionEpoch = undefined;
         const record = await this.identity.loadOrCreate();
         const headers = !record.enrolled && this.options.enrollmentToken
             ? { authorization: `Bearer ${this.options.enrollmentToken}` }
@@ -102,6 +106,10 @@ export class GatewayDeviceChannel {
     private async handleMessage(raw: string): Promise<void> {
         const message = JSON.parse(raw);
         if (message?.protocol_version !== PROTOCOL_VERSION) throw new Error('Unsupported gateway protocol version');
+        if (['auth_challenge', 'auth_ok', 'tool_call'].includes(String(message?.type || ''))) {
+            const record = await this.identity.loadOrCreate();
+            if (String(message?.device_id || '') !== record.deviceId) throw new Error('Gateway message device_id mismatch');
+        }
         if (message.type === 'auth_challenge') {
             const nonce = String(message.payload?.nonce || '');
             if (!nonce) throw new Error('Gateway authentication challenge is missing a nonce');
@@ -116,6 +124,10 @@ export class GatewayDeviceChannel {
             return;
         }
         if (message.type === 'auth_ok') {
+            if (message.connection_epoch === undefined || message.connection_epoch === null || String(message.connection_epoch).trim() === '') throw new Error('Gateway auth_ok is missing connection_epoch');
+            const record = await this.identity.loadOrCreate();
+            this.authenticatedDeviceId = record.deviceId;
+            this.connectionEpoch = message.connection_epoch;
             await this.identity.markEnrolled();
             this.startHeartbeat();
             this.reconnectAttempt = 0;
@@ -125,10 +137,13 @@ export class GatewayDeviceChannel {
             return;
         }
         if (message.type !== 'tool_call') return;
+        if (this.connectionEpoch === undefined || this.authenticatedDeviceId === undefined) throw new Error('Gateway tool_call arrived before authentication');
+        if (String(message.connection_epoch) !== String(this.connectionEpoch)) throw new Error('Gateway tool_call connection_epoch mismatch');
         await this.handleToolCall(message);
     }
 
     private async handleToolCall(message: any): Promise<void> {
+        if (this.connectionEpoch === undefined || !this.authenticatedDeviceId) throw new Error('Gateway tool_call arrived before authentication');
         const requestId = String(message.request_id || '');
         const tool = String(message.payload?.tool || '');
         try {
@@ -137,8 +152,8 @@ export class GatewayDeviceChannel {
                 protocol_version: PROTOCOL_VERSION,
                 type: 'tool_result',
                 request_id: requestId,
-                device_id: message.device_id,
-                connection_epoch: message.connection_epoch,
+                device_id: this.authenticatedDeviceId,
+                connection_epoch: this.connectionEpoch,
                 timestamp: Date.now(),
                 payload: result
             });
@@ -147,8 +162,8 @@ export class GatewayDeviceChannel {
                 protocol_version: PROTOCOL_VERSION,
                 type: 'tool_error',
                 request_id: requestId,
-                device_id: message.device_id,
-                connection_epoch: message.connection_epoch,
+                device_id: this.authenticatedDeviceId,
+                connection_epoch: this.connectionEpoch,
                 timestamp: Date.now(),
                 payload: {
                     message: String(error?.message || error),
@@ -203,6 +218,13 @@ export class GatewayDeviceChannel {
         const reject = this.readyReject;
         this.readyResolve = undefined;
         this.readyReject = undefined;
-        reject?.(error);
+        if (reject) {
+            reject(error);
+            return;
+        }
+        const socket = this.socket;
+        if (socket && socket.readyState !== WebSocket.CLOSED) {
+            try { socket.terminate(); } catch {}
+        }
     }
 }

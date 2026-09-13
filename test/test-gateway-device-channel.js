@@ -204,6 +204,65 @@ async function testChannelEnrollmentToolAndReconnect() {
 }
 
 
+async function testRejectsMismatchedAuthDevice() {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-gateway-auth-device-'));
+  const identity = new GatewayDeviceIdentity(path.join(root, 'identity.json'));
+  const wss = new WebSocketServer({ port: 0 });
+  await new Promise(resolve => wss.once('listening', resolve));
+  const address = wss.address();
+  const port = typeof address === 'object' && address ? address.port : 0;
+  wss.on('connection', ws => ws.on('message', raw => {
+    const message = JSON.parse(raw.toString());
+    if (message.type === 'enroll_hello') {
+      ws.send(JSON.stringify({ protocol_version: 1, type: 'auth_challenge', device_id: 'wrong-device', payload: { nonce: 'mismatch' } }));
+    }
+  }));
+  const channel = new GatewayDeviceChannel({ gatewayUrl: `ws://127.0.0.1:${port}/device`, enrollmentToken: 'enroll-once', identity, adapter: { async call() { return {}; } }, agentVersion: 'test' });
+  await assert.rejects(Promise.race([channel.start(), new Promise((_, reject) => setTimeout(() => reject(new Error('auth mismatch was not rejected')), 1000))]), /device_id/i);
+  assert.equal((await identity.loadOrCreate()).enrolled, false);
+  await channel.stop();
+  await new Promise(resolve => wss.close(resolve));
+  await fs.rm(root, { recursive: true, force: true });
+}
+
+async function testRejectsStaleToolEpochAndReconnects() {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-gateway-stale-epoch-'));
+  const identity = new GatewayDeviceIdentity(path.join(root, 'identity.json'));
+  const desktop = new FakeDesktop();
+  const adapter = new GatewayToolAdapter(desktop, { allowedRoots: ['/work'], pathValidator: async value => value });
+  const wss = new WebSocketServer({ port: 0 });
+  await new Promise(resolve => wss.once('listening', resolve));
+  const address = wss.address();
+  const port = typeof address === 'object' && address ? address.port : 0;
+  let connections = 0;
+  let reconnectSeen = false;
+  wss.on('connection', ws => {
+    connections += 1;
+    const current = connections;
+    ws.on('message', raw => {
+      const message = JSON.parse(raw.toString());
+      if (message.type === 'enroll_hello' || message.type === 'auth_hello') {
+        ws.send(JSON.stringify({ protocol_version: 1, type: 'auth_challenge', device_id: message.device_id, payload: { nonce: `epoch-${current}` } }));
+      } else if (message.type === 'auth_response') {
+        ws.send(JSON.stringify({ protocol_version: 1, type: 'auth_ok', device_id: message.device_id, connection_epoch: current, payload: { accepted: true } }));
+        if (current === 1) {
+          setTimeout(() => ws.send(JSON.stringify({ protocol_version: 1, type: 'tool_call', request_id: 'stale-1', device_id: message.device_id, connection_epoch: 0, payload: { tool: 'read_text_file', arguments: { path: '/work/remote.txt' } } })), 20);
+        } else {
+          reconnectSeen = true;
+        }
+      }
+    });
+  });
+  const channel = new GatewayDeviceChannel({ gatewayUrl: `ws://127.0.0.1:${port}/device`, enrollmentToken: 'enroll-once', identity, adapter, agentVersion: 'test' });
+  await channel.start();
+  await waitFor(() => reconnectSeen && connections >= 2, 5000);
+  assert.equal(desktop.calls.length, 0);
+  await channel.stop();
+  await new Promise(resolve => wss.close(resolve));
+  await fs.rm(root, { recursive: true, force: true });
+}
+
+
 async function testOversizedToolResultReturnsBoundedError() {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-gateway-oversize-'));
   const identity = new GatewayDeviceIdentity(path.join(root, 'identity.json'));
@@ -237,5 +296,7 @@ await testAdapterRequiresExplicitLocalRoots();
 await testAdapter();
 await testOperatorPreEnrolledIdentityUsesAuthHello();
 await testChannelEnrollmentToolAndReconnect();
+await testRejectsMismatchedAuthDevice();
+await testRejectsStaleToolEpochAndReconnects();
 await testOversizedToolResultReturnsBoundedError();
 console.log('âœ… Gateway identity, adapter, enrollment, tool routing, and reconnect tests passed');
