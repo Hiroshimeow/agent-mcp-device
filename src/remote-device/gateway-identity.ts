@@ -11,8 +11,19 @@ export interface GatewayIdentityRecord {
 }
 
 function defaultIdentityPath(): string {
-    return process.env.MCP_GATEWAY_DEVICE_IDENTITY_PATH
-        || path.join(os.homedir(), '.desktop-commander-device', 'gateway-identity.json');
+    const home = path.resolve(os.homedir());
+    const secureRoot = path.join(home, '.desktop-commander-device');
+    const fallback = path.join(secureRoot, 'gateway-identity.json');
+    const configured = String(process.env.MCP_GATEWAY_DEVICE_IDENTITY_PATH || '').trim();
+    if (!configured) return fallback;
+    const resolved = path.resolve(configured);
+    if (process.platform === 'win32') {
+        const relative = path.relative(secureRoot, resolved);
+        if (relative.startsWith('..') || path.isAbsolute(relative)) {
+            throw new Error('MCP_GATEWAY_DEVICE_IDENTITY_PATH must stay inside ~/.desktop-commander-device on Windows');
+        }
+    }
+    return resolved;
 }
 
 function newDeviceId(): string {

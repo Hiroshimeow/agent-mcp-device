@@ -1,4 +1,5 @@
 import assert from 'assert';
+import { execFileSync } from 'child_process';
 import { createPublicKey, verify } from 'crypto';
 import fs from 'fs/promises';
 import os from 'os';
@@ -50,6 +51,28 @@ async function testIdentity() {
   const signature = Buffer.from(await identity.signChallenge(nonce), 'base64');
   assert(verify(null, Buffer.from(`mcp-device-auth-v1\n${first.deviceId}\n${nonce}`), createPublicKey(first.publicKeyPem), signature));
   await fs.rm(root, { recursive: true, force: true });
+}
+
+async function testDefaultWindowsIdentityPathIsProfileBound() {
+  if (process.platform !== 'win32') return;
+  const previous = process.env.MCP_GATEWAY_DEVICE_IDENTITY_PATH;
+  const outside = path.join(path.parse(os.homedir()).root, `dc-unsafe-identity-${process.pid}.json`);
+  process.env.MCP_GATEWAY_DEVICE_IDENTITY_PATH = outside;
+  assert.throws(() => new GatewayDeviceIdentity(), /desktop-commander-device/);
+
+  const root = await fs.mkdtemp(path.join(os.homedir(), '.desktop-commander-device', `.test-${process.pid}-`));
+  const inside = path.join(root, 'identity.json');
+  process.env.MCP_GATEWAY_DEVICE_IDENTITY_PATH = inside;
+  try {
+    await new GatewayDeviceIdentity().loadOrCreate();
+    const acl = execFileSync('icacls.exe', [inside], { encoding: 'utf8', windowsHide: true });
+    assert.equal((acl.match(/\(F\)/g) || []).length, 3, `identity ACL must have three full-control principals: ${acl}`);
+    assert(!/\((?:M|RX|R|W)\)/.test(acl), `identity ACL must not grant broad read/write/modify access: ${acl}`);
+  } finally {
+    if (previous === undefined) delete process.env.MCP_GATEWAY_DEVICE_IDENTITY_PATH;
+    else process.env.MCP_GATEWAY_DEVICE_IDENTITY_PATH = previous;
+    await fs.rm(root, { recursive: true, force: true });
+  }
 }
 
 async function testAdapterRequiresExplicitLocalRoots() {
@@ -209,6 +232,7 @@ async function testOversizedToolResultReturnsBoundedError() {
 
 testPm2EntrypointDetection();
 await testIdentity();
+await testDefaultWindowsIdentityPathIsProfileBound();
 await testAdapterRequiresExplicitLocalRoots();
 await testAdapter();
 await testOperatorPreEnrolledIdentityUsesAuthHello();
