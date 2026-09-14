@@ -48,6 +48,13 @@ async function serviceStatus(status: GatewayDeviceStatus) {
     return await new WindowsDeviceService().status(status.deviceId);
 }
 
+export async function applyServiceCommandStatus(
+    store: GatewayDeviceStatusStore,
+    command: 'install' | 'start' | 'stop' | 'uninstall'
+): Promise<void> {
+    if (command === 'stop' || command === 'uninstall') await store.markOffline();
+}
+
 async function showStatus(json: boolean): Promise<void> {
     const store = new GatewayDeviceStatusStore();
     const status = await store.load();
@@ -134,10 +141,12 @@ async function serviceCommand(command: 'install' | 'start' | 'stop' | 'uninstall
     }
     if (command === 'stop') {
         await service.stop(status.deviceId);
+        await applyServiceCommandStatus(store, command);
         console.log(`Background device stop requested: ${status.deviceId}`);
         return;
     }
     await service.uninstall(status.deviceId);
+    await applyServiceCommandStatus(store, command);
     console.log(`Background device uninstalled: ${status.deviceId}`);
 }
 
