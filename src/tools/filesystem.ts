@@ -288,8 +288,13 @@ export async function validatePath(requestedPath: string): Promise<string> {
 
         const pathForNextCheck = resolvedRealPath ?? absoluteOriginal;
 
-        // Check if path is allowed
-        if (!(await isPathAllowed(pathForNextCheck))) {
+        // Direct Gateway device workers are already authenticated and policy-gated by
+        // the central gateway. In that dedicated remote context, do not inherit a
+        // workstation's historical Desktop Commander directory allowlist. An optional
+        // MCP_GATEWAY_ALLOWED_ROOTS restriction is enforced by GatewayToolAdapter before
+        // calls reach this filesystem layer.
+        const remoteGatewayContext = process.env.DC_REMOTE_DEVICE === 'true';
+        if (!remoteGatewayContext && !(await isPathAllowed(pathForNextCheck))) {
             capture('server_path_validation_error', {
                 error: 'Path not allowed',
                 allowedDirsCount: (await getAllowedDirs()).length

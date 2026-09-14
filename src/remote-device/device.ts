@@ -108,6 +108,7 @@ export class MCPDevice {
             const storedGatewayStatus = await gatewayStatus.load();
             const gatewayUrl = String(process.env.MCP_GATEWAY_URL || storedGatewayStatus.gatewayUrl || '').trim();
             if (gatewayUrl) {
+                process.env.DC_REMOTE_DEVICE = 'true';
                 console.log(`⏳ Connecting directly to MCP Gateway ${gatewayUrl}`);
                 const identity = new GatewayDeviceIdentity();
                 const identityRecord = await identity.loadOrCreate();
