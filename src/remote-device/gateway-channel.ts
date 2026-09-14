@@ -19,9 +19,11 @@ function gatewaySocketUrl(raw: string): string {
 export interface GatewayChannelOptions {
     gatewayUrl: string;
     enrollmentToken?: string;
+    pairingGrant?: string;
     identity?: GatewayDeviceIdentity;
     adapter: GatewayToolAdapter;
     agentVersion?: string;
+    onStatus?: (payload: any) => void | Promise<void>;
 }
 
 export class GatewayDeviceChannel {
@@ -35,6 +37,8 @@ export class GatewayDeviceChannel {
     private reconnectAttempt = 0;
     private authenticatedDeviceId?: string;
     private connectionEpoch?: string | number;
+    private accountLogoutResolve?: (payload: any) => void;
+    private accountLogoutReject?: (error: Error) => void;
 
     constructor(private options: GatewayChannelOptions) {
         this.identity = options.identity || new GatewayDeviceIdentity();
@@ -44,9 +48,8 @@ export class GatewayDeviceChannel {
         this.authenticatedDeviceId = undefined;
         this.connectionEpoch = undefined;
         const record = await this.identity.loadOrCreate();
-        const headers = !record.enrolled && this.options.enrollmentToken
-            ? { authorization: `Bearer ${this.options.enrollmentToken}` }
-            : undefined;
+        const credential = this.options.pairingGrant || (!record.enrolled ? this.options.enrollmentToken : undefined);
+        const headers = credential ? { authorization: `Bearer ${credential}` } : undefined;
         const socket = new WebSocket(gatewaySocketUrl(this.options.gatewayUrl), { headers });
         this.socket = socket;
         const ready = new Promise<void>((resolve, reject) => {
@@ -89,10 +92,11 @@ export class GatewayDeviceChannel {
 
     private async sendHello(): Promise<void> {
         const record = await this.identity.loadOrCreate();
-        const enrolling = !record.enrolled && Boolean(this.options.enrollmentToken);
+        const pairing = record.enrolled && Boolean(this.options.pairingGrant);
+        const enrolling = !record.enrolled && Boolean(this.options.pairingGrant || this.options.enrollmentToken);
         this.send({
             protocol_version: PROTOCOL_VERSION,
-            type: enrolling ? 'enroll_hello' : 'auth_hello',
+            type: pairing ? 'pair_hello' : enrolling ? 'enroll_hello' : 'auth_hello',
             device_id: record.deviceId,
             timestamp: Date.now(),
             payload: {
@@ -129,6 +133,8 @@ export class GatewayDeviceChannel {
             this.authenticatedDeviceId = record.deviceId;
             this.connectionEpoch = message.connection_epoch;
             await this.identity.markEnrolled();
+            this.options.pairingGrant = undefined;
+            if (this.options.onStatus && message.payload) await this.options.onStatus(message.payload);
             this.startHeartbeat();
             this.reconnectAttempt = 0;
             this.readyResolve?.();
@@ -136,10 +142,49 @@ export class GatewayDeviceChannel {
             this.readyReject = undefined;
             return;
         }
+        if (message.type === 'status_snapshot') {
+            if (this.connectionEpoch === undefined || this.authenticatedDeviceId === undefined) return;
+            if (String(message.connection_epoch) !== String(this.connectionEpoch)) return;
+            if (this.options.onStatus && message.payload) await this.options.onStatus(message.payload);
+            if (message.payload?.account?.connected === false && this.accountLogoutResolve) {
+                this.accountLogoutResolve(message.payload);
+                this.accountLogoutResolve = undefined;
+                this.accountLogoutReject = undefined;
+            }
+            return;
+        }
         if (message.type !== 'tool_call') return;
         if (this.connectionEpoch === undefined || this.authenticatedDeviceId === undefined) throw new Error('Gateway tool_call arrived before authentication');
         if (String(message.connection_epoch) !== String(this.connectionEpoch)) throw new Error('Gateway tool_call connection_epoch mismatch');
         await this.handleToolCall(message);
+    }
+
+    async logoutAccount(timeoutMs = 5000): Promise<any> {
+        if (!this.socket || this.socket.readyState !== WebSocket.OPEN || this.connectionEpoch === undefined || !this.authenticatedDeviceId) {
+            throw new Error('Gateway device is not authenticated.');
+        }
+        if (this.accountLogoutResolve) throw new Error('Account logout is already pending.');
+        const result = new Promise<any>((resolve, reject) => {
+            this.accountLogoutResolve = resolve;
+            this.accountLogoutReject = reject;
+        });
+        this.send({
+            protocol_version: PROTOCOL_VERSION,
+            type: 'account_logout',
+            device_id: this.authenticatedDeviceId,
+            connection_epoch: this.connectionEpoch,
+            timestamp: Date.now(),
+            payload: {}
+        });
+        const timer = setTimeout(() => {
+            if (!this.accountLogoutReject) return;
+            const reject = this.accountLogoutReject;
+            this.accountLogoutResolve = undefined;
+            this.accountLogoutReject = undefined;
+            reject(new Error('Timed out waiting for account logout status.'));
+        }, timeoutMs);
+        try { return await result; }
+        finally { clearTimeout(timer); }
     }
 
     private async handleToolCall(message: any): Promise<void> {

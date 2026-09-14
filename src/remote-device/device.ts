@@ -4,6 +4,9 @@ import { RemoteChannel } from './remote-channel.js';
 import { DeviceAuthenticator } from './device-authenticator.js';
 import { DesktopCommanderIntegration } from './desktop-commander-integration.js';
 import { GatewayDeviceChannel } from './gateway-channel.js';
+import { GatewayDeviceIdentity } from './gateway-identity.js';
+import { pairGatewayDevice } from './gateway-pairing.js';
+import { GatewayDeviceStatusStore } from './device-status.js';
 import { GatewayToolAdapter } from './gateway-tool-adapter.js';
 import { fileURLToPath } from 'url';
 import os from 'os';
@@ -101,12 +104,56 @@ export class MCPDevice {
             // Initialize desktop integration
             await this.desktop.initialize();
 
-            const gatewayUrl = String(process.env.MCP_GATEWAY_URL || '').trim();
+            const gatewayStatus = new GatewayDeviceStatusStore();
+            const storedGatewayStatus = await gatewayStatus.load();
+            const gatewayUrl = String(process.env.MCP_GATEWAY_URL || storedGatewayStatus.gatewayUrl || '').trim();
             if (gatewayUrl) {
                 console.log(`⏳ Connecting directly to MCP Gateway ${gatewayUrl}`);
-                this.gatewayChannel = new GatewayDeviceChannel({ gatewayUrl, enrollmentToken: String(process.env.MCP_GATEWAY_ENROLLMENT_TOKEN || process.env.MCP_DEVICE_ENROLLMENT_TOKEN || '').trim() || undefined, adapter: new GatewayToolAdapter(this.desktop), agentVersion: process.env.npm_package_version });
+                const identity = new GatewayDeviceIdentity();
+                const identityRecord = await identity.loadOrCreate();
+                const enrollmentCredential = String(process.env.MCP_GATEWAY_ENROLLMENT_TOKEN || process.env.MCP_DEVICE_ENROLLMENT_TOKEN || '').trim() || undefined;
+                let pairingGrant: string | undefined;
+                if (!identityRecord.enrolled && !enrollmentCredential) {
+                    const pairing = await pairGatewayDevice({ gatewayUrl, identity, deviceName: os.hostname() });
+                    pairingGrant = pairing.enrollmentGrant;
+                    await gatewayStatus.update({
+                        gatewayUrl,
+                        deviceId: identityRecord.deviceId,
+                        deviceName: os.hostname(),
+                        identityPresent: true,
+                        account: { connected: false, label: pairing.account.label },
+                        connection: { ...storedGatewayStatus.connection, online: false }
+                    });
+                    console.log(`✓ Authorized account: ${pairing.account.label || 'connected'}`);
+                }
+                this.gatewayChannel = new GatewayDeviceChannel({
+                    gatewayUrl,
+                    enrollmentToken: enrollmentCredential,
+                    pairingGrant,
+                    identity,
+                    adapter: new GatewayToolAdapter(this.desktop),
+                    agentVersion: process.env.npm_package_version,
+                    onStatus: async payload => {
+                        const record = await identity.loadOrCreate();
+                        await gatewayStatus.update({
+                            gatewayUrl,
+                            deviceId: record.deviceId,
+                            deviceName: payload?.device?.name || os.hostname(),
+                            identityPresent: true,
+                            account: payload?.account || storedGatewayStatus.account,
+                            connection: {
+                                online: payload?.device?.online !== false,
+                                connectionEpoch: payload?.device?.connectionEpoch ?? null,
+                                lastConnectedAt: payload?.device?.connectedAt || Date.now()
+                            },
+                            usage: payload?.usage || null,
+                            schema: payload?.schema || null,
+                            usageFreshAt: Date.now()
+                        });
+                    }
+                });
                 await this.gatewayChannel.start();
-                console.log('✅ Device ready through direct Gateway channel');
+                console.log('✓ Device ready through direct Gateway channel');
                 return;
             }
 
@@ -346,6 +393,7 @@ export class MCPDevice {
                 console.log('  → Closing direct Gateway channel...');
                 await this.gatewayChannel.stop();
                 this.gatewayChannel = undefined;
+                await new GatewayDeviceStatusStore().markOffline().catch(() => {});
                 await this.desktop.shutdown();
                 console.log('✓ Device shutdown complete');
                 return;
