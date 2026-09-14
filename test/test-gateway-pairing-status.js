@@ -53,7 +53,7 @@ async function testPairingUsesPkceQrBrowserAndReturnsOnlyEnrollmentGrant() {
         res.end(JSON.stringify({
           enrollment_grant: 'pairing-grant-only',
           device_id: startPayload.device_id,
-          account: { connected: true, label: 'HCU Gateway' }
+          account: { connected: true, label: 'Example Gateway' }
         }));
       }
       return;
@@ -83,7 +83,7 @@ async function testPairingUsesPkceQrBrowserAndReturnsOnlyEnrollmentGrant() {
     assert.equal(opened[0], 'https://gateway.test/device/verify?user_code=ABCD-2345');
     assert.equal(qrs[0], opened[0]);
     assert(logs.some(line => line.includes('ABCD-2345')));
-    assert.deepEqual(result.account, { connected: true, label: 'HCU Gateway' });
+    assert.deepEqual(result.account, { connected: true, label: 'Example Gateway' });
     assert.equal(result.enrollmentGrant, 'pairing-grant-only');
     assert.equal('accessToken' in result, false);
     assert.equal('refreshToken' in result, false);
@@ -99,10 +99,10 @@ async function testStatusStorePersistsOnlyNonSecretAccountUsageAndSchemaMetadata
   const store = new GatewayDeviceStatusStore(statusPath);
   await store.update({
     gatewayUrl: 'https://mcp-v2.example.test',
-    deviceId: 'dc-thinkbook-1',
+    deviceId: 'dc-device-1',
     deviceName: 'ThinkBook',
     identityPresent: true,
-    account: { connected: true, label: 'HCU Gateway' },
+    account: { connected: true, label: 'Example Gateway' },
     connection: { online: true, connectionEpoch: 2, lastConnectedAt: 123456 },
     usage: {
       connections: 2,
@@ -131,7 +131,7 @@ async function testStatusStorePersistsOnlyNonSecretAccountUsageAndSchemaMetadata
   assert(!/privateKey|enrollmentGrant|accessToken|refreshToken/.test(raw));
 
   const text = formatGatewayStatus(restored, { json: false, service: { installed: false, running: false } });
-  assert(text.includes('Account: connected (HCU Gateway)'));
+  assert(text.includes('Account: connected (Example Gateway)'));
   assert(text.includes('Schema token estimate: 4057'));
   assert(/not ChatGPT billing/i.test(text));
   const json = JSON.parse(formatGatewayStatus(restored, { json: true, service: { installed: false, running: false } }));

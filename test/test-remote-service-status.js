@@ -11,10 +11,10 @@ try {
   const store = new GatewayDeviceStatusStore(path.join(root, 'gateway-status.json'));
   await store.update({
     gatewayUrl: 'https://gateway.test',
-    deviceId: 'thinkbook',
+    deviceId: 'device',
     deviceName: 'ThinkBook',
     identityPresent: true,
-    account: { connected: true, label: 'HCU Gateway' },
+    account: { connected: true, label: 'Example Gateway' },
     connection: { online: true, connectionEpoch: 7, lastConnectedAt: Date.now() }
   });
 

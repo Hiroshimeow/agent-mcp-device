@@ -10,15 +10,14 @@ import {
 } from '../dist/remote-device/windows-service.js';
 
 function testDeterministicTaskNameAndRunnerAreSecretFree() {
-  assert.equal(buildWindowsTaskName('dc-thinkbook_1'), 'DesktopCommander-MCP-Device-dc-thinkbook_1');
+  assert.equal(buildWindowsTaskName('device_1'), 'DesktopCommander-MCP-Device-device_1');
   const script = buildWindowsRunnerScript({
-    gatewayUrl: 'https://mcp-v2.example.test',
-    allowedRoots: '["E:\\\\git-project"]',
+    gatewayUrl: 'https://mcp.example.test',
     nodePath: 'C:\\Program Files\\nodejs\\node.exe',
     entrypoint: 'C:\\Program Files\\desktop-commander\\dist\\index.js'
   });
-  assert(script.includes("$env:MCP_GATEWAY_URL = 'https://mcp-v2.example.test'"));
-  assert(script.includes('MCP_GATEWAY_ALLOWED_ROOTS'));
+  assert(script.includes("$env:MCP_GATEWAY_URL = 'https://mcp.example.test'"));
+  assert(!script.includes('MCP_GATEWAY_ALLOWED_ROOTS'));
   assert(script.includes(' remote'));
   assert(!/enrollment|pairing_grant|private_key|bearer/i.test(script));
 }
@@ -40,16 +39,16 @@ async function testLifecycleUsesOneTaskAndRemovesRunner() {
     nodePath: 'C:\\node.exe',
     entrypoint: 'C:\\dc\\dist\\index.js'
   });
-  await service.install({ deviceId: 'dc-test', gatewayUrl: 'https://gateway.test', allowedRoots: '["E:\\\\git-project"]' });
+  await service.install({ deviceId: 'device-test', gatewayUrl: 'https://gateway.example.test' });
   const runner = await fs.readFile(path.join(root, 'run-device.ps1'), 'utf8');
-  assert(runner.includes('https://gateway.test'));
+  assert(runner.includes('https://gateway.example.test'));
   assert(calls.some(call => call.file.toLowerCase().includes('schtasks') && call.args.includes('/Create')));
-  assert(calls.some(call => call.args.includes('DesktopCommander-MCP-Device-dc-test')));
-  await service.start('dc-test');
-  await service.stop('dc-test');
-  const status = await service.status('dc-test');
-  assert.deepEqual(status, { installed: true, running: false, taskName: 'DesktopCommander-MCP-Device-dc-test' });
-  await service.uninstall('dc-test');
+  assert(calls.some(call => call.args.includes('DesktopCommander-MCP-Device-device-test')));
+  await service.start('device-test');
+  await service.stop('device-test');
+  const status = await service.status('device-test');
+  assert.deepEqual(status, { installed: true, running: false, taskName: 'DesktopCommander-MCP-Device-device-test' });
+  await service.uninstall('device-test');
   await assert.rejects(fs.readFile(path.join(root, 'run-device.ps1'), 'utf8'), /ENOENT/);
   assert(calls.some(call => call.file.toLowerCase().includes('schtasks') && call.args.includes('/Delete')));
   await fs.rm(root, { recursive: true, force: true });
@@ -92,22 +91,22 @@ async function testSchTasksAccessDeniedFallsBackToUserRunKey() {
     entrypoint: 'C:\\dc\\dist\\index.js'
   });
 
-  await service.install({ deviceId: 'dc-fallback', gatewayUrl: 'https://gateway.test', allowedRoots: '["E:/git-project"]' });
+  await service.install({ deviceId: 'device-fallback', gatewayUrl: 'https://gateway.example.test' });
   assert(calls.some(call => call.file.toLowerCase().includes('reg.exe') && call.args[0] === 'add'));
-  await service.start('dc-fallback');
+  await service.start('device-fallback');
   assert(calls.some(call => call.file.toLowerCase().includes('powershell') && call.args.join(' ').includes('Start-Process')));
-  const status = await service.status('dc-fallback');
-  assert.deepEqual(status, { installed: true, running: true, taskName: 'DesktopCommander-MCP-Device-dc-fallback' });
-  await service.stop('dc-fallback');
+  const status = await service.status('device-fallback');
+  assert.deepEqual(status, { installed: true, running: true, taskName: 'DesktopCommander-MCP-Device-device-fallback' });
+  await service.stop('device-fallback');
   assert(calls.some(call => call.file.toLowerCase().includes('powershell') && call.args.join(' ').includes('taskkill.exe')));
-  await service.uninstall('dc-fallback');
+  await service.uninstall('device-fallback');
   assert(calls.some(call => call.file.toLowerCase().includes('reg.exe') && call.args[0] === 'delete'));
   await fs.rm(root, { recursive: true, force: true });
 }
 
 async function testNonWindowsRefusesLifecycle() {
   const service = new WindowsDeviceService({ platform: 'linux', execFile: async () => ({ stdout: '', stderr: '' }) });
-  await assert.rejects(service.install({ deviceId: 'dc-test', gatewayUrl: 'https://gateway.test', allowedRoots: '[]' }), /Windows/i);
+  await assert.rejects(service.install({ deviceId: 'device-test', gatewayUrl: 'https://gateway.example.test' }), /Windows/i);
 }
 
 testDeterministicTaskNameAndRunnerAreSecretFree();

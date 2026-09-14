@@ -128,8 +128,7 @@ async function serviceCommand(command: 'install' | 'start' | 'stop' | 'uninstall
         const gatewayUrl = String(process.env.MCP_GATEWAY_URL || status.gatewayUrl || '').trim();
         const allowedRoots = String(process.env.MCP_GATEWAY_ALLOWED_ROOTS || '').trim();
         if (!gatewayUrl) throw new Error('Gateway URL is missing from status and MCP_GATEWAY_URL.');
-        if (!allowedRoots) throw new Error('MCP_GATEWAY_ALLOWED_ROOTS is required before installing the background agent.');
-        await service.install({ deviceId: status.deviceId, gatewayUrl, allowedRoots });
+        await service.install({ deviceId: status.deviceId, gatewayUrl, ...(allowedRoots ? { allowedRoots } : {}) });
         await service.start(status.deviceId);
         console.log(`Background device installed and started: ${status.deviceId}`);
         return;

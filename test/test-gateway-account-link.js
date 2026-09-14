@@ -31,7 +31,7 @@ async function testPairHelloAndLogout() {
       } else if (message.type === 'auth_response') {
         ws.send(JSON.stringify({ protocol_version: 1, type: 'auth_ok', device_id: record.deviceId, connection_epoch: 3, payload: {
           accepted: true,
-          account: { connected: true, label: 'HCU Gateway' },
+          account: { connected: true, label: 'Example Gateway' },
           device: { id: record.deviceId, name: 'ThinkBook', online: true, connectionEpoch: 3, connectedAt: 10, lastSeenAt: 10 },
           usage: null,
           schema: null

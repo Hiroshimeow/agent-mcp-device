@@ -26,18 +26,17 @@ export function buildWindowsTaskName(deviceId: string): string {
 
 export function buildWindowsRunnerScript(options: {
     gatewayUrl: string;
-    allowedRoots: string;
+    allowedRoots?: string;
     nodePath: string;
     entrypoint: string;
 }): string {
     const gatewayUrl = String(options.gatewayUrl || '').trim();
     if (!/^https?:\/\//i.test(gatewayUrl) && !/^wss?:\/\//i.test(gatewayUrl)) throw new Error('Gateway URL is required for Windows service.');
     const allowedRoots = String(options.allowedRoots || '').trim();
-    if (!allowedRoots) throw new Error('MCP_GATEWAY_ALLOWED_ROOTS is required for Windows service.');
     return [
         "$ErrorActionPreference = 'Stop'",
         `$env:MCP_GATEWAY_URL = ${psQuote(gatewayUrl)}`,
-        `$env:MCP_GATEWAY_ALLOWED_ROOTS = ${psQuote(allowedRoots)}`,
+        ...(allowedRoots ? [`$env:MCP_GATEWAY_ALLOWED_ROOTS = ${psQuote(allowedRoots)}`] : []),
         `& ${psQuote(options.nodePath)} ${psQuote(options.entrypoint)} remote --service`,
         'exit $LASTEXITCODE',
         ''
@@ -97,7 +96,7 @@ export class WindowsDeviceService {
         await this.execFile('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', command]);
     }
 
-    async install(options: { deviceId: string; gatewayUrl: string; allowedRoots: string }): Promise<void> {
+    async install(options: { deviceId: string; gatewayUrl: string; allowedRoots?: string }): Promise<void> {
         this.assertWindows();
         const taskName = buildWindowsTaskName(options.deviceId);
         const runner = buildWindowsRunnerScript({

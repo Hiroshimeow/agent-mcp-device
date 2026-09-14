@@ -38,9 +38,11 @@ coverage/
 
 server.log
 
-# Local planning/documentation directories
+# Local planning/runtime directories
 plans/
 planning/
+.plan/
+.runtime/
 
 # Test output files
 test/test_output/

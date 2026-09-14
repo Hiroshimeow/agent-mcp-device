@@ -123,15 +123,13 @@ export class GatewayToolAdapter {
     constructor(private desktop: DesktopCommanderIntegration, options: GatewayToolAdapterOptions = {}) {
         this.allowedRoots = options.allowedRoots ?? configuredGatewayRoots();
         this.pathValidator = options.pathValidator ?? validatePath;
-        if (!this.allowedRoots.length) {
-            throw new Error('Direct Gateway mode requires MCP_GATEWAY_ALLOWED_ROOTS with at least one explicit root');
-        }
     }
 
     private async guardPath(requestedPath: unknown): Promise<string> {
         const value = String(requestedPath || '').trim();
         if (!value) throw new Error('Remote device path/working_directory is required');
         const candidate = await this.pathValidator(value);
+        if (!this.allowedRoots.length) return candidate;
         this.canonicalRoots ??= Promise.all(this.allowedRoots.map(root => this.pathValidator(root)));
         const roots = await this.canonicalRoots;
         if (!roots.some(root => isWithinRoot(candidate, root))) {

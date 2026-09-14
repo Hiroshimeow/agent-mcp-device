@@ -75,12 +75,14 @@ async function testDefaultWindowsIdentityPathIsProfileBound() {
   }
 }
 
-async function testAdapterRequiresExplicitLocalRoots() {
+async function testAdapterDefaultsToDesktopCommanderWideAccess() {
   const desktop = new FakeDesktop();
   const previous = process.env.MCP_GATEWAY_ALLOWED_ROOTS;
   delete process.env.MCP_GATEWAY_ALLOWED_ROOTS;
   try {
-    assert.throws(() => new GatewayToolAdapter(desktop), /MCP_GATEWAY_ALLOWED_ROOTS/);
+    const adapter = new GatewayToolAdapter(desktop, { pathValidator: async value => value });
+    await adapter.call('read_text_file', { path: '/shared/anywhere.txt' });
+    assert.deepEqual(desktop.calls.at(-1), { name: 'read_file', args: { path: '/shared/anywhere.txt' } });
   } finally {
     if (previous === undefined) delete process.env.MCP_GATEWAY_ALLOWED_ROOTS;
     else process.env.MCP_GATEWAY_ALLOWED_ROOTS = previous;
@@ -292,7 +294,7 @@ async function testOversizedToolResultReturnsBoundedError() {
 testPm2EntrypointDetection();
 await testIdentity();
 await testDefaultWindowsIdentityPathIsProfileBound();
-await testAdapterRequiresExplicitLocalRoots();
+await testAdapterDefaultsToDesktopCommanderWideAccess();
 await testAdapter();
 await testOperatorPreEnrolledIdentityUsesAuthHello();
 await testChannelEnrollmentToolAndReconnect();

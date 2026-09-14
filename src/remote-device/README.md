@@ -104,7 +104,7 @@ npm run device:start
 Set `MCP_GATEWAY_URL` to the central gateway to use the direct WebSocket/Ed25519 device path instead of the hosted relay. First enrollment also needs `MCP_GATEWAY_ENROLLMENT_TOKEN`; reconnects use the persisted Ed25519 identity at `MCP_GATEWAY_DEVICE_IDENTITY_PATH`.
 On Windows, the identity defaults to `%USERPROFILE%\.desktop-commander-device\gateway-identity.json`; any `MCP_GATEWAY_DEVICE_IDENTITY_PATH` override must remain inside that dedicated directory so the private device key cannot inherit broad workspace ACLs.
 
-Direct Gateway mode is fail-closed locally: `MCP_GATEWAY_ALLOWED_ROOTS` is required and must be a JSON array of explicit absolute roots (for example `["C:\\work\\project"]` on Windows or `["/home/user/project"]` on Linux). File paths and process working directories are canonicalized and must stay inside those roots before the local Desktop Commander engine runs the tool.
+Direct Gateway mode follows Desktop Commander-wide access by default in YOLO usage. `MCP_GATEWAY_ALLOWED_ROOTS` is optional: set it to a JSON array of explicit absolute roots only when you want to narrow a device to selected directories. When configured, file paths and process working directories are canonicalized and must stay inside those roots before the local Desktop Commander engine runs the tool.
 
 ### 2. Authenticate
 
