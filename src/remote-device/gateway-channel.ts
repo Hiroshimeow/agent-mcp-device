@@ -102,7 +102,7 @@ export class GatewayDeviceChannel {
             payload: {
                 agent_version: this.options.agentVersion || 'desktop-commander-gateway-1',
                 capabilities: [...GATEWAY_CAPABILITIES],
-                ...(enrolling ? { public_key_pem: record.publicKeyPem } : {})
+                ...(enrolling || pairing ? { public_key_pem: record.publicKeyPem } : {})
             }
         });
     }

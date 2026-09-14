@@ -26,6 +26,7 @@ async function testPairHelloAndLogout() {
       if (message.type === 'pair_hello') {
         sawPairHello = true;
         assert.equal(message.device_id, record.deviceId);
+        assert.equal(message.payload.public_key_pem, record.publicKeyPem);
         ws.send(JSON.stringify({ protocol_version: 1, type: 'auth_challenge', device_id: record.deviceId, payload: { nonce: 'pair-nonce' } }));
       } else if (message.type === 'auth_response') {
         ws.send(JSON.stringify({ protocol_version: 1, type: 'auth_ok', device_id: record.deviceId, connection_epoch: 3, payload: {
