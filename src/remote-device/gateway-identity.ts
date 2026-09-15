@@ -12,7 +12,7 @@ export interface GatewayIdentityRecord {
 
 function defaultIdentityPath(): string {
     const home = path.resolve(os.homedir());
-    const secureRoot = path.join(home, '.desktop-commander-device');
+    const secureRoot = path.join(home, '.hcu-device');
     const fallback = path.join(secureRoot, 'gateway-identity.json');
     const configured = String(process.env.MCP_GATEWAY_DEVICE_IDENTITY_PATH || '').trim();
     if (!configured) return fallback;
@@ -20,16 +20,15 @@ function defaultIdentityPath(): string {
     if (process.platform === 'win32') {
         const relative = path.relative(secureRoot, resolved);
         if (relative.startsWith('..') || path.isAbsolute(relative)) {
-            throw new Error('MCP_GATEWAY_DEVICE_IDENTITY_PATH must stay inside ~/.desktop-commander-device on Windows');
+            throw new Error('MCP_GATEWAY_DEVICE_IDENTITY_PATH must stay inside ~/.hcu-device on Windows');
         }
     }
     return resolved;
 }
 
 function newDeviceId(): string {
-    const host = os.hostname().toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '');
-    const prefix = host || 'device';
-    return `dc-${prefix.slice(0, 40)}-${randomUUID().slice(0, 8)}`;
+    const host = os.hostname().toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 54) || 'device';
+    return `${host}-${randomUUID().slice(0, 8)}`;
 }
 
 function validateRecord(value: any): GatewayIdentityRecord {

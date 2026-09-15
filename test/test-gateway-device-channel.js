@@ -36,31 +36,41 @@ function testPm2EntrypointDetection() {
   assert.equal(isModuleEntrypoint(moduleUrl, modulePath), true);
   assert.equal(isModuleEntrypoint(moduleUrl, path.resolve('node_modules/pm2/lib/ProcessContainerFork.js'), modulePath), true);
   assert.equal(isModuleEntrypoint(moduleUrl, path.resolve('other.js'), path.resolve('different.js')), false);
+  assert.equal(isModuleEntrypoint(moduleUrl, path.resolve('dist/hcu-device.js')), false);
 }
 
 async function testIdentity() {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-gateway-identity-'));
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'hcu-device-identity-'));
   const identityPath = path.join(root, 'identity.json');
+  const previousDeviceId = process.env.MCP_DEVICE_ID;
+  delete process.env.MCP_DEVICE_ID;
   const identity = new GatewayDeviceIdentity(identityPath);
   const first = await identity.loadOrCreate();
   const second = await new GatewayDeviceIdentity(identityPath).loadOrCreate();
+  const host = os.hostname().toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 54) || 'device';
+  assert.equal(first.deviceId.startsWith(`${host}-`), true);
+  assert.match(first.deviceId.slice(host.length + 1), /^[0-9a-f]{8}$/);
   assert.equal(first.deviceId, second.deviceId);
   assert.equal(first.publicKeyPem, second.publicKeyPem);
   assert.equal(first.privateKeyPem, second.privateKeyPem);
   const nonce = 'test-nonce';
   const signature = Buffer.from(await identity.signChallenge(nonce), 'base64');
   assert(verify(null, Buffer.from(`mcp-device-auth-v1\n${first.deviceId}\n${nonce}`), createPublicKey(first.publicKeyPem), signature));
+  if (previousDeviceId === undefined) delete process.env.MCP_DEVICE_ID;
+  else process.env.MCP_DEVICE_ID = previousDeviceId;
   await fs.rm(root, { recursive: true, force: true });
 }
 
 async function testDefaultWindowsIdentityPathIsProfileBound() {
   if (process.platform !== 'win32') return;
   const previous = process.env.MCP_GATEWAY_DEVICE_IDENTITY_PATH;
-  const outside = path.join(path.parse(os.homedir()).root, `dc-unsafe-identity-${process.pid}.json`);
+  const outside = path.join(path.parse(os.homedir()).root, `hcu-unsafe-identity-${process.pid}.json`);
   process.env.MCP_GATEWAY_DEVICE_IDENTITY_PATH = outside;
-  assert.throws(() => new GatewayDeviceIdentity(), /desktop-commander-device/);
+  assert.throws(() => new GatewayDeviceIdentity(), /\.hcu-device/);
 
-  const root = await fs.mkdtemp(path.join(os.homedir(), '.desktop-commander-device', `.test-${process.pid}-`));
+  const secureRoot = path.join(os.homedir(), '.hcu-device');
+  await fs.mkdir(secureRoot, { recursive: true });
+  const root = await fs.mkdtemp(path.join(secureRoot, `.test-${process.pid}-`));
   const inside = path.join(root, 'identity.json');
   process.env.MCP_GATEWAY_DEVICE_IDENTITY_PATH = inside;
   try {
@@ -167,6 +177,11 @@ async function testChannelEnrollmentToolAndReconnect() {
     ws.on('message', raw => {
       const message = JSON.parse(raw.toString());
       if (message.type === 'enroll_hello' || message.type === 'auth_hello') {
+        assert.equal(message.payload.agent_version, 'hcu-device-1');
+        assert.equal(message.payload.hostname, os.hostname());
+        assert.equal(message.payload.platform, process.platform);
+        assert.equal(message.payload.arch, process.arch);
+        assert.equal(message.payload.path_style, process.platform === 'win32' ? 'windows' : 'posix');
         if (current === 1) {
           assert.equal(message.type, 'enroll_hello');
           publicKeyPem = message.payload.public_key_pem;
@@ -195,7 +210,7 @@ async function testChannelEnrollmentToolAndReconnect() {
     });
   });
 
-  const channel = new GatewayDeviceChannel({ gatewayUrl: `ws://127.0.0.1:${port}/device`, enrollmentToken: 'enroll-once', identity, adapter, agentVersion: 'test' });
+  const channel = new GatewayDeviceChannel({ gatewayUrl: `ws://127.0.0.1:${port}/device`, enrollmentToken: 'enroll-once', identity, adapter });
   await channel.start();
   await waitFor(() => Boolean(firstToolResult));
   assert.equal(firstToolResult.content[0].text, 'read_file:ok');

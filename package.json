@@ -1,24 +1,21 @@
 {
-  "name": "@wonderwhy-er/desktop-commander",
+  "name": "@hcu/device",
   "version": "0.2.46",
-  "description": "MCP server for terminal operations and file editing",
-  "mcpName": "io.github.wonderwhy-er/desktop-commander",
+  "description": "HCU remote device execution agent for authenticated MCP gateways",
   "license": "MIT",
-  "author": "Eduards Ruzga",
-  "homepage": "https://github.com/wonderwhy-er/DesktopCommanderMCP",
+  "author": "HCU",
+  "homepage": "https://github.com/Hiroshimeow/agent-mcp-device",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wonderwhy-er/DesktopCommanderMCP.git"
+    "url": "https://github.com/Hiroshimeow/agent-mcp-device.git"
   },
-  "bugs": "https://github.com/wonderwhy-er/DesktopCommanderMCP/issues",
+  "bugs": "https://github.com/Hiroshimeow/agent-mcp-device/issues",
   "type": "module",
   "engines": {
     "node": ">=18.0.0"
   },
   "bin": {
-    "desktop-commander": "dist/index.js",
-    "setup": "dist/setup-claude-server.js",
-    "remove": "dist/uninstall-claude-server.js"
+    "hcu-device": "dist/hcu-device.js"
   },
   "files": [
     "dist",

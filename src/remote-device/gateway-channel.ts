@@ -1,3 +1,4 @@
+import os from 'os';
 import WebSocket from 'ws';
 
 import { GatewayDeviceIdentity } from './gateway-identity.js';
@@ -100,7 +101,11 @@ export class GatewayDeviceChannel {
             device_id: record.deviceId,
             timestamp: Date.now(),
             payload: {
-                agent_version: this.options.agentVersion || 'desktop-commander-gateway-1',
+                agent_version: this.options.agentVersion || 'hcu-device-1',
+                hostname: os.hostname(),
+                platform: process.platform,
+                arch: process.arch,
+                path_style: process.platform === 'win32' ? 'windows' : 'posix',
                 capabilities: [...GATEWAY_CAPABILITIES],
                 ...(enrolling || pairing ? { public_key_pem: record.publicKeyPem } : {})
             }

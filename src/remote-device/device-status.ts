@@ -51,7 +51,7 @@ export interface GatewayServiceStatus {
 }
 
 function defaultStatusPath(): string {
-    return path.join(path.resolve(os.homedir()), '.desktop-commander-device', 'gateway-status.json');
+    return path.join(path.resolve(os.homedir()), '.hcu-device', 'gateway-status.json');
 }
 
 function emptyStatus(): GatewayDeviceStatus {

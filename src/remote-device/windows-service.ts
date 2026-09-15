@@ -21,7 +21,7 @@ function taskSafeDeviceId(deviceId: string): string {
 }
 
 export function buildWindowsTaskName(deviceId: string): string {
-    return `DesktopCommander-MCP-Device-${taskSafeDeviceId(deviceId)}`;
+    return `HCU-Device-${taskSafeDeviceId(deviceId)}`;
 }
 
 export function buildWindowsRunnerScript(options: {
@@ -62,7 +62,7 @@ export class WindowsDeviceService {
             const result = await execFileAsync(file, args, { windowsHide: true, encoding: 'utf8' });
             return { stdout: String(result.stdout || ''), stderr: String(result.stderr || '') };
         });
-        this.runnerPath = path.resolve(options.runnerPath || path.join(os.homedir(), '.desktop-commander-device', 'run-gateway-device.ps1'));
+        this.runnerPath = path.resolve(options.runnerPath || path.join(os.homedir(), '.hcu-device', 'run-device.ps1'));
         this.nodePath = path.resolve(options.nodePath || process.execPath);
         this.entrypoint = path.resolve(options.entrypoint || process.argv[1]);
     }
