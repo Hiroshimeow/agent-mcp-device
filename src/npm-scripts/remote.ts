@@ -10,8 +10,17 @@ import { WindowsDeviceService } from '../remote-device/windows-service.js';
 
 function commandName(): string {
     const value = String(process.argv[3] || '').trim().toLowerCase();
+    if (['help', '-h', '--help'].includes(value)) return 'help';
     if (!value || value.startsWith('--')) return 'run';
     return value;
+}
+
+function printRemoteUsage(): void {
+    console.log([
+        'Usage: hcu-device [command]',
+        '',
+        'Commands: run, login, logout, status, install, start, stop, uninstall'
+    ].join('\n'));
 }
 
 async function persistGatewayPayload(
@@ -156,6 +165,7 @@ export async function runRemote() {
     else console.debug('[DEBUG] Verbose mode:', verbose);
 
     const command = commandName();
+    if (command === 'help') return printRemoteUsage();
     if (command === 'status') return await showStatus(process.argv.includes('--json'));
     if (command === 'login') return await login();
     if (command === 'logout') return await logout();
