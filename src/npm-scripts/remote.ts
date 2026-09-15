@@ -150,7 +150,6 @@ async function serviceCommand(command: 'install' | 'start' | 'stop' | 'uninstall
 }
 
 export async function runRemote() {
-    const persistSession = process.argv.includes('--persist-session');
     const disableNoSleep = process.argv.includes('--disable-no-sleep');
     const verbose = process.argv.includes('--debug');
     if (!verbose) console.debug = () => { };
@@ -177,6 +176,6 @@ export async function runRemote() {
         }
     }
 
-    const device = new MCPDevice({ persistSession });
+    const device = new MCPDevice();
     await device.start();
 }
