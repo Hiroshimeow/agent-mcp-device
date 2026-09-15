@@ -1,6 +1,8 @@
 import { exec, execFile } from 'child_process';
+import fs from 'fs/promises';
 import { promisify } from 'util';
 import path from 'path';
+import sharp from 'sharp';
 
 import { commandManager } from '../command-manager.js';
 import { configManager } from '../config-manager.js';
@@ -9,6 +11,14 @@ import { DesktopCommanderIntegration } from './desktop-commander-integration.js'
 
 const execAsync = promisify(exec);
 const execFileAsync = promisify(execFile);
+const MAX_REMOTE_IMAGE_SOURCE_BYTES = 32 * 1024 * 1024;
+const MAX_REMOTE_IMAGE_PREVIEW_BYTES = 32 * 1024;
+const IMAGE_PREVIEW_ATTEMPTS = [
+    { size: 512, quality: 65 },
+    { size: 384, quality: 55 },
+    { size: 256, quality: 45 },
+    { size: 160, quality: 35 }
+] as const;
 
 export const GATEWAY_CAPABILITIES = [
     'read_text_file',
@@ -18,7 +28,8 @@ export const GATEWAY_CAPABILITIES = [
     'start_process',
     'read_process_output',
     'interact_with_process',
-    'terminate_process'
+    'terminate_process',
+    'image_preview'
  ] as const;
 
 export interface GatewayToolAdapterOptions {
@@ -138,6 +149,54 @@ export class GatewayToolAdapter {
         return candidate;
     }
 
+    private async imagePreview(args: any): Promise<any> {
+        const requestedPath = args.path || args.file || args.sourcePath;
+        const filePath = await this.guardPath(requestedPath);
+        const stat = await fs.stat(filePath);
+        if (!stat.isFile()) throw new Error('Remote image preview path is not a file');
+        const requestedMaxBytes = Number(args.maxBytes ?? 8 * 1024 * 1024);
+        const maxBytes = Number.isFinite(requestedMaxBytes)
+            ? Math.max(1, Math.min(MAX_REMOTE_IMAGE_SOURCE_BYTES, Math.floor(requestedMaxBytes)))
+            : 8 * 1024 * 1024;
+        if (stat.size > maxBytes) throw new Error(`Remote image source exceeds maxBytes (${stat.size} > ${maxBytes})`);
+
+        const includeImage = Boolean(args.embed ?? args.includeImage ?? args.includeData ?? true);
+        const source = sharp(filePath, { animated: false, limitInputPixels: 64 * 1024 * 1024 });
+        const metadata = await source.metadata();
+        const text = {
+            ok: true,
+            tool: 'image_preview',
+            summary: includeImage ? 'Loaded bounded remote image preview.' : 'Loaded remote image metadata.',
+            data: {
+                path: filePath,
+                bytes: stat.size,
+                width: metadata.width ?? null,
+                height: metadata.height ?? null,
+                sourceFormat: metadata.format ?? null,
+                mimeType: 'image/webp',
+                embedded: includeImage
+            }
+        };
+        if (!includeImage) return { content: [{ type: 'text', text: JSON.stringify(text) }] };
+
+        for (const attempt of IMAGE_PREVIEW_ATTEMPTS) {
+            const preview = await sharp(filePath, { animated: false, limitInputPixels: 64 * 1024 * 1024 })
+                .rotate()
+                .resize({ width: attempt.size, height: attempt.size, fit: 'inside', withoutEnlargement: true })
+                .webp({ quality: attempt.quality })
+                .toBuffer();
+            if (preview.length <= MAX_REMOTE_IMAGE_PREVIEW_BYTES) {
+                return {
+                    content: [
+                        { type: 'text', text: JSON.stringify({ ...text, data: { ...text.data, previewBytes: preview.length } }) },
+                        { type: 'image', data: preview.toString('base64'), mimeType: 'image/webp' }
+                    ]
+                };
+            }
+        }
+        throw new Error(`REMOTE_IMAGE_TOO_LARGE: unable to fit preview within ${MAX_REMOTE_IMAGE_PREVIEW_BYTES} bytes`);
+    }
+
     async call(tool: string, args: any = {}): Promise<any> {
         if (tool === 'read_text_file') {
             if (args.head !== undefined && args.tail !== undefined) throw new Error('Use either head or tail, not both');
@@ -188,6 +247,7 @@ export class GatewayToolAdapter {
                 pid: Number(args.session_id)
             }), 'force_terminate');
         }
+        if (tool === 'image_preview') return await this.imagePreview(args);
         throw new Error(`Unsupported gateway capability: ${tool}`);
     }
 

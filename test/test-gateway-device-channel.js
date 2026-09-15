@@ -5,11 +5,12 @@ import fs from 'fs/promises';
 import os from 'os';
 import path from 'path';
 import { pathToFileURL } from 'url';
+import sharp from 'sharp';
 import { WebSocketServer } from 'ws';
 
 import { GatewayDeviceChannel } from '../dist/remote-device/gateway-channel.js';
 import { GatewayDeviceIdentity } from '../dist/remote-device/gateway-identity.js';
-import { GatewayToolAdapter } from '../dist/remote-device/gateway-tool-adapter.js';
+import { GATEWAY_CAPABILITIES, GatewayToolAdapter } from '../dist/remote-device/gateway-tool-adapter.js';
 import { isModuleEntrypoint } from '../dist/remote-device/device.js';
 
 const waitFor = async (predicate, timeoutMs = 4000) => {
@@ -96,6 +97,28 @@ async function testAdapterDefaultsToDesktopCommanderWideAccess() {
   } finally {
     if (previous === undefined) delete process.env.MCP_GATEWAY_ALLOWED_ROOTS;
     else process.env.MCP_GATEWAY_ALLOWED_ROOTS = previous;
+  }
+}
+
+async function testRemoteImagePreviewIsBounded() {
+  assert.equal(GATEWAY_CAPABILITIES.includes('image_preview'), true);
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'hcu-device-image-'));
+  try {
+    const imagePath = path.join(root, 'pixel.png');
+    await sharp({ create: { width: 16, height: 16, channels: 4, background: { r: 40, g: 80, b: 120, alpha: 1 } } })
+      .png()
+      .toFile(imagePath);
+    const adapter = new GatewayToolAdapter(new FakeDesktop(), {
+      allowedRoots: [root],
+      pathValidator: async value => path.resolve(value)
+    });
+    const result = await adapter.call('image_preview', { path: imagePath, includeImage: true });
+    const image = result.content.find(item => item.type === 'image');
+    assert(image, 'remote image_preview should return MCP image content');
+    assert.equal(image.mimeType, 'image/webp');
+    assert(Buffer.from(image.data, 'base64').length <= 32 * 1024, 'remote preview must stay within the bounded WSS payload budget');
+  } finally {
+    await fs.rm(root, { recursive: true, force: true });
   }
 }
 
@@ -310,6 +333,7 @@ testPm2EntrypointDetection();
 await testIdentity();
 await testDefaultWindowsIdentityPathIsProfileBound();
 await testAdapterDefaultsToDesktopCommanderWideAccess();
+await testRemoteImagePreviewIsBounded();
 await testAdapter();
 await testOperatorPreEnrolledIdentityUsesAuthHello();
 await testChannelEnrollmentToolAndReconnect();
