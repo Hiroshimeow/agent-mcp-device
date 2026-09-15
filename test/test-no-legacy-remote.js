@@ -7,6 +7,7 @@ const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'))
 const deviceSource = fs.readFileSync(path.join(root, 'src', 'remote-device', 'device.ts'), 'utf8');
 
 assert.equal(pkg.dependencies?.['@supabase/supabase-js'], undefined, 'HCU device must not ship the legacy Supabase remote transport');
+assert.equal(pkg.dependencies?.glob, undefined, 'HCU device must not ship the unused direct glob dependency');
 assert.equal(fs.existsSync(path.join(root, 'src', 'remote-device', 'remote-channel.ts')), false, 'legacy RemoteChannel source must be removed');
 assert.equal(fs.existsSync(path.join(root, 'src', 'remote-device', 'device-authenticator.ts')), false, 'legacy Desktop Commander Remote authenticator must be removed');
 assert.equal(fs.existsSync(path.join(root, 'src', 'remote-device', 'scripts', 'blocking-offline-update.js')), false, 'legacy Supabase offline updater must be removed');
