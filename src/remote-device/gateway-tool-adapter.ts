@@ -83,7 +83,6 @@ async function runShell(args: any) {
     if (!Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 28000) {
         throw new Error('Remote shell_execute timeout_ms must be between 1 and 28000');
     }
-    const started = Date.now();
     try {
         const shell = config.defaultShell || undefined;
         const shellName = shell ? path.basename(shell).toLowerCase() : '';
@@ -103,8 +102,6 @@ async function runShell(args: any) {
             exitCode: 0,
             stdout,
             stderr,
-            stderrClassification: stderr ? 'warning' : 'none',
-            durationMs: Date.now() - started,
             timedOut: false,
             stdoutTruncated: false,
             stderrTruncated: false,
@@ -118,8 +115,6 @@ async function runShell(args: any) {
             exitCode: timedOut ? 124 : Number.isInteger(error?.code) ? error.code : 1,
             stdout: String(error?.stdout || ''),
             stderr: String(error?.stderr || error?.message || ''),
-            stderrClassification: 'error',
-            durationMs: Date.now() - started,
             timedOut: Boolean(timedOut),
             stdoutTruncated: false,
             stderrTruncated: false,
@@ -257,17 +252,11 @@ export class GatewayToolAdapter {
     }
 
     private async editFile(args: any): Promise<any> {
-        if (Array.isArray(args.edits)) {
-            let result: any = null;
-            for (const edit of args.edits) {
-                result = assertSuccess(await this.desktop.callClientTool('edit_block', {
-                    file_path: args.path,
-                    old_string: edit.oldText,
-                    new_string: edit.newText,
-                    expected_replacements: edit.expected_replacements || 1
-                }), 'edit_block');
-            }
-            return result;
+        if (typeof args.old_text !== 'string' || args.old_text.length === 0) throw new Error('old_text is required');
+        if (typeof args.new_text !== 'string') throw new Error('new_text is required');
+        const expectedReplacements = Number(args.expected_replacements ?? 1);
+        if (!Number.isInteger(expectedReplacements) || expectedReplacements < 1) {
+            throw new Error('expected_replacements must be a positive integer');
         }
         if (args.dry_run === true) {
             const read = assertSuccess(await this.desktop.callClientTool('read_file', {
@@ -276,14 +265,13 @@ export class GatewayToolAdapter {
                 length: 100000
             }), 'read_file');
             const source = textFromResult(read);
-            const needle = String(args.old_text || '');
-            const count = needle ? source.split(needle).length - 1 : 0;
+            const count = source.split(args.old_text).length - 1;
             return {
                 content: [{ type: 'text', text: JSON.stringify({
-                    ok: count === Number(args.expected_replacements || 1),
-                    dryRun: true,
-                    expectedReplacements: Number(args.expected_replacements || 1),
-                    actualCount: count
+                    ok: count === expectedReplacements,
+                    dry_run: true,
+                    expected_replacements: expectedReplacements,
+                    actual_count: count
                 }) }]
             };
         }
@@ -291,7 +279,7 @@ export class GatewayToolAdapter {
             file_path: args.path,
             old_string: args.old_text,
             new_string: args.new_text,
-            expected_replacements: Number(args.expected_replacements || 1)
+            expected_replacements: expectedReplacements
         }), 'edit_block');
     }
 }

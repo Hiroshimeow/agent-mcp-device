@@ -24,9 +24,11 @@ const waitFor = async (predicate, timeoutMs = 4000) => {
 
 class FakeDesktop {
   calls = [];
+  readFileText = 'read_file:ok';
   async callClientTool(name, args) {
     this.calls.push({ name, args });
     if (name === 'start_process') return { content: [{ type: 'text', text: 'Process started with PID 123' }] };
+    if (name === 'read_file') return { content: [{ type: 'text', text: this.readFileText }] };
     return { content: [{ type: 'text', text: `${name}:ok` }] };
   }
 }
@@ -186,6 +188,18 @@ async function testAdapter() {
   assert.equal(desktop.calls.at(-1).name, 'write_file');
   await adapter.call('edit_file', { path: '/work/x.txt', old_text: 'old', new_text: 'new', expected_replacements: 1 });
   assert.deepEqual(desktop.calls.at(-1), { name: 'edit_block', args: { file_path: '/work/x.txt', old_string: 'old', new_string: 'new', expected_replacements: 1 } });
+  desktop.readFileText = 'old old';
+  const dryRun = await adapter.call('edit_file', {
+    path: '/work/x.txt', old_text: 'old', new_text: 'new', expected_replacements: 2, dry_run: true
+  });
+  desktop.readFileText = 'read_file:ok';
+  assert.deepEqual(JSON.parse(dryRun.content[0].text), {
+    ok: true, dry_run: true, expected_replacements: 2, actual_count: 2
+  });
+  await assert.rejects(
+    adapter.call('edit_file', { path: '/work/x.txt', edits: [{ oldText: 'old', newText: 'legacy' }], dryRun: false }),
+    /old_text is required/
+  );
   const started = await adapter.call('start_process', { command: 'node -v', working_directory: '/work' });
   assert.equal(started.session_id, '123');
   assert.deepEqual(desktop.calls.at(-1), { name: 'start_process', args: { command: 'node -v', timeout_ms: 10000, working_directory: '/work' } });
