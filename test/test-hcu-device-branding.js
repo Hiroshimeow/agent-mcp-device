@@ -11,6 +11,12 @@ assert.equal(pkg.bin?.['hcu-device'], 'dist/hcu-device.js');
 assert.equal(pkg.bin?.['desktop-commander'], undefined);
 assert.equal(pkg.mcpName, undefined);
 assert.equal(pkg.repository?.url, 'https://github.com/Hiroshimeow/agent-mcp-device.git');
+assert.deepEqual(pkg.files, ['dist'], 'published device package must not ship upstream marketing assets');
+
+const readme = fs.readFileSync(new URL('../README.md', import.meta.url), 'utf8');
+assert.match(readme, /^# HCU Device/m);
+assert.match(readme, /Desktop Commander/i, 'HCU README must retain upstream engine attribution');
+assert.doesNotMatch(readme, /npx @wonderwhy-er\/desktop-commander@latest setup/);
 
 const wrapper = fs.readFileSync(new URL('../src/hcu-device.ts', import.meta.url), 'utf8');
 assert.match(wrapper, /splice\(2,\s*0,\s*['\"]remote['\"]\)/);

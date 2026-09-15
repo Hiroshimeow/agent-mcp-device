@@ -18,9 +18,7 @@
     "hcu-device": "dist/hcu-device.js"
   },
   "files": [
-    "dist",
-    "logo.png",
-    "testemonials"
+    "dist"
   ],
   "scripts": {
     "postinstall": "node dist/track-installation.js && node dist/npm-scripts/verify-ripgrep.js || node -e \"process.exit(0)\"",
