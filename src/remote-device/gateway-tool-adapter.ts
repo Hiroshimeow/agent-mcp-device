@@ -8,6 +8,7 @@ import { commandManager } from '../command-manager.js';
 import { configManager } from '../config-manager.js';
 import { validatePath } from '../tools/filesystem.js';
 import { DesktopCommanderIntegration } from './desktop-commander-integration.js';
+import { inspectProjectOnDevice } from './project-inspection.js';
 
 const execAsync = promisify(exec);
 const execFileAsync = promisify(execFile);
@@ -29,7 +30,8 @@ export const GATEWAY_CAPABILITIES = [
     'read_process_output',
     'interact_with_process',
     'terminate_process',
-    'image_preview'
+    'image_preview',
+    'project_inspect'
  ] as const;
 
 export interface GatewayToolAdapterOptions {
@@ -248,6 +250,9 @@ export class GatewayToolAdapter {
             }), 'force_terminate');
         }
         if (tool === 'image_preview') return await this.imagePreview(args);
+        if (tool === 'project_inspect') {
+            return await inspectProjectOnDevice(await this.guardPath(args.path), args);
+        }
         throw new Error(`Unsupported gateway capability: ${tool}`);
     }
 

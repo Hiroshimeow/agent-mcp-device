@@ -122,6 +122,60 @@ async function testRemoteImagePreviewIsBounded() {
   }
 }
 
+async function testRemoteProjectInspectionRunsOnDevice() {
+  assert.equal(GATEWAY_CAPABILITIES.includes('project_inspect'), true);
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'hcu-device-project-'));
+  try {
+    await fs.writeFile(path.join(root, 'README.md'), '# Remote project\n');
+    await fs.writeFile(path.join(root, 'package.json'), JSON.stringify({ name: 'remote-project' }));
+    await fs.mkdir(path.join(root, 'src'), { recursive: true });
+    await fs.writeFile(path.join(root, 'src', 'a.txt'), 'a');
+    execFileSync('git', ['init'], { cwd: root, stdio: 'ignore' });
+    execFileSync('git', ['add', '.'], { cwd: root, stdio: 'ignore' });
+    execFileSync('git', ['-c', 'user.name=Test', '-c', 'user.email=test@example.invalid', 'commit', '-m', 'fixture'], { cwd: root, stdio: 'ignore' });
+    await fs.appendFile(path.join(root, 'README.md'), 'changed\n');
+
+    const adapter = new GatewayToolAdapter(new FakeDesktop(), {
+      allowedRoots: [root],
+      pathValidator: async value => path.resolve(value)
+    });
+    const summary = await adapter.call('project_inspect', { path: root, project_id: 'remote', view: 'summary' });
+    assert.equal(summary.hasReadme, true);
+    assert.equal(summary.hasPackageJson, true);
+    assert.equal(summary.defaultRootName, path.basename(root));
+
+    const tree = await adapter.call('project_inspect', { path: root, project_id: 'remote', view: 'tree', depth: 2, limit: 2 });
+    assert.equal(tree.entries.length, 2);
+    assert.equal(tree.truncated, true);
+    assert.equal(typeof tree.nextCursor, 'string');
+    assert.equal(tree.entries.some(entry => entry.path.includes('.git')), false);
+
+    const status = await adapter.call('project_inspect', { path: root, project_id: 'remote', view: 'git_status' });
+    assert.equal(status.ok, true);
+    assert.match(status.status, /README\.md/);
+
+    const diff = await adapter.call('project_inspect', { path: root, project_id: 'remote', view: 'git_diff' });
+    assert.equal(diff.ok, true);
+    assert.match(diff.text, /changed/);
+
+    const readme = await adapter.call('project_inspect', { path: root, project_id: 'remote', view: 'readme' });
+    assert.equal(readme.fileName, 'README.md');
+    assert.match(readme.text, /Remote project/);
+
+    const pkg = await adapter.call('project_inspect', { path: root, project_id: 'remote', view: 'package' });
+    assert.equal(pkg.data.name, 'remote-project');
+
+    const file = await adapter.call('project_inspect', { path: root, project_id: 'remote', view: 'file', relative_path: 'src/a.txt' });
+    assert.equal(file.text, 'a');
+    await assert.rejects(
+      adapter.call('project_inspect', { path: root, project_id: 'remote', view: 'file', relative_path: '../outside.txt' }),
+      /Invalid project-relative resource path/
+    );
+  } finally {
+    await fs.rm(root, { recursive: true, force: true });
+  }
+}
+
 async function testAdapter() {
   const desktop = new FakeDesktop();
   const adapter = new GatewayToolAdapter(desktop, { allowedRoots: ['/work'], pathValidator: async value => value });
@@ -334,6 +388,7 @@ await testIdentity();
 await testDefaultWindowsIdentityPathIsProfileBound();
 await testAdapterDefaultsToDesktopCommanderWideAccess();
 await testRemoteImagePreviewIsBounded();
+await testRemoteProjectInspectionRunsOnDevice();
 await testAdapter();
 await testOperatorPreEnrolledIdentityUsesAuthHello();
 await testChannelEnrollmentToolAndReconnect();
