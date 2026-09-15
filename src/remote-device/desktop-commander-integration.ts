@@ -40,7 +40,12 @@ export class DesktopCommanderIntegration {
             // welcome page in a browser the remote user would never see.
             this.mcpTransport = new StdioClientTransport({
                 ...config,
-                env: { ...getDefaultEnvironment(), ...config.env, DC_REMOTE_DEVICE: 'true' }
+                env: {
+                    ...getDefaultEnvironment(),
+                    ...config.env,
+                    DC_REMOTE_DEVICE: 'true',
+                    DESKTOP_COMMANDER_DISABLE_TELEMETRY: 'true'
+                }
             });
 
             // Create MCP client

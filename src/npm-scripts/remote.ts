@@ -159,6 +159,10 @@ async function serviceCommand(command: 'install' | 'start' | 'stop' | 'uninstall
 }
 
 export async function runRemote() {
+    // HCU Device owns its own account-scoped usage telemetry at the gateway.
+    // Never send inherited Desktop Commander analytics from the remote execution path.
+    process.env.DESKTOP_COMMANDER_DISABLE_TELEMETRY = 'true';
+
     const disableNoSleep = process.argv.includes('--disable-no-sleep');
     const verbose = process.argv.includes('--debug');
     if (!verbose) console.debug = () => { };

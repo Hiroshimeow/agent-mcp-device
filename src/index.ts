@@ -8,8 +8,6 @@ import { server, flushDeferredMessages } from './server.js';
 import { commandManager } from './command-manager.js';
 import { configManager } from './config-manager.js';
 import { featureFlagManager } from './utils/feature-flags.js';
-import { runSetup } from './npm-scripts/setup.js';
-import { runUninstall } from './npm-scripts/uninstall.js';
 import { capture } from './utils/capture.js';
 import { logToStderr, logger } from './utils/logger.js';
 import { runRemote } from './npm-scripts/remote.js';
@@ -23,18 +21,6 @@ function deferLog(level: string, message: string) {
 
 async function runServer() {
   try {
-    // Check if first argument is "setup"
-    if (process.argv[2] === 'setup') {
-      await runSetup();
-      return;
-    }
-
-    // Check if first argument is "remove"
-    if (process.argv[2] === 'remove') {
-      await runUninstall();
-      return;
-    }
-
     // Check if first argument is "remote"
     if (process.argv[2] === 'remote') {
       await runRemote();
