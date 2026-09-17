@@ -17,8 +17,8 @@ export interface WidgetStateStorage<T> {
     write(state: T): void;
 }
 
-const FALLBACK_WIDGET_STATE_KEY_PREFIX = 'desktop-commander:widget-state';
-const FALLBACK_WIDGET_INSTANCE_MARKER = '__dc_widget_id__:';
+const FALLBACK_WIDGET_STATE_KEY_PREFIX = 'mcp-device:widget-state';
+const FALLBACK_WIDGET_INSTANCE_MARKER = '__mcp_device_widget_id__:';
 
 function createWidgetInstanceId(): string {
     const cryptoObject = typeof globalThis.crypto === 'object' ? globalThis.crypto : undefined;

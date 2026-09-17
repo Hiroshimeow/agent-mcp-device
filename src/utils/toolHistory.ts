@@ -1,7 +1,7 @@
 import { ServerResult } from '../types.js';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as os from 'os';
+import { CONFIG_DIR } from '../config.js';
 
 export interface ToolCallRecord {
   timestamp: string;
@@ -43,16 +43,16 @@ class ToolHistory {
   private writeInterval?: NodeJS.Timeout;
 
   constructor() {
-    // Store history in same directory as config to keep everything together
-    const historyDir = path.join(os.homedir(), '.claude-server-commander');
+    // Store history under the canonical MCP Device state root.
+    const historyDir = path.join(CONFIG_DIR, 'logs');
     
     // Ensure directory exists
     if (!fs.existsSync(historyDir)) {
       fs.mkdirSync(historyDir, { recursive: true });
     }
     
-    // Use append-only JSONL format (JSON Lines)
-    this.historyFile = path.join(historyDir, 'tool-history.jsonl');
+    // Use append-only JSONL format (JSON Lines).
+    this.historyFile = path.join(historyDir, 'history.jsonl');
     
     // Load existing history on startup
     this.loadFromDisk();

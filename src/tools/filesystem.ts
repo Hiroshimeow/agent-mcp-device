@@ -293,7 +293,7 @@ export async function validatePath(requestedPath: string): Promise<string> {
         // workstation's historical Desktop Commander directory allowlist. An optional
         // MCP_GATEWAY_ALLOWED_ROOTS restriction is enforced by GatewayToolAdapter before
         // calls reach this filesystem layer.
-        const remoteGatewayContext = process.env.DC_REMOTE_DEVICE === 'true';
+        const remoteGatewayContext = process.env.MCP_DEVICE_REMOTE === 'true';
         if (!remoteGatewayContext && !(await isPathAllowed(pathForNextCheck))) {
             capture('server_path_validation_error', {
                 error: 'Path not allowed',

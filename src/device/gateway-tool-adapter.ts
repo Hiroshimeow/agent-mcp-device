@@ -7,7 +7,7 @@ import sharp from 'sharp';
 import { commandManager } from '../command-manager.js';
 import { configManager } from '../config-manager.js';
 import { validatePath } from '../tools/filesystem.js';
-import { DesktopCommanderIntegration } from './desktop-commander-integration.js';
+import { DesktopCommanderIntegration } from './execution-engine.js';
 import { inspectProjectOnDevice } from './project-inspection.js';
 
 const execAsync = promisify(exec);

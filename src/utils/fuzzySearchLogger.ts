@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import os from 'os';
+import { CONFIG_DIR } from '../config.js';
 
 export interface FuzzySearchLogEntry {
     timestamp: Date;
@@ -26,8 +26,8 @@ class FuzzySearchLogger {
     private initialized = false;
 
     constructor() {
-        // Create log file in a dedicated directory
-        const logDir = path.join(os.homedir(), '.claude-server-commander-logs');
+        // Keep logs under the canonical MCP Device state root.
+        const logDir = path.join(CONFIG_DIR, 'logs');
         this.logPath = path.join(logDir, 'fuzzy-search.log');
     }
 

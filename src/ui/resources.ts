@@ -10,15 +10,15 @@ const UI_RESOURCE_MIME_TYPE = 'text/html;profile=mcp-app';
 
 export const FILE_PREVIEW_RESOURCE = {
     uri: FILE_PREVIEW_RESOURCE_URI,
-    name: 'Desktop Commander File Preview',
+    name: 'MCP Device File Preview',
     description: 'Markdown-first preview surface for read_file structured content.',
     mimeType: UI_RESOURCE_MIME_TYPE
 };
 
 export const CONFIG_EDITOR_RESOURCE = {
     uri: CONFIG_EDITOR_RESOURCE_URI,
-    name: 'Desktop Commander Config Editor',
-    description: 'Interactive editor for Desktop Commander configuration values.',
+    name: 'MCP Device Config Editor',
+    description: 'Interactive editor for MCP Device configuration values.',
     mimeType: UI_RESOURCE_MIME_TYPE
 };
 

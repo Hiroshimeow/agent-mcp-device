@@ -1,10 +1,10 @@
-import assert from 'assert';
+﻿import assert from 'assert';
 import fs from 'fs/promises';
 import os from 'os';
 import path from 'path';
 
 import * as remoteModule from '../dist/npm-scripts/remote.js';
-import { GatewayDeviceStatusStore } from '../dist/remote-device/device-status.js';
+import { GatewayDeviceStatusStore } from '../dist/device/device-status.js';
 
 const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-remote-service-status-'));
 try {
@@ -19,6 +19,7 @@ try {
   });
 
   assert.equal(typeof remoteModule.applyServiceCommandStatus, 'function');
+  assert.equal('parseAutostartValue' in remoteModule, false, 'obsolete public autostart helper must not remain exported');
   await remoteModule.applyServiceCommandStatus(store, 'stop');
   assert.equal((await store.load()).connection.online, false);
 

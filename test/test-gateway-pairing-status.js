@@ -1,13 +1,13 @@
-import assert from 'assert';
+﻿import assert from 'assert';
 import crypto from 'crypto';
 import fs from 'fs/promises';
 import http from 'http';
 import os from 'os';
 import path from 'path';
 
-import { GatewayDeviceIdentity } from '../dist/remote-device/gateway-identity.js';
-import { pairGatewayDevice } from '../dist/remote-device/gateway-pairing.js';
-import { GatewayDeviceStatusStore, formatGatewayStatus } from '../dist/remote-device/device-status.js';
+import { GatewayDeviceIdentity } from '../dist/device/gateway-identity.js';
+import { pairGatewayDevice } from '../dist/device/gateway-pairing.js';
+import { GatewayDeviceStatusStore, formatGatewayStatus } from '../dist/device/device-status.js';
 
 async function listen(server) {
   await new Promise((resolve, reject) => {
@@ -65,10 +65,18 @@ async function testPairingUsesPkceQrBrowserAndReturnsOnlyEnrollmentGrant() {
   const opened = [];
   const qrs = [];
   const logs = [];
+  let proxyAgentRequests = 0;
+  const proxyAgent = new http.Agent();
+  const originalAddRequest = proxyAgent.addRequest;
+  proxyAgent.addRequest = function (...args) {
+    proxyAgentRequests += 1;
+    return originalAddRequest.apply(this, args);
+  };
   try {
     const result = await pairGatewayDevice({
       gatewayUrl: `http://127.0.0.1:${port}`,
       identity,
+      proxyAgent,
       deviceName: 'ThinkBook Pair Test',
       openBrowser: async url => opened.push(url),
       renderQr: value => qrs.push(value),
@@ -87,6 +95,7 @@ async function testPairingUsesPkceQrBrowserAndReturnsOnlyEnrollmentGrant() {
     assert.equal(result.enrollmentGrant, 'pairing-grant-only');
     assert.equal('accessToken' in result, false);
     assert.equal('refreshToken' in result, false);
+    assert(proxyAgentRequests >= 2, 'pairing start and poll must use the configured HTTP agent');
   } finally {
     await new Promise(resolve => server.close(resolve));
     await fs.rm(root, { recursive: true, force: true });
@@ -130,13 +139,37 @@ async function testStatusStorePersistsOnlyNonSecretAccountUsageAndSchemaMetadata
   const raw = await fs.readFile(statusPath, 'utf8');
   assert(!/privateKey|enrollmentGrant|accessToken|refreshToken/.test(raw));
 
-  const text = formatGatewayStatus(restored, { json: false, service: { installed: false, running: false } });
+  const statusOptions = {
+    service: { installed: true, running: false, autostart: false, registration: 'manual' },
+    security: { protocolFloor: 2, appCaProvisioned: true },
+    proxy: { mode: 'configured' }
+  };
+  const text = formatGatewayStatus(restored, { json: false, ...statusOptions });
   assert(text.includes('Account: connected (Example Gateway)'));
+  assert(text.includes('Startup: manual'));
+  assert(text.includes('Security: v2 required/active; app CA provisioned'));
+  assert(text.includes('Proxy: configured'));
   assert(text.includes('Schema token estimate: 4057'));
   assert(/not ChatGPT billing/i.test(text));
-  const json = JSON.parse(formatGatewayStatus(restored, { json: true, service: { installed: false, running: false } }));
+  assert.equal(text.includes('proxy-user'), false);
+  const json = JSON.parse(formatGatewayStatus(restored, { json: true, ...statusOptions }));
   assert.equal(json.schema.tokenUsageKind, 'schema_estimate_not_billing');
-  assert.equal(json.service.installed, false);
+  assert.equal(json.service.installed, true);
+  assert.deepEqual(json.security, { protocolFloor: 2, appCaProvisioned: true, channel: 'v2 required/active' });
+  assert.deepEqual(json.proxy, { mode: 'configured' });
+
+  const offline = formatGatewayStatus({
+    ...restored,
+    connection: { ...restored.connection, online: false }
+  }, { json: false, ...statusOptions });
+  assert(offline.includes('Security: v2 required/offline; app CA provisioned'));
+
+  const legacy = formatGatewayStatus(restored, {
+    json: false,
+    ...statusOptions,
+    security: { protocolFloor: 1, appCaProvisioned: false }
+  });
+  assert(legacy.includes('Security: legacy v1; app CA not provisioned'));
 
   await fs.rm(root, { recursive: true, force: true });
 }

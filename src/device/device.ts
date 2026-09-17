@@ -4,18 +4,23 @@ import { fileURLToPath } from 'url';
 import os from 'os';
 import path from 'path';
 
-import { DesktopCommanderIntegration } from './desktop-commander-integration.js';
+import { DesktopCommanderIntegration } from './execution-engine.js';
 import { GatewayDeviceChannel } from './gateway-channel.js';
+import { GatewayDeviceConfigStore, createGatewayProxyAgent } from './gateway-config.js';
 import { GatewayDeviceIdentity } from './gateway-identity.js';
 import { pairGatewayDevice } from './gateway-pairing.js';
+import { bootstrapOfficialGatewayTrust } from './official-trust.js';
 import { GatewayDeviceStatusStore } from './device-status.js';
 import { GatewayToolAdapter } from './gateway-tool-adapter.js';
+import { RuntimeOwner, acquireRuntimeOwner, type RuntimeOwnerStatus } from './runtime-owner.js';
 import { captureRemote } from '../utils/capture.js';
 
 export class MCPDevice {
     private isShuttingDown = false;
     private desktop = new DesktopCommanderIntegration();
     private gatewayChannel?: GatewayDeviceChannel;
+    private gatewayProxyAgent?: { destroy: () => void };
+    private runtimeOwner?: RuntimeOwner;
 
     constructor() {
         this.setupShutdownHandlers();
@@ -63,30 +68,46 @@ export class MCPDevice {
         });
     }
 
-    async start() {
+    async start(options: { confirmTakeover?: (existing: RuntimeOwnerStatus) => Promise<boolean> | boolean } = {}) {
         try {
-            console.log('🚀 Starting HCU Device...');
+            console.log('🚀 Starting MCP Device...');
             if (process.env.DEBUG_MODE === 'true') console.log('  - 🐞 DEBUG_MODE');
 
+            const managerArg = process.argv.find(value => value.startsWith('--manager='));
+            const manager = managerArg?.slice('--manager='.length);
+            const mode = process.argv.includes('--service')
+                ? (process.platform === 'win32' ? 'windows' : manager === 'pm2' ? 'pm2' : 'systemd')
+                : 'foreground';
+            this.runtimeOwner = new RuntimeOwner({ mode, onStop: () => this.shutdown() });
+            await acquireRuntimeOwner(this.runtimeOwner, { confirmTakeover: options.confirmTakeover });
+            await this.runtimeOwner.bootstrap();
+            await bootstrapOfficialGatewayTrust(new GatewayDeviceConfigStore());
             await this.desktop.initialize();
 
             const gatewayStatus = new GatewayDeviceStatusStore();
             const storedGatewayStatus = await gatewayStatus.load();
-            const gatewayUrl = String(process.env.MCP_GATEWAY_URL || storedGatewayStatus.gatewayUrl || '').trim();
-            if (!gatewayUrl) throw new Error('MCP_GATEWAY_URL is required for the first HCU device connection.');
+            const gatewayConfig = await new GatewayDeviceConfigStore().load();
+            const gatewayUrl = String(gatewayConfig.gatewayUrl || storedGatewayStatus.gatewayUrl || '').trim();
+            if (!gatewayUrl) throw new Error('Gateway configuration is missing. Run `mcp-device login` or `mcp-device install` first.');
+            if (gatewayConfig.securityProtocolFloor >= 2 && !gatewayConfig.appCaPem) {
+                throw new Error('Gateway security protocol floor requires a provisioned application CA.');
+            }
+            const proxy = createGatewayProxyAgent(gatewayConfig);
+            this.gatewayProxyAgent = proxy.agent;
 
-            process.env.DC_REMOTE_DEVICE = 'true';
+            process.env.MCP_DEVICE_REMOTE = 'true';
             console.log(`⏳ Connecting directly to MCP Gateway ${gatewayUrl}`);
 
             const identity = new GatewayDeviceIdentity();
             const identityRecord = await identity.loadOrCreate();
+            this.runtimeOwner.setDeviceId(identityRecord.deviceId);
             const enrollmentCredential = String(
                 process.env.MCP_GATEWAY_ENROLLMENT_TOKEN || process.env.MCP_DEVICE_ENROLLMENT_TOKEN || ''
             ).trim() || undefined;
             let pairingGrant: string | undefined;
 
             if (!identityRecord.enrolled && !enrollmentCredential) {
-                const pairing = await pairGatewayDevice({ gatewayUrl, identity, deviceName: os.hostname() });
+                const pairing = await pairGatewayDevice({ gatewayUrl, identity, proxyAgent: proxy.agent, deviceName: os.hostname() });
                 pairingGrant = pairing.enrollmentGrant;
                 await gatewayStatus.update({
                     gatewayUrl,
@@ -104,7 +125,10 @@ export class MCPDevice {
                 enrollmentToken: enrollmentCredential,
                 pairingGrant,
                 identity,
-                adapter: new GatewayToolAdapter(this.desktop),
+                proxyAgent: proxy.agent,
+                securityProtocolFloor: gatewayConfig.securityProtocolFloor,
+                appCaPem: gatewayConfig.appCaPem || undefined,
+                adapter: new GatewayToolAdapter(this.desktop, { allowedRoots: gatewayConfig.allowedRoots }),
                 agentVersion: process.env.npm_package_version,
                 onStatus: async payload => {
                     const record = await identity.loadOrCreate();
@@ -148,8 +172,16 @@ export class MCPDevice {
                 await this.gatewayChannel.stop();
                 this.gatewayChannel = undefined;
             }
+            if (this.gatewayProxyAgent) {
+                this.gatewayProxyAgent.destroy();
+                this.gatewayProxyAgent = undefined;
+            }
             await new GatewayDeviceStatusStore().markOffline().catch(() => {});
             await this.desktop.shutdown();
+            if (this.runtimeOwner) {
+                await this.runtimeOwner.release().catch(() => {});
+                this.runtimeOwner = undefined;
+            }
             console.log('✓ Device shutdown complete');
         } catch (error: any) {
             console.error('Shutdown error:', error.message);
@@ -159,7 +191,7 @@ export class MCPDevice {
 }
 
 // Start only when this module itself is the entrypoint. Package/bin execution goes
-// through src/hcu-device.ts -> src/index.ts, which owns the single device lifecycle.
+// through src/mcp-device.ts -> src/index.ts, which owns the single device lifecycle.
 export function isModuleEntrypoint(moduleUrl: string, argvEntry?: string, pmExecPath?: string): boolean {
     const moduleEntryPath = path.resolve(fileURLToPath(moduleUrl));
     const candidates = [argvEntry, pmExecPath]

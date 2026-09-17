@@ -1,17 +1,28 @@
-import assert from 'assert';
+﻿import assert from 'assert';
 import { execFileSync } from 'child_process';
-import { createPublicKey, verify } from 'crypto';
+import { createHash, createPublicKey, verify } from 'crypto';
 import fs from 'fs/promises';
+import http from 'http';
 import os from 'os';
 import path from 'path';
-import { pathToFileURL } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import sharp from 'sharp';
+import tls from 'tls';
 import { WebSocketServer } from 'ws';
 
-import { GatewayDeviceChannel } from '../dist/remote-device/gateway-channel.js';
-import { GatewayDeviceIdentity } from '../dist/remote-device/gateway-identity.js';
-import { GATEWAY_CAPABILITIES, GatewayToolAdapter } from '../dist/remote-device/gateway-tool-adapter.js';
-import { isModuleEntrypoint } from '../dist/remote-device/device.js';
+import { GatewayDeviceChannel } from '../dist/device/gateway-channel.js';
+import { GatewayDeviceIdentity } from '../dist/device/gateway-identity.js';
+import { pairGatewayDevice } from '../dist/device/gateway-pairing.js';
+import {
+  DEVICE_INNER_TLS_SUBPROTOCOL,
+  createJsonFrameParser,
+  createWebSocketDuplex,
+  encodeJsonFrame
+} from '../dist/device/gateway-secure-transport.js';
+import { GATEWAY_CAPABILITIES, GatewayToolAdapter } from '../dist/device/gateway-tool-adapter.js';
+import { isModuleEntrypoint } from '../dist/device/device.js';
+
+const fixtureDir = path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures', 'device-inner-tls');
 
 const waitFor = async (predicate, timeoutMs = 4000) => {
   const deadline = Date.now() + timeoutMs;
@@ -34,7 +45,7 @@ class FakeDesktop {
 }
 
 function testPm2EntrypointDetection() {
-  const modulePath = path.resolve('dist/remote-device/device.js');
+  const modulePath = path.resolve('dist/device/device.js');
   const moduleUrl = pathToFileURL(modulePath).href;
   assert.equal(isModuleEntrypoint(moduleUrl, modulePath), true);
   assert.equal(isModuleEntrypoint(moduleUrl, path.resolve('node_modules/pm2/lib/ProcessContainerFork.js'), modulePath), true);
@@ -59,6 +70,25 @@ async function testIdentity() {
   const nonce = 'test-nonce';
   const signature = Buffer.from(await identity.signChallenge(nonce), 'base64');
   assert(verify(null, Buffer.from(`mcp-device-auth-v1\n${first.deviceId}\n${nonce}`), createPublicKey(first.publicKeyPem), signature));
+  assert.equal(typeof identity.signChallengeV2, 'function');
+  const exporter = Buffer.alloc(32, 7);
+  const nonceV2 = Buffer.alloc(32, 3);
+  const signatureV2 = Buffer.from(await identity.signChallengeV2({ mode: 'pair', nonce: nonceV2, exporter, grant: 'grant-one' }), 'base64');
+  const deviceBytes = Buffer.from(first.deviceId, 'utf8');
+  const deviceLength = Buffer.alloc(2);
+  deviceLength.writeUInt16BE(deviceBytes.length, 0);
+  const publicKeyDer = createPublicKey(first.publicKeyPem).export({ type: 'spki', format: 'der' });
+  const challengeV2 = Buffer.concat([
+    Buffer.from('hcu-mcp-device-auth-v2\0', 'ascii'),
+    Buffer.from([2, 2]),
+    deviceLength,
+    deviceBytes,
+    nonceV2,
+    exporter,
+    createHash('sha256').update(publicKeyDer).digest(),
+    createHash('sha256').update('grant-one', 'utf8').digest()
+  ]);
+  assert(verify(null, challengeV2, createPublicKey(first.publicKeyPem), signatureV2));
   if (previousDeviceId === undefined) delete process.env.MCP_DEVICE_ID;
   else process.env.MCP_DEVICE_ID = previousDeviceId;
   await fs.rm(root, { recursive: true, force: true });
@@ -69,9 +99,9 @@ async function testDefaultWindowsIdentityPathIsProfileBound() {
   const previous = process.env.MCP_GATEWAY_DEVICE_IDENTITY_PATH;
   const outside = path.join(path.parse(os.homedir()).root, `hcu-unsafe-identity-${process.pid}.json`);
   process.env.MCP_GATEWAY_DEVICE_IDENTITY_PATH = outside;
-  assert.throws(() => new GatewayDeviceIdentity(), /\.hcu-device/);
+  assert.throws(() => new GatewayDeviceIdentity(), /\.mcp-device/);
 
-  const secureRoot = path.join(os.homedir(), '.hcu-device');
+  const secureRoot = path.join(os.homedir(), '.mcp-device');
   await fs.mkdir(secureRoot, { recursive: true });
   const root = await fs.mkdtemp(path.join(secureRoot, `.test-${process.pid}-`));
   const inside = path.join(root, 'identity.json');
@@ -211,6 +241,155 @@ async function testAdapter() {
   assert.equal(desktop.calls.at(-1).name, 'force_terminate');
 }
 
+async function testRejectsUnsafeNonLoopbackPlaintextGatewayUrls() {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-gateway-unsafe-url-'));
+  const identity = new GatewayDeviceIdentity(path.join(root, 'identity.json'));
+  try {
+    const channel = new GatewayDeviceChannel({
+      gatewayUrl: 'ws://gateway.example.test/device',
+      identity,
+      adapter: { async call() { return {}; } },
+      agentVersion: 'test'
+    });
+    await assert.rejects(channel.start(), /plaintext|https|wss|loopback/i);
+    await assert.rejects(
+      pairGatewayDevice({
+        gatewayUrl: 'http://gateway.example.test',
+        identity,
+        fetchFn: async () => { throw new Error('fetch should not run'); },
+        openBrowser: async () => {},
+        renderQr: () => {},
+        sleep: async () => {},
+        log: () => {}
+      }),
+      /plaintext|https|wss|loopback/i
+    );
+  } finally {
+    await fs.rm(root, { recursive: true, force: true });
+  }
+}
+
+async function testV2ReconnectUsesInnerTlsExporterProofWithoutOuterCredential() {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-gateway-v2-channel-'));
+  const identity = new GatewayDeviceIdentity(path.join(root, 'identity.json'));
+  const record = await identity.loadOrCreate();
+  await identity.markEnrolled();
+  const ca = await fs.readFile(path.join(fixtureDir, 'ca-cert.pem'));
+  const cert = await fs.readFile(path.join(fixtureDir, 'server-cert.pem'));
+  const key = await fs.readFile(path.join(fixtureDir, 'server-key.pem'));
+  const wss = new WebSocketServer({ port: 0 });
+  await new Promise(resolve => wss.once('listening', resolve));
+  const address = wss.address();
+  const port = typeof address === 'object' && address ? address.port : 0;
+  let authenticated = false;
+  let outerBytes = Buffer.alloc(0);
+
+  wss.on('connection', (ws, request) => {
+    assert.equal(request.headers.authorization, undefined);
+    assert.equal(ws.protocol, DEVICE_INNER_TLS_SUBPROTOCOL);
+    ws.on('message', data => { outerBytes = Buffer.concat([outerBytes, Buffer.from(data)]); });
+    const secure = new tls.TLSSocket(createWebSocketDuplex(ws), {
+      isServer: true,
+      secureContext: tls.createSecureContext({ cert, key, minVersion: 'TLSv1.3' })
+    });
+    const parser = createJsonFrameParser({
+      onMessage: async message => {
+        if (message.type === 'auth_hello') {
+          assert.equal(message.protocol_version, 2);
+          const nonce = Buffer.alloc(32, 9).toString('base64url');
+          secure.write(encodeJsonFrame({
+            protocol_version: 2,
+            type: 'auth_challenge',
+            device_id: record.deviceId,
+            timestamp: Date.now(),
+            payload: { nonce, mode: 'reconnect' }
+          }));
+          return;
+        }
+        if (message.type === 'auth_response') {
+          const exporterContext = createHash('sha256')
+            .update(`hcu-mcp-device-auth-v2\n${record.deviceId}\nreconnect`, 'utf8')
+            .digest();
+          const exporter = secure.exportKeyingMaterial(32, 'EXPERIMENTAL-HCU-MCP-DEVICE-AUTH-V2', exporterContext);
+          const deviceBytes = Buffer.from(record.deviceId, 'utf8');
+          const deviceLength = Buffer.alloc(2);
+          deviceLength.writeUInt16BE(deviceBytes.length, 0);
+          const publicKeyDer = createPublicKey(record.publicKeyPem).export({ type: 'spki', format: 'der' });
+          const challenge = Buffer.concat([
+            Buffer.from('hcu-mcp-device-auth-v2\0', 'ascii'),
+            Buffer.from([2, 0]),
+            deviceLength,
+            deviceBytes,
+            Buffer.alloc(32, 9),
+            exporter,
+            createHash('sha256').update(publicKeyDer).digest(),
+            Buffer.alloc(32)
+          ]);
+          assert(verify(null, challenge, record.publicKeyPem, Buffer.from(message.payload.signature, 'base64')));
+          authenticated = true;
+          secure.write(encodeJsonFrame({
+            protocol_version: 2,
+            type: 'auth_ok',
+            device_id: record.deviceId,
+            connection_epoch: 1,
+            timestamp: Date.now(),
+            payload: { accepted: true }
+          }));
+        }
+      }
+    });
+    secure.on('data', chunk => parser.push(chunk));
+  });
+
+  const channel = new GatewayDeviceChannel({
+    gatewayUrl: `ws://localhost:${port}/device`,
+    identity,
+    adapter: { async call() { return {}; } },
+    securityProtocolFloor: 2,
+    appCaPem: ca.toString('utf8'),
+    agentVersion: 'test'
+  });
+  try {
+    await channel.start();
+    await waitFor(() => authenticated);
+    assert.equal(outerBytes.includes(Buffer.from(record.deviceId)), false);
+  } finally {
+    await channel.stop();
+    await new Promise(resolve => wss.close(resolve));
+    await fs.rm(root, { recursive: true, force: true });
+  }
+}
+
+async function testFloorTwoNeverFallsBackWhenV2SubprotocolIsNotSelected() {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-gateway-v2-no-fallback-'));
+  const identity = new GatewayDeviceIdentity(path.join(root, 'identity.json'));
+  await identity.loadOrCreate();
+  await identity.markEnrolled();
+  const ca = await fs.readFile(path.join(fixtureDir, 'ca-cert.pem'), 'utf8');
+  const wss = new WebSocketServer({ port: 0, handleProtocols: () => false });
+  await new Promise(resolve => wss.once('listening', resolve));
+  const address = wss.address();
+  const port = typeof address === 'object' && address ? address.port : 0;
+  let connections = 0;
+  wss.on('connection', () => { connections += 1; });
+  const channel = new GatewayDeviceChannel({
+    gatewayUrl: `ws://localhost:${port}/device`,
+    identity,
+    adapter: { async call() { return {}; } },
+    securityProtocolFloor: 2,
+    appCaPem: ca,
+    agentVersion: 'test'
+  });
+  try {
+    await assert.rejects(channel.start(), /subprotocol|v2|inner tls/i);
+    assert.equal(connections, 1, 'floor-2 client must not retry a second v1 connection');
+  } finally {
+    await channel.stop().catch(() => {});
+    await new Promise(resolve => wss.close(resolve));
+    await fs.rm(root, { recursive: true, force: true });
+  }
+}
+
 async function testOperatorPreEnrolledIdentityUsesAuthHello() {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-gateway-preenroll-'));
   const identity = new GatewayDeviceIdentity(path.join(root, 'identity.json'));
@@ -236,11 +415,19 @@ async function testOperatorPreEnrolledIdentityUsesAuthHello() {
       }
     });
   });
-  const channel = new GatewayDeviceChannel({ gatewayUrl: `ws://127.0.0.1:${port}/device`, identity, adapter: { async call() { return {}; } }, agentVersion: 'test' });
+  let proxyAgentRequests = 0;
+  const proxyAgent = new http.Agent();
+  const originalAddRequest = proxyAgent.addRequest;
+  proxyAgent.addRequest = function (...args) {
+    proxyAgentRequests += 1;
+    return originalAddRequest.apply(this, args);
+  };
+  const channel = new GatewayDeviceChannel({ gatewayUrl: `ws://127.0.0.1:${port}/device`, identity, proxyAgent, adapter: { async call() { return {}; } }, agentVersion: 'test' });
   await channel.start();
   await waitFor(() => authenticated);
   assert.equal(helloType, 'auth_hello');
   assert.equal((await identity.loadOrCreate()).enrolled, true);
+  assert(proxyAgentRequests >= 1, 'gateway WebSocket must use the configured HTTP agent');
   await channel.stop();
   await new Promise(resolve => wss.close(resolve));
   await fs.rm(root, { recursive: true, force: true });
@@ -268,7 +455,7 @@ async function testChannelEnrollmentToolAndReconnect() {
     ws.on('message', raw => {
       const message = JSON.parse(raw.toString());
       if (message.type === 'enroll_hello' || message.type === 'auth_hello') {
-        assert.equal(message.payload.agent_version, 'hcu-device-1');
+        assert.equal(message.payload.agent_version, 'mcp-device-1');
         assert.equal(message.payload.hostname, os.hostname());
         assert.equal(message.payload.platform, process.platform);
         assert.equal(message.payload.arch, process.arch);
@@ -404,9 +591,12 @@ await testAdapterDefaultsToDesktopCommanderWideAccess();
 await testRemoteImagePreviewIsBounded();
 await testRemoteProjectInspectionRunsOnDevice();
 await testAdapter();
+await testRejectsUnsafeNonLoopbackPlaintextGatewayUrls();
+await testV2ReconnectUsesInnerTlsExporterProofWithoutOuterCredential();
+await testFloorTwoNeverFallsBackWhenV2SubprotocolIsNotSelected();
 await testOperatorPreEnrolledIdentityUsesAuthHello();
 await testChannelEnrollmentToolAndReconnect();
 await testRejectsMismatchedAuthDevice();
 await testRejectsStaleToolEpochAndReconnects();
 await testOversizedToolResultReturnsBoundedError();
-console.log('âœ… Gateway identity, adapter, enrollment, tool routing, and reconnect tests passed');
+console.log('Ã¢Å“â€¦ Gateway identity, adapter, enrollment, tool routing, and reconnect tests passed');

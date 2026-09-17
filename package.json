@@ -1,9 +1,9 @@
 {
-  "name": "@hcu/device",
-  "version": "0.2.46",
-  "description": "HCU remote device execution agent for authenticated MCP gateways",
+  "name": "@hcu-lab.me/mcp-device",
+  "version": "1.0.0",
+  "description": "MCP Device securely connects a user-owned computer to an authenticated Model Context Protocol gateway.",
   "license": "MIT",
-  "author": "HCU",
+  "author": "Hirohimeow",
   "homepage": "https://github.com/Hiroshimeow/agent-mcp-device",
   "repository": {
     "type": "git",
@@ -15,24 +15,25 @@
     "node": ">=18.0.0"
   },
   "bin": {
-    "hcu-device": "dist/hcu-device.js"
+    "mcp-device": "dist/mcp-device.js",
+    "md": "dist/mcp-device.js"
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "device:install": "cd src/remote-device && npm install",
-    "device:start": "tsx src/remote-device/device.ts",
-    "device:start:dev": "nodemon --watch src/remote-device --exec tsx src/remote-device/device.ts",
+    "device:install": "cd src/device && npm install",
+    "device:start": "tsx src/device/device.ts",
+    "device:start:dev": "nodemon --watch src/device --exec tsx src/device/device.ts",
     "sync-version": "node scripts/sync-version.js",
     "bump": "node scripts/sync-version.js --bump",
     "bump:minor": "node scripts/sync-version.js --bump --minor",
     "bump:major": "node scripts/sync-version.js --bump --major",
-    "build": "tsc && shx chmod +x dist/*.js && shx mkdir -p dist/data && shx cp src/data/onboarding-prompts.json dist/data/ && node scripts/build-ui-runtime.cjs",
+    "build": "shx rm -rf dist/remote-device && shx rm -f dist/device/desktop-commander-integration.js dist/device/desktop-commander-integration.d.ts && tsc && shx chmod +x dist/*.js && shx mkdir -p dist/data && shx cp src/data/onboarding-prompts.json dist/data/ && node scripts/copy-official-ca.cjs && node scripts/build-ui-runtime.cjs",
     "watch": "tsc --watch",
-    "start": "node dist/hcu-device.js",
-    "start:debug": "node --inspect-brk=9229 dist/hcu-device.js",
-    "prepack": "shx rm -f dist/track-installation.js dist/setup-claude-server.js dist/uninstall-claude-server.js dist/npm-scripts/setup.js dist/npm-scripts/setup.d.ts dist/npm-scripts/uninstall.js dist/npm-scripts/uninstall.d.ts dist/npm-scripts/verify-ripgrep.js dist/npm-scripts/verify-ripgrep.d.ts",
+    "start": "node dist/mcp-device.js",
+    "start:debug": "node --inspect-brk=9229 dist/mcp-device.js",
+    "prepack": "node scripts/verify-production-trust.cjs && shx rm -rf dist/remote-device && shx rm -f dist/device/desktop-commander-integration.js dist/device/desktop-commander-integration.d.ts dist/hcu-device.js dist/hcu-device.d.ts dist/track-installation.js dist/setup-claude-server.js dist/uninstall-claude-server.js dist/npm-scripts/setup.js dist/npm-scripts/setup.d.ts dist/npm-scripts/uninstall.js dist/npm-scripts/uninstall.d.ts dist/npm-scripts/verify-ripgrep.js dist/npm-scripts/verify-ripgrep.d.ts",
     "prepare": "npm run build",
     "clean": "shx rm -rf dist",
     "test": "npm run build && node test/run-all-tests.js",
@@ -90,6 +91,8 @@
     "open": "^10.2.0",
     "pdf-lib": "^1.17.1",
     "pizzip": "^3.2.0",
+    "proxy-agent": "6.5.0",
+    "proxy-from-env": "2.1.0",
     "qrcode-terminal": "^0.12.0",
     "remark": "^15.0.1",
     "remark-gfm": "^4.0.1",

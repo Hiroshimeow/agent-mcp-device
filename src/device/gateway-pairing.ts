@@ -1,9 +1,12 @@
 import { createHash, randomBytes } from 'crypto';
+import type { Agent } from 'http';
 import { createRequire } from 'module';
 import os from 'os';
 import open from 'open';
+import fetch from 'cross-fetch';
 
 import { GatewayDeviceIdentity } from './gateway-identity.js';
+import { gatewayHttpBase } from './gateway-url-policy.js';
 
 const CLIENT_ID = 'mcp-device';
 const SCOPE = 'mcp:tools';
@@ -22,6 +25,7 @@ export interface GatewayPairingOptions {
     identity: GatewayDeviceIdentity;
     deviceName?: string;
     fetchFn?: typeof fetch;
+    proxyAgent?: Agent;
     openBrowser?: (url: string) => Promise<unknown>;
     renderQr?: (value: string) => void;
     sleep?: (ms: number) => Promise<void>;
@@ -35,17 +39,6 @@ interface DeviceStartResponse {
     verification_uri_complete?: string;
     expires_in: number;
     interval: number;
-}
-
-function gatewayHttpBase(raw: string): string {
-    const url = new URL(raw);
-    if (url.protocol === 'ws:') url.protocol = 'http:';
-    if (url.protocol === 'wss:') url.protocol = 'https:';
-    if (!['http:', 'https:'].includes(url.protocol)) throw new Error('Gateway URL must use http(s) or ws(s).');
-    url.pathname = '/';
-    url.search = '';
-    url.hash = '';
-    return url.toString().replace(/\/$/, '');
 }
 
 function pkce(): { verifier: string; challenge: string } {
@@ -86,6 +79,7 @@ export async function pairGatewayDevice(options: GatewayPairingOptions): Promise
     const start = await jsonResponse(await fetchFn(`${baseUrl}/device/start`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
+        ...(options.proxyAgent ? { agent: options.proxyAgent } : {}),
         body: JSON.stringify({
             client_id: CLIENT_ID,
             scope: SCOPE,
@@ -113,6 +107,7 @@ export async function pairGatewayDevice(options: GatewayPairingOptions): Promise
             const payload = await jsonResponse(await fetchFn(`${baseUrl}/device/poll`, {
                 method: 'POST',
                 headers: { 'content-type': 'application/json' },
+                ...(options.proxyAgent ? { agent: options.proxyAgent } : {}),
                 body: JSON.stringify({
                     device_code: start.device_code,
                     client_id: CLIENT_ID,

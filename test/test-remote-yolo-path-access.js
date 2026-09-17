@@ -17,10 +17,10 @@ await fs.writeFile(path.join(configDir, 'config.json'), JSON.stringify({ allowed
 process.env.DESKTOP_COMMANDER_CONFIG_DIR = configDir;
 const { validatePath } = await import('../dist/tools/filesystem.js');
 
-process.env.DC_REMOTE_DEVICE = 'false';
+process.env.MCP_DEVICE_REMOTE = 'false';
 await assert.rejects(validatePath(target), /Path not allowed/);
 
-process.env.DC_REMOTE_DEVICE = 'true';
+process.env.MCP_DEVICE_REMOTE = 'true';
 assert.equal(await validatePath(target), await fs.realpath(target));
 
 await fs.rm(root, { recursive: true, force: true });

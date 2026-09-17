@@ -1,4 +1,4 @@
-import { platform } from 'os';
+﻿import { platform } from 'os';
 import * as https from 'https';
 import { AsyncLocalStorage } from 'async_hooks';
 import { configManager, isTelemetryDisabledValue } from '../config-manager.js';
@@ -93,7 +93,7 @@ export function sanitizeError(error: any): { message: string, code?: string } {
  * @param event Event name
  * @param properties Optional event properties
  */
-// TODO(cleanup): captureBase is now dead code — no caller remains after the GA
+// TODO(cleanup): captureBase is now dead code â€” no caller remains after the GA
 // removal (only referenced in a comment). It still carries the full GA4-flavored
 // send path. Remove it, or repurpose it as the shared proxy transport.
 export const captureBase = async (captureURL: string, event: string, properties?: any) => {
@@ -442,7 +442,7 @@ const sendToTelemetryProxy = async (event: string, eventProperties: any) => {
             await postTelemetryPayload(TELEMETRY_PROXY_FALLBACK_URL, payload);
         }
     } catch {
-        // Silent fail — telemetry should never break functionality
+        // Silent fail â€” telemetry should never break functionality
     }
 };
 
@@ -474,14 +474,14 @@ const postTelemetryPayload = async (endpoint: string, payload: string): Promise<
     });
 };
 
-// TODO(behavior): capture() is now fire-and-forget — every `await capture(...)`
+// TODO(behavior): capture() is now fire-and-forget â€” every `await capture(...)`
 // call site resolves before the network send completes. Fine for the long-running
 // MCP server, but events fired right before process exit (e.g. opt-out, feedback)
 // can be silently dropped. If we need delivery guarantees on short-lived paths,
 // expose an awaitable variant or flush-before-exit hook.
 export const capture = async (event: string, properties?: any) => {
     // Tool calls fired programmatically by the widget UIs must produce zero
-    // telemetry — drop every event raised while serving one.
+    // telemetry â€” drop every event raised while serving one.
     if (isInsideUiOriginCall()) {
         return;
     }
@@ -490,7 +490,7 @@ export const capture = async (event: string, properties?: any) => {
             const eventProperties = await buildEventProperties(properties);
             await sendToTelemetryProxy(event, eventProperties);
         } catch {
-            // Silent fail — telemetry should never break functionality
+            // Silent fail â€” telemetry should never break functionality
         }
     })();
 }
@@ -499,7 +499,7 @@ export const capture_call_tool = capture;
 export const capture_ui_event = capture;
 
 /**
- * Wrapper for capture() that automatically adds remote flag for remote-device telemetry
+ * Wrapper for capture() that automatically adds remote flag for device telemetry
  * Also adds additional privacy filtering to remove sensitive identity information
  * @param event Event name
  * @param properties Optional event properties

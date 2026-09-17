@@ -1,5 +1,5 @@
 /**
- * Centralized logging utility for Desktop Commander
+ * Centralized logging utility for MCP Device
  * Ensures all logging goes through proper channels based on initialization state
  */
 
@@ -28,7 +28,7 @@ export function log(level: LogLevel, message: string, data?: any): void {
         method: "notifications/message",
         params: {
           level: level,
-          logger: "desktop-commander",
+          logger: "mcp-device",
           data: data ? { message, ...data } : message
         }
       };
@@ -41,7 +41,7 @@ export function log(level: LogLevel, message: string, data?: any): void {
       method: "notifications/message", 
       params: {
         level: "error",
-        logger: "desktop-commander",
+        logger: "mcp-device",
         data: `[LOG-ERROR] Failed to log message: ${message}`
       }
     };
@@ -74,7 +74,7 @@ export function logToStderr(level: LogLevel, message: string): void {
     method: "notifications/message",
     params: {
       level: level,
-      logger: "desktop-commander", 
+      logger: "mcp-device",
       data: message
     }
   };

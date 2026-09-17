@@ -22,7 +22,7 @@ const OS_GUIDANCE = getOSSpecificGuidance(SYSTEM_INFO);
 const DEV_TOOL_GUIDANCE = getDevelopmentToolGuidance(SYSTEM_INFO);
 const PATH_GUIDANCE = `IMPORTANT: ${getPathGuidance(SYSTEM_INFO)} Relative paths may fail as they depend on the current working directory. Tilde paths (~/...) might not work in all contexts. Unless the user explicitly asks for relative paths, use absolute paths.`;
 
-const CMD_PREFIX_DESCRIPTION = `This command can be referenced as "DC: ..." or "use Desktop Commander to ..." in your instructions.`;
+const CMD_PREFIX_DESCRIPTION = `This command can be referenced as "MCP Device: ..." or "use MCP Device to ..." in your instructions.`;
 
 import {
     StartProcessArgsSchema,
@@ -97,7 +97,7 @@ deferLog('info', 'Loading server.ts');
 
 export const server = new Server(
     {
-        name: "desktop-commander",
+        name: "mcp-device",
         version: VERSION,
     },
     {
@@ -172,12 +172,12 @@ function setCurrentRemoteClient(clientInfo: { name?: string; version?: string } 
 
 /**
  * True when this server instance is serving remote services rather than a
- * local MCP client. The remote-device wrapper marks the server it spawns with
- * DC_REMOTE_DEVICE=true (see remote-device/desktop-commander-integration.ts);
+ * local MCP client. The device wrapper marks the server it spawns with
+ * MCP_DEVICE_REMOTE=true (see device/execution-engine.ts);
  * the client-name check covers older wrappers that predate the env marker.
  */
 function isRemoteClientContext(clientName?: string): boolean {
-    return process.env.DC_REMOTE_DEVICE === 'true' || clientName === 'desktop-commander-client';
+    return process.env.MCP_DEVICE_REMOTE === 'true' || clientName === 'desktop-commander-client';
 }
 
 /**
@@ -213,10 +213,10 @@ server.setRequestHandler(InitializeRequestSchema, async (request: InitializeRequ
         if (clientInfo) {
             await updateCurrentClient(clientInfo);
 
-            // Welcome page for new users (A/B test controlled) — all clients except
+            // Welcome page for new users (A/B test controlled) â€” all clients except
             // the Desktop Commander app and remote contexts. Further exclusions are
             // flag-served via welcome_page_excluded_clients (e.g. claude-code, which
-            // covers Claude Code and Cowork plugin sessions — both identify as
+            // covers Claude Code and Cowork plugin sessions â€” both identify as
             // `claude-code` and provide their own onboarding surface).
             const isWelcomePageEligibleClient = currentClient.name !== 'desktop-commander-app'
                 && currentClient.name !== 'desktop-commander'
@@ -233,11 +233,11 @@ server.setRequestHandler(InitializeRequestSchema, async (request: InitializeRequ
         }
 
         // Raw host environment signals (no PII, undefined when absent). Some
-        // hosts share a clientInfo name — Claude Code CLI, Claude Code inside
-        // the Claude Desktop app, and Cowork all report 'claude-code' — and
+        // hosts share a clientInfo name â€” Claude Code CLI, Claude Code inside
+        // the Claude Desktop app, and Cowork all report 'claude-code' â€” and
         // these let analytics tell them apart without client-specific
-        // branching in code. Verified signatures: CLI → entrypoint 'cli';
-        // CC-in-desktop → entrypoint 'claude-desktop'; Cowork → no
+        // branching in code. Verified signatures: CLI â†’ entrypoint 'cli';
+        // CC-in-desktop â†’ entrypoint 'claude-desktop'; Cowork â†’ no
         // entrypoint/agent, plugin id 'desktop-commander-inline'.
         // Values truncated to GA4's 100-char param limit (same convention as
         // containerName/containerImage) so an oversized value can never get
@@ -265,7 +265,7 @@ server.setRequestHandler(InitializeRequestSchema, async (request: InitializeRequ
                 logging: {},
             },
             serverInfo: {
-                name: "desktop-commander",
+                name: "mcp-device",
                 version: VERSION,
             },
         };
@@ -317,7 +317,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                         - telemetryEnabled (boolean for telemetry opt-in/out)
                         - currentClient (information about the currently connected MCP client)
                         - clientHistory (history of all clients that have connected)
-                        - version (version of the DesktopCommander)
+                        - version (version of MCP Device)
                         - systemInfo (operating system and environment details)
                         ${CMD_PREFIX_DESCRIPTION}`,
                 inputSchema: zodToJsonSchema(GetConfigArgsSchema),
@@ -374,10 +374,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                           * Ignored when offset is negative (reads all requested tail lines)
                         
                         Examples:
-                        - offset: 0, length: 10     → First 10 lines
-                        - offset: 100, length: 5    → Lines 100-104
-                        - offset: -20               → Last 20 lines  
-                        - offset: -5, length: 10    → Last 5 lines (length ignored)
+                        - offset: 0, length: 10     â†’ First 10 lines
+                        - offset: 100, length: 5    â†’ Lines 100-104
+                        - offset: -20               â†’ Last 20 lines
+                        - offset: -5, length: 10    â†’ Last 5 lines (length ignored)
                         
                         Performance optimizations:
                         - Large files with negative offsets use reverse reading for efficiency
@@ -399,7 +399,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                           * offset/length work as page pagination (0-based)
                           * Includes embedded images when available
                         - DOCX (.docx): Two modes depending on parameters:
-                          * DEFAULT (no offset/length): Returns a text-bearing outline — shows paragraphs with text,
+                          * DEFAULT (no offset/length): Returns a text-bearing outline â€” shows paragraphs with text,
                             tables with cell content, styles, image refs. Skips shapes/drawings/SVG noise.
                             Each element shows its body index [0], [1], etc.
                           * WITH offset/length: Returns raw pretty-printed XML with line pagination.
@@ -449,15 +449,15 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 
                         IMPORTANT: DO NOT use this tool to create PDF files. Use 'write_pdf' for all PDF creation tasks.
                         DO NOT use this tool to edit DOCX files. Use 'edit_block' with old_string/new_string instead.
-                        To CREATE a new DOCX, use write_file with .docx extension — text content with markdown headings (#, ##, ###) is converted to styled DOCX paragraphs.
+                        To CREATE a new DOCX, use write_file with .docx extension â€” text content with markdown headings (#, ##, ###) is converted to styled DOCX paragraphs.
 
                         CHUNKING IS STANDARD PRACTICE: Always write files in chunks of 25-30 lines maximum.
                         This is the normal, recommended way to write files - not an emergency measure.
 
                         STANDARD PROCESS FOR ANY FILE:
-                        1. FIRST → write_file(filePath, firstChunk, {mode: 'rewrite'})  [≤30 lines]
-                        2. THEN → write_file(filePath, secondChunk, {mode: 'append'})   [≤30 lines]
-                        3. CONTINUE → write_file(filePath, nextChunk, {mode: 'append'}) [≤30 lines]
+                        1. FIRST â†’ write_file(filePath, firstChunk, {mode: 'rewrite'})  [â‰¤30 lines]
+                        2. THEN â†’ write_file(filePath, secondChunk, {mode: 'append'})   [â‰¤30 lines]
+                        3. CONTINUE â†’ write_file(filePath, nextChunk, {mode: 'append'}) [â‰¤30 lines]
 
                         ALWAYS CHUNK PROACTIVELY - don't wait for performance warnings!
 
@@ -681,12 +681,12 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                         - earlyTermination: Stop search early when exact filename match is found (optional: defaults to true for file searches, false for content searches)
                         
                         DECISION EXAMPLES:
-                        - "find package.json" → searchType="files", pattern="package.json" (specific file)
-                        - "find authentication components" → searchType="content", pattern="authentication" (looking for functionality)
-                        - "locate all React components" → searchType="files", pattern="*.tsx" or "*.jsx" (file pattern)
-                        - "find TODO comments" → searchType="content", pattern="TODO" (text in files)
-                        - "show me login files" → AMBIGUOUS → run both: files with "login" AND content with "login"
-                        - "find config" → AMBIGUOUS → run both: config files AND files containing config code
+                        - "find package.json" â†’ searchType="files", pattern="package.json" (specific file)
+                        - "find authentication components" â†’ searchType="content", pattern="authentication" (looking for functionality)
+                        - "locate all React components" â†’ searchType="files", pattern="*.tsx" or "*.jsx" (file pattern)
+                        - "find TODO comments" â†’ searchType="content", pattern="TODO" (text in files)
+                        - "show me login files" â†’ AMBIGUOUS â†’ run both: files with "login" AND content with "login"
+                        - "find config" â†’ AMBIGUOUS â†’ run both: config files AND files containing config code
                         
                         COMPREHENSIVE SEARCH EXAMPLES:
                         - Find package.json files: searchType="files", pattern="package.json"
@@ -729,10 +729,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                           * Ignored when offset is negative (reads all requested tail results)
                         
                         Examples:
-                        - offset: 0, length: 100     → First 100 results
-                        - offset: 200, length: 50    → Results 200-249
-                        - offset: -20                → Last 20 results
-                        - offset: -5, length: 10     → Last 5 results (length ignored)
+                        - offset: 0, length: 100     â†’ First 100 results
+                        - offset: 200, length: 50    â†’ Results 200-249
+                        - offset: -20                â†’ Last 20 results
+                        - offset: -5, length: 10     â†’ Last 5 results (length ignored)
                         
                         Returns only results in the specified range, along with search status.
                         Works like read_process_output - call this repeatedly to get progressive
@@ -834,7 +834,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 
                         DOCX FILES (.docx) - XML Find/Replace mode:
                         Takes same parameters as text files (old_string, new_string, expected_replacements).
-                        Operates on the pretty-printed XML inside the DOCX — the same XML you see from
+                        Operates on the pretty-printed XML inside the DOCX â€” the same XML you see from
                         read_file with offset/length. Copy XML fragments from read output as old_string.
                         After editing, the XML is repacked into a valid DOCX.
                         Also searches headers/footers if not found in document body.
@@ -895,12 +895,12 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                         5. Continue analysis with pandas, matplotlib, seaborn, etc.
                         
                         COMMON FILE ANALYSIS PATTERNS:
-                        • start_process("python3 -i") → Python REPL for data analysis (RECOMMENDED)
-                        • start_process("node -i") → Node.js REPL for JSON processing
-                        • start_process("node:local") → Node.js on MCP server (stateless, ES imports, all code in one call)
-                        • start_process("cut -d',' -f1 file.csv | sort | uniq -c") → Quick CSV analysis
-                        • start_process("wc -l /path/file.csv") → Line counting
-                        • start_process("head -10 /path/file.csv") → File preview
+                        â€¢ start_process("python3 -i") â†’ Python REPL for data analysis (RECOMMENDED)
+                        â€¢ start_process("node -i") â†’ Node.js REPL for JSON processing
+                        â€¢ start_process("node:local") â†’ Node.js on MCP server (stateless, ES imports, all code in one call)
+                        â€¢ start_process("cut -d',' -f1 file.csv | sort | uniq -c") â†’ Quick CSV analysis
+                        â€¢ start_process("wc -l /path/file.csv") â†’ Line counting
+                        â€¢ start_process("head -10 /path/file.csv") â†’ File preview
                         
                         BINARY FILE SUPPORT:
                         For PDF, Excel, Word, archives, databases, and other binary formats, use process tools with appropriate libraries or command-line utilities.
@@ -960,11 +960,11 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                         - 'length' (max lines to read, default: configurable via 'fileReadLineLimit' setting)
                         
                         Examples:
-                        - offset: 0, length: 100     → First 100 NEW lines since last read
-                        - offset: 0                  → All new lines (respects config limit)
-                        - offset: 500, length: 50    → Lines 500-549 (absolute position)
-                        - offset: -20                → Last 20 lines (tail)
-                        - offset: -50, length: 10    → Start 50 from end, read 10 lines
+                        - offset: 0, length: 100     â†’ First 100 NEW lines since last read
+                        - offset: 0                  â†’ All new lines (respects config limit)
+                        - offset: 500, length: 50    â†’ Lines 500-549 (absolute position)
+                        - offset: -20                â†’ Last 20 lines (tail)
+                        - offset: -50, length: 10    â†’ Start 50 from end, read 10 lines
                         
                         OUTPUT PROTECTION:
                         - Uses same fileReadLineLimit as read_file (default: 1000 lines)
@@ -1159,7 +1159,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             {
                 name: "give_feedback_to_desktop_commander",
                 description: `
-                        Open feedback form in browser to provide feedback about Desktop Commander.
+                        Open feedback form in browser to provide feedback about MCP Device.
                         
                         IMPORTANT: This tool simply opens the feedback form - no pre-filling available.
                         The user will fill out the form manually in their browser.
@@ -1169,7 +1169,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                         2. No need to ask questions or collect information
                         3. Tool opens form with only usage statistics pre-filled automatically:
                            - tool_call_count: Number of commands they've made
-                           - days_using: How many days they've used Desktop Commander
+                           - days_using: How many days they've used MCP Device
                            - platform: Their operating system (Mac/Windows/Linux)
                            - client_id: Analytics identifier
                         
@@ -1177,7 +1177,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                         - Job title and technical comfort level
                         - Company URL for industry context
                         - Other AI tools they use
-                        - Desktop Commander's biggest advantage
+                        - MCP Device's biggest advantage
                         - How they typically use it
                         - Recommendation likelihood (0-10)
                         - User study participation interest
@@ -1201,7 +1201,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             {
                 name: "get_prompts",
                 description: `
-                        Retrieve a specific Desktop Commander onboarding prompt by ID and execute it.
+                        Retrieve a specific MCP Device onboarding prompt by ID and execute it.
                         
                         SIMPLIFIED ONBOARDING V2: This tool only supports direct prompt retrieval.
                         The onboarding system presents 5 options as a simple numbered list:
@@ -1214,11 +1214,11 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                         
                         USAGE:
                         When user says "1", "2", "3", "4", or "5" from onboarding:
-                        - "1" → get_prompts(action='get_prompt', promptId='onb2_01')
-                        - "2" → get_prompts(action='get_prompt', promptId='onb2_02')
-                        - "3" → get_prompts(action='get_prompt', promptId='onb2_03')
-                        - "4" → get_prompts(action='get_prompt', promptId='onb2_04')
-                        - "5" → get_prompts(action='get_prompt', promptId='onb2_05')
+                        - "1" â†’ get_prompts(action='get_prompt', promptId='onb2_01')
+                        - "2" â†’ get_prompts(action='get_prompt', promptId='onb2_02')
+                        - "3" â†’ get_prompts(action='get_prompt', promptId='onb2_03')
+                        - "4" â†’ get_prompts(action='get_prompt', promptId='onb2_04')
+                        - "5" â†’ get_prompts(action='get_prompt', promptId='onb2_05')
                         
                         The prompt content will be injected and execution begins immediately.
 
@@ -1285,7 +1285,7 @@ async function handleCallToolRequest(request: CallToolRequest): Promise<ServerRe
             telemetryData.remote = String(metadata.remote);
             // Remote calls carry the originating MCP client (e.g. openai-mcp,
             // claude-ai) in _meta.clientInfo. Attribute this call to that remote
-            // client — NOT the device's own currentClient. Fall back to a sentinel
+            // client â€” NOT the device's own currentClient. Fall back to a sentinel
             // when it's absent so the call is visibly remote-but-unattributed
             // rather than masquerading as the local device client. We deliberately
             // do NOT call updateCurrentClient here: currentClient tracks the LOCAL
@@ -1299,7 +1299,7 @@ async function handleCallToolRequest(request: CallToolRequest): Promise<ServerRe
             telemetryData.client_name = remoteClient.name;
             telemetryData.client_version = remoteClient.version;
         } else {
-            // Local call — clear any remote attribution left by a prior call.
+            // Local call â€” clear any remote attribution left by a prior call.
             setCurrentRemoteClient(null);
         }
 
@@ -1682,7 +1682,7 @@ async function handleCallToolRequest(request: CallToolRequest): Promise<ServerRe
         // timing. In a finally so it still fires on the hard-crash path (the catch
         // above). Only missed if a tool never returns or throws (a true hang).
         // Not emitted for track_ui_event (it is just the transport for
-        // mcp_ui_event) — and UI-origin calls are dropped wholesale by the
+        // mcp_ui_event) â€” and UI-origin calls are dropped wholesale by the
         // capture layer, so server_call_tool reflects only genuine
         // agent-driven tool calls.
         if (name !== 'track_ui_event') {

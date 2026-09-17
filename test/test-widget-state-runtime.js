@@ -39,7 +39,7 @@ async function testWidgetStateUsesPerFrameKeys() {
     const firstStorage = createWidgetStateStorage((value) => typeof value === 'string');
     firstStorage.write('first payload');
 
-    assert.ok(firstWindow.name.includes('__dc_widget_id__:'), 'The first frame should persist its widget id in window.name');
+    assert.ok(firstWindow.name.includes('__mcp_device_widget_id__:'), 'The first frame should persist its widget id in window.name');
     assert.strictEqual(firstStorage.read(), 'first payload', 'The first frame should read back its own cached payload');
 
     const secondWindow = createMockWindow('/ui/file-preview/index.html', sessionStorage);
@@ -47,7 +47,7 @@ async function testWidgetStateUsesPerFrameKeys() {
     const secondStorage = createWidgetStateStorage((value) => typeof value === 'string');
     secondStorage.write('second payload');
 
-    assert.ok(secondWindow.name.includes('__dc_widget_id__:'), 'The second frame should persist its widget id in window.name');
+    assert.ok(secondWindow.name.includes('__mcp_device_widget_id__:'), 'The second frame should persist its widget id in window.name');
     assert.notStrictEqual(secondWindow.name, firstWindow.name, 'Visible frames should get distinct widget ids');
     assert.strictEqual(secondStorage.read(), 'second payload', 'The second frame should read back its own cached payload');
     assert.strictEqual(sessionStorage.data.size, 2, 'Two same-origin frames should write to separate cache keys');

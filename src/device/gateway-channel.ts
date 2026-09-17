@@ -1,27 +1,32 @@
+import type { Agent } from 'http';
 import os from 'os';
+import type tls from 'tls';
 import WebSocket from 'ws';
 
 import { GatewayDeviceIdentity } from './gateway-identity.js';
+import {
+    DEVICE_INNER_TLS_SUBPROTOCOL,
+    createClientInnerTls,
+    createJsonFrameParser,
+    encodeJsonFrame,
+    exportDeviceAuthKeyingMaterial
+} from './gateway-secure-transport.js';
 import { GATEWAY_CAPABILITIES, GatewayToolAdapter } from './gateway-tool-adapter.js';
+import { gatewaySocketUrl } from './gateway-url-policy.js';
 
 const PROTOCOL_VERSION = 1;
+const PROTOCOL_VERSION_V2 = 2;
 const HEARTBEAT_MS = 20_000;
 const MAX_OUTBOUND_MESSAGE_BYTES = 56 * 1024;
-
-function gatewaySocketUrl(raw: string): string {
-    const url = new URL(raw);
-    if (url.protocol === 'http:') url.protocol = 'ws:';
-    if (url.protocol === 'https:') url.protocol = 'wss:';
-    if (!['ws:', 'wss:'].includes(url.protocol)) throw new Error('MCP_GATEWAY_URL must use http(s) or ws(s)');
-    if (!url.pathname || url.pathname === '/') url.pathname = '/device';
-    return url.toString();
-}
 
 export interface GatewayChannelOptions {
     gatewayUrl: string;
     enrollmentToken?: string;
     pairingGrant?: string;
     identity?: GatewayDeviceIdentity;
+    proxyAgent?: Agent;
+    securityProtocolFloor?: number;
+    appCaPem?: string;
     adapter: GatewayToolAdapter;
     agentVersion?: string;
     onStatus?: (payload: any) => void | Promise<void>;
@@ -40,6 +45,10 @@ export class GatewayDeviceChannel {
     private connectionEpoch?: string | number;
     private accountLogoutResolve?: (payload: any) => void;
     private accountLogoutReject?: (error: Error) => void;
+    private messageQueue: Promise<void> = Promise.resolve();
+    private protocolVersion = PROTOCOL_VERSION;
+    private secureSocket?: tls.TLSSocket;
+    private authMode: 'reconnect' | 'enroll' | 'pair' = 'reconnect';
 
     constructor(private options: GatewayChannelOptions) {
         this.identity = options.identity || new GatewayDeviceIdentity();
@@ -48,17 +57,35 @@ export class GatewayDeviceChannel {
     async start(): Promise<void> {
         this.authenticatedDeviceId = undefined;
         this.connectionEpoch = undefined;
+        this.messageQueue = Promise.resolve();
         const record = await this.identity.loadOrCreate();
+        this.protocolVersion = Number(this.options.securityProtocolFloor || 1) >= 2 ? PROTOCOL_VERSION_V2 : PROTOCOL_VERSION;
+        if (this.protocolVersion === PROTOCOL_VERSION_V2 && !String(this.options.appCaPem || '').trim()) {
+            throw new Error('Protocol v2 requires a provisioned gateway application CA.');
+        }
         const credential = this.options.pairingGrant || (!record.enrolled ? this.options.enrollmentToken : undefined);
-        const headers = credential ? { authorization: `Bearer ${credential}` } : undefined;
-        const socket = new WebSocket(gatewaySocketUrl(this.options.gatewayUrl), { headers });
+        const webSocketOptions = this.options.proxyAgent ? { agent: this.options.proxyAgent } : {};
+        const socket = this.protocolVersion === PROTOCOL_VERSION_V2
+            ? new WebSocket(gatewaySocketUrl(this.options.gatewayUrl), DEVICE_INNER_TLS_SUBPROTOCOL, webSocketOptions)
+            : new WebSocket(gatewaySocketUrl(this.options.gatewayUrl), {
+                ...(credential ? { headers: { authorization: `Bearer ${credential}` } } : {}),
+                ...webSocketOptions
+            });
         this.socket = socket;
         const ready = new Promise<void>((resolve, reject) => {
             this.readyResolve = resolve;
             this.readyReject = reject;
         });
-        socket.once('open', () => this.sendHello().catch(error => this.fail(error)));
-        socket.on('message', raw => this.handleMessage(raw.toString()).catch(error => this.fail(error)));
+        if (this.protocolVersion === PROTOCOL_VERSION_V2) {
+            socket.once('open', () => this.startV2Transport().catch(error => this.fail(error)));
+        } else {
+            socket.once('open', () => this.sendHello().catch(error => this.fail(error)));
+            socket.on('message', raw => {
+                this.messageQueue = this.messageQueue
+                    .then(() => this.handleMessage(raw.toString()))
+                    .catch(error => this.fail(error));
+            });
+        }
         socket.once('error', error => this.fail(error));
         socket.once('close', (code, reason) => {
             this.stopHeartbeat();
@@ -70,11 +97,46 @@ export class GatewayDeviceChannel {
         });
         await ready;
     }
+
+    private async startV2Transport(): Promise<void> {
+        const socket = this.socket;
+        if (!socket || socket.readyState !== WebSocket.OPEN) throw new Error('Gateway socket is not open');
+        if (socket.protocol !== DEVICE_INNER_TLS_SUBPROTOCOL) {
+            throw new Error('Gateway did not negotiate the required v2 inner TLS subprotocol.');
+        }
+        const url = new URL(gatewaySocketUrl(this.options.gatewayUrl));
+        const secure = createClientInnerTls(socket, {
+            ca: String(this.options.appCaPem || ''),
+            servername: url.hostname
+        });
+        this.secureSocket = secure;
+        const parser = createJsonFrameParser({
+            onMessage: message => {
+                this.messageQueue = this.messageQueue
+                    .then(() => this.handleMessage(message))
+                    .catch(error => this.fail(error));
+            }
+        });
+        secure.on('data', chunk => {
+            try { parser.push(chunk); }
+            catch (error: any) { this.fail(error instanceof Error ? error : new Error(String(error))); }
+        });
+        secure.once('error', error => this.fail(error));
+        await new Promise<void>((resolve, reject) => {
+            secure.once('secureConnect', resolve);
+            secure.once('error', reject);
+        });
+        await this.sendHelloV2();
+    }
+
     async stop(): Promise<void> {
         this.shuttingDown = true;
         this.stopHeartbeat();
         if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
         this.reconnectTimer = undefined;
+        const secure = this.secureSocket;
+        this.secureSocket = undefined;
+        if (secure && !secure.destroyed) secure.destroy();
         const socket = this.socket;
         this.socket = undefined;
         if (!socket || socket.readyState === WebSocket.CLOSED) return;
@@ -101,7 +163,7 @@ export class GatewayDeviceChannel {
             device_id: record.deviceId,
             timestamp: Date.now(),
             payload: {
-                agent_version: this.options.agentVersion || 'hcu-device-1',
+                agent_version: this.options.agentVersion || 'mcp-device-1',
                 hostname: os.hostname(),
                 platform: process.platform,
                 arch: process.arch,
@@ -112,9 +174,32 @@ export class GatewayDeviceChannel {
         });
     }
 
-    private async handleMessage(raw: string): Promise<void> {
-        const message = JSON.parse(raw);
-        if (message?.protocol_version !== PROTOCOL_VERSION) throw new Error('Unsupported gateway protocol version');
+    private async sendHelloV2(): Promise<void> {
+        const record = await this.identity.loadOrCreate();
+        const pairing = record.enrolled && Boolean(this.options.pairingGrant);
+        const enrolling = !record.enrolled && Boolean(this.options.pairingGrant || this.options.enrollmentToken);
+        this.authMode = pairing ? 'pair' : enrolling ? 'enroll' : 'reconnect';
+        const grant = pairing || enrolling ? String(this.options.pairingGrant || this.options.enrollmentToken || '') : '';
+        this.send({
+            protocol_version: PROTOCOL_VERSION_V2,
+            type: pairing ? 'pair_hello' : enrolling ? 'enroll_hello' : 'auth_hello',
+            device_id: record.deviceId,
+            timestamp: Date.now(),
+            payload: {
+                agent_version: this.options.agentVersion || 'mcp-device-1',
+                hostname: os.hostname(),
+                platform: process.platform,
+                arch: process.arch,
+                path_style: process.platform === 'win32' ? 'windows' : 'posix',
+                capabilities: [...GATEWAY_CAPABILITIES],
+                ...(pairing || enrolling ? { public_key_pem: record.publicKeyPem, enrollment_grant: grant } : {})
+            }
+        });
+    }
+
+    private async handleMessage(raw: string | any): Promise<void> {
+        const message = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        if (message?.protocol_version !== this.protocolVersion) throw new Error('Unsupported gateway protocol version');
         if (['auth_challenge', 'auth_ok', 'tool_call'].includes(String(message?.type || ''))) {
             const record = await this.identity.loadOrCreate();
             if (String(message?.device_id || '') !== record.deviceId) throw new Error('Gateway message device_id mismatch');
@@ -123,6 +208,25 @@ export class GatewayDeviceChannel {
             const nonce = String(message.payload?.nonce || '');
             if (!nonce) throw new Error('Gateway authentication challenge is missing a nonce');
             const record = await this.identity.loadOrCreate();
+            if (this.protocolVersion === PROTOCOL_VERSION_V2) {
+                const mode = String(message.payload?.mode || '');
+                if (mode !== this.authMode) throw new Error('Gateway authentication challenge mode mismatch');
+                const nonceBytes = Buffer.from(nonce, 'base64url');
+                if (nonceBytes.length !== 32) throw new Error('Gateway v2 authentication challenge nonce must be exactly 32 bytes');
+                if (!this.secureSocket) throw new Error('Gateway v2 inner TLS socket is unavailable');
+                const exporter = exportDeviceAuthKeyingMaterial(this.secureSocket, record.deviceId, this.authMode);
+                const grant = this.authMode === 'reconnect' ? null : String(this.options.pairingGrant || this.options.enrollmentToken || '');
+                this.send({
+                    protocol_version: PROTOCOL_VERSION_V2,
+                    type: 'auth_response',
+                    device_id: record.deviceId,
+                    timestamp: Date.now(),
+                    payload: {
+                        signature: await this.identity.signChallengeV2({ mode: this.authMode, nonce: nonceBytes, exporter, grant })
+                    }
+                });
+                return;
+            }
             this.send({
                 protocol_version: PROTOCOL_VERSION,
                 type: 'auth_response',
@@ -174,7 +278,7 @@ export class GatewayDeviceChannel {
             this.accountLogoutReject = reject;
         });
         this.send({
-            protocol_version: PROTOCOL_VERSION,
+            protocol_version: this.protocolVersion,
             type: 'account_logout',
             device_id: this.authenticatedDeviceId,
             connection_epoch: this.connectionEpoch,
@@ -199,7 +303,7 @@ export class GatewayDeviceChannel {
         try {
             const result = await this.options.adapter.call(tool, message.payload?.arguments || {});
             this.send({
-                protocol_version: PROTOCOL_VERSION,
+                protocol_version: this.protocolVersion,
                 type: 'tool_result',
                 request_id: requestId,
                 device_id: this.authenticatedDeviceId,
@@ -209,7 +313,7 @@ export class GatewayDeviceChannel {
             });
         } catch (error: any) {
             this.send({
-                protocol_version: PROTOCOL_VERSION,
+                protocol_version: this.protocolVersion,
                 type: 'tool_error',
                 request_id: requestId,
                 device_id: this.authenticatedDeviceId,
@@ -239,7 +343,7 @@ export class GatewayDeviceChannel {
         this.heartbeat = setInterval(async () => {
             const record = await this.identity.loadOrCreate();
             this.send({
-                protocol_version: PROTOCOL_VERSION,
+                protocol_version: this.protocolVersion,
                 type: 'heartbeat',
                 device_id: record.deviceId,
                 timestamp: Date.now(),
@@ -260,6 +364,11 @@ export class GatewayDeviceChannel {
             const error: any = new Error('Gateway device response exceeds the outbound message limit');
             error.code = 'DEVICE_OUTPUT_TOO_LARGE';
             throw error;
+        }
+        if (this.protocolVersion === PROTOCOL_VERSION_V2) {
+            if (!this.secureSocket || this.secureSocket.destroyed) throw new Error('Gateway v2 inner TLS socket is not open');
+            this.secureSocket.write(encodeJsonFrame(message));
+            return;
         }
         this.socket.send(encoded);
     }

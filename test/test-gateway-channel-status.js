@@ -1,11 +1,11 @@
-import assert from 'assert';
+﻿import assert from 'assert';
 import fs from 'fs/promises';
 import os from 'os';
 import path from 'path';
 import { WebSocketServer } from 'ws';
 
-import { GatewayDeviceChannel } from '../dist/remote-device/gateway-channel.js';
-import { GatewayDeviceIdentity } from '../dist/remote-device/gateway-identity.js';
+import { GatewayDeviceChannel } from '../dist/device/gateway-channel.js';
+import { GatewayDeviceIdentity } from '../dist/device/gateway-identity.js';
 
 async function testStatusCallbacksReceiveAuthAndSnapshots() {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-channel-status-'));

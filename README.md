@@ -1,50 +1,51 @@
-# HCU Device
+# MCP Device
 
-`@hcu/device` is the execution-plane agent for the HCU MCP Gateway. It keeps an outbound WebSocket connection to the gateway and executes the bounded filesystem, edit, shell, process, image-preview, and project-inspection capabilities routed to this machine.
+`@hcu-lab.me/mcp-device` securely connects a user-owned computer to an authenticated Model Context Protocol gateway. The device makes the outbound connection; no inbound device port is required.
 
-The central gateway owns accounts, OAuth, device ownership, skills/workflows, MCP tool contracts, routing, and usage aggregation. This package owns the machine identity, pairing, reconnect lifecycle, local execution, and local status.
+The gateway owns accounts, OAuth, device ownership, MCP tool contracts, routing, and usage aggregation. MCP Device owns local device identity, pairing, reconnect lifecycle, bounded execution, background registration, and local status.
 
-## Development setup
+## Commands
+
+```text
+mcp-device              start in the foreground
+mcp-device start        start in the foreground
+mcp-device login        explicitly link or switch the gateway account
+mcp-device logout       unlink the gateway account from this device
+mcp-device status       show runtime, manager, connection, security, proxy, usage, and schema state
+mcp-device install      pair if needed, then install and start a background runtime
+mcp-device stop         stop the current runtime without deleting identity/account state
+mcp-device uninstall    remove background registration while preserving identity/account state
+mcp-device --help       show command help
+```
+
+`md` is an alias of `mcp-device` on POSIX shells. On Windows, use `mcp-device`; bare `md` has a shell collision with built-in directory-creation commands/aliases and is not the supported invocation.
+
+On Windows, `install` uses the current-user background registration. On Linux, every `install` asks whether to use `systemd --user` or an already configured PM2 installation. MCP Device does not install PM2, run `pm2 startup`, or use `sudo` automatically.
+
+## First run and trust
+
+The official gateway is `https://mcp-v2.hcu-lab.me/mcp`. The official package is designed to pin an independently distributed application CA and require protocol v2 before the first network connection. If that CA is absent, MCP Device fails closed rather than learning trust from the gateway it is about to contact or falling back to protocol v1.
+
+For a custom gateway, configure the gateway URL and provision its application CA through an independent trusted channel before enabling protocol v2. Proxy selection is captured during interactive provisioning and reused by the background runtime; proxy credentials are protected with Windows DPAPI on Windows.
+
+## Local state and migration
+
+Canonical state is stored under `~/.mcp-device/`. Existing `~/.hcu-device/` identity/config/status state is migrated non-destructively under serialized runtime ownership. A conflicting canonical and legacy identity fails closed rather than creating a second device identity.
+
+The device identity is Ed25519. On Windows, the private key is protected with DPAPI for the current user. The gateway stores the public identity and account ownership.
+
+## Development
 
 ```powershell
 git clone https://github.com/Hiroshimeow/agent-mcp-device.git
 cd agent-mcp-device
-git checkout feat/direct-agent-gateway-device
 npm ci
 npm run build
-
-$env:MCP_GATEWAY_URL="https://<gateway-host>"
-node dist/hcu-device.js login
-node dist/hcu-device.js install
-node dist/hcu-device.js status
+node dist/mcp-device.js --help
 ```
 
-`install` runs the device agent in the background on Windows. The terminal does not need to stay open after installation.
-
-Useful commands:
-
-```text
-hcu-device              run in the foreground
-hcu-device login        pair/link this device through the browser flow
-hcu-device logout       unlink the account from this device
-hcu-device status       show gateway, connection, usage, and schema status
-hcu-device install      install and start the background device service
-hcu-device start        start the installed service
-hcu-device stop         stop the installed service
-hcu-device uninstall    remove the installed service
-hcu-device --help       show command help without starting the runtime
-```
-
-## Identity and routing
-
-A device keeps an Ed25519 private identity locally under `~/.hcu-device/`. The gateway stores the public key and account ownership. New device IDs use `<hostname>-<random8>`; the friendly device name can change without changing the immutable identity.
-
-No inbound device port is required. The agent connects outbound to the gateway, and every account-scoped tool dispatch is routed by `device_id`.
-
-## Package status
-
-The target npm package name is `@hcu/device`, but npm publication is intentionally deferred. The repository build and tarball are used for local validation until publication is explicitly approved.
+For a custom development gateway, set `MCP_GATEWAY_URL`. Supply `MCP_GATEWAY_APP_CA_PATH` from an independent trusted source when using protocol v2. Non-loopback plaintext gateway URLs are rejected.
 
 ## Upstream execution engine
 
-The local execution engine is derived from [Desktop Commander MCP](https://github.com/wonderwhy-er/DesktopCommanderMCP). Its MIT copyright and license are preserved in `LICENSE`; use the upstream repository for the original Desktop Commander documentation.
+The local execution engine is derived from [Desktop Commander MCP](https://github.com/wonderwhy-er/DesktopCommanderMCP). Desktop Commander is MIT licensed; its copyright and MIT license are preserved in this repository's `LICENSE`. The MCP Device product identity, gateway protocol, account/device lifecycle, security layer, and packaging are maintained separately in this repository.

@@ -24,7 +24,9 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
-const TEST_DIR = path.join(__dirname, 'test_read_file_unknown_params');
+const RUN_ID = `${process.pid}-${Date.now()}`;
+const TEST_CONFIG_DIR = path.join(process.env.TEMP || process.env.TMP || __dirname, `desktop-commander-read-file-integration-config-${RUN_ID}`);
+const TEST_DIR = path.join(__dirname, `test_read_file_unknown_params-${RUN_ID}`);
 const TEST_FILE = path.join(TEST_DIR, 'numbered.txt');
 const LINE_COUNT = 50;
 
@@ -42,7 +44,11 @@ async function createMcpClient() {
     args: [path.join(PROJECT_ROOT, 'dist/index.js'), '--no-onboarding'],
     cwd: PROJECT_ROOT,
     stderr: 'pipe',
-    env: { ...process.env, DESKTOP_COMMANDER_DISABLE_TELEMETRY: 'true' },
+    env: {
+      ...process.env,
+      DESKTOP_COMMANDER_DISABLE_TELEMETRY: 'true',
+      DESKTOP_COMMANDER_CONFIG_DIR: TEST_CONFIG_DIR,
+    },
   });
 
   const client = new Client(
@@ -78,6 +84,7 @@ async function teardown(client, originalConfig) {
     await callTool(client, 'set_config_value', { key, value, origin: 'llm' });
   }
   await fs.rm(TEST_DIR, { recursive: true, force: true });
+  await fs.rm(TEST_CONFIG_DIR, { recursive: true, force: true });
 }
 
 async function main() {

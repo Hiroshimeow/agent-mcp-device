@@ -2,6 +2,8 @@ import fs from 'fs/promises';
 import os from 'os';
 import path from 'path';
 
+import { deviceStatePaths } from './device-state.js';
+
 export interface GatewayAccountStatus {
     connected: boolean;
     label: string | null;
@@ -47,11 +49,22 @@ export interface GatewayDeviceStatus {
 export interface GatewayServiceStatus {
     installed: boolean;
     running: boolean;
+    autostart?: boolean;
+    registration?: 'task' | 'run' | 'manual' | 'stale';
     taskName?: string | null;
 }
 
+export interface GatewaySecurityStatus {
+    protocolFloor: number;
+    appCaProvisioned: boolean;
+}
+
+export interface GatewayProxyStatus {
+    mode: 'direct' | 'configured';
+}
+
 function defaultStatusPath(): string {
-    return path.join(path.resolve(os.homedir()), '.hcu-device', 'gateway-status.json');
+    return deviceStatePaths().status;
 }
 
 function emptyStatus(): GatewayDeviceStatus {
@@ -165,12 +178,34 @@ function dateText(value: number | null | undefined): string {
     return Number.isNaN(date.getTime()) ? 'unknown' : date.toISOString();
 }
 
+export function effectiveGatewayStatus(status: GatewayDeviceStatus, { runtimeOwned = false, serviceRunning = false } = {}): GatewayDeviceStatus {
+    if (runtimeOwned || serviceRunning || !status.connection.online) return status;
+    return { ...status, connection: { ...status.connection, online: false } };
+}
+
+function securityChannelText(status: GatewayDeviceStatus, security: GatewaySecurityStatus): 'v2 required/active' | 'v2 required/offline' | 'legacy v1' {
+    if (Math.max(1, Number(security.protocolFloor) || 1) < 2) return 'legacy v1';
+    return status.connection.online ? 'v2 required/active' : 'v2 required/offline';
+}
+
 export function formatGatewayStatus(
     status: GatewayDeviceStatus,
-    options: { json?: boolean; service?: GatewayServiceStatus } = {}
+    options: {
+        json?: boolean;
+        service?: GatewayServiceStatus;
+        security?: GatewaySecurityStatus;
+        proxy?: GatewayProxyStatus;
+        runtime?: { mode: string; pid: number } | null;
+        managers?: Array<{ manager: string; installed: boolean; running: boolean; autostart: boolean }>;
+    } = {}
 ): string {
     const service = options.service || { installed: false, running: false };
-    const payload = { ...status, service };
+    const security = options.security || { protocolFloor: 1, appCaProvisioned: false };
+    const proxy = options.proxy || { mode: 'direct' };
+    const runtime = options.runtime || null;
+    const managers = options.managers || [];
+    const securityChannel = securityChannelText(status, security);
+    const payload = { ...status, service, runtime, managers, security: { ...security, channel: securityChannel }, proxy };
     if (options.json) return JSON.stringify(payload, null, 2);
     const accountText = status.account.connected
         ? `connected${status.account.label ? ` (${status.account.label})` : ''}`
@@ -183,7 +218,12 @@ export function formatGatewayStatus(
         `Identity: ${status.identityPresent ? 'present' : 'missing'}`,
         `Account: ${accountText}`,
         `Connection: ${status.connection.online ? 'online' : 'offline'}; last connected ${dateText(status.connection.lastConnectedAt)}`,
+        `Runtime: ${runtime ? `${runtime.mode} (pid ${runtime.pid})` : 'not running'}`,
         `Service: ${service.installed ? (service.running ? 'installed/running' : 'installed/stopped') : 'not installed'}`,
+        `Startup: ${service.installed ? (service.autostart ? `autostart${service.registration && service.registration !== 'manual' ? ` (${service.registration})` : ''}` : 'manual') : (service.registration === 'stale' ? 'stale registration' : 'not installed')}`,
+        ...(managers.length ? managers.map(manager => `Manager: ${manager.manager} ${manager.installed ? 'installed' : 'not-installed'}/${manager.running ? 'running' : 'stopped'}/${manager.autostart ? 'autostart' : 'manual'}`) : []),
+        `Security: ${securityChannel}; app CA ${security.appCaProvisioned ? 'provisioned' : 'not provisioned'}`,
+        `Proxy: ${proxy.mode === 'configured' ? 'configured' : 'direct'}`,
         `Usage: calls ${usage?.toolCallsStarted ?? 0} started / ${usage?.toolCallsSucceeded ?? 0} succeeded / ${usage?.toolCallsFailed ?? 0} failed; bytes ${usage?.requestBytes ?? 0} in / ${usage?.responseBytes ?? 0} out`,
         `Schema: ${schema?.toolCount ?? 0} tools / ${schema?.toolSchemaBytes ?? 0} bytes`,
         `Schema token estimate: ${schema?.toolSchemaTokenEstimate ?? 0} (${schema?.tokenEstimateMethod || 'unavailable'}; not ChatGPT billing usage)`,
