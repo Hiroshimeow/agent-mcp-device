@@ -4,10 +4,15 @@ import { fileURLToPath } from 'url';
 
 import { GatewayDeviceConfigStore, type GatewayDeviceConfig } from './gateway-config.js';
 
-export const OFFICIAL_GATEWAY_URL = 'https://mcp-v2.hcu-lab.me/mcp';
+export const OFFICIAL_GATEWAY_URL = 'https://device.hcu-lab.me';
 
 function normalizedUrl(value: string): string {
     return new URL(value).toString();
+}
+
+function isOfficialGatewayHost(hostname: string): boolean {
+    const host = hostname.toLowerCase();
+    return host === 'hcu-lab.me' || host.endsWith('.hcu-lab.me');
 }
 
 function defaultOfficialCaPath(): string {
@@ -16,8 +21,12 @@ function defaultOfficialCaPath(): string {
 
 export function isOfficialGatewayUrl(value: string | null | undefined): boolean {
     if (!value) return false;
-    try { return normalizedUrl(value) === normalizedUrl(OFFICIAL_GATEWAY_URL); }
-    catch { return false; }
+    try {
+        const url = new URL(value);
+        return url.protocol === 'https:' && isOfficialGatewayHost(url.hostname);
+    } catch {
+        return false;
+    }
 }
 
 export async function bootstrapOfficialGatewayTrust(
@@ -36,7 +45,8 @@ export async function bootstrapOfficialGatewayTrust(
         return await store.update({ gatewayUrl });
     }
     if (current.appCaPem && current.securityProtocolFloor >= 2 && isOfficialGatewayUrl(current.gatewayUrl || gatewayUrl)) {
-        return current;
+        if (current.gatewayUrl && normalizedUrl(current.gatewayUrl) === normalizedUrl(gatewayUrl)) return current;
+        return await store.update({ gatewayUrl });
     }
 
     const caPath = options.caPath || defaultOfficialCaPath();
@@ -50,7 +60,7 @@ export async function bootstrapOfficialGatewayTrust(
     }
 
     return await store.update({
-        gatewayUrl: OFFICIAL_GATEWAY_URL,
+        gatewayUrl,
         appCaPem,
         securityProtocolFloor: 2
     });

@@ -15,7 +15,7 @@ import {
   createGatewayProxyAgent,
   resolveProxyDecisionFromEnvironment
 } from '../dist/device/gateway-config.js';
-import { OFFICIAL_GATEWAY_URL, bootstrapOfficialGatewayTrust } from '../dist/device/official-trust.js';
+import { OFFICIAL_GATEWAY_URL, bootstrapOfficialGatewayTrust, isOfficialGatewayUrl } from '../dist/device/official-trust.js';
 
 async function testConfigPersistenceAndMonotonicSecurityFloor() {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'hcu-gateway-config-'));
@@ -184,18 +184,35 @@ async function testPersistedProxyTunnelsTrustedOuterTlsAndRejectsUntrustedCertif
   }
 }
 
+function testHcuLabSubdomainsUseBundledTrust() {
+  assert.equal(isOfficialGatewayUrl('https://device.hcu-lab.me'), true);
+  assert.equal(isOfficialGatewayUrl('https://device1.hcu-lab.me/mcp'), true);
+  assert.equal(isOfficialGatewayUrl('https://deep.device.hcu-lab.me/path'), true);
+  assert.equal(isOfficialGatewayUrl('https://hcu-lab.me'), true);
+  assert.equal(isOfficialGatewayUrl('https://evil-hcu-lab.me'), false);
+  assert.equal(isOfficialGatewayUrl('https://hcu-lab.me.evil.example'), false);
+}
+
 async function testOfficialGatewayTrustBootstrapIsIndependentAndFailClosed() {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-official-trust-'));
   const configPath = path.join(root, 'gateway-config.json');
   const store = new GatewayDeviceConfigStore(configPath, { platform: 'linux' });
   const caPath = path.join(fixtureDir, 'ca-cert.pem');
   try {
-    const seeded = await bootstrapOfficialGatewayTrust(store, { gatewayUrl: OFFICIAL_GATEWAY_URL, caPath });
-    assert.equal(seeded.gatewayUrl, OFFICIAL_GATEWAY_URL);
+    const hcuGatewayUrl = 'https://device1.hcu-lab.me/mcp';
+    const seeded = await bootstrapOfficialGatewayTrust(store, { gatewayUrl: hcuGatewayUrl, caPath });
+    assert.equal(seeded.gatewayUrl, hcuGatewayUrl);
     assert.equal(seeded.securityProtocolFloor, 2);
     assert.match(seeded.appCaPem, /BEGIN CERTIFICATE/);
     await store.update({ securityProtocolFloor: 1 });
     assert.equal((await store.load()).securityProtocolFloor, 2);
+
+    const movedOfficial = await bootstrapOfficialGatewayTrust(store, {
+      gatewayUrl: 'https://device2.hcu-lab.me/mcp',
+      caPath
+    });
+    assert.equal(movedOfficial.gatewayUrl, 'https://device2.hcu-lab.me/mcp');
+    assert.match(movedOfficial.appCaPem, /BEGIN CERTIFICATE/);
 
     const switched = await bootstrapOfficialGatewayTrust(store, {
       gatewayUrl: 'https://custom-switch.example.test/mcp',
@@ -254,6 +271,7 @@ await testConfigPersistenceAndMonotonicSecurityFloor();
 await testWindowsProxyCredentialsAreProtectedAtRest();
 await testInteractiveCapturePersistsConnectionInputs();
 await testPersistedProxyTunnelsTrustedOuterTlsAndRejectsUntrustedCertificate();
+testHcuLabSubdomainsUseBundledTrust();
 await testOfficialGatewayTrustBootstrapIsIndependentAndFailClosed();
 testStandardProxyEnvironmentResolution();
 console.log('Gateway persisted config and proxy tests passed');
