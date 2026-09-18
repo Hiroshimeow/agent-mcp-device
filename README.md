@@ -1,8 +1,27 @@
 # MCP Device
 
-`@hcu-lab.me/mcp-device` securely connects a user-owned computer to an authenticated Model Context Protocol gateway. The device makes the outbound connection; no inbound device port is required.
+`@hcu-lab.me/mcp-device` connects a user-owned computer to the authenticated MCP Gateway. The device opens the outbound connection; no inbound device port is required.
 
 The gateway owns accounts, OAuth, device ownership, MCP tool contracts, routing, and usage aggregation. MCP Device owns local device identity, pairing, reconnect lifecycle, bounded execution, background registration, and local status.
+
+## Quick start
+
+Canonical production gateway: https://device.hcu-lab.me
+
+- Dashboard: https://device.hcu-lab.me/dashboard
+- Pair device: https://device.hcu-lab.me/pair
+- Live setup/help: https://device.hcu-lab.me/help
+
+Install the current release:
+
+```powershell
+npm install -g @hcu-lab.me/mcp-device@1.0.2
+mcp-device login
+mcp-device install
+mcp-device status
+```
+
+The hosted Pair/Help pages render their gateway URL and navigation from the deployment that served the page, so staging or custom deployments do not need a production-host rewrite. For the canonical package, `https://device.hcu-lab.me` is the default gateway; `MCP_GATEWAY_URL` is only needed when intentionally using another gateway.
 
 ## Commands
 
@@ -20,19 +39,19 @@ mcp-device --help       show command help
 
 `md` is an alias of `mcp-device` on POSIX shells. On Windows, use `mcp-device`; bare `md` has a shell collision with built-in directory-creation commands/aliases and is not the supported invocation.
 
-On Windows, `install` uses the current-user background registration. On Linux, every `install` asks whether to use `systemd --user` or an already configured PM2 installation. MCP Device does not install PM2, run `pm2 startup`, or use `sudo` automatically.
+On Windows, `install` uses current-user background registration. On Linux, every `install` asks whether to use `systemd --user` or an already configured PM2 installation. MCP Device does not install PM2, run `pm2 startup`, or use `sudo` automatically.
 
 ## First run and trust
 
-The official gateway is `https://mcp-v2.hcu-lab.me/mcp`. The official package is designed to pin an independently distributed application CA and require protocol v2 before the first network connection. If that CA is absent, MCP Device fails closed rather than learning trust from the gateway it is about to contact or falling back to protocol v1.
+The official gateway base URL is `https://device.hcu-lab.me`. The official package pins the independently distributed application CA and requires protocol v2 before the first network connection. If that CA is absent or invalid, MCP Device fails closed instead of learning trust from the gateway it is about to contact or falling back to protocol v1.
 
-For a custom gateway, configure the gateway URL and provision its application CA through an independent trusted channel before enabling protocol v2. Proxy selection is captured during interactive provisioning and reused by the background runtime; proxy credentials are protected with Windows DPAPI on Windows.
+For a custom gateway, set `MCP_GATEWAY_URL` and provision its application CA through an independent trusted channel before enabling protocol v2. Proxy selection is captured during interactive provisioning and reused by the background runtime.
 
-## Local state and migration
+## Local state and 1.0.2 migration
 
 Canonical state is stored under `~/.mcp-device/`. Existing `~/.hcu-device/` identity/config/status state is migrated non-destructively under serialized runtime ownership. A conflicting canonical and legacy identity fails closed rather than creating a second device identity.
 
-The device identity is Ed25519. On Windows, the private key is protected with DPAPI for the current user. The gateway stores the public identity and account ownership.
+The device identity is Ed25519. MCP Device 1.0.2 does not use Windows DPAPI for the device private key or proxy configuration. A legacy protected 1.0.1 identity is archived without decrypting it, a fresh local identity is generated, and the device must be paired once again. A legacy protected proxy configuration must be supplied again during `mcp-device login`. The gateway stores only the public device identity and account ownership.
 
 ## Development
 
