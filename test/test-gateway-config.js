@@ -47,19 +47,16 @@ async function testConfigPersistenceAndMonotonicSecurityFloor() {
   }
 }
 
-async function testWindowsProxyCredentialsAreProtectedAtRest() {
+async function testWindowsProxyPersistsWithoutDpapi() {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'hcu-gateway-proxy-'));
   const configPath = path.join(root, 'gateway-config.json');
-  const protectSecret = async value => `sealed:${Buffer.from(value).toString('base64')}`;
-  const unprotectSecret = async value => Buffer.from(String(value).slice('sealed:'.length), 'base64');
   try {
-    const store = new GatewayDeviceConfigStore(configPath, { platform: 'win32', protectSecret, unprotectSecret });
+    const store = new GatewayDeviceConfigStore(configPath, { platform: 'win32' });
     const proxyUrl = 'http://proxy-user:proxy-pass@127.0.0.1:8080';
     await store.update({ proxy: { mode: 'configured', url: proxyUrl } });
     const raw = await fs.readFile(configPath, 'utf8');
-    assert.equal(raw.includes('proxy-user'), false);
-    assert.equal(raw.includes('proxy-pass'), false);
-    assert.equal(raw.includes(proxyUrl), false);
+    assert.equal(raw.includes('dpapi-current-user-v1'), false);
+    assert.equal(raw.includes(proxyUrl), true);
     const loaded = await store.load();
     assert.deepEqual(loaded.proxy, { mode: 'configured', url: `${proxyUrl}/` });
     const proxy = createGatewayProxyAgent(loaded);
@@ -268,7 +265,7 @@ function testStandardProxyEnvironmentResolution() {
 }
 
 await testConfigPersistenceAndMonotonicSecurityFloor();
-await testWindowsProxyCredentialsAreProtectedAtRest();
+await testWindowsProxyPersistsWithoutDpapi();
 await testInteractiveCapturePersistsConnectionInputs();
 await testPersistedProxyTunnelsTrustedOuterTlsAndRejectsUntrustedCertificate();
 testHcuLabSubdomainsUseBundledTrust();

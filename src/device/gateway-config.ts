@@ -6,7 +6,6 @@ import path from 'path';
 import { ProxyAgent } from 'proxy-agent';
 
 import { deviceStatePaths } from './device-state.js';
-import { protectWindowsSecret, unprotectWindowsSecret } from './windows-dpapi.js';
 
 const require = createRequire(import.meta.url);
 const { getProxyForUrl } = require('proxy-from-env') as { getProxyForUrl: (url: string | URL) => string };
@@ -25,9 +24,6 @@ export interface GatewayDeviceConfig {
     appCaPem: string | null;
     securityProtocolFloor: number;
 }
-
-type SecretProtect = (value: Buffer) => Promise<string>;
-type SecretUnprotect = (value: string) => Promise<Buffer>;
 
 function defaultConfigPath(): string {
     return deviceStatePaths().config;
@@ -83,19 +79,8 @@ function normalizeFloor(value: unknown): number {
 
 export class GatewayDeviceConfigStore {
     readonly configPath: string;
-    private platform: NodeJS.Platform | string;
-    private protectSecret: SecretProtect;
-    private unprotectSecret: SecretUnprotect;
-
-    constructor(configPath = defaultConfigPath(), options: {
-        platform?: NodeJS.Platform | string;
-        protectSecret?: SecretProtect;
-        unprotectSecret?: SecretUnprotect;
-    } = {}) {
+    constructor(configPath = defaultConfigPath(), _options: { platform?: NodeJS.Platform | string } = {}) {
         this.configPath = path.resolve(configPath);
-        this.platform = options.platform || process.platform;
-        this.protectSecret = options.protectSecret || (value => protectWindowsSecret(value, 'proxy', { platform: this.platform }));
-        this.unprotectSecret = options.unprotectSecret || (value => unprotectWindowsSecret(value, 'proxy', { platform: this.platform }));
     }
 
     async load(): Promise<GatewayDeviceConfig> {
@@ -107,14 +92,10 @@ export class GatewayDeviceConfigStore {
             throw error;
         }
         if (!parsed || typeof parsed !== 'object') throw new Error('Invalid gateway config record.');
-        let proxy: GatewayProxyConfig;
-        if (parsed.proxy?.mode === 'configured' && parsed.proxy?.protected?.scheme === 'dpapi-current-user-v1') {
-            if (this.platform !== 'win32') throw new Error('DPAPI-protected proxy configuration requires Windows.');
-            const restored = await this.unprotectSecret(String(parsed.proxy.protected.blob || ''));
-            proxy = normalizedProxy({ mode: 'configured', url: restored.toString('utf8') });
-        } else {
-            proxy = normalizedProxy(parsed.proxy);
+        if (parsed.proxy?.mode === 'configured' && parsed.proxy?.protected) {
+            throw new Error('Legacy protected proxy configuration is unsupported in MCP Device 1.0.2+. Re-run `mcp-device login` with your proxy environment configured.');
         }
+        const proxy = normalizedProxy(parsed.proxy);
         const appCaPem = normalizeAppCa(parsed.appCaPem);
         const requestedFloor = normalizeFloor(parsed.securityProtocolFloor);
         return {
@@ -146,17 +127,9 @@ export class GatewayDeviceConfigStore {
     }
 
     private async persist(config: GatewayDeviceConfig): Promise<void> {
-        let proxy: any = { mode: 'direct' };
-        if (config.proxy.mode === 'configured' && config.proxy.url) {
-            if (this.platform === 'win32') {
-                const blob = await this.protectSecret(Buffer.from(config.proxy.url, 'utf8'));
-                const restored = await this.unprotectSecret(blob);
-                if (restored.toString('utf8') !== config.proxy.url) throw new Error('DPAPI proxy verification failed.');
-                proxy = { mode: 'configured', protected: { scheme: 'dpapi-current-user-v1', blob } };
-            } else {
-                proxy = { mode: 'configured', url: config.proxy.url };
-            }
-        }
+        const proxy: any = config.proxy.mode === 'configured' && config.proxy.url
+            ? { mode: 'configured', url: config.proxy.url }
+            : { mode: 'direct' };
         const persisted = {
             version: 1,
             gatewayUrl: config.gatewayUrl,

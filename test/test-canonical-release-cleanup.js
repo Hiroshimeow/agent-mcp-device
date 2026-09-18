@@ -16,9 +16,11 @@ for (const [name, script] of Object.entries(pkg.scripts || {})) {
 }
 assert.match(pkg.scripts?.build || '', /^shx rm -rf dist\/remote-device/, 'build must prune stale dist/remote-device before emit');
 assert.match(pkg.scripts?.build || '', /dist\/device\/desktop-commander-integration\.js/, 'build must prune the renamed upstream adapter artifact');
+assert.match(pkg.scripts?.build || '', /dist\/device\/windows-dpapi\.js/, 'build must prune the removed Windows DPAPI artifact before emit');
 assert.match(pkg.scripts?.build || '', /&& tsc/, 'build must prune stale outputs before TypeScript emit');
 assert.match(pkg.scripts?.prepack || '', /rm -rf dist\/remote-device/, 'prepack must prune stale dist/remote-device artifacts');
 assert.match(pkg.scripts?.prepack || '', /dist\/device\/desktop-commander-integration\.js/, 'prepack must prune the renamed upstream adapter artifact');
+assert.match(pkg.scripts?.prepack || '', /dist\/device\/windows-dpapi\.js/, 'prepack must never ship the removed Windows DPAPI artifact');
 
 const config = read('src/config.ts');
 assert.match(config, /MCP_DEVICE_CONFIG_DIR/);

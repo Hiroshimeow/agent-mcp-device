@@ -56,20 +56,6 @@
     "why": "Legacy Windows registration cleanup documentation."
   },
   {
-    "file": "src/device/windows-dpapi.ts",
-    "token": "hcu-device-identity-private-key-v1",
-    "count": 1,
-    "reason": "B",
-    "why": "DPAPI decryption purpose continuity for existing protected identity material."
-  },
-  {
-    "file": "src/device/windows-dpapi.ts",
-    "token": "hcu-device-proxy-url-v1",
-    "count": 1,
-    "reason": "B",
-    "why": "DPAPI decryption purpose continuity for existing protected proxy material."
-  },
-  {
     "file": "src/device/windows-service.ts",
     "token": "HCU-Device-",
     "count": 1,

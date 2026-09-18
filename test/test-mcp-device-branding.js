@@ -7,7 +7,7 @@ import path from 'path';
 const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 
 assert.equal(pkg.name, '@hcu-lab.me/mcp-device');
-assert.equal(pkg.version, '1.0.0');
+assert.equal(pkg.version, '1.0.2');
 assert.equal(pkg.author, 'Hirohimeow');
 assert.equal(pkg.bin?.['mcp-device'], 'dist/mcp-device.js');
 assert.equal(pkg.bin?.md, 'dist/mcp-device.js');

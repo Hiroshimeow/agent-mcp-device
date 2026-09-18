@@ -4,7 +4,6 @@ import os from 'os';
 import path from 'path';
 
 import { deviceStatePaths } from './device-state.js';
-import { protectWindowsSecret, unprotectWindowsSecret } from './windows-dpapi.js';
 
 export interface GatewayIdentityRecord {
     deviceId: string;
@@ -16,9 +15,6 @@ export interface GatewayIdentityRecord {
 export function deviceIdentityNeedsPairing(record: Pick<GatewayIdentityRecord, 'enrolled'>): boolean {
     return record.enrolled !== true;
 }
-
-type SecretProtect = (value: Buffer) => Promise<string>;
-type SecretUnprotect = (value: string) => Promise<Buffer>;
 
 function defaultIdentityPath(): string {
     const secureRoot = deviceStatePaths().root;
@@ -57,38 +53,23 @@ function validateRecord(value: any): GatewayIdentityRecord {
     return { deviceId, publicKeyPem: normalizedPublic, privateKeyPem, enrolled: value.enrolled === true };
 }
 
-function privateKeyDer(privateKeyPem: string): Buffer {
-    return createPrivateKey(privateKeyPem).export({ type: 'pkcs8', format: 'der' }) as Buffer;
-}
-
-function privateKeyPemFromDer(value: Buffer): string {
-    return createPrivateKey({ key: value, type: 'pkcs8', format: 'der' }).export({ type: 'pkcs8', format: 'pem' }).toString();
-}
-
 export class GatewayDeviceIdentity {
     readonly identityPath: string;
     private record?: GatewayIdentityRecord;
-    private platform: NodeJS.Platform | string;
-    private protectSecret: SecretProtect;
-    private unprotectSecret: SecretUnprotect;
-
-    constructor(identityPath = defaultIdentityPath(), options: {
-        platform?: NodeJS.Platform | string;
-        protectSecret?: SecretProtect;
-        unprotectSecret?: SecretUnprotect;
-    } = {}) {
+    constructor(identityPath = defaultIdentityPath(), _options: { platform?: NodeJS.Platform | string } = {}) {
         this.identityPath = identityPath;
-        this.platform = options.platform || process.platform;
-        this.protectSecret = options.protectSecret || (value => protectWindowsSecret(value, 'identity', { platform: this.platform }));
-        this.unprotectSecret = options.unprotectSecret || (value => unprotectWindowsSecret(value, 'identity', { platform: this.platform }));
     }
 
     async loadOrCreate(): Promise<GatewayIdentityRecord> {
         if (this.record) return { ...this.record };
         try {
             const parsed = JSON.parse(await fs.readFile(this.identityPath, 'utf8'));
-            this.record = await this.loadPersisted(parsed);
-            return { ...this.record };
+            if (parsed?.privateKey?.scheme) {
+                await this.archiveLegacyProtectedIdentity();
+            } else {
+                this.record = validateRecord(parsed);
+                return { ...this.record };
+            }
         } catch (error: any) {
             if (error?.code !== 'ENOENT') throw error;
         }
@@ -149,48 +130,13 @@ export class GatewayDeviceIdentity {
         return sign(null, challenge, current.privateKeyPem).toString('base64');
     }
 
-    private async loadPersisted(value: any): Promise<GatewayIdentityRecord> {
-        if (value?.privateKeyPem) {
-            const legacy = validateRecord(value);
-            if (this.platform !== 'win32') return legacy;
-            const blob = await this.protectAndVerify(legacy);
-            await this.persistSerialized({
-                version: 2,
-                deviceId: legacy.deviceId,
-                publicKeyPem: legacy.publicKeyPem,
-                privateKey: { scheme: 'dpapi-current-user-v1', blob },
-                enrolled: legacy.enrolled
-            });
-            return legacy;
-        }
-        if (value?.privateKey?.scheme !== 'dpapi-current-user-v1' || !value.privateKey.blob) {
-            throw new Error('Invalid gateway identity protected private key');
-        }
-        if (this.platform !== 'win32') throw new Error('DPAPI-protected gateway identity requires Windows');
-        const privateKeyPem = privateKeyPemFromDer(await this.unprotectSecret(String(value.privateKey.blob)));
-        return validateRecord({ ...value, privateKeyPem });
-    }
-
-    private async protectAndVerify(record: GatewayIdentityRecord): Promise<string> {
-        const blob = await this.protectSecret(privateKeyDer(record.privateKeyPem));
-        const restoredPem = privateKeyPemFromDer(await this.unprotectSecret(blob));
-        validateRecord({ ...record, privateKeyPem: restoredPem });
-        return blob;
+    private async archiveLegacyProtectedIdentity(): Promise<void> {
+        const archivePath = `${this.identityPath}.legacy-protected.${Date.now()}`;
+        await fs.rename(this.identityPath, archivePath);
     }
 
     private async persist(): Promise<void> {
         if (!this.record) throw new Error('Gateway identity is not initialized');
-        if (this.platform === 'win32') {
-            const blob = await this.protectAndVerify(this.record);
-            await this.persistSerialized({
-                version: 2,
-                deviceId: this.record.deviceId,
-                publicKeyPem: this.record.publicKeyPem,
-                privateKey: { scheme: 'dpapi-current-user-v1', blob },
-                enrolled: this.record.enrolled
-            });
-            return;
-        }
         await this.persistSerialized(this.record);
     }
 
