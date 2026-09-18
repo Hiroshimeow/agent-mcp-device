@@ -15,7 +15,7 @@ Canonical production gateway: https://device.hcu-lab.me
 Install the current release:
 
 ```powershell
-npm install -g @hcu-lab.me/mcp-device@1.0.3
+npm install -g @hcu-lab.me/mcp-device
 mcp-device login
 mcp-device install
 mcp-device status

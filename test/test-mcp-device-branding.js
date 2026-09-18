@@ -14,7 +14,7 @@ assert.equal(pkg.bin?.md, 'dist/mcp-device.js');
 assert.equal(pkg.bin?.['hcu-device'], undefined);
 assert.equal(pkg.bin?.['desktop-commander'], undefined);
 assert.equal(pkg.mcpName, undefined);
-assert.equal(pkg.repository?.url, 'https://github.com/Hiroshimeow/agent-mcp-device.git');
+assert.equal(pkg.repository?.url, 'git+https://github.com/Hiroshimeow/agent-mcp-device.git');
 assert.deepEqual(pkg.files, ['dist'], 'published device package must not ship upstream marketing assets');
 for (const name of ['release', 'release:minor', 'release:major', 'release:dry', 'release:mcp', 'release:alpha', 'release:skip-mcp', 'build:mcpb', 'validate:tools', 'open-chat', 'setup', 'setup:debug', 'remove']) {
   assert.equal(pkg.scripts?.[name], undefined, `upstream product script ${name} must not remain in MCP Device`);
@@ -42,7 +42,7 @@ assert.equal(fs.existsSync(new URL('../PUBLISH.md', import.meta.url)), false);
 const readme = fs.readFileSync(new URL('../README.md', import.meta.url), 'utf8');
 assert.match(readme, /^# MCP Device/m);
 assert.match(readme, /@hcu-lab\.me\/mcp-device/);
-assert.match(readme, /npm install -g @hcu-lab\.me\/mcp-device@1\.0\.3/);
+assert.match(readme, /npm install -g @hcu-lab\.me\/mcp-device(?:\s|$)/m);
 assert.match(readme, /https:\/\/device\.hcu-lab\.me/);
 assert.match(readme, /https:\/\/device\.hcu-lab\.me\/dashboard/);
 assert.match(readme, /https:\/\/device\.hcu-lab\.me\/pair/);

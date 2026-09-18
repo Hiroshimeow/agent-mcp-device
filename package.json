@@ -7,7 +7,7 @@
   "homepage": "https://github.com/Hiroshimeow/agent-mcp-device",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Hiroshimeow/agent-mcp-device.git"
+    "url": "git+https://github.com/Hiroshimeow/agent-mcp-device.git"
   },
   "bugs": "https://github.com/Hiroshimeow/agent-mcp-device/issues",
   "type": "module",
