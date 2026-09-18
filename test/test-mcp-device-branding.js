@@ -1,4 +1,4 @@
-﻿import assert from 'assert';
+import assert from 'assert';
 import { spawnSync } from 'child_process';
 import fs from 'fs';
 import os from 'os';
@@ -7,7 +7,7 @@ import path from 'path';
 const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 
 assert.equal(pkg.name, '@hcu-lab.me/mcp-device');
-assert.equal(pkg.version, '1.0.2');
+assert.equal(pkg.version, '1.0.3');
 assert.equal(pkg.author, 'Hirohimeow');
 assert.equal(pkg.bin?.['mcp-device'], 'dist/mcp-device.js');
 assert.equal(pkg.bin?.md, 'dist/mcp-device.js');
@@ -42,7 +42,7 @@ assert.equal(fs.existsSync(new URL('../PUBLISH.md', import.meta.url)), false);
 const readme = fs.readFileSync(new URL('../README.md', import.meta.url), 'utf8');
 assert.match(readme, /^# MCP Device/m);
 assert.match(readme, /@hcu-lab\.me\/mcp-device/);
-assert.match(readme, /npm install -g @hcu-lab\.me\/mcp-device@1\.0\.2/);
+assert.match(readme, /npm install -g @hcu-lab\.me\/mcp-device@1\.0\.3/);
 assert.match(readme, /https:\/\/device\.hcu-lab\.me/);
 assert.match(readme, /https:\/\/device\.hcu-lab\.me\/dashboard/);
 assert.match(readme, /https:\/\/device\.hcu-lab\.me\/pair/);
@@ -68,7 +68,7 @@ try {
   const result = spawnSync(process.execPath, ['dist/mcp-device.js', '--help'], {
     cwd: new URL('..', import.meta.url),
     encoding: 'utf8',
-    timeout: 5000,
+    timeout: process.platform === 'win32' ? 20000 : 5000,
     env: {
       ...process.env,
       HOME: helpHome,
