@@ -1,6 +1,6 @@
 {
   "name": "@hcu-lab.me/mcp-device",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "MCP Device securely connects a user-owned computer to an authenticated Model Context Protocol gateway.",
   "license": "MIT",
   "author": "Hirohimeow",
