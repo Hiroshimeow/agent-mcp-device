@@ -47,6 +47,12 @@ mcp-device --help       show command help
 
 On Windows, `install` uses current-user background registration. On Linux, every `install` asks whether to use `systemd --user` or an already configured PM2 installation. MCP Device does not install PM2, run `pm2 startup`, or use `sudo` automatically.
 
+## Dashboard updates
+
+Starting with MCP Device 1.0.5, an installed background device reports its package version to the authenticated gateway and can accept a per-device update requested by its owning account from the dashboard. The control is intentionally narrow: the gateway supplies only an exact stable version, and the device installs only `@hcu-lab.me/mcp-device@<version>`, verifies the installed version, then restarts through its existing Windows, systemd-user, or PM2 lifecycle.
+
+Installations older than 1.0.5 do not understand this update control. Upgrade those devices to 1.0.5 once with npm; subsequent releases can be applied from the dashboard. Offline devices remain unchanged until they are online and explicitly updated.
+
 ## First run and trust
 
 The official gateway base URL is `https://device.hcu-lab.me`. The official package pins the independently distributed application CA and requires protocol v2 before the first network connection. If that CA is absent or invalid, MCP Device fails closed instead of learning trust from the gateway it is about to contact or falling back to protocol v1.

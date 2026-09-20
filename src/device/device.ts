@@ -13,6 +13,7 @@ import { bootstrapOfficialGatewayTrust } from './official-trust.js';
 import { GatewayDeviceStatusStore } from './device-status.js';
 import { GatewayToolAdapter } from './gateway-tool-adapter.js';
 import { RuntimeOwner, acquireRuntimeOwner, type RuntimeOwnerStatus } from './runtime-owner.js';
+import { installDevicePackageUpdate, scheduleDeviceRuntimeRestart } from './self-update.js';
 import { captureRemote } from '../utils/capture.js';
 
 export class MCPDevice {
@@ -130,6 +131,11 @@ export class MCPDevice {
                 appCaPem: gatewayConfig.appCaPem || undefined,
                 adapter: new GatewayToolAdapter(this.desktop, { allowedRoots: gatewayConfig.allowedRoots }),
                 agentVersion: process.env.npm_package_version,
+                onUpdateRequest: async targetVersion => {
+                    const record = await identity.loadOrCreate();
+                    await installDevicePackageUpdate(targetVersion);
+                    scheduleDeviceRuntimeRestart({ deviceId: record.deviceId });
+                },
                 onStatus: async payload => {
                     const record = await identity.loadOrCreate();
                     await gatewayStatus.update({

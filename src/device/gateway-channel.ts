@@ -13,6 +13,7 @@ import {
 } from './gateway-secure-transport.js';
 import { GATEWAY_CAPABILITIES, GatewayToolAdapter } from './gateway-tool-adapter.js';
 import { gatewaySocketUrl } from './gateway-url-policy.js';
+import { VERSION } from '../version.js';
 
 const PROTOCOL_VERSION = 1;
 const PROTOCOL_VERSION_V2 = 2;
@@ -30,6 +31,7 @@ export interface GatewayChannelOptions {
     adapter: GatewayToolAdapter;
     agentVersion?: string;
     onStatus?: (payload: any) => void | Promise<void>;
+    onUpdateRequest?: (targetVersion: string) => void | Promise<void>;
 }
 
 export class GatewayDeviceChannel {
@@ -164,6 +166,7 @@ export class GatewayDeviceChannel {
             timestamp: Date.now(),
             payload: {
                 agent_version: this.options.agentVersion || 'mcp-device-1',
+                package_version: VERSION,
                 hostname: os.hostname(),
                 platform: process.platform,
                 arch: process.arch,
@@ -187,6 +190,7 @@ export class GatewayDeviceChannel {
             timestamp: Date.now(),
             payload: {
                 agent_version: this.options.agentVersion || 'mcp-device-1',
+                package_version: VERSION,
                 hostname: os.hostname(),
                 platform: process.platform,
                 arch: process.arch,
@@ -200,7 +204,7 @@ export class GatewayDeviceChannel {
     private async handleMessage(raw: string | any): Promise<void> {
         const message = typeof raw === 'string' ? JSON.parse(raw) : raw;
         if (message?.protocol_version !== this.protocolVersion) throw new Error('Unsupported gateway protocol version');
-        if (['auth_challenge', 'auth_ok', 'tool_call'].includes(String(message?.type || ''))) {
+        if (['auth_challenge', 'auth_ok', 'tool_call', 'device_update'].includes(String(message?.type || ''))) {
             const record = await this.identity.loadOrCreate();
             if (String(message?.device_id || '') !== record.deviceId) throw new Error('Gateway message device_id mismatch');
         }
@@ -262,6 +266,12 @@ export class GatewayDeviceChannel {
             }
             return;
         }
+        if (message.type === 'device_update') {
+            if (this.connectionEpoch === undefined || this.authenticatedDeviceId === undefined) throw new Error('Gateway device_update arrived before authentication');
+            if (String(message.connection_epoch) !== String(this.connectionEpoch)) throw new Error('Gateway device_update connection_epoch mismatch');
+            void this.handleUpdateRequest(message);
+            return;
+        }
         if (message.type !== 'tool_call') return;
         if (this.connectionEpoch === undefined || this.authenticatedDeviceId === undefined) throw new Error('Gateway tool_call arrived before authentication');
         if (String(message.connection_epoch) !== String(this.connectionEpoch)) throw new Error('Gateway tool_call connection_epoch mismatch');
@@ -294,6 +304,39 @@ export class GatewayDeviceChannel {
         }, timeoutMs);
         try { return await result; }
         finally { clearTimeout(timer); }
+    }
+
+    private async handleUpdateRequest(message: any): Promise<void> {
+        if (this.connectionEpoch === undefined || !this.authenticatedDeviceId) return;
+        const requestId = String(message.request_id || '').trim();
+        const targetVersion = String(message.payload?.target_version || '').trim();
+        const sendStatus = (state: string, extra: any = {}) => {
+            try {
+                this.send({
+                    protocol_version: this.protocolVersion,
+                    type: 'device_update_status',
+                    request_id: requestId,
+                    device_id: this.authenticatedDeviceId,
+                    connection_epoch: this.connectionEpoch,
+                    timestamp: Date.now(),
+                    payload: { state, target_version: targetVersion, package_version: VERSION, ...extra }
+                });
+            } catch { /* reconnect state will make the final version authoritative */ }
+        };
+        if (!requestId || !/^\d+\.\d+\.\d+$/.test(targetVersion) || typeof this.options.onUpdateRequest !== 'function') {
+            sendStatus('failed', { code: 'DEVICE_UPDATE_UNSUPPORTED', message: 'Device update request is unsupported or invalid.' });
+            return;
+        }
+        sendStatus('accepted');
+        try {
+            await this.options.onUpdateRequest(targetVersion);
+            sendStatus('installed');
+        } catch (error: any) {
+            sendStatus('failed', {
+                code: String(error?.code || 'DEVICE_UPDATE_FAILED').slice(0, 64),
+                message: String(error?.message || error).slice(0, 240)
+            });
+        }
     }
 
     private async handleToolCall(message: any): Promise<void> {
