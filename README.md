@@ -21,6 +21,12 @@ mcp-device install
 mcp-device status
 ```
 
+`mcp-device login` stays terminal-only: it prints the pairing URL, user code, and QR code, and never opens a browser automatically.
+
+## Limited hosted access
+
+The public source package remains MIT licensed, but access to the hosted `device.hcu-lab.me` gateway is intentionally limited. New hosted accounts are admitted through a small, controlled supply of invite codes rather than open registration. Invite availability may be capped, paused, expired, or revoked as the service capacity and security policy change. Installing the package does not by itself grant a hosted-service account or guarantee that an invite code will be available.
+
 The hosted Pair/Help pages render their gateway URL and navigation from the deployment that served the page, so staging or custom deployments do not need a production-host rewrite. For the canonical package, `https://device.hcu-lab.me` is the default gateway; `MCP_GATEWAY_URL` is only needed when intentionally using another gateway.
 
 ## Commands
@@ -62,6 +68,14 @@ npm ci
 npm run build
 node dist/mcp-device.js --help
 ```
+
+Normal development pushes do not publish npm. After reviewed development work is committed on a clean `main`, a release is intentionally created with:
+
+```powershell
+npm run release
+```
+
+That command runs the test suite, bumps the patch version, synchronizes project version files, creates the release commit and `vX.Y.Z` tag, then atomically pushes `main` and the tag. The tag-triggered GitHub Actions workflow performs the npm publish through trusted OIDC publishing. Use `npm run release:minor` or `npm run release:major` only when that version change is intentional.
 
 For a custom development gateway, set `MCP_GATEWAY_URL`. Supply `MCP_GATEWAY_APP_CA_PATH` from an independent trusted source when using protocol v2. Non-loopback plaintext gateway URLs are rejected.
 

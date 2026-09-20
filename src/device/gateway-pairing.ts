@@ -2,7 +2,6 @@ import { createHash, randomBytes } from 'crypto';
 import type { Agent } from 'http';
 import { createRequire } from 'module';
 import os from 'os';
-import open from 'open';
 import fetch from 'cross-fetch';
 
 import { GatewayDeviceIdentity } from './gateway-identity.js';
@@ -26,6 +25,7 @@ export interface GatewayPairingOptions {
     deviceName?: string;
     fetchFn?: typeof fetch;
     proxyAgent?: Agent;
+    /** @deprecated Pairing is intentionally terminal-only; this hook is ignored. */
     openBrowser?: (url: string) => Promise<unknown>;
     renderQr?: (value: string) => void;
     sleep?: (ms: number) => Promise<void>;
@@ -68,7 +68,6 @@ async function jsonResponse(response: Response): Promise<any> {
 export async function pairGatewayDevice(options: GatewayPairingOptions): Promise<GatewayPairingResult> {
     const baseUrl = gatewayHttpBase(options.gatewayUrl);
     const fetchFn = options.fetchFn || fetch;
-    const openBrowser = options.openBrowser || (url => open(url));
     const renderQr = options.renderQr || defaultQrRenderer;
     const sleep = options.sleep || (ms => new Promise(resolve => setTimeout(resolve, ms)));
     const log = options.log || (value => console.log(value));
@@ -98,7 +97,6 @@ export async function pairGatewayDevice(options: GatewayPairingOptions): Promise
     log(`Pair this device: ${verificationUrl}`);
     log(`Code: ${start.user_code}`);
     renderQr(verificationUrl);
-    try { await openBrowser(verificationUrl); } catch { /* URL + QR remain usable */ }
 
     const intervalMs = Math.max(1000, Math.min(30_000, Number(start.interval || 2) * 1000));
     const deadline = Date.now() + Math.max(1, Number(start.expires_in || 600)) * 1000;

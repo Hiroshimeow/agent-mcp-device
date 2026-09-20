@@ -7,7 +7,11 @@ import path from 'path';
 const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 
 assert.equal(pkg.name, '@hcu-lab.me/mcp-device');
-assert.equal(pkg.version, '1.0.3');
+assert.match(pkg.version, /^\d+\.\d+\.\d+$/);
+const serverManifest = JSON.parse(fs.readFileSync(new URL('../server.json', import.meta.url), 'utf8'));
+const versionSource = fs.readFileSync(new URL('../src/version.ts', import.meta.url), 'utf8');
+assert.equal(serverManifest.version, pkg.version);
+assert.match(versionSource, new RegExp(`VERSION = ['\"]${pkg.version.replace(/\\./g, '\\\\.')}['\"]`));
 assert.equal(pkg.author, 'Hirohimeow');
 assert.equal(pkg.bin?.['mcp-device'], 'dist/mcp-device.js');
 assert.equal(pkg.bin?.md, 'dist/mcp-device.js');
@@ -16,13 +20,18 @@ assert.equal(pkg.bin?.['desktop-commander'], undefined);
 assert.equal(pkg.mcpName, undefined);
 assert.equal(pkg.repository?.url, 'git+https://github.com/Hiroshimeow/agent-mcp-device.git');
 assert.deepEqual(pkg.files, ['dist'], 'published device package must not ship upstream marketing assets');
-for (const name of ['release', 'release:minor', 'release:major', 'release:dry', 'release:mcp', 'release:alpha', 'release:skip-mcp', 'build:mcpb', 'validate:tools', 'open-chat', 'setup', 'setup:debug', 'remove']) {
+for (const name of ['release:dry', 'release:mcp', 'release:alpha', 'release:skip-mcp', 'build:mcpb', 'validate:tools', 'open-chat', 'setup', 'setup:debug', 'remove']) {
   assert.equal(pkg.scripts?.[name], undefined, `upstream product script ${name} must not remain in MCP Device`);
 }
+assert.equal(pkg.scripts?.release, 'node scripts/release.js patch');
+assert.equal(pkg.scripts?.['release:minor'], 'node scripts/release.js minor');
+assert.equal(pkg.scripts?.['release:major'], 'node scripts/release.js major');
+assert.equal(pkg.scripts?.version, 'node scripts/sync-version.js && git add server.json src/version.ts package-lock.json');
 assert.equal(pkg.scripts?.start, 'node dist/mcp-device.js');
 assert.equal(pkg.scripts?.['start:debug'], 'node --inspect-brk=9229 dist/mcp-device.js');
 assert.equal(pkg.scripts?.postinstall, undefined, 'MCP Device must not run Desktop Commander telemetry during install');
 assert.equal(pkg.devDependencies?.['@anthropic-ai/mcpb'], undefined);
+assert.equal(fs.existsSync(new URL('../scripts/release.js', import.meta.url)), true);
 assert.equal(fs.existsSync(new URL('../scripts/publish-release.cjs', import.meta.url)), false);
 assert.equal(fs.existsSync(new URL('../scripts/build-mcpb.cjs', import.meta.url)), false);
 assert.equal(fs.existsSync(new URL('../scripts/validate-tools-sync.js', import.meta.url)), false);
@@ -51,6 +60,9 @@ assert.doesNotMatch(readme, /mcp-v2\.hcu-lab\.me/);
 assert.doesNotMatch(readme, /protected with Windows DPAPI|DPAPI for the current user/i);
 assert.match(readme, /Desktop Commander/i, 'MCP Device README must retain upstream engine attribution');
 assert.match(readme, /MIT licensed/i);
+assert.match(readme, /small, controlled supply of invite codes/i);
+assert.match(readme, /npm run release/);
+assert.match(readme, /GitHub Actions.*OIDC/i);
 assert.match(readme, /Windows.*bare `md`.*shell.*collision/i, 'Windows docs must not advertise the shell-reserved bare md alias');
 assert.doesNotMatch(readme, /npx @wonderwhy-er\/desktop-commander@latest setup/);
 

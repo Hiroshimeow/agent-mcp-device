@@ -17,7 +17,7 @@ async function listen(server) {
   return server.address().port;
 }
 
-async function testPairingUsesPkceQrBrowserAndReturnsOnlyEnrollmentGrant() {
+async function testPairingUsesPkceQrWithoutOpeningBrowserAndReturnsOnlyEnrollmentGrant() {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-pairing-'));
   const identity = new GatewayDeviceIdentity(path.join(root, 'identity.json'));
   let startPayload = null;
@@ -88,8 +88,8 @@ async function testPairingUsesPkceQrBrowserAndReturnsOnlyEnrollmentGrant() {
     assert.equal(startPayload.device_name, 'ThinkBook Pair Test');
     assert.equal(startPayload.public_key_pem, record.publicKeyPem);
     assert.equal(startPayload.code_challenge_method, 'S256');
-    assert.equal(opened[0], 'https://gateway.test/device/verify?user_code=ABCD-2345');
-    assert.equal(qrs[0], opened[0]);
+    assert.equal(opened.length, 0, 'pairing must never auto-open a browser');
+    assert.equal(qrs[0], 'https://gateway.test/device/verify?user_code=ABCD-2345');
     assert(logs.some(line => line.includes('ABCD-2345')));
     assert.deepEqual(result.account, { connected: true, label: 'Example Gateway' });
     assert.equal(result.enrollmentGrant, 'pairing-grant-only');
@@ -174,6 +174,6 @@ async function testStatusStorePersistsOnlyNonSecretAccountUsageAndSchemaMetadata
   await fs.rm(root, { recursive: true, force: true });
 }
 
-await testPairingUsesPkceQrBrowserAndReturnsOnlyEnrollmentGrant();
+await testPairingUsesPkceQrWithoutOpeningBrowserAndReturnsOnlyEnrollmentGrant();
 await testStatusStorePersistsOnlyNonSecretAccountUsageAndSchemaMetadata();
 console.log('Gateway pairing + status tests passed');
