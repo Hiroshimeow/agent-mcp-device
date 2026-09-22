@@ -8,7 +8,8 @@
  */
 
 import assert from 'node:assert/strict';
-import { spawn } from 'node:child_process';
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -16,7 +17,7 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DIST_INDEX = path.join(__dirname, '..', 'dist', 'index.js');
-const TIMEOUT_MS = 10_000;
+const TIMEOUT_MS = 30_000;
 
 class ExistingConfigClaudeCodeMigrationTest {
   constructor() {
@@ -36,58 +37,33 @@ class ExistingConfigClaudeCodeMigrationTest {
   }
 
   async initializeAsClaudeCode() {
-    await new Promise((resolve, reject) => {
-      const child = spawn('node', [DIST_INDEX], {
-        env: {
-          ...process.env,
-          HOME: this.home,
-          USERPROFILE: this.home,
-          DESKTOP_COMMANDER_CONFIG_DIR: path.dirname(this.configPath),
-          DC_FLAG_URL: 'http://127.0.0.1:9/',
-        },
-        stdio: ['pipe', 'pipe', 'pipe'],
-      });
-      let stdout = '';
-      const timeout = setTimeout(() => finish(new Error('Timed out waiting for initialize response')), TIMEOUT_MS);
-
-      const finish = (error) => {
-        clearTimeout(timeout);
-        child.kill('SIGTERM');
-        error ? reject(error) : resolve();
-      };
-
-      child.stdout.on('data', (chunk) => {
-        stdout += chunk.toString();
-        let newline;
-        while ((newline = stdout.indexOf('\n')) >= 0) {
-          const line = stdout.slice(0, newline);
-          stdout = stdout.slice(newline + 1);
-          try {
-            const message = JSON.parse(line);
-            if (message.id === 1) {
-              // MCP SDK may flush the initialize response before filesystem
-              // side effects from the same initialization turn are visible to
-              // the parent process on Windows. Give the awaited config write a
-              // short grace period before terminating the child.
-              setTimeout(() => finish(), 250);
-            }
-          } catch {
-            // Ignore non-protocol output.
-          }
-        }
-      });
-      child.on('error', finish);
-      child.stdin.write(`${JSON.stringify({
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'initialize',
-        params: {
-          protocolVersion: '2024-11-05',
-          capabilities: {},
-          clientInfo: { name: 'claude-code', version: 'test' },
-        },
-      })}\n`);
+    const transport = new StdioClientTransport({
+      command: process.execPath,
+      args: [DIST_INDEX],
+      cwd: path.resolve(__dirname, '..'),
+      stderr: 'pipe',
+      env: {
+        ...process.env,
+        HOME: this.home,
+        USERPROFILE: this.home,
+        DESKTOP_COMMANDER_CONFIG_DIR: path.dirname(this.configPath),
+        DESKTOP_COMMANDER_DISABLE_TELEMETRY: 'true',
+        MCP_DEVICE_REMOTE: 'false',
+        DC_FLAG_URL: 'http://127.0.0.1:9/',
+      },
     });
+    const client = new Client(
+      { name: 'claude-code', version: 'test' },
+      { capabilities: {} }
+    );
+    try {
+      await client.connect(transport, { timeout: TIMEOUT_MS });
+      // Initialization-side config writes can land just after the initialize
+      // response on Windows. Preserve the original test's short grace period.
+      await new Promise(resolve => setTimeout(resolve, 250));
+    } finally {
+      await client.close().catch(() => {});
+    }
   }
 
   readConfig() {

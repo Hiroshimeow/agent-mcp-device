@@ -830,11 +830,13 @@ export async function launchDeviceUpdateHelper(
                 prepared.helperRunnerPath + '"';
             const command = [
                 '$action = New-ScheduledTaskAction -Execute ' + psQuote(state.powershellPath) + ' -Argument ' + psQuote(actionArgs),
+                '$currentUser = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name',
+                '$principal = New-ScheduledTaskPrincipal -UserId $currentUser -LogonType Interactive -RunLevel Limited',
                 // Demand-start only: no future trigger can replay the helper.
-                // Battery settings are explicit so laptops cannot silently queue
-                // or terminate the update helper after the device has shut down.
+                // Battery/idle settings are explicit so laptops cannot silently
+                // queue or terminate the helper after the device has shut down.
                 '$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -DontStopOnIdleEnd -StartWhenAvailable -ExecutionTimeLimit (New-TimeSpan -Hours 1) -MultipleInstances IgnoreNew',
-                'Register-ScheduledTask -TaskName ' + psQuote(state.windowsUpdateTaskName) + ' -Action $action -Settings $settings -Force | Out-Null',
+                'Register-ScheduledTask -TaskName ' + psQuote(state.windowsUpdateTaskName) + ' -Action $action -Principal $principal -Settings $settings -Force | Out-Null',
                 'Start-ScheduledTask -TaskName ' + psQuote(state.windowsUpdateTaskName)
             ].join('; ');
 

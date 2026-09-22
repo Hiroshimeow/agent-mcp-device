@@ -1,6 +1,7 @@
 import assert from 'assert';
 import { spawn } from 'child_process';
 import fs from 'fs/promises';
+import net from 'net';
 import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -288,6 +289,199 @@ async function runHelperCase({ failInstall, stripPath = false }) {
   await fs.rm(home, { recursive: true, force: true });
 }
 
+async function testHelperRefusesLiveRuntimeOwner() {
+  const home = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-helper-live-owner-'));
+  const updateRoot = path.join(home, '.mcp-device', 'update');
+  const prefix = path.join(home, 'prefix');
+  const packageRoot = await makePackage(prefix, '1.0.5');
+  const rollbackSnapshot = path.join(updateRoot, 'rollback-package');
+  const helperPath = path.join(updateRoot, 'update-helper.cjs');
+  const handoffPath = path.join(updateRoot, 'handoff.ready');
+  const statePath = path.join(updateRoot, 'update-state.json');
+  const controlPath = path.join(home, '.mcp-device', 'runtime-control.json');
+  const rollbackPath = path.join(prefix, 'node_modules', '@hcu-lab.me', '.mcp-device-rollback-owner');
+  const fakeNpm = path.join(home, 'fake-npm.cjs');
+  const npmMarker = path.join(home, 'npm-called.txt');
+  const targetTarball = path.join(updateRoot, 'target.tgz');
+  const cacheDir = path.join(updateRoot, 'npm-cache');
+  const runner = path.join(home, 'run-device.ps1');
+  const endpoint = process.platform === 'win32'
+    ? '\\\\.\\pipe\\mcp-device-update-owner-' + process.pid + '-' + Date.now()
+    : path.join(home, 'runtime-owner.sock');
+
+  await fs.mkdir(updateRoot, { recursive: true });
+  await fs.mkdir(path.dirname(controlPath), { recursive: true });
+  await fs.cp(packageRoot, rollbackSnapshot, { recursive: true, force: true });
+  await fs.copyFile(SOURCE_HELPER, helperPath);
+  await fs.writeFile(handoffPath, 'ready\n');
+  await fs.writeFile(targetTarball, 'fake');
+  await fs.mkdir(cacheDir, { recursive: true });
+  await fs.writeFile(runner, 'exit 0\r\n');
+  await fs.writeFile(fakeNpm, [
+    "const fs = require('fs');",
+    "fs.writeFileSync(process.env.FAKE_NPM_MARKER, 'called');",
+    "process.exit(0);",
+    ""
+  ].join('\n'));
+  await fs.writeFile(controlPath, JSON.stringify({ endpoint }));
+
+  const owner = net.createServer(socket => {
+    let data = '';
+    socket.setEncoding('utf8');
+    socket.on('data', chunk => {
+      data += chunk;
+      if (!data.includes('\n')) return;
+      socket.end(JSON.stringify({
+        ok: true,
+        status: { product: 'MCP Device', pid: process.pid }
+      }) + '\n');
+    });
+  });
+  await new Promise((resolve, reject) => {
+    owner.once('error', reject);
+    owner.listen(endpoint, resolve);
+  });
+
+  const state = {
+    schema: 1,
+    requestId: 'helper-live-owner',
+    fromVersion: '1.0.5',
+    targetVersion: '1.0.6',
+    state: 'handoff_ready',
+    startedAt: Date.now(),
+    updatedAt: Date.now(),
+    completedAt: null,
+    errorCode: null,
+    message: null,
+    deviceId: 'device-helper-owner',
+    managerKind: 'windows-manual',
+    parentPid: 99999999,
+    childPid: null,
+    packageRoot,
+    globalPrefix: prefix,
+    nodePath: process.execPath,
+    npmCliPath: fakeNpm,
+    targetTarball,
+    cacheDir,
+    rollbackSnapshot,
+    rollbackPath,
+    helperPath,
+    handoffPath,
+    runtimeOwnerControlPath: controlPath,
+    windowsRunnerPath: runner,
+    powershellPath: process.execPath
+  };
+  await fs.writeFile(statePath, JSON.stringify(state, null, 2));
+
+  try {
+    const exitCode = await new Promise((resolve, reject) => {
+      const child = spawn(process.execPath, [helperPath, statePath], {
+        windowsHide: true,
+        stdio: ['ignore', 'pipe', 'pipe'],
+        env: { ...process.env, FAKE_NPM_MARKER: npmMarker }
+      });
+      child.once('error', reject);
+      child.once('close', resolve);
+    });
+    assert.equal(exitCode, 1);
+    const finalState = JSON.parse(await fs.readFile(statePath, 'utf8'));
+    assert.equal(finalState.state, 'failed');
+    assert.equal(finalState.errorCode, 'DEVICE_UPDATE_RUNTIME_OWNER_ACTIVE');
+    assert.equal(
+      JSON.parse(await fs.readFile(path.join(packageRoot, 'package.json'), 'utf8')).version,
+      '1.0.5'
+    );
+    await assert.rejects(() => fs.access(npmMarker), /ENOENT/,
+      'live RuntimeOwner must block npm package mutation');
+  } finally {
+    await new Promise(resolve => owner.close(resolve));
+    await fs.rm(home, { recursive: true, force: true });
+  }
+}
+
+async function testHelperRefusesLiveTrackedPid() {
+  const home = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-helper-live-pid-'));
+  const updateRoot = path.join(home, '.mcp-device', 'update');
+  const prefix = path.join(home, 'prefix');
+  const packageRoot = await makePackage(prefix, '1.0.5');
+  const rollbackSnapshot = path.join(updateRoot, 'rollback-package');
+  const helperPath = path.join(updateRoot, 'update-helper.cjs');
+  const handoffPath = path.join(updateRoot, 'handoff.ready');
+  const statePath = path.join(updateRoot, 'update-state.json');
+  const targetTarball = path.join(updateRoot, 'target.tgz');
+  const cacheDir = path.join(updateRoot, 'npm-cache');
+  const fakeNpm = path.join(home, 'fake-npm.cjs');
+  const runner = path.join(home, 'run-device.ps1');
+  const controlPath = path.join(home, '.mcp-device', 'runtime-control.json');
+
+  await fs.mkdir(updateRoot, { recursive: true });
+  await fs.cp(packageRoot, rollbackSnapshot, { recursive: true, force: true });
+  await fs.copyFile(SOURCE_HELPER, helperPath);
+  await fs.writeFile(handoffPath, 'ready\n');
+  await fs.writeFile(targetTarball, 'fake');
+  await fs.mkdir(cacheDir, { recursive: true });
+  await fs.writeFile(fakeNpm, 'process.exit(0);\n');
+  await fs.writeFile(runner, 'exit 0\r\n');
+
+  const sleeper = spawn(process.execPath, ['-e', 'setTimeout(() => {}, 60000)'], {
+    windowsHide: true,
+    stdio: 'ignore'
+  });
+
+  const state = {
+    schema: 1,
+    requestId: 'helper-live-pid',
+    fromVersion: '1.0.5',
+    targetVersion: '1.0.6',
+    state: 'handoff_ready',
+    startedAt: Date.now(),
+    updatedAt: Date.now(),
+    completedAt: null,
+    errorCode: null,
+    message: null,
+    deviceId: 'device-helper-pid',
+    managerKind: 'windows-manual',
+    parentPid: sleeper.pid,
+    childPid: null,
+    packageRoot,
+    globalPrefix: prefix,
+    nodePath: process.execPath,
+    npmCliPath: fakeNpm,
+    targetTarball,
+    cacheDir,
+    rollbackSnapshot,
+    rollbackPath: path.join(prefix, 'node_modules', '@hcu-lab.me', '.mcp-device-rollback-pid'),
+    helperPath,
+    handoffPath,
+    runtimeOwnerControlPath: controlPath,
+    windowsRunnerPath: runner,
+    powershellPath: process.execPath
+  };
+  await fs.writeFile(statePath, JSON.stringify(state, null, 2));
+
+  try {
+    const exitCode = await new Promise((resolve, reject) => {
+      const child = spawn(process.execPath, [helperPath, statePath], {
+        windowsHide: true,
+        stdio: ['ignore', 'pipe', 'pipe']
+      });
+      child.once('error', reject);
+      child.once('close', resolve);
+    });
+    assert.equal(exitCode, 1);
+    const finalState = JSON.parse(await fs.readFile(statePath, 'utf8'));
+    assert.equal(finalState.state, 'failed');
+    assert.equal(finalState.errorCode, 'DEVICE_UPDATE_RUNTIME_STILL_ALIVE');
+    assert.equal(
+      JSON.parse(await fs.readFile(path.join(packageRoot, 'package.json'), 'utf8')).version,
+      '1.0.5'
+    );
+  } finally {
+    try { sleeper.kill(); } catch {}
+    await fs.rm(home, { recursive: true, force: true });
+  }
+}
+
 async function testLifecycleScopedLaunchers() {
   const home = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-launchers-'));
   const paths = deviceStatePaths(home);
@@ -353,6 +547,9 @@ async function testLifecycleScopedLaunchers() {
   assert.match(windowsCommand, /MCP-Device-Update-launcher-test/);
   assert.match(windowsCommand, /AllowStartIfOnBatteries/);
   assert.match(windowsCommand, /DontStopIfGoingOnBatteries/);
+  assert.match(windowsCommand, /New-ScheduledTaskPrincipal/);
+  assert.match(windowsCommand, /LogonType Interactive/);
+  assert.match(windowsCommand, /RunLevel Limited/);
   assert.match(windowsCommand, /MultipleInstances IgnoreNew/);
   assert.doesNotMatch(windowsCommand, /New-ScheduledTaskTrigger/,
     'demand-start update helper must not retain a future replay trigger');
@@ -478,6 +675,8 @@ async function testPersistedUpdateStateRecovery() {
 await testUnixNpmCliSymlinkResolution();
 await testPreparedUpdateContract();
 await testLifecycleScopedLaunchers();
+await testHelperRefusesLiveRuntimeOwner();
+await testHelperRefusesLiveTrackedPid();
 await testPersistedUpdateStateRecovery();
 await runHelperCase({ failInstall: false });
 await runHelperCase({ failInstall: false, stripPath: true });
