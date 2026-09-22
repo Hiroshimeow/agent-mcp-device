@@ -10,6 +10,7 @@ import sharp from 'sharp';
 import tls from 'tls';
 import { WebSocketServer } from 'ws';
 
+import { LocalExecutionEngine } from '../dist/device/execution-engine.js';
 import { GatewayDeviceChannel } from '../dist/device/gateway-channel.js';
 import { GatewayDeviceIdentity } from '../dist/device/gateway-identity.js';
 import { pairGatewayDevice } from '../dist/device/gateway-pairing.js';
@@ -123,6 +124,21 @@ async function testDefaultWindowsIdentityPathIsProfileBound() {
     else process.env.MCP_GATEWAY_DEVICE_IDENTITY_PATH = previous;
     await fs.rm(root, { recursive: true, force: true });
   }
+}
+
+async function testExecutionEngineFailureKeepsRuntimeObservableButNotReady() {
+  const engine = new LocalExecutionEngine();
+  engine.resolveMcpConfig = async () => null;
+  await engine.initialize();
+  assert.deepEqual(engine.getRuntimeState(), {
+    runtime_ready: false,
+    runtime_reason: 'LOCAL_EXECUTION_ENGINE_UNAVAILABLE',
+    execution_runtime_generation: null
+  });
+  assert.throws(
+    () => engine.assertReady(),
+    error => error?.code === 'DEVICE_NOT_READY'
+  );
 }
 
 async function testAdapterRejectsWhenRuntimeIsNotReady() {
@@ -832,6 +848,7 @@ async function testOversizedToolResultReturnsBoundedError() {
 testPm2EntrypointDetection();
 await testIdentity();
 await testDefaultWindowsIdentityPathIsProfileBound();
+await testExecutionEngineFailureKeepsRuntimeObservableButNotReady();
 await testAdapterRejectsWhenRuntimeIsNotReady();
 await testAdapterDefaultsToWideAccess();
 await testRemoteImagePreviewIsBounded();
