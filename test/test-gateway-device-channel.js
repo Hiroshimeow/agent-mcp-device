@@ -141,6 +141,62 @@ async function testExecutionEngineFailureKeepsRuntimeObservableButNotReady() {
   );
 }
 
+async function testExecutionEngineChildDeathInvalidatesReadiness() {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-engine-close-'));
+  const engine = new LocalExecutionEngine();
+  engine.resolveMcpConfig = async () => ({
+    command: process.execPath,
+    args: [path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../dist/index.js')],
+    cwd: root,
+    env: {
+      HOME: root,
+      USERPROFILE: root
+    }
+  });
+
+  try {
+    await engine.initialize();
+    const before = engine.getRuntimeState();
+    assert.equal(before.runtime_ready, true);
+    assert.equal(typeof before.execution_runtime_generation, 'string');
+    assert(before.execution_runtime_generation.length > 0);
+
+    const childPid = engine.getChildPid();
+    assert(Number.isInteger(childPid) && childPid > 0, 'local execution engine must expose a live child PID');
+    process.kill(childPid, 'SIGTERM');
+
+    await waitFor(() => engine.getRuntimeState().runtime_ready === false);
+    const after = engine.getRuntimeState();
+    assert.deepEqual(after, {
+      runtime_ready: false,
+      runtime_reason: 'LOCAL_EXECUTION_ENGINE_UNAVAILABLE',
+      execution_runtime_generation: null
+    });
+    assert.notEqual(after.execution_runtime_generation, before.execution_runtime_generation);
+    assert.throws(
+      () => engine.assertReady(),
+      error => error?.code === 'DEVICE_NOT_READY'
+    );
+
+    const adapter = new GatewayToolAdapter(engine, { pathValidator: async value => value });
+    await assert.rejects(
+      () => adapter.call('read_text_file', { path: path.join(root, 'missing.txt') }),
+      error => error?.code === 'DEVICE_NOT_READY'
+    );
+
+    const channel = new GatewayDeviceChannel({
+      gatewayUrl: 'ws://127.0.0.1:1/device',
+      enrollmentToken: 'unused',
+      adapter,
+      runtimeState: () => engine.getRuntimeState()
+    });
+    assert.deepEqual(channel.runtimePayload(), after);
+  } finally {
+    await engine.shutdown();
+    await fs.rm(root, { recursive: true, force: true });
+  }
+}
+
 async function testAdapterRejectsWhenRuntimeIsNotReady() {
   const desktop = new FakeDesktop();
   desktop.assertReady = () => {
@@ -849,6 +905,7 @@ testPm2EntrypointDetection();
 await testIdentity();
 await testDefaultWindowsIdentityPathIsProfileBound();
 await testExecutionEngineFailureKeepsRuntimeObservableButNotReady();
+await testExecutionEngineChildDeathInvalidatesReadiness();
 await testAdapterRejectsWhenRuntimeIsNotReady();
 await testAdapterDefaultsToWideAccess();
 await testRemoteImagePreviewIsBounded();
