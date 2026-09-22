@@ -44,19 +44,12 @@ assert.equal(fs.existsSync(new URL('../PUBLISH.md', import.meta.url)), false);
 
 const readme = fs.readFileSync(new URL('../README.md', import.meta.url), 'utf8');
 assert.match(readme, /^# MCP Device/m);
-assert.match(readme, /@hcu-lab\.me\/mcp-device/);
-assert.match(readme, /npm install -g @hcu-lab\.me\/mcp-device(?:\s|$)/m);
-assert.match(readme, /https:\/\/device\.hcu-lab\.me/);
-assert.match(readme, /https:\/\/device\.hcu-lab\.me\/dashboard/);
-assert.match(readme, /https:\/\/device\.hcu-lab\.me\/pair/);
-assert.match(readme, /https:\/\/device\.hcu-lab\.me\/help/);
-assert.doesNotMatch(readme, /mcp-v2\.hcu-lab\.me/);
-assert.doesNotMatch(readme, /protected with Windows DPAPI|DPAPI for the current user/i);
-assert.match(readme, /Third-party licensing and attribution are preserved in `LICENSE`/);
-assert.match(readme, /small, controlled supply of invite codes/i);
-assert.match(readme, /npm run release/);
-assert.match(readme, /GitHub Actions.*OIDC/i);
-assert.match(readme, /Windows.*bare `md`.*shell.*collision/i, 'Windows docs must not advertise the shell-reserved bare md alias');
+assert.match(readme, /The gateway owns accounts, OAuth, device ownership, MCP tool contracts, routing, and usage aggregation\. MCP Device owns local device identity, pairing, reconnect lifecycle, bounded execution, background registration, and local status\./);
+assert.match(readme, /npm install -g @hcu-lab\.me\/mcp-device@1\.0\.7/);
+for (const command of ['login', 'logout', 'status', 'install', 'stop', 'uninstall']) {
+  assert.match(readme, new RegExp(`mcp-device ${command}\\b`));
+}
+assert.doesNotMatch(readme, /connects a user-owned computer|outbound connection|no inbound device port|Limited hosted access|Dashboard updates|First run and trust|Local state and|Development|Upstream execution engine/i);
 
 const wrapper = fs.readFileSync(new URL('../src/mcp-device.ts', import.meta.url), 'utf8');
 assert.match(wrapper, /splice\(2,\s*0,\s*['\"]remote['\"]\)/);
