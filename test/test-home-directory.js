@@ -31,10 +31,10 @@ const HOME_DIR = os.homedir();
 const HOME_TILDE = '~';
 const HOME_DOCS_PATH = path.join(HOME_DIR, 'Documents');
 const HOME_DOCS_TILDE = '~/Documents';
-const TEST_DIR = path.join(HOME_DIR, '.claude-test-tilde');
-const TEST_DIR_TILDE = '~/.claude-test-tilde';
+const TEST_DIR = path.join(HOME_DIR, '.mcp-device-test-tilde');
+const TEST_DIR_TILDE = '~/.mcp-device-test-tilde';
 const TEST_FILE = path.join(TEST_DIR, 'test-file.txt');
-const TEST_FILE_TILDE = '~/.claude-test-tilde/test-file.txt';
+const TEST_FILE_TILDE = '~/.mcp-device-test-tilde/test-file.txt';
 const TEST_CONTENT = 'This is a test file for tilde expansion';
 
 /**

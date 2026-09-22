@@ -4,7 +4,7 @@ import os from 'os';
 // MCP Device owns one canonical per-user state/config root.
 export const USER_HOME = os.homedir();
 export const CONFIG_DIR = path.resolve(
-  process.env.MCP_DEVICE_CONFIG_DIR || process.env.DESKTOP_COMMANDER_CONFIG_DIR || path.join(USER_HOME, '.mcp-device')
+  process.env.MCP_DEVICE_CONFIG_DIR || path.join(USER_HOME, '.mcp-device')
 );
 
 // Paths relative to the config directory.

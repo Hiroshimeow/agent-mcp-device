@@ -51,11 +51,10 @@ function testPm2EntrypointDetection() {
   assert.equal(isModuleEntrypoint(moduleUrl, modulePath), true);
   assert.equal(isModuleEntrypoint(moduleUrl, path.resolve('node_modules/pm2/lib/ProcessContainerFork.js'), modulePath), true);
   assert.equal(isModuleEntrypoint(moduleUrl, path.resolve('other.js'), path.resolve('different.js')), false);
-  assert.equal(isModuleEntrypoint(moduleUrl, path.resolve('dist/hcu-device.js')), false);
 }
 
 async function testIdentity() {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'hcu-device-identity-'));
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-identity-'));
   const identityPath = path.join(root, 'identity.json');
   const previousDeviceId = process.env.MCP_DEVICE_ID;
   delete process.env.MCP_DEVICE_ID;
@@ -125,7 +124,7 @@ async function testDefaultWindowsIdentityPathIsProfileBound() {
   }
 }
 
-async function testAdapterDefaultsToDesktopCommanderWideAccess() {
+async function testAdapterDefaultsToWideAccess() {
   const desktop = new FakeDesktop();
   const previous = process.env.MCP_GATEWAY_ALLOWED_ROOTS;
   delete process.env.MCP_GATEWAY_ALLOWED_ROOTS;
@@ -141,7 +140,7 @@ async function testAdapterDefaultsToDesktopCommanderWideAccess() {
 
 async function testRemoteImagePreviewIsBounded() {
   assert.equal(GATEWAY_CAPABILITIES.includes('image_preview'), true);
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'hcu-device-image-'));
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-image-'));
   try {
     const imagePath = path.join(root, 'pixel.png');
     await sharp({ create: { width: 16, height: 16, channels: 4, background: { r: 40, g: 80, b: 120, alpha: 1 } } })
@@ -163,7 +162,7 @@ async function testRemoteImagePreviewIsBounded() {
 
 async function testRemoteProjectInspectionRunsOnDevice() {
   assert.equal(GATEWAY_CAPABILITIES.includes('project_inspect'), true);
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'hcu-device-project-'));
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-project-'));
   try {
     await fs.writeFile(path.join(root, 'README.md'), '# Remote project\n');
     await fs.writeFile(path.join(root, 'package.json'), JSON.stringify({ name: 'remote-project' }));
@@ -735,7 +734,7 @@ async function testOversizedToolResultReturnsBoundedError() {
 testPm2EntrypointDetection();
 await testIdentity();
 await testDefaultWindowsIdentityPathIsProfileBound();
-await testAdapterDefaultsToDesktopCommanderWideAccess();
+await testAdapterDefaultsToWideAccess();
 await testRemoteImagePreviewIsBounded();
 await testRemoteProjectInspectionRunsOnDevice();
 await testAdapter();

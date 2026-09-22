@@ -14,32 +14,23 @@ for (const [name, script] of Object.entries(pkg.scripts || {})) {
   if (name === 'build' || name === 'prepack') continue;
   assert.doesNotMatch(script, /src\/remote-device|dist\/remote-device/, `script ${name} must use canonical device namespace`);
 }
-assert.match(pkg.scripts?.build || '', /^shx rm -rf dist\/remote-device/, 'build must prune stale dist/remote-device before emit');
-assert.match(pkg.scripts?.build || '', /dist\/device\/desktop-commander-integration\.js/, 'build must prune the renamed upstream adapter artifact');
-assert.match(pkg.scripts?.build || '', /dist\/device\/windows-dpapi\.js/, 'build must prune the removed Windows DPAPI artifact before emit');
-assert.match(pkg.scripts?.build || '', /&& tsc/, 'build must prune stale outputs before TypeScript emit');
-assert.match(pkg.scripts?.prepack || '', /rm -rf dist\/remote-device/, 'prepack must prune stale dist/remote-device artifacts');
-assert.match(pkg.scripts?.prepack || '', /dist\/device\/desktop-commander-integration\.js/, 'prepack must prune the renamed upstream adapter artifact');
-assert.match(pkg.scripts?.prepack || '', /dist\/device\/windows-dpapi\.js/, 'prepack must never ship the removed Windows DPAPI artifact');
+assert.match(pkg.scripts?.build || '', /^shx rm -rf dist && tsc/, 'build must start from a clean dist directory before TypeScript emit');
+assert.equal(pkg.scripts?.prepack, 'node scripts/verify-production-trust.cjs', 'prepack must only verify release trust; prepare/build owns clean output generation');
 
 const config = read('src/config.ts');
 assert.match(config, /MCP_DEVICE_CONFIG_DIR/);
-assert.doesNotMatch(config, /\.claude-server-commander/);
 assert.doesNotMatch(config, /claude_tool_call\.log/);
 assert.match(config, /\.mcp-device/);
 
 const history = read('src/utils/toolHistory.ts');
-assert.doesNotMatch(history, /\.claude-server-commander|tool-history\.jsonl/);
+assert.doesNotMatch(history, /tool-history\.jsonl/);
 assert.match(history, /CONFIG_DIR/);
 
 const fuzzy = read('src/utils/fuzzySearchLogger.ts');
-assert.doesNotMatch(fuzzy, /\.claude-server-commander-logs/);
 assert.match(fuzzy, /CONFIG_DIR/);
 
 const isolatedRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'mcp-device-canonical-state-'));
-const legacyOverride = path.join(isolatedRoot, 'legacy-override-must-not-win');
 process.env.MCP_DEVICE_CONFIG_DIR = isolatedRoot;
-process.env.DESKTOP_COMMANDER_CONFIG_DIR = legacyOverride;
 try {
   const configModule = await import('../dist/config.js');
   const { toolHistory } = await import('../dist/utils/toolHistory.js');
@@ -48,11 +39,9 @@ try {
   assert.equal(configModule.TOOL_CALL_FILE, path.join(isolatedRoot, 'logs', 'tool-calls.log'));
   assert.equal(toolHistory.getStats().historyFile, path.join(isolatedRoot, 'logs', 'history.jsonl'));
   assert.equal(await fuzzySearchLogger.getLogPath(), path.join(isolatedRoot, 'logs', 'fuzzy-search.log'));
-  assert.equal(fs.existsSync(legacyOverride), false, 'legacy config override must not receive active writes when canonical override exists');
   await toolHistory.cleanup();
 } finally {
   delete process.env.MCP_DEVICE_CONFIG_DIR;
-  delete process.env.DESKTOP_COMMANDER_CONFIG_DIR;
   fs.rmSync(isolatedRoot, { recursive: true, force: true });
 }
 
@@ -93,34 +82,41 @@ assert.match(read('src/ui/shared/widget-state.ts'), /mcp-device:widget-state|__m
 assert.doesNotMatch(read('src/utils/open-browser.ts'), /desktopcommander\.app\/welcome|Desktop Commander welcome page/);
 assert.match(read('src/utils/open-browser.ts'), /Hiroshimeow\/agent-mcp-device/);
 
-const allowlist = JSON.parse(read('test/fixtures/canonical-legacy-allowlist.json'));
-for (const entry of allowlist) {
-  assert.match(entry.reason, /^[BCD]$/, `invalid reason code for ${entry.file}`);
-  assert.ok(entry.why, `missing allowlist rationale for ${entry.file}`);
-}
 function walk(dir) {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
     const fullPath = path.join(dir, entry.name);
     return entry.isDirectory() ? walk(fullPath) : [fullPath];
   });
 }
-const shippedFiles = [
+
+
+// Public/runtime product identity must be vendor-neutral apart from the immutable
+// package/domain identity and the v2 wire labels retained for protocol continuity.
+const allowedIdentityLiterals = [
+  '@hcu-lab.me/mcp-device',
+  'https://device.hcu-lab.me',
+  'hcu-lab.me',
+  'hcu-device-v2-inner-tls',
+  'hcu-mcp-device-auth-v2',
+  'EXPERIMENTAL-HCU-MCP-DEVICE-AUTH-V2'
+];
+const forbiddenBrandPattern = /Desktop Commander|desktop-commander|DesktopCommander|desktopcommander|DESKTOP_COMMANDER_[A-Z0-9_]+|\.claude|claude|\.hcu-device|HCU-Device-|hcu-device/gi;
+const brandSurfaceFiles = [
   'README.md',
   'package.json',
-  ...walk(path.join(root, 'src'))
-    .filter(file => /\.(?:ts|md)$/.test(file))
-    .map(file => path.relative(root, file).replaceAll('\\', '/'))
-];
-const stalePattern = /remote-device|hcu-device|\.claude-server-commander|claude_tool_call\.log|tool-history\.jsonl|DC_REMOTE_DEVICE|DESKTOP_COMMANDER_[A-Z0-9_]+|Desktop Commander|desktop-commander|desktopcommander|DesktopCommander|give_feedback_to_desktop_commander/gi;
-for (const rel of shippedFiles) {
+  ...walk(path.join(root, 'src')).filter(file => /\.(?:ts|json|html|css|md)$/.test(file)),
+  ...walk(path.join(root, 'scripts')).filter(file => /\.(?:js|cjs|mjs|ts|json|md)$/.test(file)),
+  ...(fs.existsSync(path.join(root, 'skills')) ? walk(path.join(root, 'skills')).filter(file => /\.(?:md|json)$/.test(file)) : [])
+].map(file => path.isAbsolute(file) ? path.relative(root, file).replaceAll('\\', '/') : file);
+for (const rel of brandSurfaceFiles) {
   let content = read(rel);
-  for (const entry of allowlist.filter(item => item.file === rel).sort((a, b) => b.token.length - a.token.length)) {
-    const parts = content.split(entry.token);
-    assert.equal(parts.length - 1, entry.count, `allowlist count changed for ${entry.file}: ${entry.token}`);
-    content = parts.join(' '.repeat(entry.token.length));
-  }
-  const unexplained = content.match(stalePattern) || [];
-  assert.deepEqual(unexplained, [], `${rel} has unexplained stale identity: ${unexplained.join(', ')}`);
+  for (const literal of allowedIdentityLiterals) content = content.split(literal).join(' '.repeat(literal.length));
+  const matches = content.match(forbiddenBrandPattern) || [];
+  assert.deepEqual(matches, [], `${rel} exposes legacy/vendor branding: ${matches.join(', ')}`);
 }
+assert.equal(fs.existsSync(path.join(root, 'skills', 'ai-tools-setup')), false, 'Claude-specific setup skill must not live in the runtime repo');
+assert.equal(fs.existsSync(path.join(root, 'skills', 'desktop-commander-overview')), false, 'Desktop Commander overview skill must not live in the runtime repo');
+assert.match(pkg.scripts?.build || '', /^shx rm -rf dist && tsc/, 'build must start from a clean dist directory');
+assert.match(pkg.scripts?.prepack || '', /^node scripts\/verify-production-trust\.cjs$/, 'prepack should verify trust only; build owns clean output generation');
 
 console.log('canonical release cleanup tests passed');

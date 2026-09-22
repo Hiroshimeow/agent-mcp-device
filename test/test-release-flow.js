@@ -62,11 +62,6 @@ function createFixture({ testsPass = true } = {}) {
       }
     }
   });
-  writeJson(path.join(repo, 'server.json'), {
-    name: 'mcp-device-test',
-    version: '1.2.3',
-    packages: []
-  });
   fs.writeFileSync(path.join(repo, 'src', 'version.ts'), "export const VERSION = '1.2.3';\n");
 
   git(repo, 'init', '-b', 'main');
@@ -149,13 +144,11 @@ function assertVersionUnchanged(dir) {
 
     const pkg = readPackage(f.repo);
     const lock = JSON.parse(fs.readFileSync(path.join(f.repo, 'package-lock.json'), 'utf8'));
-    const server = JSON.parse(fs.readFileSync(path.join(f.repo, 'server.json'), 'utf8'));
     const versionTs = fs.readFileSync(path.join(f.repo, 'src', 'version.ts'), 'utf8');
 
     assert.equal(pkg.version, '1.2.4');
     assert.equal(lock.version, '1.2.4');
     assert.equal(lock.packages[''].version, '1.2.4');
-    assert.equal(server.version, '1.2.3', 'release must not rewrite vendored upstream server.json');
     assert.match(versionTs, /VERSION = '1\.2\.4'/);
     assert.equal(git(f.repo, 'log', '-1', '--pretty=%s'), 'release: v1.2.4');
     assert.equal(git(f.repo, 'tag', '--points-at', 'HEAD'), 'v1.2.4');

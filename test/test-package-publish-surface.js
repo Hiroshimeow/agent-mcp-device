@@ -32,7 +32,6 @@ assert(pack, 'npm pack --dry-run returned no package entry');
 const paths = (pack.files || []).map(file => String(file.path));
 assert(paths.includes('dist/device/update-helper.cjs'), 'published package must contain update helper');
 assert(paths.includes('package.json'), 'published package must contain package.json');
-assert(!paths.includes('server.json'), 'stale Desktop Commander server.json must not be published');
 assert(!paths.some(file => file.startsWith('src/')), 'src/ must not be published');
 assert(!paths.some(file => file.startsWith('test/')), 'test/ must not be published');
 assert(!paths.some(file => file.startsWith('.plan/')), '.plan/ must not be published');

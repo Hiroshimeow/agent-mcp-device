@@ -32,8 +32,6 @@ if (shouldBump) {
     writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
 }
 
-// server.json belongs to vendored Desktop Commander upstream metadata.
-// MCP Device releases must not rewrite or publish that registry identity.
 
 // Update version.ts
 const versionFileContent = `export const VERSION = '${version}';\n`;

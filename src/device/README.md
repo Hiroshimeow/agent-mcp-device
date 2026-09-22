@@ -6,9 +6,9 @@ This directory contains the MCP Device execution-plane runtime used by `@hcu-lab
 
 Public commands are `start`, `login`, `logout`, `status`, `install`, `stop`, and `uninstall`. No subcommand is equivalent to foreground `start`. Background manager runners use the internal `--service` mode.
 
-Canonical per-user state lives under `~/.mcp-device/`. Legacy `~/.hcu-device/` state is read only for non-destructive migration compatibility; identity conflicts fail closed.
+Canonical per-user state lives under `~/.mcp-device/`.
 
-On Windows, background lifecycle uses the current-user Scheduled Task with HKCU Run fallback. New resources use the `MCP-Device-<device_id>` name. Verified legacy `HCU-Device-<device_id>` registrations are migration-only compatibility resources.
+On Windows, background lifecycle uses the current-user Scheduled Task with HKCU Run fallback. Resources use the `MCP-Device-<device_id>` name.
 
 On Linux, `install` asks on every invocation between `systemd --user` and an already-configured PM2 installation. MCP Device does not install PM2, configure privileged startup, use `sudo`, or modify linger automatically.
 
@@ -34,4 +34,4 @@ Compatibility crypto/state identifiers containing the historical `hcu` prefix re
 
 ## Upstream engine
 
-The local execution engine is derived from Desktop Commander MCP. Its MIT license and upstream attribution are preserved in the repository `LICENSE` and root `README.md`.
+Third-party licensing and attribution are preserved in the repository `LICENSE`.

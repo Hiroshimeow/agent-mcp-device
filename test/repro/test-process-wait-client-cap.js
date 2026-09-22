@@ -7,7 +7,7 @@ import { configManager } from '../../dist/config-manager.js';
  * FAILING repro for the "No result received after 4 minutes" crash.
  *
  * Symptom (customer): a `Send Input to Process` / start_process call hangs and
- * Claude Desktop reports "No result received from the Claude Desktop app after
+ * the MCP client reports "No result received from the the MCP client app after
  * waiting 4 minutes. The local MCP server ... may be unresponsive."
  *
  * Verified root cause (src/terminal-manager.ts executeCommand + improved-
@@ -32,7 +32,7 @@ import { configManager } from '../../dist/config-manager.js';
  * uses the real client ceiling.
  */
 
-// The MCP client (Claude Desktop) kills a single tool call at ~4 minutes.
+// The MCP client (the MCP client) kills a single tool call at ~4 minutes.
 const CLIENT_CEILING_MS = 240000;
 // Config key the fix should read to bound the single-call wait.
 const CAP_KEY = 'maxProcessWaitMs';

@@ -7,7 +7,7 @@
  * slow or cloud-synced filesystem — 4 stalled operations exhaust the pool, and
  * because a stalled syscall keeps its thread until the OS returns (a JS-level
  * timeout does not cancel it), every subsequent fs op queues for minutes. That
- * surfaced as multi-minute tool-call hangs under parallel `claude -p` load.
+ * surfaced as multi-minute tool-call hangs under parallel agent load.
  *
  * Raising the pool size gives enough headroom that a burst of slow reads no
  * longer starves the rest. libuv reads UV_THREADPOOL_SIZE only when the pool is

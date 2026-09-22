@@ -102,8 +102,7 @@ export class FilteredStdioServerTransport extends StdioServerTransport {
     
     // Detect Cline and disable notifications
     if (this.clientName.includes('cline') || 
-        this.clientName.includes('vscode') ||
-        this.clientName === 'claude-dev') {
+        this.clientName.includes('vscode')) {
       this.disableNotifications = true;
       process.stderr.write(`[INFO] MCP Device: Notifications disabled for ${clientName}\n`);
     }

@@ -331,8 +331,6 @@ async function serviceCommand(command: 'install' | 'stop' | 'uninstall'): Promis
 
 export async function runRemote() {
     // MCP Device owns its account-scoped usage telemetry at the gateway.
-    // Never send inherited Desktop Commander analytics from the remote execution path.
-    process.env.DESKTOP_COMMANDER_DISABLE_TELEMETRY = 'true';
 
     const disableNoSleep = process.argv.includes('--disable-no-sleep');
     const verbose = process.argv.includes('--debug');

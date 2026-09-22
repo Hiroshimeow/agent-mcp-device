@@ -6,19 +6,16 @@ import path from 'path';
 const originalHome = process.env.HOME;
 const originalUserProfile = process.env.USERPROFILE;
 const originalConfigDir = process.env.MCP_DEVICE_CONFIG_DIR;
-const originalLegacyConfigDir = process.env.DESKTOP_COMMANDER_CONFIG_DIR;
 
 const home = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-execution-engine-'));
 process.env.HOME = home;
 process.env.USERPROFILE = home;
 process.env.MCP_DEVICE_CONFIG_DIR = path.join(home, '.mcp-device');
-process.env.DESKTOP_COMMANDER_CONFIG_DIR = path.join(home, '.mcp-device');
-process.env.DESKTOP_COMMANDER_DISABLE_TELEMETRY = 'true';
 
 let integration;
 try {
-  const { DesktopCommanderIntegration } = await import('../dist/device/execution-engine.js');
-  integration = new DesktopCommanderIntegration();
+  const { LocalExecutionEngine } = await import('../dist/device/execution-engine.js');
+  integration = new LocalExecutionEngine();
 
   const resolved = await integration.resolveMcpConfig();
   assert(resolved, 'local built MCP child must resolve');
@@ -42,7 +39,6 @@ try {
   if (originalHome === undefined) delete process.env.HOME; else process.env.HOME = originalHome;
   if (originalUserProfile === undefined) delete process.env.USERPROFILE; else process.env.USERPROFILE = originalUserProfile;
   if (originalConfigDir === undefined) delete process.env.MCP_DEVICE_CONFIG_DIR; else process.env.MCP_DEVICE_CONFIG_DIR = originalConfigDir;
-  if (originalLegacyConfigDir === undefined) delete process.env.DESKTOP_COMMANDER_CONFIG_DIR; else process.env.DESKTOP_COMMANDER_CONFIG_DIR = originalLegacyConfigDir;
 }
 
 process.exit(0);

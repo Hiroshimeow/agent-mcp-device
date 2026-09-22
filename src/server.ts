@@ -1,4 +1,3 @@
-import path from 'path';
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import {
     CallToolRequestSchema,
@@ -43,7 +42,6 @@ import {
     ListProcessesArgsSchema,
     EditBlockArgsSchema,
     GetUsageStatsArgsSchema,
-    GiveFeedbackArgsSchema,
     StartSearchArgsSchema,
     GetMoreSearchResultsArgsSchema,
     StopSearchArgsSchema,
@@ -60,7 +58,6 @@ import {
 } from './utils/unsupportedParams.js';
 import { getConfig, setConfigValue } from './tools/config.js';
 import { getUsageStats } from './tools/usage.js';
-import { giveFeedbackToDesktopCommander } from './tools/feedback.js';
 import { getPrompts } from './tools/prompts.js';
 import { trackToolCall } from './utils/trackTools.js';
 import { usageTracker } from './utils/usageTracker.js';
@@ -156,7 +153,7 @@ function setCurrentCallIsRemote(isRemote: boolean) {
 }
 
 // The remote caller's client for the in-flight tool call (e.g. openai-mcp,
-// claude-ai). Set per CallTool when the call is remote; null for local calls.
+// remote client). Set per CallTool when the call is remote; null for local calls.
 // Mirrors currentCallIsRemote so telemetry attributes remote events to the
 // actual remote client instead of the device's own currentClient (which stays
 // LOCAL and must not be polluted by remote callers).
@@ -173,11 +170,10 @@ function setCurrentRemoteClient(clientInfo: { name?: string; version?: string } 
 /**
  * True when this server instance is serving remote services rather than a
  * local MCP client. The device wrapper marks the server it spawns with
- * MCP_DEVICE_REMOTE=true (see device/execution-engine.ts);
- * the client-name check covers older wrappers that predate the env marker.
+ * MCP_DEVICE_REMOTE=true (see device/execution-engine.ts).
  */
 function isRemoteClientContext(clientName?: string): boolean {
-    return process.env.MCP_DEVICE_REMOTE === 'true' || clientName === 'desktop-commander-client';
+    return process.env.MCP_DEVICE_REMOTE === 'true';
 }
 
 /**
@@ -213,44 +209,19 @@ server.setRequestHandler(InitializeRequestSchema, async (request: InitializeRequ
         if (clientInfo) {
             await updateCurrentClient(clientInfo);
 
-            // Welcome page for new users (A/B test controlled) â€” all clients except
-            // the Desktop Commander app and remote contexts. Further exclusions are
-            // flag-served via welcome_page_excluded_clients (e.g. claude-code, which
-            // covers Claude Code and Cowork plugin sessions â€” both identify as
-            // `claude-code` and provide their own onboarding surface).
-            const isWelcomePageEligibleClient = currentClient.name !== 'desktop-commander-app'
-                && currentClient.name !== 'desktop-commander'
-                && !isRemoteClientContext(currentClient.name)
+            const isWelcomePageEligibleClient = !isRemoteClientContext(currentClient.name)
                 && !(global as any).disableOnboarding;
 
             if (isRemoteClientContext(currentClient.name)) {
-                // Remote MCP Device children must not mutate local onboarding
-                // state merely because they initialized an inherited MCP server.
+                // Remote child engines do not mutate local onboarding state.
             } else if (isWelcomePageEligibleClient) {
                 await handleWelcomePageOnboarding(currentClient.name);
             } else {
-                // Do not carry a first-run page over to a client that is made
-                // eligible in a later release.
                 await skipWelcomePageOnboarding();
             }
-        }
 
-        // Raw host environment signals (no PII, undefined when absent). Some
-        // hosts share a clientInfo name â€” Claude Code CLI, Claude Code inside
-        // the Claude Desktop app, and Cowork all report 'claude-code' â€” and
-        // these let analytics tell them apart without client-specific
-        // branching in code. Verified signatures: CLI â†’ entrypoint 'cli';
-        // CC-in-desktop â†’ entrypoint 'claude-desktop'; Cowork â†’ no
-        // entrypoint/agent, plugin id 'desktop-commander-inline'.
-        // Values truncated to GA4's 100-char param limit (same convention as
-        // containerName/containerImage) so an oversized value can never get
-        // the whole event rejected.
-        capture('run_server_mcp_initialized', {
-            host_entrypoint: process.env.CLAUDE_CODE_ENTRYPOINT?.substring(0, 100),
-            host_agent: process.env.AI_AGENT?.substring(0, 100),
-            host_plugin_id: process.env.CLAUDE_PLUGIN_DATA
-                ? path.basename(process.env.CLAUDE_PLUGIN_DATA).substring(0, 100) : undefined
-        });
+            capture('run_server_mcp_initialized');
+        }
 
         // Negotiate protocol version with client
         const requestedVersion = request.params?.protocolVersion;
@@ -286,17 +257,7 @@ deferLog('info', 'Setting up request handlers...');
 /**
  * Check if a tool should be included based on current client
  */
-function shouldIncludeTool(toolName: string): boolean {
-    // Exclude these tools for desktop-commander client (DC-specific meta-tools not useful when DC itself is the client)
-    if (currentClient?.name === 'desktop-commander-app') {
-        if (toolName === 'give_feedback_to_desktop_commander' || toolName === 'get_prompts') {
-            return false;
-        }
-    }
-
-    // Add more conditional tool logic here as needed
-    // Example: if (toolName === 'some_tool' && currentClient?.name === 'some_client') return false;
-
+function shouldIncludeTool(_toolName: string): boolean {
     return true;
 }
 
@@ -1160,48 +1121,6 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                 },
             },
             {
-                name: "give_feedback_to_desktop_commander",
-                description: `
-                        Open feedback form in browser to provide feedback about MCP Device.
-                        
-                        IMPORTANT: This tool simply opens the feedback form - no pre-filling available.
-                        The user will fill out the form manually in their browser.
-                        
-                        WORKFLOW:
-                        1. When user agrees to give feedback, just call this tool immediately
-                        2. No need to ask questions or collect information
-                        3. Tool opens form with only usage statistics pre-filled automatically:
-                           - tool_call_count: Number of commands they've made
-                           - days_using: How many days they've used MCP Device
-                           - platform: Their operating system (Mac/Windows/Linux)
-                           - client_id: Analytics identifier
-                        
-                        All survey questions will be answered directly in the form:
-                        - Job title and technical comfort level
-                        - Company URL for industry context
-                        - Other AI tools they use
-                        - MCP Device's biggest advantage
-                        - How they typically use it
-                        - Recommendation likelihood (0-10)
-                        - User study participation interest
-                        - Email and any additional feedback
-                        
-                        EXAMPLE INTERACTION:
-                        User: "sure, I'll give feedback"
-                        Claude: "Perfect! Let me open the feedback form for you."
-                        [calls tool immediately]
-                        
-                        No parameters are needed - just call the tool to open the form.
-                        
-                        ${CMD_PREFIX_DESCRIPTION}`,
-                inputSchema: zodToJsonSchema(GiveFeedbackArgsSchema),
-                annotations: {
-                    title: "Give Feedback",
-                    readOnlyHint: false,
-                    openWorldHint: true,
-                },
-            },
-            {
                 name: "get_prompts",
                 description: `
                         Retrieve a specific MCP Device onboarding prompt by ID and execute it.
@@ -1287,7 +1206,7 @@ async function handleCallToolRequest(request: CallToolRequest): Promise<ServerRe
             // add remote flag (convert to string for telemetry)
             telemetryData.remote = String(metadata.remote);
             // Remote calls carry the originating MCP client (e.g. openai-mcp,
-            // claude-ai) in _meta.clientInfo. Attribute this call to that remote
+            // remote client) in _meta.clientInfo. Attribute this call to that remote
             // client â€” NOT the device's own currentClient. Fall back to a sentinel
             // when it's absent so the call is visibly remote-but-unattributed
             // rather than masquerading as the local device client. We deliberately
@@ -1434,17 +1353,6 @@ async function handleCallToolRequest(request: CallToolRequest): Promise<ServerRe
                 }
                 break;
 
-            case "give_feedback_to_desktop_commander":
-                try {
-                    result = await giveFeedbackToDesktopCommander(args);
-                } catch (error) {
-                    capture('server_request_error', { message: `Error in give_feedback_to_desktop_commander handler: ${error}` });
-                    result = {
-                        content: [{ type: "text", text: `Error: Failed to open feedback form` }],
-                        isError: true,
-                    };
-                }
-                break;
 
             // Terminal tools
             case "start_process":

@@ -5,10 +5,10 @@
  *
  * READ (default): Returns a text-bearing outline — skips shapes, drawings, SVG noise.
  *   Shows paragraphs with text, tables with cell content, style info, and image refs.
- *   Each element shows its raw XML tag context so Claude can target it for editing.
+ *   Each element shows its raw XML tag context so an agent can target it for editing.
  *
  * READ (with offset/length): Returns raw pretty-printed XML with line pagination,
- *   so Claude can drill into specific sections when the outline isn't enough.
+ *   so an agent can drill into specific sections when the outline isn't enough.
  *
  * EDIT (old_string/new_string): Find/replace on the pretty-printed XML, then
  *   compact and repack into valid DOCX. Works exactly like text file editing.

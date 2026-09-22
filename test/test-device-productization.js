@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 import os from 'os';
 import path from 'path';
 
-import { deviceStatePaths, migrateLegacyDeviceState } from '../dist/device/device-state.js';
+import { deviceStatePaths } from '../dist/device/device-state.js';
 import { effectiveGatewayStatus, formatGatewayStatus } from '../dist/device/device-status.js';
 import { deviceIdentityNeedsPairing } from '../dist/device/gateway-identity.js';
 import { gatewaySocketUrl } from '../dist/device/gateway-url-policy.js';
@@ -24,39 +24,10 @@ function sampleStatus() {
   };
 }
 
-async function testMigrationIsNonDestructiveAndIdempotent() {
-  const home = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-state-'));
-  const paths = deviceStatePaths(home);
-  try {
-    await fs.mkdir(paths.legacyRoot, { recursive: true });
-    const identity = { deviceId: 'device-one', publicKeyPem: 'PUBLIC', privateKeyPem: 'PRIVATE', enrolled: true };
-    await fs.writeFile(path.join(paths.legacyRoot, 'gateway-identity.json'), JSON.stringify(identity));
-    await fs.writeFile(path.join(paths.legacyRoot, 'gateway-config.json'), JSON.stringify({ version: 1, gatewayUrl: 'https://example.test/', proxy: { mode: 'direct', url: null }, allowedRoots: [], appCaPem: null, securityProtocolFloor: 1 }));
-    await fs.writeFile(path.join(paths.legacyRoot, 'gateway-status.json'), JSON.stringify(sampleStatus()));
-
-    const first = await migrateLegacyDeviceState(paths);
-    assert.deepEqual(first.migrated.sort(), ['gateway-config.json', 'gateway-identity.json', 'gateway-status.json']);
-    assert.equal((await fs.readFile(paths.identity, 'utf8')).includes('device-one'), true);
-    assert.equal((await fs.readFile(path.join(paths.legacyRoot, 'gateway-identity.json'), 'utf8')).includes('device-one'), true, 'legacy state must be retained');
-    const second = await migrateLegacyDeviceState(paths);
-    assert.deepEqual(second.migrated, []);
-  } finally {
-    await fs.rm(home, { recursive: true, force: true });
-  }
-}
-
-async function testMigrationIdentityConflictFailsClosed() {
-  const home = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-conflict-'));
-  const paths = deviceStatePaths(home);
-  try {
-    await fs.mkdir(paths.legacyRoot, { recursive: true });
-    await fs.mkdir(paths.root, { recursive: true });
-    await fs.writeFile(path.join(paths.legacyRoot, 'gateway-identity.json'), JSON.stringify({ deviceId: 'legacy', publicKeyPem: 'A' }));
-    await fs.writeFile(paths.identity, JSON.stringify({ deviceId: 'canonical', publicKeyPem: 'B' }));
-    await assert.rejects(() => migrateLegacyDeviceState(paths), /identities differ/i);
-  } finally {
-    await fs.rm(home, { recursive: true, force: true });
-  }
+function testCanonicalDeviceStateHasNoLegacyRoot() {
+  const paths = deviceStatePaths('/tmp/mcp-device-canonical-home');
+  assert.equal(paths.root, path.resolve('/tmp/mcp-device-canonical-home', '.mcp-device'));
+  assert.equal(Object.prototype.hasOwnProperty.call(paths, 'legacyRoot'), false, 'legacy state root must not remain part of the runtime contract');
 }
 
 async function testRuntimeOwnerSerializesBootstrap() {
@@ -161,8 +132,7 @@ function testGatewayRoutingAndEffectiveStatus() {
   assert.equal(liveForeground.connection.online, true, 'live foreground owner must not be forced offline by stopped background registration');
 }
 
-await testMigrationIsNonDestructiveAndIdempotent();
-await testMigrationIdentityConflictFailsClosed();
+testCanonicalDeviceStateHasNoLegacyRoot();
 await testRuntimeOwnerSerializesBootstrap();
 await testHealthyRuntimeTakeoverUsesAuthenticatedOwnerStop();
 await testRuntimeTakeoverNoIsNonMutatingAndBootstrapIsNotTakenOver();

@@ -7,7 +7,7 @@ import path from 'path';
 // test/run-all-tests.js. No test may touch the user's real ~/.mcp-device.
 const sandbox = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-green-hardening-'));
 process.env.MCP_DEVICE_CONFIG_DIR = sandbox;
-process.env.DESKTOP_COMMANDER_CONFIG_DIR = sandbox;
+process.env.MCP_DEVICE_CONFIG_DIR = sandbox;
 
 const { CONFIG_DIR, CONFIG_FILE, TOOL_CALL_FILE } = await import('../dist/config.js');
 const { configManager } = await import('../dist/config-manager.js');

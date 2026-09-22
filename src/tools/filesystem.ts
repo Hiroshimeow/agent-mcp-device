@@ -96,10 +96,10 @@ function buildPermissionError(filePath: string, errCode: string | undefined): Er
     ];
 
     if (isMac) {
-        lines.push(`       → Go to System Settings → Privacy & Security → Full Disk Access and enable Claude.`);
+        lines.push(`       → Go to System Settings → Privacy & Security → Full Disk Access and enable the terminal or runtime hosting MCP Device.`);
         lines.push(`       → To open that pane directly, run in terminal:`);
         lines.push(`           open "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles"`);
-        lines.push(`         Then find "Claude" in the list and enable the toggle next to it.`);
+        lines.push(`         Then enable the toggle for the application that launches MCP Device.`);
     } else {
         lines.push(`       → Check that the app has permission to access this file location.`);
     }
@@ -290,7 +290,7 @@ export async function validatePath(requestedPath: string): Promise<string> {
 
         // Direct Gateway device workers are already authenticated and policy-gated by
         // the central gateway. In that dedicated remote context, do not inherit a
-        // workstation's historical Desktop Commander directory allowlist. An optional
+        // workstation's historical directory allowlist. An optional
         // MCP_GATEWAY_ALLOWED_ROOTS restriction is enforced by GatewayToolAdapter before
         // calls reach this filesystem layer.
         const remoteGatewayContext = process.env.MCP_DEVICE_REMOTE === 'true';

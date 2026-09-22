@@ -7,7 +7,7 @@ import sharp from 'sharp';
 import { commandManager } from '../command-manager.js';
 import { configManager } from '../config-manager.js';
 import { validatePath } from '../tools/filesystem.js';
-import { DesktopCommanderIntegration } from './execution-engine.js';
+import { LocalExecutionEngine } from './execution-engine.js';
 import { inspectProjectOnDevice } from './project-inspection.js';
 
 const execAsync = promisify(exec);
@@ -69,7 +69,7 @@ function assertSuccess(result: any, tool: string): any {
 function parsePid(result: any): number {
     const match = textFromResult(result).match(/PID\s+(-?\d+)/i);
     const pid = Number(match?.[1]);
-    if (!Number.isInteger(pid)) throw new Error('Desktop Commander did not return a process PID');
+    if (!Number.isInteger(pid)) throw new Error('Local execution engine did not return a process PID');
     return pid;
 }
 async function runShell(args: any) {
@@ -128,7 +128,7 @@ export class GatewayToolAdapter {
     private pathValidator: (requestedPath: string) => Promise<string>;
     private canonicalRoots?: Promise<string[]>;
 
-    constructor(private desktop: DesktopCommanderIntegration, options: GatewayToolAdapterOptions = {}) {
+    constructor(private engine: LocalExecutionEngine, options: GatewayToolAdapterOptions = {}) {
         this.allowedRoots = options.allowedRoots ?? configuredGatewayRoots();
         this.pathValidator = options.pathValidator ?? validatePath;
     }
@@ -204,10 +204,10 @@ export class GatewayToolAdapter {
             } else if (args.tail !== undefined) {
                 mapped.offset = -Number(args.tail);
             }
-            return assertSuccess(await this.desktop.callClientTool('read_file', mapped), 'read_file');
+            return assertSuccess(await this.engine.callClientTool('read_file', mapped), 'read_file');
         }
         if (tool === 'write_file') {
-            return assertSuccess(await this.desktop.callClientTool('write_file', {
+            return assertSuccess(await this.engine.callClientTool('write_file', {
                 path: await this.guardPath(args.path),
                 content: args.content,
                 mode: 'rewrite'
@@ -217,7 +217,7 @@ export class GatewayToolAdapter {
         if (tool === 'shell_execute') return await runShell({ ...args, working_directory: await this.guardPath(args.working_directory) });
         if (tool === 'start_process') {
             const workingDirectory = await this.guardPath(args.working_directory);
-            const result = assertSuccess(await this.desktop.callClientTool('start_process', {
+            const result = assertSuccess(await this.engine.callClientTool('start_process', {
                 command: args.command,
                 timeout_ms: Number(args.timeout_ms || 10000),
                 working_directory: workingDirectory
@@ -225,7 +225,7 @@ export class GatewayToolAdapter {
             return { ...result, pid: parsePid(result), session_id: String(parsePid(result)) };
         }
         if (tool === 'read_process_output') {
-            return assertSuccess(await this.desktop.callClientTool('read_process_output', {
+            return assertSuccess(await this.engine.callClientTool('read_process_output', {
                 pid: Number(args.session_id),
                 offset: args.offset,
                 length: args.length,
@@ -233,14 +233,14 @@ export class GatewayToolAdapter {
             }), 'read_process_output');
         }
         if (tool === 'interact_with_process') {
-            return assertSuccess(await this.desktop.callClientTool('interact_with_process', {
+            return assertSuccess(await this.engine.callClientTool('interact_with_process', {
                 pid: Number(args.session_id),
                 input: String(args.input ?? ''),
                 timeout_ms: Number(args.timeout_ms || 8000)
             }), 'interact_with_process');
         }
         if (tool === 'terminate_process') {
-            return assertSuccess(await this.desktop.callClientTool('force_terminate', {
+            return assertSuccess(await this.engine.callClientTool('force_terminate', {
                 pid: Number(args.session_id)
             }), 'force_terminate');
         }
@@ -259,7 +259,7 @@ export class GatewayToolAdapter {
             throw new Error('expected_replacements must be a positive integer');
         }
         if (args.dry_run === true) {
-            const read = assertSuccess(await this.desktop.callClientTool('read_file', {
+            const read = assertSuccess(await this.engine.callClientTool('read_file', {
                 path: args.path,
                 offset: 0,
                 length: 100000
@@ -275,7 +275,7 @@ export class GatewayToolAdapter {
                 }) }]
             };
         }
-        return assertSuccess(await this.desktop.callClientTool('edit_block', {
+        return assertSuccess(await this.engine.callClientTool('edit_block', {
             file_path: args.path,
             old_string: args.old_text,
             new_string: args.new_text,

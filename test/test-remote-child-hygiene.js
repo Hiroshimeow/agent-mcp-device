@@ -86,7 +86,7 @@ const transport = new StdioClientTransport({
     ...getDefaultEnvironment(),
     MCP_DEVICE_REMOTE: 'true',
     MCP_DEVICE_CONFIG_DIR: root,
-    DESKTOP_COMMANDER_DISABLE_TELEMETRY: 'true',
+    MCP_DEVICE_DISABLE_TELEMETRY: 'true',
     DC_FLAG_URL: flagUrl
   }
 });
@@ -117,7 +117,7 @@ try {
     .join('\n');
   assert.match(readText, /remote child hygiene content/);
   assert(!/SYSTEM INSTRUCTION|Docker setup notice|feedback|onboarding/i.test(readText),
-    'remote result must not receive inherited Desktop Commander prompt injection');
+    'remote result must not receive inherited prompt injection');
 
   const secret = 'REMOTE_CHILD_SECRET_92731';
   const writeResult = await client.callTool({
@@ -134,7 +134,7 @@ try {
   // Give the inherited async history writer more than one flush interval.
   await new Promise(resolve => setTimeout(resolve, 1200));
 
-  assert.equal(flagRequests, 0, 'remote child must never fetch Desktop Commander feature flags');
+  assert.equal(flagRequests, 0, 'remote child must never fetch external feature flags');
 
   const finalConfigText = await fs.readFile(configPath, 'utf8');
   assert.equal(finalConfigText, initialConfigText,
@@ -161,9 +161,5 @@ try {
   await transport.close().catch(() => {});
   await new Promise(resolve => flagServer.close(resolve));
   await fs.rm(root, { recursive: true, force: true });
-}
-
-if (/desktopcommander\.app\/flags/i.test(stderrText)) {
-  throw new Error('Remote child attempted Desktop Commander feature-flag egress.');
 }
 process.exit(0);

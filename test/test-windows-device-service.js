@@ -14,7 +14,7 @@ function testDeterministicTaskNameAndRunnerAreSecretFree() {
   const script = buildWindowsRunnerScript({
     gatewayUrl: 'https://mcp.example.test',
     nodePath: 'C:\\Program Files\\nodejs\\node.exe',
-    entrypoint: 'C:\\Program Files\\hcu-device\\dist\\index.js'
+    entrypoint: 'C:\\Program Files\\mcp-device\\dist\\index.js'
   });
   assert(!script.includes('mcp.example.test'));
   assert(!script.includes('MCP_GATEWAY_URL'));
@@ -25,7 +25,7 @@ function testDeterministicTaskNameAndRunnerAreSecretFree() {
 }
 
 async function testLifecycleUsesOneTaskAndRemovesRunner() {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-service-'));
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-service-'));
   const calls = [];
   const execFile = async (file, args) => {
     calls.push({ file, args });
@@ -46,7 +46,6 @@ async function testLifecycleUsesOneTaskAndRemovesRunner() {
   assert(!runner.includes('https://gateway.example.test'));
   assert(calls.some(call => call.file.toLowerCase().includes('schtasks') && call.args.includes('/Create')));
   assert(calls.some(call => call.args.includes('MCP-Device-device-test')));
-  assert(calls.some(call => call.args.includes('HCU-Device-device-test')), 'legacy registration must be removed during migration');
   await service.start('device-test');
   await service.stop('device-test');
   const status = await service.status('device-test');
@@ -58,7 +57,7 @@ async function testLifecycleUsesOneTaskAndRemovesRunner() {
 }
 
 async function testSchTasksAccessDeniedFallsBackToUserRunKey() {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-service-fallback-'));
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-service-fallback-'));
   const calls = [];
   let processChecks = 0;
   const execFile = async (file, args) => {
@@ -108,7 +107,7 @@ async function testSchTasksAccessDeniedFallsBackToUserRunKey() {
 }
 
 async function testManualModeKeepsRunnerAndStartsDirectly() {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-service-manual-'));
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-service-manual-'));
   const calls = [];
   const runnerPath = path.join(root, 'run-device.ps1');
   let taskExists = false;
@@ -157,122 +156,6 @@ async function testManualModeKeepsRunnerAndStartsDirectly() {
   await fs.rm(root, { recursive: true, force: true });
 }
 
-async function testUnrelatedLookalikeLegacyRegistrationIsUntouched() {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-service-legacy-lookalike-'));
-  const runnerPath = path.join(root, 'run-device.ps1');
-  const legacyRunnerPath = path.join(root, 'legacy-run-device.ps1');
-  const calls = [];
-  const execFile = async (file, args) => {
-    calls.push({ file, args });
-    const joined = args.join(' ');
-    if (file.toLowerCase().includes('powershell') && joined.includes('Get-ScheduledTask')) {
-      if (joined.includes('HCU-Device-device-lookalike') && joined.includes('.Actions')) {
-        return { stdout: 'powershell.exe -File C:\\unrelated\\run-device.ps1\n', stderr: '' };
-      }
-      throw new Error('task missing');
-    }
-    if (file.toLowerCase().includes('reg.exe') && args[0] === 'query') {
-      if (args.includes('HCU-Device-device-lookalike')) {
-        return { stdout: 'HCU-Device-device-lookalike REG_SZ powershell.exe -File C:\\unrelated\\run-device.ps1', stderr: '' };
-      }
-      throw new Error('missing');
-    }
-    return { stdout: '', stderr: '' };
-  };
-  const service = new WindowsDeviceService({
-    platform: 'win32',
-    execFile,
-    runnerPath,
-    legacyRunnerPath,
-    nodePath: 'C:\\node.exe',
-    entrypoint: 'C:\\dc\\dist\\mcp-device.js'
-  });
-  try {
-    await service.install({ deviceId: 'device-lookalike' });
-    const legacyDeletes = calls.filter(call =>
-      call.args.includes('HCU-Device-device-lookalike') &&
-      ((call.file.toLowerCase().includes('schtasks') && call.args.includes('/Delete')) ||
-       (call.file.toLowerCase().includes('reg.exe') && call.args[0] === 'delete'))
-    );
-    assert.deepEqual(legacyDeletes, [], 'same-name legacy registrations with an unrelated command must not be deleted');
-  } finally {
-    await fs.rm(root, { recursive: true, force: true });
-  }
-}
-
-async function testVerifiedLegacyDeletionFailureStopsMigrationBeforeNewRegistration() {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-service-legacy-delete-fail-'));
-  const runnerPath = path.join(root, 'run-device.ps1');
-  const legacyRunnerPath = path.join(root, 'legacy-run-device.ps1');
-  const calls = [];
-  const execFile = async (file, args) => {
-    calls.push({ file, args });
-    const joined = args.join(' ');
-    if (file.toLowerCase().includes('powershell') && joined.includes('Get-ScheduledTask')) {
-      if (joined.includes('HCU-Device-device-delete-fail') && joined.includes('.Actions')) {
-        return { stdout: `powershell.exe -File \"${legacyRunnerPath}\"\n`, stderr: '' };
-      }
-      throw new Error('task missing');
-    }
-    if (file.toLowerCase().includes('schtasks') && args.includes('/Delete') && args.includes('HCU-Device-device-delete-fail')) {
-      const error = new Error('Command failed');
-      error.stderr = 'ERROR: Access is denied.';
-      throw error;
-    }
-    if (file.toLowerCase().includes('reg.exe') && args[0] === 'query') throw new Error('missing');
-    return { stdout: '', stderr: '' };
-  };
-  const service = new WindowsDeviceService({ platform: 'win32', execFile, runnerPath, legacyRunnerPath, nodePath: 'C:\\node.exe', entrypoint: 'C:\\dc\\dist\\mcp-device.js' });
-  try {
-    await assert.rejects(
-      () => service.install({ deviceId: 'device-delete-fail' }),
-      error => /command failed/i.test(error.message) && /access is denied/i.test(String(error.stderr || ''))
-    );
-    assert.equal(calls.some(call => call.file.toLowerCase().includes('schtasks') && call.args.includes('/Create') && call.args.includes('MCP-Device-device-delete-fail')), false);
-  } finally {
-    await fs.rm(root, { recursive: true, force: true });
-  }
-}
-
-async function testVerifiedLegacyRegistrationIsRemoved() {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-service-legacy-owned-'));
-  const runnerPath = path.join(root, 'run-device.ps1');
-  const legacyRunnerPath = path.join(root, 'legacy-run-device.ps1');
-  const calls = [];
-  const execFile = async (file, args) => {
-    calls.push({ file, args });
-    const joined = args.join(' ');
-    if (file.toLowerCase().includes('powershell') && joined.includes('Get-ScheduledTask')) {
-      if (joined.includes('HCU-Device-device-owned') && joined.includes('.Actions')) {
-        return { stdout: `powershell.exe -File \"${legacyRunnerPath}\"\n`, stderr: '' };
-      }
-      throw new Error('task missing');
-    }
-    if (file.toLowerCase().includes('reg.exe') && args[0] === 'query') {
-      if (args.includes('HCU-Device-device-owned')) {
-        return { stdout: `HCU-Device-device-owned REG_SZ powershell.exe -File \"${legacyRunnerPath}\"`, stderr: '' };
-      }
-      throw new Error('missing');
-    }
-    return { stdout: '', stderr: '' };
-  };
-  const service = new WindowsDeviceService({
-    platform: 'win32',
-    execFile,
-    runnerPath,
-    legacyRunnerPath,
-    nodePath: 'C:\\node.exe',
-    entrypoint: 'C:\\dc\\dist\\mcp-device.js'
-  });
-  try {
-    await service.install({ deviceId: 'device-owned' });
-    assert(calls.some(call => call.file.toLowerCase().includes('schtasks') && call.args.includes('/Delete') && call.args.includes('HCU-Device-device-owned')));
-    assert(calls.some(call => call.file.toLowerCase().includes('reg.exe') && call.args[0] === 'delete' && call.args.includes('HCU-Device-device-owned')));
-  } finally {
-    await fs.rm(root, { recursive: true, force: true });
-  }
-}
-
 async function testNonWindowsRefusesLifecycle() {
   const service = new WindowsDeviceService({ platform: 'linux', execFile: async () => ({ stdout: '', stderr: '' }) });
   await assert.rejects(service.install({ deviceId: 'device-test', gatewayUrl: 'https://gateway.example.test' }), /Windows/i);
@@ -282,8 +165,5 @@ testDeterministicTaskNameAndRunnerAreSecretFree();
 await testLifecycleUsesOneTaskAndRemovesRunner();
 await testSchTasksAccessDeniedFallsBackToUserRunKey();
 await testManualModeKeepsRunnerAndStartsDirectly();
-await testUnrelatedLookalikeLegacyRegistrationIsUntouched();
-await testVerifiedLegacyDeletionFailureStopsMigrationBeforeNewRegistration();
-await testVerifiedLegacyRegistrationIsRemoved();
 await testNonWindowsRefusesLifecycle();
 console.log('Windows device service tests passed');

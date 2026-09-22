@@ -52,7 +52,7 @@ async function pathExists(filePath) {
 }
 
 async function main() {
-    const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'desktop-commander-chrome-cache-'));
+    const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-chrome-cache-'));
 
     try {
         const cacheDir = path.join(tempRoot, 'puppeteer');

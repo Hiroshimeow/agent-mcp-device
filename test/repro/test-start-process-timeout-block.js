@@ -3,7 +3,7 @@ import { terminalManager } from '../../dist/terminal-manager.js';
 
 /**
  * Repro / characterization test for issue #310:
- *   "start_process blocks ... causing Claude Desktop crashes"
+ *   "start_process blocks ... causing MCP client timeouts"
  *
  * Root cause (src/terminal-manager.ts executeCommand): the call resolves early
  * ONLY via one of:

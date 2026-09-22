@@ -20,7 +20,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PROJECT_ROOT = path.dirname(path.dirname(__dirname));
 const RUN_ID = `${process.pid}-${Date.now()}`;
-const TEST_CONFIG_DIR = path.join(process.env.TEMP || process.env.TMP || __dirname, `desktop-commander-edit-performance-config-${RUN_ID}`);
+const TEST_CONFIG_DIR = path.join(process.env.TEMP || process.env.TMP || __dirname, `mcp-device-edit-performance-config-${RUN_ID}`);
 const README_TEXT = await fs.readFile(path.join(PROJECT_ROOT, 'README.md'), 'utf8');
 const README_LINES = README_TEXT
   .split(/\r?\n/)
@@ -88,7 +88,7 @@ async function sleep(ms) {
 
 function createLargeFileContent(workflowId, editCount) {
   const lines = [
-    '# Desktop Commander MCP Large Edit Fixture',
+    '# MCP Device Large Edit Fixture',
     '',
     'This generated file mirrors README-style sections so edit_block has realistic markdown content.',
     `Workflow: ${workflowId}`,
@@ -122,7 +122,7 @@ function createLargeFileContent(workflowId, editCount) {
 
 function createLargePythonFileContent(workflowId, editCount) {
   const lines = [
-    '# Generated Python fixture for Desktop Commander MCP edit_block performance tests',
+    '# Generated Python fixture for MCP Device edit_block performance tests',
     `WORKFLOW_ID = ${JSON.stringify(workflowId)}`,
     `PLANNED_EDITS = ${editCount}`,
     '',
@@ -154,7 +154,7 @@ function createDocxFileContent(workflowId, editCount) {
   // Plain text; DocxFileHandler turns each line into a paragraph and lines
   // starting with # into headings. Marker text is kept alphanumeric so it is
   // not altered by XML escaping and maps to a single <w:t> element per line.
-  const lines = ['# Desktop Commander MCP DOCX Edit Fixture'];
+  const lines = ['# MCP Device DOCX Edit Fixture'];
   for (let index = 1; index <= editCount; index++) {
     if (index % 10 === 1) {
       lines.push(`## Section ${Math.ceil(index / 10)}`);
@@ -216,7 +216,7 @@ function docxBodyElement(text) {
 }
 
 function fuzzyPythonReportLine(workflowId, state) {
-  return `unique_report_anchor_${workflowId.replace(/[^a-zA-Z0-9_]/g, '_')} = "${state}: Desktop Commander MCP handles files, commands, and edit blocks"`;
+  return `unique_report_anchor_${workflowId.replace(/[^a-zA-Z0-9_]/g, '_')} = "${state}: MCP Device handles files, commands, and edit blocks"`;
 }
 
 function getReadmeLine(index, salt) {
@@ -608,7 +608,7 @@ async function runPythonFuzzyFallbackWorkflow(client, attemptCount) {
   const filePath = path.join(TEST_DIR, `large-workflow-${workflowId}.py`);
   const exactTarget = fuzzyPythonReportLine(workflowId, 'original');
   const editedTarget = fuzzyPythonReportLine(workflowId, 'edited');
-  const fuzzyOldString = exactTarget.replace('Commander', 'Comander');
+  const fuzzyOldString = exactTarget.replace('Device', 'Devcie');
   const startedAt = performance.now();
 
   const writeResult = await callTool(client, 'write_file', {
@@ -792,8 +792,8 @@ async function createMcpClient() {
     stderr: 'pipe',
     env: {
       ...process.env,
-      DESKTOP_COMMANDER_DISABLE_TELEMETRY: 'true',
-      DESKTOP_COMMANDER_CONFIG_DIR: TEST_CONFIG_DIR,
+      MCP_DEVICE_DISABLE_TELEMETRY: 'true',
+      MCP_DEVICE_CONFIG_DIR: TEST_CONFIG_DIR,
     },
   });
 
@@ -803,7 +803,7 @@ async function createMcpClient() {
   });
 
   const client = new Client(
-    { name: 'desktop-commander-edit-performance-test', version: '1.0.0' },
+    { name: 'mcp-device-edit-performance-test', version: '1.0.0' },
     { capabilities: {} }
   );
 

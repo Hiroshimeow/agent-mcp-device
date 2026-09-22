@@ -25,7 +25,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 const RUN_ID = `${process.pid}-${Date.now()}`;
-const TEST_CONFIG_DIR = path.join(process.env.TEMP || process.env.TMP || __dirname, `desktop-commander-read-file-integration-config-${RUN_ID}`);
+const TEST_CONFIG_DIR = path.join(process.env.TEMP || process.env.TMP || __dirname, `mcp-device-read-file-integration-config-${RUN_ID}`);
 const TEST_DIR = path.join(__dirname, `test_read_file_unknown_params-${RUN_ID}`);
 const TEST_FILE = path.join(TEST_DIR, 'numbered.txt');
 const LINE_COUNT = 50;
@@ -46,13 +46,13 @@ async function createMcpClient() {
     stderr: 'pipe',
     env: {
       ...process.env,
-      DESKTOP_COMMANDER_DISABLE_TELEMETRY: 'true',
-      DESKTOP_COMMANDER_CONFIG_DIR: TEST_CONFIG_DIR,
+      MCP_DEVICE_DISABLE_TELEMETRY: 'true',
+      MCP_DEVICE_CONFIG_DIR: TEST_CONFIG_DIR,
     },
   });
 
   const client = new Client(
-    { name: 'desktop-commander-unknown-params-test', version: '1.0.0' },
+    { name: 'mcp-device-unknown-params-test', version: '1.0.0' },
     { capabilities: {} }
   );
   await client.connect(transport, { timeout: 30000 });

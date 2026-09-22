@@ -1,5 +1,5 @@
 /*
- * App-specific styling for File Preview — tuned to blend with Claude's UI.
+ * App-specific styling for File Preview — tuned for the MCP Device UI.
  */
 :root {
   --code-bg: var(--panel);
@@ -24,7 +24,7 @@
   --toc-rail-width: 320px;
 }
 
-/* ── Panel (Claude-style card) ── */
+/* ── Panel (compact card) ── */
 
 .panel {
   margin-top: 6px;

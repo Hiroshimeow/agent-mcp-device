@@ -30,9 +30,6 @@ export function buildWindowsTaskName(deviceId: string): string {
     return `MCP-Device-${taskSafeDeviceId(deviceId)}`;
 }
 
-function legacyWindowsTaskName(deviceId: string): string {
-    return `HCU-Device-${taskSafeDeviceId(deviceId)}`;
-}
 
 export function buildWindowsRunnerScript(options: {
     gatewayUrl?: string;
@@ -60,7 +57,6 @@ export class WindowsDeviceService {
     private platform: NodeJS.Platform | string;
     private execFile: ExecFileFn;
     private runnerPath: string;
-    private legacyRunnerPath: string;
     private nodePath: string;
     private entrypoint: string;
 
@@ -68,7 +64,6 @@ export class WindowsDeviceService {
         platform?: NodeJS.Platform | string;
         execFile?: ExecFileFn;
         runnerPath?: string;
-        legacyRunnerPath?: string;
         nodePath?: string;
         entrypoint?: string;
     } = {}) {
@@ -78,7 +73,6 @@ export class WindowsDeviceService {
             return { stdout: String(result.stdout || ''), stderr: String(result.stderr || '') };
         });
         this.runnerPath = path.resolve(options.runnerPath || path.join(deviceStatePaths().root, 'run-device.ps1'));
-        this.legacyRunnerPath = path.resolve(options.legacyRunnerPath || path.join(deviceStatePaths().legacyRoot, 'run-device.ps1'));
         this.nodePath = path.resolve(options.nodePath || process.execPath);
         this.entrypoint = path.resolve(options.entrypoint || process.argv[1]);
     }
@@ -122,30 +116,6 @@ export class WindowsDeviceService {
         try { await this.execFile('reg.exe', ['delete', USER_RUN_KEY, '/v', taskName, '/f']); } catch { /* absent is fine */ }
     }
 
-    private commandReferencesLegacyRunner(value: string): boolean {
-        const normalize = (text: string) => String(text || '').replace(/\//g, '\\').toLowerCase();
-        return normalize(value).includes(normalize(this.legacyRunnerPath));
-    }
-
-    private async deleteVerifiedLegacyRegistrations(taskName: string): Promise<void> {
-        let scheduledAction: string | null = null;
-        try {
-            const command = `(Get-ScheduledTask -TaskName ${psQuote(taskName)} -ErrorAction Stop).Actions | ForEach-Object { ($_.Execute + ' ' + $_.Arguments) }`;
-            scheduledAction = String((await this.execFile('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', command])).stdout || '');
-        } catch { /* absent scheduled task is fine */ }
-        if (scheduledAction !== null && this.commandReferencesLegacyRunner(scheduledAction)) {
-            try { await this.execFile('schtasks.exe', ['/Delete', '/F', '/TN', taskName]); }
-            catch (error: any) { if (!isMissingRegistrationError(error)) throw error; }
-        }
-
-        let runValue: string | null = null;
-        try { runValue = String((await this.execFile('reg.exe', ['query', USER_RUN_KEY, '/v', taskName])).stdout || ''); }
-        catch { /* absent Run value is fine */ }
-        if (runValue !== null && this.commandReferencesLegacyRunner(runValue)) {
-            try { await this.execFile('reg.exe', ['delete', USER_RUN_KEY, '/v', taskName, '/f']); }
-            catch (error: any) { if (!isMissingRegistrationError(error)) throw error; }
-        }
-    }
 
     private async createAutostartRegistration(taskName: string): Promise<'task' | 'run'> {
         const taskAction = `powershell.exe -NoProfile -ExecutionPolicy Bypass -File "${this.runnerPath}"`;
@@ -176,13 +146,11 @@ export class WindowsDeviceService {
     async install(options: { deviceId: string; gatewayUrl?: string; allowedRoots?: string }): Promise<void> {
         this.assertWindows();
         const taskName = buildWindowsTaskName(options.deviceId);
-        const legacyTaskName = legacyWindowsTaskName(options.deviceId);
         const existing = await this.status(options.deviceId).catch(() => null);
         const preserveManual = existing?.installed === true && existing.autostart === false;
         const runner = buildWindowsRunnerScript({ nodePath: this.nodePath, entrypoint: this.entrypoint });
         await fs.mkdir(path.dirname(this.runnerPath), { recursive: true });
         await fs.writeFile(this.runnerPath, runner, { mode: 0o600 });
-        await this.deleteVerifiedLegacyRegistrations(legacyTaskName);
         if (preserveManual) {
             await this.deleteRegistrations(taskName);
             return;
@@ -239,10 +207,8 @@ export class WindowsDeviceService {
     async uninstall(deviceId: string): Promise<void> {
         this.assertWindows();
         const taskName = buildWindowsTaskName(deviceId);
-        const legacyTaskName = legacyWindowsTaskName(deviceId);
         try { await this.stop(deviceId); } catch { /* registration cleanup remains authoritative; runtime is never PID-killed. */ }
         await this.deleteRegistrations(taskName);
-        await this.deleteVerifiedLegacyRegistrations(legacyTaskName);
         await fs.rm(this.runnerPath, { force: true });
     }
 }

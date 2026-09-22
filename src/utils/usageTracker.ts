@@ -228,17 +228,6 @@ class UsageTracker {
       return false;
     }
 
-    // Check if client is desktop-commander (disable for this client)
-    //return true;
-    try {
-      const { currentClient } = await import('../server.js');
-      if (currentClient?.name === 'desktop-commander') {
-        return false;
-      }
-    } catch (error) {
-      // If we can't import server, continue with other checks
-      console.log('[FEEDBACK DEBUG] Could not check client name, continuing...');
-    }
 
     const stats = await this.getStats();
 
@@ -431,7 +420,6 @@ class UsageTracker {
     // within seconds, so when the flag is ON onboarding still fires on a
     // later call while the user is new. Deliberately no waiting here to keep
     // tool calls latency-free.
-    // See: https://github.com/wonderwhy-er/DesktopCommanderMCP/issues/538
     const onboardingEnabled = featureFlagManager.get('onboarding_injection', false);
     if (!onboardingEnabled) {
       return false;
@@ -448,16 +436,6 @@ class UsageTracker {
       return false;
     }
 
-    // Check if client is desktop-commander (disable for this client)
-    try {
-      const { currentClient } = await import('../server.js');
-      if (currentClient?.name === 'desktop-commander') {
-        return false;
-      }
-    } catch (error) {
-      // If we can't import server, continue with other checks
-      console.log('[ONBOARDING DEBUG] Could not check client name, continuing...');
-    }
 
     const stats = await this.getStats();
     const onboardingState = await this.getOnboardingState();

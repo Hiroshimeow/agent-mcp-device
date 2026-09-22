@@ -193,7 +193,7 @@ class ConfigManager {
         }
         // Use user's actual shell from environment
         // On macOS, default to zsh (default since Catalina) since process.env.SHELL
-        // may not be set when running inside Claude Desktop
+        // may not be set when launched by a desktop host
         const fallbackShell = os.platform() === 'darwin' ? '/bin/zsh' : '/bin/sh';
         const userShell = process.env.SHELL || fallbackShell;
         // Return just the shell path - we'll handle login shell flag elsewhere

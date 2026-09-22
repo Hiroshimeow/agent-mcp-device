@@ -181,15 +181,6 @@ export const InteractWithProcessArgsSchema = z.object({
 // Usage stats schema
 export const GetUsageStatsArgsSchema = z.object({});
 
-// Feedback tool schema - no pre-filled parameters, all user input
-export const GiveFeedbackArgsSchema = z.object({
-  // No parameters needed - form will be filled manually by user
-  // Only auto-filled hidden fields remain:
-  // - tool_call_count (auto)
-  // - days_using (auto) 
-  // - platform (auto)
-  // - client_id (auto)
-});
 
 // Search schemas (renamed for natural language)
 export const StartSearchArgsSchema = z.object({
@@ -272,7 +263,6 @@ export const toolArgSchemas: Record<string, z.ZodTypeAny> = {
   kill_process: KillProcessArgsSchema,
   get_usage_stats: GetUsageStatsArgsSchema,
   get_recent_tool_calls: GetRecentToolCallsArgsSchema,
-  give_feedback_to_desktop_commander: GiveFeedbackArgsSchema,
   get_prompts: GetPromptsArgsSchema,
   track_ui_event: TrackUiEventArgsSchema,
 };

@@ -4,7 +4,7 @@ import net from 'net';
 import os from 'os';
 import path from 'path';
 
-import { deviceStatePaths, type DeviceStatePaths, migrateLegacyDeviceState } from './device-state.js';
+import { deviceStatePaths, type DeviceStatePaths } from './device-state.js';
 
 export type RuntimeMode = 'foreground' | 'windows' | 'systemd' | 'pm2' | 'bootstrap';
 
@@ -129,7 +129,7 @@ export class RuntimeOwner {
     }
 
     async bootstrap(): Promise<void> {
-        await migrateLegacyDeviceState(this.paths);
+        await fs.mkdir(this.paths.root, { recursive: true, mode: 0o700 });
     }
 
     setDeviceId(deviceId: string): void {

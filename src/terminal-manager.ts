@@ -10,7 +10,7 @@ import { analyzeProcessState } from './utils/process-detection.js';
  * Standard Windows PATHEXT value, used to repair a corrupted PATHEXT before
  * spawning child shells.
  *
- * On some Windows Claude Desktop / DXT launches the server process inherits a
+ * On some Windows host launches the server process inherits a
  * broken PATHEXT (observed as ".CPL" only). Because we build the child env from
  * { ...process.env }, that broken value would propagate into every spawned
  * shell, stripping ".EXE" and breaking resolution of git / node / python / rg /

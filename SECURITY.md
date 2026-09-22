@@ -2,13 +2,13 @@
 
 ## Security Model
 
-Desktop Commander is a privileged local automation tool. It lets an AI client you authorize read and write files and execute terminal commands on your machine. That capability is the point of the product — not a flaw.
+MCP Device is a privileged local automation tool. It lets an AI client you authorize read and write files and execute terminal commands on your machine. That capability is the point of the product — not a flaw.
 
-Because it can run arbitrary terminal commands, Desktop Commander should be understood as an **amplifier of whatever the connected AI client asks it to do**. Its built-in restrictions are **safety guardrails that reduce accidental or unintended actions**, not a security sandbox that can contain a malicious or compromised client.
+Because it can run arbitrary terminal commands, MCP Device should be understood as an **amplifier of whatever the connected AI client asks it to do**. Its built-in restrictions are **safety guardrails that reduce accidental or unintended actions**, not a security sandbox that can contain a malicious or compromised client.
 
 ### Core assumption
 
-Desktop Commander assumes the connected AI client — and the account driving it — is **trusted and uncompromised**. It executes requested actions and does not attempt to determine whether a request originates from a genuine user, from prompt injection, or from a compromised AI account. Protecting the integrity of that client and account is part of the overall security model and is the user's responsibility.
+MCP Device assumes the connected AI client — and the account driving it — is **trusted and uncompromised**. It executes requested actions and does not attempt to determine whether a request originates from a genuine user, from prompt injection, or from a compromised AI account. Protecting the integrity of that client and account is part of the overall security model and is the user's responsibility.
 
 If the AI client should never be able to reach the rest of your machine, that guarantee can only come from OS-level isolation (see below).
 
@@ -25,7 +25,7 @@ Terminal command execution is a first-class feature. Because it can launch arbit
 
 ## Recommended deployment for stronger isolation
 
-For any workload where the AI client must not access the wider machine, run Desktop Commander inside an isolated environment:
+For any workload where the AI client must not access the wider machine, run MCP Device inside an isolated environment:
 
 - **Docker** with selective folder mounting (see the [Docker installation section](README.md#option-6-docker-installation-🐳-⭐-auto-updates-no-nodejs-required))
 - A **virtual machine**, dev container, or a separate/dedicated workstation
@@ -41,11 +41,11 @@ Additional practical steps:
 
 - Directory restrictions are guardrails, not sandboxing — terminal commands can reach files outside `allowedDirectories`.
 - The command blocklist can be circumvented via substitution, absolute paths, or alternate interpreters.
-- Desktop Commander does not protect against a compromised AI account or prompt injection reaching a trusted client. For that threat model, use OS-level isolation.
+- MCP Device does not protect against a compromised AI account or prompt injection reaching a trusted client. For that threat model, use OS-level isolation.
 
 ## License and responsibility
 
-Desktop Commander is free, open-source software released under the MIT License. As is standard for MIT-licensed software, it is provided "as is," without warranty, and you are responsible for how you deploy and secure it in your environment. This security model describes how the tool is designed to behave; it does not transfer responsibility for your accounts, machines, or connected AI clients to the project.
+MCP Device is free, open-source software released under the MIT License. As is standard for MIT-licensed software, it is provided "as is," without warranty, and you are responsible for how you deploy and secure it in your environment. This security model describes how the tool is designed to behave; it does not transfer responsibility for your accounts, machines, or connected AI clients to the project.
 
 ## Reporting a Vulnerability
 
@@ -59,7 +59,7 @@ If you'd prefer not to disclose publicly, reach out via Discord to arrange priva
 
 ## Contact
 
-- **GitHub Issues**: https://github.com/wonderwhy-er/DesktopCommanderMCP/issues
+- **GitHub Issues**: https://github.com/Hiroshimeow/agent-mcp-device/issues
 - **Discord Community**: https://discord.gg/kQ27sNnZr7
 
 ---

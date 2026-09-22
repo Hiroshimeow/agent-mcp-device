@@ -204,7 +204,7 @@ async function testCrlfPreserved() {
 
 async function testReadmeStyleFileNotCollapsed() {
   console.log('\n--- Test: README-style file not collapsed by Tiptap (issue #437 in-the-wild reproduction) ---');
-  // This mirrors a real corruption captured by another Claude session: a 200+ line
+  // This mirrors a real corruption captured by another agent session: a 200+ line
   // README with mixed markdown (headings, tables, code blocks, lists) was reduced
   // to ~22 lines after a single edit_block call. The file-preview UI mounts on
   // edit_block (server.ts:788), the editor parses the file via tiptap-markdown,
@@ -308,7 +308,7 @@ async function testBareUrlNotAutoLinked() {
   // Captured from /Users/eduardsruzga/work/best-value-ai/README.md.
   // Tiptap with `linkify: true` autolinks bare URLs and the serializer
   // emits them as `<https://...>` even when the source had no brackets.
-  const input = '🔗 **Live tool:** https://desktopcommander.app/best-value-ai/\n';
+  const input = '🔗 **Live tool:** https://example.test/best-value-ai/\n';
   const output = roundTrip(input);
   assert.strictEqual(
     output,
@@ -325,9 +325,9 @@ async function testEmojiPrefixedSoftBreaksRestored() {
   // them as one paragraph and serializes them concatenated. restoreSoftBreaks
   // currently only repairs pairs; this is a triple.
   const input =
-    '🔗 **Live tool:** desktopcommander.app/best-value-ai/\n' +
+    '🔗 **Live tool:** example.test/best-value-ai/\n' +
     '📖 **Article:** [Local LLMs Beat Cloud](https://example.com/x)\n' +
-    '🏠 **Supported by:** [Desktop Commander](https://desktopcommander.app)\n';
+    '🏠 **Supported by:** [MCP Device](https://example.test)\n';
   const output = roundTrip(input);
   assert.strictEqual(
     output,
@@ -376,7 +376,7 @@ async function testStarBulletMarkerPreserved() {
 
 async function testRelativePathLinksSurvive() {
   console.log('\n--- Test: links to relative paths survive (skill-files batch) ---');
-  // From SKILL.md files in ~/.desktop-commander/skills/. Tiptap's link
+  // From SKILL.md files in ~/.mcp-device/examples/. Tiptap's link
   // extension validates URLs against a scheme/relative-prefix list and
   // SILENTLY DROPS links whose URL is a bare relative path with `/`
   // (`scripts/foo.mjs`). Single-segment paths (`foo.md`) survive, but

@@ -12,7 +12,7 @@ import { fileURLToPath } from 'url';
 // Get directory name
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const testConfigRoot = path.join(os.tmpdir(), `desktop-commander-test-config-${process.pid}`);
+const testConfigRoot = path.join(os.tmpdir(), `mcp-device-test-config-${process.pid}`);
 
 // Colors for console output
 const colors = {
@@ -74,15 +74,11 @@ function runTestFile(testFile) {
     // A few tests deliberately construct their own HOME/config roots and must
     // not inherit the runner's config override or their fixtures become invalid.
     const selfManagedConfigTests = new Set([
-      './test-onboarding-injection-flag.js',
       './test-remote-yolo-path-access.js',
-      './test-welcome-onboarding-legacy-config.js'
     ]);
     if (selfManagedConfigTests.has(testFile)) {
       delete env.MCP_DEVICE_CONFIG_DIR;
-      delete env.DESKTOP_COMMANDER_CONFIG_DIR;
     } else {
-      env.DESKTOP_COMMANDER_CONFIG_DIR = configDir;
       env.MCP_DEVICE_CONFIG_DIR = configDir;
     }
 
@@ -245,7 +241,7 @@ async function main() {
   const overallStartTime = Date.now();
   
   try {
-    console.log(`${colors.bold}${colors.cyan}===== DESKTOP COMMANDER TEST RUNNER =====${colors.reset}`);
+    console.log(`${colors.bold}${colors.cyan}===== MCP DEVICE TEST RUNNER =====${colors.reset}`);
     console.log(`${colors.blue}Starting test execution at ${new Date().toISOString()}${colors.reset}\n`);
     
     // Build the project first

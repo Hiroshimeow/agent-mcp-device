@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import os from 'os';
 import path from 'path';
 
-import { DesktopCommanderIntegration } from './execution-engine.js';
+import { LocalExecutionEngine } from './execution-engine.js';
 import { GatewayDeviceChannel } from './gateway-channel.js';
 import { GatewayDeviceConfigStore, createGatewayProxyAgent } from './gateway-config.js';
 import { GatewayDeviceIdentity } from './gateway-identity.js';
@@ -26,7 +26,7 @@ import { VERSION } from '../version.js';
 
 export class MCPDevice {
     private isShuttingDown = false;
-    private desktop = new DesktopCommanderIntegration();
+    private executionEngine = new LocalExecutionEngine();
     private gatewayChannel?: GatewayDeviceChannel;
     private gatewayProxyAgent?: { destroy: () => void };
     private runtimeOwner?: RuntimeOwner;
@@ -95,7 +95,7 @@ export class MCPDevice {
             await acquireRuntimeOwner(this.runtimeOwner, { confirmTakeover: options.confirmTakeover });
             await this.runtimeOwner.bootstrap();
             await bootstrapOfficialGatewayTrust(new GatewayDeviceConfigStore());
-            await this.desktop.initialize();
+            await this.executionEngine.initialize();
 
             const gatewayStatus = new GatewayDeviceStatusStore();
             const storedGatewayStatus = await gatewayStatus.load();
@@ -141,7 +141,7 @@ export class MCPDevice {
                 proxyAgent: proxy.agent,
                 securityProtocolFloor: gatewayConfig.securityProtocolFloor,
                 appCaPem: gatewayConfig.appCaPem || undefined,
-                adapter: new GatewayToolAdapter(this.desktop, { allowedRoots: gatewayConfig.allowedRoots }),
+                adapter: new GatewayToolAdapter(this.executionEngine, { allowedRoots: gatewayConfig.allowedRoots }),
                 agentVersion: process.env.npm_package_version,
                 onUpdateRequest: async (targetVersion, { requestId }) => {
                     const record = await identity.loadOrCreate();
@@ -149,7 +149,7 @@ export class MCPDevice {
                         targetVersion,
                         requestId,
                         deviceId: record.deviceId,
-                        childPid: this.desktop.getChildPid(),
+                        childPid: this.executionEngine.getChildPid(),
                         fromVersion: VERSION
                     });
                     try {
@@ -167,7 +167,7 @@ export class MCPDevice {
                             // shutdown and RuntimeOwner release before arming the helper.
                             // This preserves G5.6: no destructive update work may begin
                             // until the old runtime has finished releasing package handles.
-                            const childPid = this.desktop.getChildPid();
+                            const childPid = this.executionEngine.getChildPid();
                             await this.shutdown();
                             await signalDeviceUpdateHandoff({ childPid });
                             process.exit(0);
@@ -253,7 +253,7 @@ export class MCPDevice {
                 this.gatewayProxyAgent = undefined;
             }
             await new GatewayDeviceStatusStore().markOffline().catch(() => {});
-            await this.desktop.shutdown();
+            await this.executionEngine.shutdown();
             if (this.runtimeOwner) {
                 await this.runtimeOwner.release().catch(() => {});
                 this.runtimeOwner = undefined;

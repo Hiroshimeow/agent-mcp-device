@@ -61,7 +61,7 @@ For a custom gateway, set `MCP_GATEWAY_URL` and provision its application CA thr
 
 ## Local state and 1.0.2 migration
 
-Canonical state is stored under `~/.mcp-device/`. Existing `~/.hcu-device/` identity/config/status state is migrated non-destructively under serialized runtime ownership. A conflicting canonical and legacy identity fails closed rather than creating a second device identity.
+Canonical per-user state is stored under `~/.mcp-device/`.
 
 The device identity is Ed25519. MCP Device 1.0.2 does not use Windows DPAPI for the device private key or proxy configuration. A legacy protected 1.0.1 identity is archived without decrypting it, a fresh local identity is generated, and the device must be paired once again. A legacy protected proxy configuration must be supplied again during `mcp-device login`. The gateway stores only the public device identity and account ownership.
 
@@ -87,4 +87,4 @@ For a custom development gateway, set `MCP_GATEWAY_URL`. Supply `MCP_GATEWAY_APP
 
 ## Upstream execution engine
 
-The local execution engine is derived from [Desktop Commander MCP](https://github.com/wonderwhy-er/DesktopCommanderMCP). Desktop Commander is MIT licensed; its copyright and MIT license are preserved in this repository's `LICENSE`. The MCP Device product identity, gateway protocol, account/device lifecycle, security layer, and packaging are maintained separately in this repository.
+Third-party licensing and attribution are preserved in `LICENSE`.
