@@ -37,6 +37,7 @@ const waitFor = async (predicate, timeoutMs = 4000) => {
 class FakeDesktop {
   calls = [];
   readFileText = 'read_file:ok';
+  assertReady() {}
   async callClientTool(name, args) {
     this.calls.push({ name, args });
     if (name === 'start_process') return { content: [{ type: 'text', text: 'Process started with PID 123' }] };
@@ -122,6 +123,21 @@ async function testDefaultWindowsIdentityPathIsProfileBound() {
     else process.env.MCP_GATEWAY_DEVICE_IDENTITY_PATH = previous;
     await fs.rm(root, { recursive: true, force: true });
   }
+}
+
+async function testAdapterRejectsWhenRuntimeIsNotReady() {
+  const desktop = new FakeDesktop();
+  desktop.assertReady = () => {
+    const error = new Error('execution runtime is not ready');
+    error.code = 'DEVICE_NOT_READY';
+    throw error;
+  };
+  const adapter = new GatewayToolAdapter(desktop, { pathValidator: async value => value });
+  await assert.rejects(
+    () => adapter.call('read_text_file', { path: '/work/file.txt' }),
+    error => error?.code === 'DEVICE_NOT_READY'
+  );
+  assert.equal(desktop.calls.length, 0);
 }
 
 async function testAdapterDefaultsToWideAccess() {
@@ -416,6 +432,7 @@ async function testOperatorPreEnrolledIdentityUsesAuthHello() {
   const address = wss.address();
   const port = typeof address === 'object' && address ? address.port : 0;
   let helloType = null;
+  let helloRuntime = null;
   let authenticated = false;
   wss.on('connection', (ws, request) => {
     assert.equal(request.headers.authorization, undefined);
@@ -423,6 +440,11 @@ async function testOperatorPreEnrolledIdentityUsesAuthHello() {
       const message = JSON.parse(raw.toString());
       if (message.type === 'auth_hello') {
         helloType = message.type;
+        helloRuntime = {
+          ready: message.payload.runtime_ready,
+          reason: message.payload.runtime_reason,
+          generation: message.payload.execution_runtime_generation
+        };
         assert.equal(message.payload.public_key_pem, undefined);
         ws.send(JSON.stringify({ protocol_version: 1, type: 'auth_challenge', device_id: message.device_id, payload: { nonce: 'pre-enrolled' } }));
       } else if (message.type === 'auth_response') {
@@ -438,15 +460,91 @@ async function testOperatorPreEnrolledIdentityUsesAuthHello() {
     proxyAgentRequests += 1;
     return originalAddRequest.apply(this, args);
   };
-  const channel = new GatewayDeviceChannel({ gatewayUrl: `ws://127.0.0.1:${port}/device`, identity, proxyAgent, adapter: { async call() { return {}; } }, agentVersion: 'test' });
+  const channel = new GatewayDeviceChannel({
+    gatewayUrl: `ws://127.0.0.1:${port}/device`,
+    identity,
+    proxyAgent,
+    adapter: { async call() { return {}; } },
+    runtimeState: () => ({
+      runtime_ready: true,
+      runtime_reason: null,
+      execution_runtime_generation: 'runtime-test-generation'
+    }),
+    agentVersion: 'test'
+  });
   await channel.start();
   await waitFor(() => authenticated);
   assert.equal(helloType, 'auth_hello');
+  assert.deepEqual(helloRuntime, {
+    ready: true,
+    reason: null,
+    generation: 'runtime-test-generation'
+  });
   assert.equal((await identity.loadOrCreate()).enrolled, true);
   assert(proxyAgentRequests >= 1, 'gateway WebSocket must use the configured HTTP agent');
   await channel.stop();
   await new Promise(resolve => wss.close(resolve));
   await fs.rm(root, { recursive: true, force: true });
+}
+
+async function testNotReadyRuntimeIsAdvertisedOnHello() {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-gateway-not-ready-'));
+  const identity = new GatewayDeviceIdentity(path.join(root, 'identity.json'));
+  await identity.loadOrCreate();
+  const wss = new WebSocketServer({ port: 0 });
+  await new Promise(resolve => wss.once('listening', resolve));
+  const address = wss.address();
+  const port = typeof address === 'object' && address ? address.port : 0;
+  let helloRuntime = null;
+  wss.on('connection', ws => {
+    ws.on('message', raw => {
+      const message = JSON.parse(raw.toString());
+      if (message.type === 'auth_hello') {
+        helloRuntime = {
+          ready: message.payload.runtime_ready,
+          reason: message.payload.runtime_reason,
+          generation: message.payload.execution_runtime_generation
+        };
+        ws.send(JSON.stringify({
+          protocol_version: 1,
+          type: 'auth_challenge',
+          device_id: message.device_id,
+          payload: { nonce: 'not-ready' }
+        }));
+      } else if (message.type === 'auth_response') {
+        ws.send(JSON.stringify({
+          protocol_version: 1,
+          type: 'auth_ok',
+          device_id: message.device_id,
+          connection_epoch: 1,
+          payload: { accepted: true }
+        }));
+      }
+    });
+  });
+  const channel = new GatewayDeviceChannel({
+    gatewayUrl: `ws://127.0.0.1:${port}/device`,
+    identity,
+    adapter: { async call() { return {}; } },
+    runtimeState: () => ({
+      runtime_ready: false,
+      runtime_reason: 'LOCAL_EXECUTION_ENGINE_UNAVAILABLE',
+      execution_runtime_generation: null
+    }),
+    agentVersion: 'test'
+  });
+  try {
+    await channel.start();
+    assert.deepEqual(helloRuntime, {
+      ready: false,
+      reason: 'LOCAL_EXECUTION_ENGINE_UNAVAILABLE',
+      generation: null
+    });
+  } finally {
+    await channel.stop();
+    await new Promise(resolve => wss.close(resolve));
+    await fs.rm(root, { recursive: true, force: true });
+  }
 }
 
 async function testChannelEnrollmentToolAndReconnect() {
@@ -734,6 +832,7 @@ async function testOversizedToolResultReturnsBoundedError() {
 testPm2EntrypointDetection();
 await testIdentity();
 await testDefaultWindowsIdentityPathIsProfileBound();
+await testAdapterRejectsWhenRuntimeIsNotReady();
 await testAdapterDefaultsToWideAccess();
 await testRemoteImagePreviewIsBounded();
 await testRemoteProjectInspectionRunsOnDevice();
@@ -742,6 +841,7 @@ await testRejectsUnsafeNonLoopbackPlaintextGatewayUrls();
 await testV2ReconnectUsesInnerTlsExporterProofWithoutOuterCredential();
 await testFloorTwoNeverFallsBackWhenV2SubprotocolIsNotSelected();
 await testOperatorPreEnrolledIdentityUsesAuthHello();
+await testNotReadyRuntimeIsAdvertisedOnHello();
 await testChannelEnrollmentToolAndReconnect();
 await testRejectsMismatchedAuthDevice();
 await testRejectsStaleToolEpochAndReconnects();

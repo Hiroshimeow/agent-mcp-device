@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import path from 'path';
 import fs from 'fs/promises';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
@@ -20,13 +21,17 @@ export class LocalExecutionEngine {
     private mcpClient: Client | null = null;
     private mcpTransport: StdioClientTransport | null = null;
     private isReady = false;
+    private runtimeReason: string | null = 'LOCAL_EXECUTION_ENGINE_UNAVAILABLE';
+    private runtimeGeneration: string | null = null;
 
     async initialize() {
         console.debug('[DEBUG] LocalExecutionEngine.initialize() called');
-        const config = await this.resolveMcpConfig();
-        if (!config) throw new Error('Bundled local execution engine is unavailable. Reinstall MCP Device.');
-
+        this.isReady = false;
+        this.runtimeReason = 'LOCAL_EXECUTION_ENGINE_UNAVAILABLE';
+        this.runtimeGeneration = null;
         try {
+            const config = await this.resolveMcpConfig();
+            if (!config) throw new Error('Bundled local execution engine is unavailable. Reinstall MCP Device.');
             this.mcpTransport = new StdioClientTransport({
                 ...config,
                 env: {
@@ -40,12 +45,20 @@ export class LocalExecutionEngine {
                 { capabilities: {} }
             );
             await this.mcpClient.connect(this.mcpTransport);
+            this.runtimeGeneration = randomUUID();
             this.isReady = true;
+            this.runtimeReason = null;
             console.log(' - Local execution engine ready');
         } catch (error) {
             console.error(' - Failed to start local execution engine:', error);
             await captureRemote('local_engine_init_failed', { error });
-            throw error;
+            try { await this.mcpClient?.close(); } catch {}
+            try { await this.mcpTransport?.close(); } catch {}
+            this.mcpClient = null;
+            this.mcpTransport = null;
+            this.isReady = false;
+            this.runtimeReason = 'LOCAL_EXECUTION_ENGINE_UNAVAILABLE';
+            this.runtimeGeneration = null;
         }
     }
 
@@ -69,10 +82,25 @@ export class LocalExecutionEngine {
         return this.mcpTransport?.pid ?? null;
     }
 
+    getRuntimeState() {
+        return {
+            runtime_ready: this.isReady,
+            runtime_reason: this.isReady ? null : this.runtimeReason,
+            execution_runtime_generation: this.isReady ? this.runtimeGeneration : null
+        };
+    }
+
+    assertReady(): void {
+        if (this.isReady && this.mcpClient) return;
+        const error: Error & { code?: string } = new Error('Local execution engine is unavailable.');
+        error.code = 'DEVICE_NOT_READY';
+        throw error;
+    }
+
     async callClientTool(toolName: string, args: any, metadata?: any) {
-        if (!this.isReady || !this.mcpClient) throw new Error('Local execution engine is not initialized');
+        this.assertReady();
         try {
-            return await this.mcpClient.callTool({
+            return await this.mcpClient!.callTool({
                 name: toolName,
                 arguments: args,
                 _meta: { remote: true, ...metadata || {} }
@@ -111,5 +139,7 @@ export class LocalExecutionEngine {
             this.mcpTransport = null;
         }
         this.isReady = false;
+        this.runtimeReason = 'LOCAL_EXECUTION_ENGINE_UNAVAILABLE';
+        this.runtimeGeneration = null;
     }
 }

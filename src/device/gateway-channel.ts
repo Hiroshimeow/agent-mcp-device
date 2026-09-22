@@ -32,6 +32,11 @@ export interface GatewayChannelOptions {
     securityProtocolFloor?: number;
     appCaPem?: string;
     adapter: GatewayToolAdapter;
+    runtimeState?: () => {
+        runtime_ready: boolean;
+        runtime_reason: string | null;
+        execution_runtime_generation: string | null;
+    };
     agentVersion?: string;
     onStatus?: (payload: any) => void | Promise<void>;
     onUpdateRequest?: (
@@ -61,6 +66,19 @@ export class GatewayDeviceChannel {
 
     constructor(private options: GatewayChannelOptions) {
         this.identity = options.identity || new GatewayDeviceIdentity();
+    }
+
+    private runtimePayload(): Record<string, unknown> {
+        if (!this.options.runtimeState) return {};
+        const state = this.options.runtimeState();
+        const ready = state?.runtime_ready === true;
+        const reason = ready ? null : String(state?.runtime_reason || 'LOCAL_EXECUTION_ENGINE_UNAVAILABLE').slice(0, 96);
+        const generation = String(state?.execution_runtime_generation || '').trim().slice(0, 128) || null;
+        return {
+            runtime_ready: ready,
+            runtime_reason: reason,
+            execution_runtime_generation: generation
+        };
     }
 
     async start(): Promise<void> {
@@ -183,6 +201,7 @@ export class GatewayDeviceChannel {
                 arch: process.arch,
                 path_style: process.platform === 'win32' ? 'windows' : 'posix',
                 capabilities: [...GATEWAY_CAPABILITIES],
+                ...this.runtimePayload(),
                 ...(enrolling || pairing ? { public_key_pem: record.publicKeyPem } : {})
             }
         });
@@ -207,6 +226,7 @@ export class GatewayDeviceChannel {
                 arch: process.arch,
                 path_style: process.platform === 'win32' ? 'windows' : 'posix',
                 capabilities: [...GATEWAY_CAPABILITIES],
+                ...this.runtimePayload(),
                 ...(pairing || enrolling ? { public_key_pem: record.publicKeyPem, enrollment_grant: grant } : {})
             }
         });
@@ -473,7 +493,7 @@ export class GatewayDeviceChannel {
                 type: 'heartbeat',
                 device_id: record.deviceId,
                 timestamp: Date.now(),
-                payload: {}
+                payload: this.runtimePayload()
             });
         }, HEARTBEAT_MS);
         this.heartbeat.unref?.();

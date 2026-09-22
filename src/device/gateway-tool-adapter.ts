@@ -195,6 +195,7 @@ export class GatewayToolAdapter {
     }
 
     async call(tool: string, args: any = {}): Promise<any> {
+        this.engine.assertReady();
         if (tool === 'read_text_file') {
             if (args.head !== undefined && args.tail !== undefined) throw new Error('Use either head or tail, not both');
             const mapped: any = { path: await this.guardPath(args.path) };

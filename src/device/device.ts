@@ -142,6 +142,7 @@ export class MCPDevice {
                 securityProtocolFloor: gatewayConfig.securityProtocolFloor,
                 appCaPem: gatewayConfig.appCaPem || undefined,
                 adapter: new GatewayToolAdapter(this.executionEngine, { allowedRoots: gatewayConfig.allowedRoots }),
+                runtimeState: () => this.executionEngine.getRuntimeState(),
                 agentVersion: process.env.npm_package_version,
                 onUpdateRequest: async (targetVersion, { requestId }) => {
                     const record = await identity.loadOrCreate();
