@@ -36,9 +36,12 @@ export function buildWindowsRunnerScript(options: {
     allowedRoots?: string;
     nodePath: string;
     entrypoint: string;
+    runtimeDir?: string;
 }): string {
+    const runtimeDir = options.runtimeDir ? String(options.runtimeDir) : deviceStatePaths().runtime;
     return [
         "$ErrorActionPreference = 'Stop'",
+        `Set-Location -LiteralPath ${psQuote(runtimeDir)}`,
         `& ${psQuote(options.nodePath)} ${psQuote(options.entrypoint)} --service`,
         'exit $LASTEXITCODE',
         ''
@@ -59,6 +62,7 @@ export class WindowsDeviceService {
     private runnerPath: string;
     private nodePath: string;
     private entrypoint: string;
+    private runtimeDir: string;
 
     constructor(options: {
         platform?: NodeJS.Platform | string;
@@ -66,6 +70,7 @@ export class WindowsDeviceService {
         runnerPath?: string;
         nodePath?: string;
         entrypoint?: string;
+        runtimeDir?: string;
     } = {}) {
         this.platform = options.platform || process.platform;
         this.execFile = options.execFile || (async (file, args) => {
@@ -75,6 +80,7 @@ export class WindowsDeviceService {
         this.runnerPath = path.resolve(options.runnerPath || path.join(deviceStatePaths().root, 'run-device.ps1'));
         this.nodePath = path.resolve(options.nodePath || process.execPath);
         this.entrypoint = path.resolve(options.entrypoint || process.argv[1]);
+        this.runtimeDir = options.runtimeDir ? String(options.runtimeDir) : deviceStatePaths().runtime;
     }
 
     private assertWindows(): void {
@@ -148,7 +154,8 @@ export class WindowsDeviceService {
         const taskName = buildWindowsTaskName(options.deviceId);
         const existing = await this.status(options.deviceId).catch(() => null);
         const preserveManual = existing?.installed === true && existing.autostart === false;
-        const runner = buildWindowsRunnerScript({ nodePath: this.nodePath, entrypoint: this.entrypoint });
+        const runner = buildWindowsRunnerScript({ nodePath: this.nodePath, entrypoint: this.entrypoint, runtimeDir: this.runtimeDir });
+        await fs.mkdir(this.runtimeDir, { recursive: true, mode: 0o700 });
         await fs.mkdir(path.dirname(this.runnerPath), { recursive: true });
         await fs.writeFile(this.runnerPath, runner, { mode: 0o600 });
         if (preserveManual) {

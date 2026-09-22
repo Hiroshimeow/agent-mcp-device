@@ -14,8 +14,10 @@ function testDeterministicTaskNameAndRunnerAreSecretFree() {
   const script = buildWindowsRunnerScript({
     gatewayUrl: 'https://mcp.example.test',
     nodePath: 'C:\\Program Files\\nodejs\\node.exe',
-    entrypoint: 'C:\\Program Files\\mcp-device\\dist\\index.js'
+    entrypoint: 'C:\\Program Files\\mcp-device\\dist\\index.js',
+    runtimeDir: 'C:\\Users\\test\\.mcp-device\\runtime'
   });
+  assert(script.includes("Set-Location -LiteralPath 'C:\\Users\\test\\.mcp-device\\runtime'"));
   assert(!script.includes('mcp.example.test'));
   assert(!script.includes('MCP_GATEWAY_URL'));
   assert(!script.includes('MCP_GATEWAY_ALLOWED_ROOTS'));
@@ -39,7 +41,8 @@ async function testLifecycleUsesOneTaskAndRemovesRunner() {
     execFile,
     runnerPath: path.join(root, 'run-device.ps1'),
     nodePath: 'C:\\node.exe',
-    entrypoint: 'C:\\dc\\dist\\index.js'
+    entrypoint: 'C:\\dc\\dist\\index.js',
+    runtimeDir: path.join(root, 'runtime')
   });
   await service.install({ deviceId: 'device-test', gatewayUrl: 'https://gateway.example.test' });
   const runner = await fs.readFile(path.join(root, 'run-device.ps1'), 'utf8');
@@ -90,7 +93,8 @@ async function testSchTasksAccessDeniedFallsBackToUserRunKey() {
     execFile,
     runnerPath: path.join(root, 'run-device.ps1'),
     nodePath: 'C:\\node.exe',
-    entrypoint: 'C:\\dc\\dist\\index.js'
+    entrypoint: 'C:\\dc\\dist\\index.js',
+    runtimeDir: path.join(root, 'runtime')
   });
 
   await service.install({ deviceId: 'device-fallback', gatewayUrl: 'https://gateway.example.test' });
@@ -139,7 +143,14 @@ async function testManualModeKeepsRunnerAndStartsDirectly() {
     if (lower.includes('powershell') && joined.includes('taskkill.exe')) { running = false; return { stdout: '', stderr: '' }; }
     return { stdout: '', stderr: '' };
   };
-  const service = new WindowsDeviceService({ platform: 'win32', execFile, runnerPath, nodePath: 'C:\\node.exe', entrypoint: 'C:\\dc\\dist\\index.js' });
+  const service = new WindowsDeviceService({
+    platform: 'win32',
+    execFile,
+    runnerPath,
+    nodePath: 'C:\\node.exe',
+    entrypoint: 'C:\\dc\\dist\\index.js',
+    runtimeDir: path.join(root, 'runtime')
+  });
   await service.install({ deviceId: 'device-manual', gatewayUrl: 'https://gateway.example.test' });
   await service.setAutostart('device-manual', false);
   let status = await service.status('device-manual');

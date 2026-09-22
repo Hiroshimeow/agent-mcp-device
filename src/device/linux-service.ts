@@ -4,6 +4,7 @@ import os from 'os';
 import path from 'path';
 import readline from 'readline/promises';
 import { promisify } from 'util';
+import { deviceStatePaths } from './device-state.js';
 
 const execFileAsync = promisify(execFileCallback);
 export const SYSTEMD_UNIT = 'mcp-device.service';
@@ -58,6 +59,7 @@ export class SystemdUserDeviceService {
     private nodePath: string;
     private entrypoint: string;
     private pathValue: string;
+    private runtimeDir: string;
 
     constructor(options: {
         platform?: NodeJS.Platform | string;
@@ -66,6 +68,7 @@ export class SystemdUserDeviceService {
         nodePath?: string;
         entrypoint?: string;
         pathValue?: string;
+        runtimeDir?: string;
     } = {}) {
         this.platform = options.platform || process.platform;
         this.execFile = options.execFile || defaultExecFile;
@@ -73,6 +76,7 @@ export class SystemdUserDeviceService {
         this.nodePath = options.platform === 'linux' && options.nodePath ? String(options.nodePath) : path.resolve(options.nodePath || process.execPath);
         this.entrypoint = options.platform === 'linux' && options.entrypoint ? String(options.entrypoint) : path.resolve(options.entrypoint || process.argv[1]);
         this.pathValue = String(options.pathValue ?? process.env.PATH ?? '/usr/local/bin:/usr/bin:/bin');
+        this.runtimeDir = options.platform === 'linux' && options.runtimeDir ? String(options.runtimeDir) : path.resolve(options.runtimeDir || deviceStatePaths().runtime);
     }
 
     private assertLinux(): void {
@@ -103,6 +107,7 @@ export class SystemdUserDeviceService {
             '[Service]',
             'Type=simple',
             `Environment="PATH=${this.pathValue.replace(/["\\]/g, match => `\\${match}`)}"`,
+            `WorkingDirectory=${quoteSystemdArg(this.runtimeDir)}`,
             `ExecStart=${quoteSystemdArg(this.nodePath)} ${quoteSystemdArg(this.entrypoint)} --service --manager=systemd`,
             'Restart=on-failure',
             'RestartSec=3',
@@ -117,6 +122,7 @@ export class SystemdUserDeviceService {
         this.assertLinux();
         await this.assertOwnedUnitIfPresent();
         await this.execFile('systemctl', ['--user', 'show-environment']);
+        await fs.mkdir(this.runtimeDir, { recursive: true, mode: 0o700 });
         await fs.mkdir(path.dirname(this.unitPath), { recursive: true });
         await fs.writeFile(this.unitPath, this.unitText(), { mode: 0o600 });
         await this.execFile('systemctl', ['--user', 'daemon-reload']);
@@ -158,6 +164,7 @@ export class Pm2DeviceService {
     private entrypoint: string;
     private user: string;
     private pm2Home: string;
+    private runtimeDir: string;
 
     constructor(options: {
         platform?: NodeJS.Platform | string;
@@ -167,6 +174,7 @@ export class Pm2DeviceService {
         entrypoint?: string;
         user?: string;
         pm2Home?: string;
+        runtimeDir?: string;
     } = {}) {
         this.platform = options.platform || process.platform;
         this.execFile = options.execFile || defaultExecFile;
@@ -175,6 +183,7 @@ export class Pm2DeviceService {
         this.entrypoint = options.platform === 'linux' && options.entrypoint ? String(options.entrypoint) : path.resolve(options.entrypoint || process.argv[1]);
         this.user = String(options.user || process.env.USER || process.env.LOGNAME || os.userInfo().username);
         this.pm2Home = options.platform === 'linux' && options.pm2Home ? String(options.pm2Home) : path.resolve(options.pm2Home || process.env.PM2_HOME || path.join(os.homedir(), '.pm2'));
+        this.runtimeDir = options.platform === 'linux' && options.runtimeDir ? String(options.runtimeDir) : path.resolve(options.runtimeDir || deviceStatePaths().runtime);
     }
 
     private assertLinux(): void {
@@ -222,12 +231,14 @@ export class Pm2DeviceService {
 
     async install(): Promise<void> {
         await this.proveStartup();
+        await fs.mkdir(this.runtimeDir, { recursive: true, mode: 0o700 });
         const existing = await this.processRow();
         this.assertOwnedProcess(existing);
         if (!existing) {
-            await this.execFile(this.pm2Path, ['start', this.entrypoint, '--name', PM2_NAME, '--interpreter', this.nodePath, '--', '--service', '--manager=pm2']);
-        } else if (String(existing?.pm2_env?.status || '').toLowerCase() !== 'online') {
-            await this.execFile(this.pm2Path, ['restart', PM2_NAME]);
+            await this.execFile(this.pm2Path, ['start', this.entrypoint, '--name', PM2_NAME, '--interpreter', this.nodePath, '--cwd', this.runtimeDir, '--', '--service', '--manager=pm2']);
+        } else if (String(existing?.pm2_env?.status || '').toLowerCase() !== 'online' ||
+            String(existing?.pm2_env?.pm_cwd || '') !== this.runtimeDir) {
+            await this.execFile(this.pm2Path, ['restart', PM2_NAME, '--cwd', this.runtimeDir]);
         }
         await this.execFile(this.pm2Path, ['save']);
         const status = await this.status();

@@ -42,13 +42,15 @@ async function testSystemdUserLifecycleUsesOwnedUnitWithoutSecrets() {
     unitPath,
     nodePath: '/usr/bin/node',
     entrypoint: '/opt/mcp-device/dist/mcp-device.js',
-    pathValue: '/usr/local/bin:/usr/bin:/bin'
+    pathValue: '/usr/local/bin:/usr/bin:/bin',
+    runtimeDir: path.join(root, 'runtime')
   });
   try {
     await service.install();
     const unit = await fs.readFile(unitPath, 'utf8');
     assert.match(unit, /ExecStart=\/usr\/bin\/node \/opt\/mcp-device\/dist\/mcp-device\.js --service --manager=systemd/);
     assert.match(unit, /Environment="PATH=\/usr\/local\/bin:\/usr\/bin:\/bin"/);
+    assert.match(unit, new RegExp(`WorkingDirectory=${path.join(root, 'runtime').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
     assert.doesNotMatch(unit, /proxy|bearer|token|private.?key/i);
     assert(calls.some(call => call.args.join(' ').includes('--user daemon-reload')));
     assert(calls.some(call => call.args.join(' ').includes('--user enable --now mcp-device.service')));
@@ -126,6 +128,7 @@ function fileIsPm2(file) {
 }
 
 async function testPm2LookalikeProcessIsNeverMutated() {
+  const runtimeDir = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-pm2-lookalike-'));
   const calls = [];
   const execFile = async (file, args) => {
     calls.push({ file, args });
@@ -145,15 +148,18 @@ async function testPm2LookalikeProcessIsNeverMutated() {
     nodePath: '/usr/bin/node',
     entrypoint: '/opt/mcp-device/dist/mcp-device.js',
     user: 'alice',
-    pm2Home: '/home/alice/.pm2'
+    pm2Home: '/home/alice/.pm2',
+    runtimeDir
   });
   await assert.rejects(() => service.install(), /not owned|ownership conflict/i);
   await assert.rejects(() => service.stop(), /not owned|ownership conflict/i);
   await assert.rejects(() => service.uninstall(), /not owned|ownership conflict/i);
   assert.equal(calls.some(call => ['start', 'stop', 'delete', 'save'].includes(call.args[0])), false);
+  await fs.rm(runtimeDir, { recursive: true, force: true });
 }
 
 async function testPm2LifecycleRequiresMatchingStartupEvidenceAndSavesState() {
+  const runtimeDir = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-pm2-runtime-'));
   const calls = [];
   let online = false;
   let present = false;
@@ -178,10 +184,12 @@ async function testPm2LifecycleRequiresMatchingStartupEvidenceAndSavesState() {
     nodePath: '/usr/bin/node',
     entrypoint: '/opt/mcp-device/dist/mcp-device.js',
     user: 'alice',
-    pm2Home: '/home/alice/.pm2'
+    pm2Home: '/home/alice/.pm2',
+    runtimeDir
   });
   await service.install();
   assert(calls.some(call => call.file === '/usr/bin/pm2' && call.args[0] === 'start' && call.args.includes('--manager=pm2')));
+  assert(calls.some(call => call.file === '/usr/bin/pm2' && call.args[0] === 'start' && call.args.includes('--cwd') && call.args.includes(runtimeDir)));
   assert(calls.some(call => call.file === '/usr/bin/pm2' && call.args[0] === 'save'));
   assert.deepEqual(await service.status(), { installed: true, running: true, autostart: true, manager: 'pm2' });
   await service.stop();
@@ -189,6 +197,7 @@ async function testPm2LifecycleRequiresMatchingStartupEvidenceAndSavesState() {
   await service.uninstall();
   assert(calls.filter(call => call.file === '/usr/bin/pm2' && call.args[0] === 'save').length >= 2);
   assert.deepEqual(await service.status(), { installed: false, running: false, autostart: true, manager: 'pm2' });
+  await fs.rm(runtimeDir, { recursive: true, force: true });
 }
 
 await testManagerChoicePromptsEveryInstall();
