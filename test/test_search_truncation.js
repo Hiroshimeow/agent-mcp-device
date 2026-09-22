@@ -24,7 +24,7 @@ async function searchAndWaitForCompletion(searchArgs, timeout = 30000) {
         return { initialResult: result, finalResult: moreResults, sessionId };
       }
       
-      if (moreResults.content[0].text.includes('❌ ERROR')) {
+      if (moreResults.isError) {
         throw new Error(`Search failed: ${moreResults.content[0].text}`);
       }
       

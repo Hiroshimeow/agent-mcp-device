@@ -41,6 +41,8 @@ async function makePackage(prefix, version, globalRoot = path.join(prefix, 'node
 }
 
 async function testUnixNpmCliSymlinkResolution() {
+  const previousNpmExecPath = process.env.npm_execpath;
+  delete process.env.npm_execpath;
   const home = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-npm-cli-'));
   const realNpmCli = path.join(home, 'npm-cli.js');
   await fs.writeFile(realNpmCli, '// fake distro npm cli\n');
@@ -62,6 +64,8 @@ async function testUnixNpmCliSymlinkResolution() {
     'Unix npm resolver must accept a which/npm realpath that is npm-cli.js itself'
   );
   await fs.rm(home, { recursive: true, force: true });
+  if (previousNpmExecPath === undefined) delete process.env.npm_execpath;
+  else process.env.npm_execpath = previousNpmExecPath;
 }
 
 async function testPreparedUpdateContract() {
@@ -186,6 +190,7 @@ async function runHelperCase({ failInstall, stripPath = false }) {
   const rollbackPath = path.join(prefix, 'node_modules', '@hcu-lab.me', '.mcp-device-rollback-test');
   const fakeNpm = path.join(home, 'fake-npm.cjs');
   const runner = path.join(home, 'run-device.ps1');
+  const fakeManager = path.join(home, process.platform === 'win32' ? 'fake-manager.cmd' : 'fake-manager');
   const cacheDir = path.join(updateRoot, 'npm-cache');
   const targetTarball = path.join(updateRoot, 'target.tgz');
   const powershell = path.join(
@@ -200,6 +205,11 @@ async function runHelperCase({ failInstall, stripPath = false }) {
   await fs.writeFile(targetTarball, 'fake');
   await fs.mkdir(cacheDir, { recursive: true });
   await fs.writeFile(runner, 'exit 0\r\n');
+  if (process.platform === 'win32') {
+    await fs.writeFile(fakeManager, '@echo off\r\nexit /b 0\r\n');
+  } else {
+    await fs.writeFile(fakeManager, '#!/bin/sh\nexit 0\n', { mode: 0o755 });
+  }
 
   await fs.writeFile(fakeNpm, [
     "const fs = require('fs');",
@@ -228,7 +238,9 @@ async function runHelperCase({ failInstall, stripPath = false }) {
     errorCode: null,
     message: null,
     deviceId: 'device-helper',
-    managerKind: 'windows-manual',
+    managerKind: 'pm2',
+    pm2Path: fakeManager,
+    pm2Name: 'mcp-device-test',
     parentPid: 99999999,
     childPid: null,
     packageRoot,

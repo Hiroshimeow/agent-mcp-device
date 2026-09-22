@@ -125,13 +125,33 @@ async function withBootstrapOwner<T>(action: () => Promise<T>, allowTakeover = t
     }
 }
 
+export async function resolvePairingIdentity(
+    identity: GatewayDeviceIdentity,
+    options: { forcePair?: boolean; probeCurrentIdentity?: () => Promise<void> } = {}
+) {
+    const current = await identity.loadOrCreate();
+    if (!options.forcePair || deviceIdentityNeedsPairing(current)) return current;
+    if (typeof options.probeCurrentIdentity !== 'function') {
+        throw new Error('Current device identity probe is required before forced pairing.');
+    }
+    try {
+        await options.probeCurrentIdentity();
+        return current;
+    } catch (error: any) {
+        if (String(error?.code || '') !== 'DEVICE_FORGOTTEN') throw error;
+        await identity.forget();
+        return await identity.loadOrCreate();
+    }
+}
+
 async function ensureLinkedDeviceUnderOwner(forcePair = false): Promise<{ deviceId: string; accountLabel: string | null }> {
     const store = new GatewayDeviceStatusStore();
     const current = await store.load();
     const config = await captureGatewayConfigFromEnvironment(new GatewayDeviceConfigStore(), { fallbackGatewayUrl: current.gatewayUrl });
     const gatewayUrl = String(config.gatewayUrl || '').trim();
     const identity = new GatewayDeviceIdentity();
-    const record = await identity.loadOrCreate();
+    let record = await identity.loadOrCreate();
+    const initialDeviceId = record.deviceId;
     await store.update({
         gatewayUrl,
         deviceId: record.deviceId,
@@ -145,6 +165,32 @@ async function ensureLinkedDeviceUnderOwner(forcePair = false): Promise<{ device
     const proxy = createGatewayProxyAgent(config);
     let channel: GatewayDeviceChannel | undefined;
     try {
+        record = await resolvePairingIdentity(identity, {
+            forcePair,
+            probeCurrentIdentity: async () => {
+                const probe = new GatewayDeviceChannel({
+                    gatewayUrl,
+                    identity,
+                    proxyAgent: proxy.agent,
+                    securityProtocolFloor: config.securityProtocolFloor,
+                    appCaPem: config.appCaPem || undefined,
+                    adapter: controlAdapter(),
+                    agentVersion: process.env.npm_package_version
+                });
+                try { await probe.start(); }
+                finally { await probe.stop().catch(() => {}); }
+            }
+        });
+        if (record.deviceId !== initialDeviceId) {
+            await store.update({
+                gatewayUrl,
+                deviceId: record.deviceId,
+                deviceName: os.hostname(),
+                identityPresent: true,
+                account: { connected: false, label: null },
+                connection: { ...current.connection, online: false }
+            });
+        }
         const pairing = await pairGatewayDevice({ gatewayUrl, identity, proxyAgent: proxy.agent, deviceName: os.hostname() });
         await store.update({
             gatewayUrl,

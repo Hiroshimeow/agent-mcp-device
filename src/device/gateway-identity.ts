@@ -92,6 +92,11 @@ export class GatewayDeviceIdentity {
         await this.persist();
     }
 
+    async forget(): Promise<void> {
+        this.record = undefined;
+        await fs.rm(this.identityPath, { force: true });
+    }
+
     async signChallenge(nonce: string): Promise<string> {
         const current = await this.loadOrCreate();
         const challenge = Buffer.from(`mcp-device-auth-v1\n${current.deviceId}\n${nonce}`, 'utf8');

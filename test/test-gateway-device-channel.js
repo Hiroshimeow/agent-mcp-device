@@ -90,6 +90,12 @@ async function testIdentity() {
     createHash('sha256').update('grant-one', 'utf8').digest()
   ]);
   assert(verify(null, challengeV2, createPublicKey(first.publicKeyPem), signatureV2));
+  await identity.markEnrolled();
+  await identity.forget();
+  const fresh = await identity.loadOrCreate();
+  assert.notEqual(fresh.deviceId, first.deviceId, 'forgotten identity must get a fresh device id');
+  assert.notEqual(fresh.publicKeyPem, first.publicKeyPem, 'forgotten identity must get a fresh keypair');
+  assert.equal(fresh.enrolled, false, 'fresh identity must require pairing');
   if (previousDeviceId === undefined) delete process.env.MCP_DEVICE_ID;
   else process.env.MCP_DEVICE_ID = previousDeviceId;
   await fs.rm(root, { recursive: true, force: true });
@@ -570,6 +576,56 @@ async function testRejectsStaleToolEpochAndReconnects() {
 }
 
 
+
+
+async function testForgottenDeviceInitialAuthIsClassified() {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-gateway-forgotten-initial-'));
+  const identity = new GatewayDeviceIdentity(path.join(root, 'identity.json'));
+  await identity.loadOrCreate();
+  await identity.markEnrolled();
+  const wss = new WebSocketServer({ port: 0 });
+  await new Promise(resolve => wss.once('listening', resolve));
+  const address = wss.address();
+  const port = typeof address === 'object' && address ? address.port : 0;
+  wss.on('connection', ws => ws.on('message', () => ws.close(4003, 'unknown or revoked device')));
+  const channel = new GatewayDeviceChannel({ gatewayUrl: `ws://127.0.0.1:${port}/device`, identity, adapter: { async call() { return {}; } }, agentVersion: 'test' });
+  await assert.rejects(channel.start(), error => error?.code === 'DEVICE_FORGOTTEN');
+  await channel.stop();
+  await new Promise(resolve => wss.close(resolve));
+  await fs.rm(root, { recursive: true, force: true });
+}
+
+async function testForgottenDeviceCloseStopsReconnectLoop() {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-gateway-forgotten-'));
+  const identity = new GatewayDeviceIdentity(path.join(root, 'identity.json'));
+  await identity.loadOrCreate();
+  await identity.markEnrolled();
+  const wss = new WebSocketServer({ port: 0 });
+  await new Promise(resolve => wss.once('listening', resolve));
+  const address = wss.address();
+  const port = typeof address === 'object' && address ? address.port : 0;
+  let connections = 0;
+  wss.on('connection', ws => {
+    connections += 1;
+    ws.on('message', raw => {
+      const message = JSON.parse(raw.toString());
+      if (message.type === 'auth_hello') {
+        ws.send(JSON.stringify({ protocol_version: 1, type: 'auth_challenge', device_id: message.device_id, payload: { nonce: 'forgotten-device' } }));
+      } else if (message.type === 'auth_response') {
+        ws.send(JSON.stringify({ protocol_version: 1, type: 'auth_ok', device_id: message.device_id, connection_epoch: 1, payload: { accepted: true } }));
+        setTimeout(() => ws.close(4003, 'unknown or revoked device'), 20);
+      }
+    });
+  });
+  const channel = new GatewayDeviceChannel({ gatewayUrl: `ws://127.0.0.1:${port}/device`, identity, adapter: { async call() { return {}; } }, agentVersion: 'test' });
+  await channel.start();
+  await new Promise(resolve => setTimeout(resolve, 1800));
+  assert.equal(connections, 1, 'definitive forgotten-device auth failure must not reconnect forever');
+  await channel.stop();
+  await new Promise(resolve => wss.close(resolve));
+  await fs.rm(root, { recursive: true, force: true });
+}
+
 async function testAuthenticatedDashboardUpdateControl() {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-gateway-update-'));
   const identity = new GatewayDeviceIdentity(path.join(root, 'identity.json'));
@@ -690,6 +746,8 @@ await testOperatorPreEnrolledIdentityUsesAuthHello();
 await testChannelEnrollmentToolAndReconnect();
 await testRejectsMismatchedAuthDevice();
 await testRejectsStaleToolEpochAndReconnects();
+await testForgottenDeviceInitialAuthIsClassified();
+await testForgottenDeviceCloseStopsReconnectLoop();
 await testAuthenticatedDashboardUpdateControl();
 await testOversizedToolResultReturnsBoundedError();
 console.log('Ã¢Å“â€¦ Gateway identity, adapter, enrollment, tool routing, and reconnect tests passed');

@@ -98,9 +98,13 @@ export class GatewayDeviceChannel {
         socket.once('error', error => this.fail(error));
         socket.once('close', (code, reason) => {
             this.stopHeartbeat();
+            const reasonText = reason.toString();
+            const forgotten = code === 4003 && /(?:unknown or revoked device|revoked device|device revoked)/i.test(reasonText);
+            const error: Error & { code?: string } = new Error(`Gateway connection closed (${code}): ${reasonText}`);
+            if (forgotten) error.code = 'DEVICE_FORGOTTEN';
             if (!this.shuttingDown && this.readyReject) {
-                this.fail(new Error(`Gateway connection closed (${code}): ${reason.toString()}`));
-            } else if (!this.shuttingDown) {
+                this.fail(error);
+            } else if (!this.shuttingDown && !forgotten) {
                 this.scheduleReconnect();
             }
         });
