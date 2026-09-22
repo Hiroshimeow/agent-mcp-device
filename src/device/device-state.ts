@@ -14,6 +14,8 @@ export interface DeviceStatePaths {
     identity: string;
     config: string;
     status: string;
+    runtime: string;
+    update: string;
 }
 
 export function deviceStatePaths(home = os.homedir()): DeviceStatePaths {
@@ -24,7 +26,9 @@ export function deviceStatePaths(home = os.homedir()): DeviceStatePaths {
         legacyRoot,
         identity: path.join(root, 'gateway-identity.json'),
         config: path.join(root, 'gateway-config.json'),
-        status: path.join(root, 'gateway-status.json')
+        status: path.join(root, 'gateway-status.json'),
+        runtime: path.join(root, 'runtime'),
+        update: path.join(root, 'update')
     };
 }
 

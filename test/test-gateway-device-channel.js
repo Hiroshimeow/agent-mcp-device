@@ -217,8 +217,13 @@ async function testAdapter() {
   await assert.rejects(adapter.call('read_text_file', { path: '/other/x.txt' }), /outside MCP_GATEWAY_ALLOWED_ROOTS/);
   await adapter.call('write_file', { path: '/work/x.txt', content: 'new' });
   assert.equal(desktop.calls.at(-1).name, 'write_file');
+  await adapter.call('write_file', { path: '/work/x.txt', content: '' });
+  assert.deepEqual(desktop.calls.at(-1), { name: 'write_file', args: { path: '/work/x.txt', content: '', mode: 'rewrite' } });
+
   await adapter.call('edit_file', { path: '/work/x.txt', old_text: 'old', new_text: 'new', expected_replacements: 1 });
   assert.deepEqual(desktop.calls.at(-1), { name: 'edit_block', args: { file_path: '/work/x.txt', old_string: 'old', new_string: 'new', expected_replacements: 1 } });
+  await adapter.call('edit_file', { path: '/work/x.txt', old_text: 'old', new_text: '', expected_replacements: 1 });
+  assert.deepEqual(desktop.calls.at(-1), { name: 'edit_block', args: { file_path: '/work/x.txt', old_string: 'old', new_string: '', expected_replacements: 1 } });
   desktop.readFileText = 'old old';
   const dryRun = await adapter.call('edit_file', {
     path: '/work/x.txt', old_text: 'old', new_text: 'new', expected_replacements: 2, dry_run: true
@@ -234,10 +239,15 @@ async function testAdapter() {
   const started = await adapter.call('start_process', { command: 'node -v', working_directory: '/work' });
   assert.equal(started.session_id, '123');
   assert.deepEqual(desktop.calls.at(-1), { name: 'start_process', args: { command: 'node -v', timeout_ms: 10000, working_directory: '/work' } });
-  await assert.rejects(adapter.call('start_process', { command: 'node -v' }), /working_directory is required/);
+  await assert.rejects(adapter.call('start_process', { command: 'node -v' }), /path\/working_directory is required/);
   await adapter.call('read_process_output', { session_id: '123', offset: 2, length: 5 });
   assert.equal(desktop.calls.at(-1).name, 'read_process_output');
   assert.equal(desktop.calls.at(-1).args.pid, 123);
+  await adapter.call('interact_with_process', { session_id: '123', input: '' });
+  assert.deepEqual(desktop.calls.at(-1), {
+    name: 'interact_with_process',
+    args: { pid: 123, input: '', timeout_ms: 8000 }
+  });
   await adapter.call('terminate_process', { session_id: '123' });
   assert.equal(desktop.calls.at(-1).name, 'force_terminate');
 }
@@ -566,10 +576,14 @@ async function testAuthenticatedDashboardUpdateControl() {
   const adapter = { async call() { throw new Error('tool calls are not expected'); } };
   const seenTargets = [];
   const statuses = [];
+  let releasePrepare;
+  const prepareGate = new Promise(resolve => { releasePrepare = resolve; });
+  let handoffCalled = false;
   const wss = new WebSocketServer({ port: 0 });
   await new Promise(resolve => wss.once('listening', resolve));
   const address = wss.address();
   const port = typeof address === 'object' && address ? address.port : 0;
+  let sentRequests = false;
   wss.on('connection', ws => ws.on('message', raw => {
     const message = JSON.parse(raw.toString());
     if (message.type === 'enroll_hello') {
@@ -577,32 +591,60 @@ async function testAuthenticatedDashboardUpdateControl() {
       ws.send(JSON.stringify({ protocol_version: 1, type: 'auth_challenge', device_id: message.device_id, payload: { nonce: 'update-control' } }));
     } else if (message.type === 'auth_response') {
       ws.send(JSON.stringify({ protocol_version: 1, type: 'auth_ok', device_id: message.device_id, connection_epoch: 7, payload: { accepted: true } }));
-      setTimeout(() => ws.send(JSON.stringify({
-        protocol_version: 1,
-        type: 'device_update',
-        request_id: 'update-1',
-        device_id: message.device_id,
-        connection_epoch: 7,
-        payload: { target_version: '1.0.5' }
-      })), 20);
+      if (!sentRequests) {
+        sentRequests = true;
+        setTimeout(() => {
+          ws.send(JSON.stringify({
+            protocol_version: 1,
+            type: 'device_update',
+            request_id: 'update-1',
+            device_id: message.device_id,
+            connection_epoch: 7,
+            payload: { target_version: '1.0.6' }
+          }));
+          ws.send(JSON.stringify({
+            protocol_version: 1,
+            type: 'device_update',
+            request_id: 'update-2',
+            device_id: message.device_id,
+            connection_epoch: 7,
+            payload: { target_version: '1.0.7' }
+          }));
+        }, 20);
+      }
     } else if (message.type === 'device_update_status') {
-      statuses.push(message.payload);
+      statuses.push({ requestId: message.request_id, ...message.payload });
     }
   }));
+
   const channel = new GatewayDeviceChannel({
     gatewayUrl: `ws://127.0.0.1:${port}/device`,
     enrollmentToken: 'enroll-once',
     identity,
     adapter,
-    onUpdateRequest: async targetVersion => { seenTargets.push(targetVersion); }
+    onUpdateRequest: async (targetVersion, context) => {
+      seenTargets.push({ targetVersion, requestId: context.requestId });
+      await prepareGate;
+      return {
+        mode: 'detached',
+        handoff: async () => { handoffCalled = true; }
+      };
+    }
   });
+
   await channel.start();
-  await waitFor(() => statuses.some(item => item.state === 'installed'));
-  assert.deepEqual(seenTargets, ['1.0.5']);
-  assert.equal(statuses[0].state, 'accepted');
-  assert.equal(statuses.at(-1).state, 'installed');
-  assert.equal(statuses.at(-1).target_version, '1.0.5');
-  assert.equal(statuses.at(-1).package_version, VERSION);
+  await waitFor(() => seenTargets.length === 1);
+  await waitFor(() => statuses.some(item => item.requestId === 'update-2' && item.state === 'failed'));
+  assert.equal(statuses.find(item => item.requestId === 'update-2').code, 'DEVICE_UPDATE_IN_PROGRESS');
+  releasePrepare();
+  await waitFor(() => statuses.some(item => item.requestId === 'update-1' && item.state === 'accepted'));
+  await waitFor(() => handoffCalled);
+  await new Promise(resolve => setTimeout(resolve, 40));
+
+  assert.deepEqual(seenTargets, [{ targetVersion: '1.0.6', requestId: 'update-1' }]);
+  assert.equal(statuses.filter(item => item.requestId === 'update-1' && item.state === 'accepted').length, 1);
+  assert.equal(statuses.filter(item => item.requestId === 'update-1' && item.state === 'installed').length, 0);
+
   await channel.stop();
   await new Promise(resolve => wss.close(resolve));
   await fs.rm(root, { recursive: true, force: true });

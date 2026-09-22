@@ -5,6 +5,7 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport, getDefaultEnvironment } from '@modelcontextprotocol/sdk/client/stdio.js';
 import { fileURLToPath } from 'url';
 import { captureRemote } from '../utils/capture.js';
+import { deviceStatePaths } from './device-state.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -86,10 +87,12 @@ export class DesktopCommanderIntegration {
         try {
             await fs.access(devPath);
             console.debug(' - ðŸ” Found local MCP server at:', devPath);
+            const runtimeDir = deviceStatePaths().runtime;
+            await fs.mkdir(runtimeDir, { recursive: true, mode: 0o700 });
             return {
                 command: process.execPath, // Use the current node executable
                 args: [devPath],
-                cwd: path.dirname(devPath)
+                cwd: runtimeDir
             };
         } catch {
             console.debug('[DEBUG] Local dev path not found, trying global installation');
@@ -127,6 +130,10 @@ export class DesktopCommanderIntegration {
 
         console.debug('[DEBUG] No MCP config resolved');
         return null;
+    }
+
+    getChildPid(): number | null {
+        return this.mcpTransport?.pid ?? null;
     }
 
     async callClientTool(toolName: string, args: any, metadata?: any) {

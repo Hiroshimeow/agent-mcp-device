@@ -83,6 +83,9 @@ export async function handleReadFile(args: unknown): Promise<ServerResult> {
     }
     const readFileOperation = async () => {
         const parsed = ReadFileArgsSchema.parse(args);
+        if (process.env.MCP_DEVICE_REMOTE === 'true' && parsed.isUrl) {
+            return createErrorResponse('REMOTE_URL_READ_DISABLED: URL reads are disabled for MCP Device remote execution.');
+        }
 
         // Get the configuration for file read limits
         const config = await configManager.getConfig();

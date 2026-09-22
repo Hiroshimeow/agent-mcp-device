@@ -10,7 +10,10 @@ assert.equal(pkg.name, '@hcu-lab.me/mcp-device');
 assert.match(pkg.version, /^\d+\.\d+\.\d+$/);
 const serverManifest = JSON.parse(fs.readFileSync(new URL('../server.json', import.meta.url), 'utf8'));
 const versionSource = fs.readFileSync(new URL('../src/version.ts', import.meta.url), 'utf8');
-assert.equal(serverManifest.version, pkg.version);
+// server.json is vendored Desktop Commander registry metadata and must not be
+// synchronized to MCP Device package releases.
+assert.equal(serverManifest.name, 'io.github.wonderwhy-er/desktop-commander');
+assert.equal(serverManifest.packages?.[0]?.identifier, '@wonderwhy-er/desktop-commander');
 assert.match(versionSource, new RegExp(`VERSION = ['\"]${pkg.version.replace(/\\./g, '\\\\.')}['\"]`));
 assert.equal(pkg.author, 'Hirohimeow');
 assert.equal(pkg.bin?.['mcp-device'], 'dist/mcp-device.js');
@@ -26,7 +29,7 @@ for (const name of ['release:dry', 'release:mcp', 'release:alpha', 'release:skip
 assert.equal(pkg.scripts?.release, 'node scripts/release.js patch');
 assert.equal(pkg.scripts?.['release:minor'], 'node scripts/release.js minor');
 assert.equal(pkg.scripts?.['release:major'], 'node scripts/release.js major');
-assert.equal(pkg.scripts?.version, 'node scripts/sync-version.js && git add server.json src/version.ts package-lock.json');
+assert.equal(pkg.scripts?.version, 'node scripts/sync-version.js && git add src/version.ts package-lock.json');
 assert.equal(pkg.scripts?.start, 'node dist/mcp-device.js');
 assert.equal(pkg.scripts?.['start:debug'], 'node --inspect-brk=9229 dist/mcp-device.js');
 assert.equal(pkg.scripts?.postinstall, undefined, 'MCP Device must not run Desktop Commander telemetry during install');

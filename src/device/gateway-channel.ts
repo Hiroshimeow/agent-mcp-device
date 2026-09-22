@@ -20,6 +20,9 @@ const PROTOCOL_VERSION_V2 = 2;
 const HEARTBEAT_MS = 20_000;
 const MAX_OUTBOUND_MESSAGE_BYTES = 56 * 1024;
 
+export type GatewayUpdateRequestOutcome =
+    { mode: 'detached'; handoff: () => Promise<void> };
+
 export interface GatewayChannelOptions {
     gatewayUrl: string;
     enrollmentToken?: string;
@@ -31,7 +34,10 @@ export interface GatewayChannelOptions {
     adapter: GatewayToolAdapter;
     agentVersion?: string;
     onStatus?: (payload: any) => void | Promise<void>;
-    onUpdateRequest?: (targetVersion: string) => void | Promise<void>;
+    onUpdateRequest?: (
+        targetVersion: string,
+        context: { requestId: string }
+    ) => GatewayUpdateRequestOutcome | Promise<GatewayUpdateRequestOutcome>;
 }
 
 export class GatewayDeviceChannel {
@@ -51,6 +57,7 @@ export class GatewayDeviceChannel {
     private protocolVersion = PROTOCOL_VERSION;
     private secureSocket?: tls.TLSSocket;
     private authMode: 'reconnect' | 'enroll' | 'pair' = 'reconnect';
+    private updateInFlight?: string;
 
     constructor(private options: GatewayChannelOptions) {
         this.identity = options.identity || new GatewayDeviceIdentity();
@@ -306,36 +313,108 @@ export class GatewayDeviceChannel {
         finally { clearTimeout(timer); }
     }
 
+    private updateStatusMessage(
+        requestId: string,
+        targetVersion: string,
+        state: 'accepted' | 'failed',
+        extra: any = {}
+    ): any {
+        if (this.connectionEpoch === undefined || !this.authenticatedDeviceId) {
+            throw new Error('Gateway update status cannot be sent before authentication.');
+        }
+        return {
+            protocol_version: this.protocolVersion,
+            type: 'device_update_status',
+            request_id: requestId,
+            device_id: this.authenticatedDeviceId,
+            connection_epoch: this.connectionEpoch,
+            timestamp: Date.now(),
+            payload: { state, target_version: targetVersion, package_version: VERSION, ...extra }
+        };
+    }
+
+    private sendUpdateStatus(
+        requestId: string,
+        targetVersion: string,
+        state: 'accepted' | 'failed',
+        extra: any = {}
+    ): void {
+        try {
+            this.send(this.updateStatusMessage(requestId, targetVersion, state, extra));
+        } catch {
+            // Best-effort path used only when the socket may already be closing.
+        }
+    }
+
+    private async sendUpdateStatusFlushed(
+        requestId: string,
+        targetVersion: string,
+        state: 'accepted' | 'failed',
+        extra: any = {}
+    ): Promise<void> {
+        await this.sendFlushed(this.updateStatusMessage(requestId, targetVersion, state, extra));
+    }
+
+    async reportUpdateFailure(
+        requestId: string,
+        targetVersion: string,
+        code: string,
+        message: string
+    ): Promise<void> {
+        // Failed update state is retired only after this awaited send succeeds.
+        await this.sendUpdateStatusFlushed(requestId, targetVersion, 'failed', {
+            code: String(code || 'DEVICE_UPDATE_FAILED').slice(0, 64),
+            message: String(message || 'Device update failed.').slice(0, 240)
+        });
+    }
+
     private async handleUpdateRequest(message: any): Promise<void> {
         if (this.connectionEpoch === undefined || !this.authenticatedDeviceId) return;
         const requestId = String(message.request_id || '').trim();
         const targetVersion = String(message.payload?.target_version || '').trim();
-        const sendStatus = (state: string, extra: any = {}) => {
-            try {
-                this.send({
-                    protocol_version: this.protocolVersion,
-                    type: 'device_update_status',
-                    request_id: requestId,
-                    device_id: this.authenticatedDeviceId,
-                    connection_epoch: this.connectionEpoch,
-                    timestamp: Date.now(),
-                    payload: { state, target_version: targetVersion, package_version: VERSION, ...extra }
-                });
-            } catch { /* reconnect state will make the final version authoritative */ }
-        };
+
         if (!requestId || !/^\d+\.\d+\.\d+$/.test(targetVersion) || typeof this.options.onUpdateRequest !== 'function') {
-            sendStatus('failed', { code: 'DEVICE_UPDATE_UNSUPPORTED', message: 'Device update request is unsupported or invalid.' });
+            this.sendUpdateStatus(requestId, targetVersion, 'failed', {
+                code: 'DEVICE_UPDATE_UNSUPPORTED',
+                message: 'Device update request is unsupported or invalid.'
+            });
             return;
         }
-        sendStatus('accepted');
+
+        if (this.updateInFlight) {
+            if (this.updateInFlight !== requestId) {
+                this.sendUpdateStatus(requestId, targetVersion, 'failed', {
+                    code: 'DEVICE_UPDATE_IN_PROGRESS',
+                    message: 'Another MCP Device update is already in progress.'
+                });
+            }
+            return;
+        }
+
+        this.updateInFlight = requestId;
         try {
-            await this.options.onUpdateRequest(targetVersion);
-            sendStatus('installed');
+            // Pre-stage and verify the target before acknowledging the update.
+            // If this throws, the currently running device stays healthy.
+            const outcome = await this.options.onUpdateRequest(targetVersion, { requestId });
+            if (!outcome || outcome.mode !== 'detached') {
+                throw Object.assign(
+                    new Error('Device update handler did not provide a detached handoff.'),
+                    { code: 'DEVICE_UPDATE_INVALID_HANDOFF' }
+                );
+            }
+
+            // Do not tear down the socket until the gateway has accepted
+            // the frame into the transport write path.
+            await this.sendUpdateStatusFlushed(requestId, targetVersion, 'accepted');
+            await outcome.handoff();
+            return;
         } catch (error: any) {
-            sendStatus('failed', {
+            this.sendUpdateStatus(requestId, targetVersion, 'failed', {
                 code: String(error?.code || 'DEVICE_UPDATE_FAILED').slice(0, 64),
                 message: String(error?.message || error).slice(0, 240)
             });
+        } finally {
+            if (this.updateInFlight === requestId) this.updateInFlight = undefined;
         }
     }
 
@@ -414,6 +493,30 @@ export class GatewayDeviceChannel {
             return;
         }
         this.socket.send(encoded);
+    }
+
+    private async sendFlushed(message: any): Promise<void> {
+        if (!this.socket || this.socket.readyState !== WebSocket.OPEN) throw new Error('Gateway socket is not open');
+        const encoded = JSON.stringify(message);
+        if (Buffer.byteLength(encoded, 'utf8') > MAX_OUTBOUND_MESSAGE_BYTES) {
+            const error: any = new Error('Gateway device response exceeds the outbound message limit');
+            error.code = 'DEVICE_OUTPUT_TOO_LARGE';
+            throw error;
+        }
+
+        if (this.protocolVersion === PROTOCOL_VERSION_V2) {
+            if (!this.secureSocket || this.secureSocket.destroyed) throw new Error('Gateway v2 inner TLS socket is not open');
+            const secureSocket = this.secureSocket;
+            await new Promise<void>((resolve, reject) => {
+                secureSocket.write(encodeJsonFrame(message), error => error ? reject(error) : resolve());
+            });
+            return;
+        }
+
+        const socket = this.socket;
+        await new Promise<void>((resolve, reject) => {
+            socket.send(encoded, error => error ? reject(error) : resolve());
+        });
     }
 
     private fail(error: Error): void {

@@ -13,8 +13,16 @@ import { bootstrapOfficialGatewayTrust } from './official-trust.js';
 import { GatewayDeviceStatusStore } from './device-status.js';
 import { GatewayToolAdapter } from './gateway-tool-adapter.js';
 import { RuntimeOwner, acquireRuntimeOwner, type RuntimeOwnerStatus } from './runtime-owner.js';
-import { installDevicePackageUpdate, scheduleDeviceRuntimeRestart } from './self-update.js';
+import {
+    assertDeviceStartupAllowedDuringUpdate,
+    launchDeviceUpdateHelper,
+    prepareDevicePackageUpdate,
+    reconcileDeviceUpdateAfterStart,
+    retireDeviceUpdateState,
+    signalDeviceUpdateHandoff
+} from './self-update.js';
 import { captureRemote } from '../utils/capture.js';
+import { VERSION } from '../version.js';
 
 export class MCPDevice {
     private isShuttingDown = false;
@@ -74,6 +82,10 @@ export class MCPDevice {
             console.log('🚀 Starting MCP Device...');
             if (process.env.DEBUG_MODE === 'true') console.log('  - 🐞 DEBUG_MODE');
 
+            // A fresh external update helper owns the package lifecycle.
+            // Refuse a competing runtime until it completes or becomes stale.
+            await assertDeviceStartupAllowedDuringUpdate(VERSION);
+
             const managerArg = process.argv.find(value => value.startsWith('--manager='));
             const manager = managerArg?.slice('--manager='.length);
             const mode = process.argv.includes('--service')
@@ -131,10 +143,36 @@ export class MCPDevice {
                 appCaPem: gatewayConfig.appCaPem || undefined,
                 adapter: new GatewayToolAdapter(this.desktop, { allowedRoots: gatewayConfig.allowedRoots }),
                 agentVersion: process.env.npm_package_version,
-                onUpdateRequest: async targetVersion => {
+                onUpdateRequest: async (targetVersion, { requestId }) => {
                     const record = await identity.loadOrCreate();
-                    await installDevicePackageUpdate(targetVersion);
-                    scheduleDeviceRuntimeRestart({ deviceId: record.deviceId });
+                    const prepared = await prepareDevicePackageUpdate({
+                        targetVersion,
+                        requestId,
+                        deviceId: record.deviceId,
+                        childPid: this.desktop.getChildPid(),
+                        fromVersion: VERSION
+                    });
+                    try {
+                        // Launch the helper while the service is healthy. The
+                        // helper remains inert until the explicit handoff marker.
+                        await launchDeviceUpdateHelper(prepared);
+                    } catch (error) {
+                        await retireDeviceUpdateState(prepared.state).catch(() => {});
+                        throw error;
+                    }
+                    return {
+                        mode: 'detached' as const,
+                        handoff: async () => {
+                            // Capture the last live child PID, then complete graceful
+                            // shutdown and RuntimeOwner release before arming the helper.
+                            // This preserves G5.6: no destructive update work may begin
+                            // until the old runtime has finished releasing package handles.
+                            const childPid = this.desktop.getChildPid();
+                            await this.shutdown();
+                            await signalDeviceUpdateHandoff({ childPid });
+                            process.exit(0);
+                        }
+                    };
                 },
                 onStatus: async payload => {
                     const record = await identity.loadOrCreate();
@@ -157,6 +195,38 @@ export class MCPDevice {
             });
 
             await this.gatewayChannel.start();
+
+            const updateReconciliation = await reconcileDeviceUpdateAfterStart(VERSION);
+            if (updateReconciliation.action === 'success') {
+                // Successful reconnect already advertised the target package_version
+                // in auth_hello; that reconnect is the authoritative completion proof.
+                // Do not send a late "installed" status: the gateway completes the
+                // update from the authenticated reconnect itself.
+                try {
+                    await retireDeviceUpdateState(updateReconciliation.state);
+                } catch (error: any) {
+                    // A transient Windows EPERM/EBUSY while the detached helper is
+                    // exiting must not turn a healthy target reconnect into startup failure.
+                    console.warn('Update cleanup deferred:', error?.message || error);
+                }
+            } else if (updateReconciliation.action === 'report-failed') {
+                try {
+                    await this.gatewayChannel.reportUpdateFailure(
+                        updateReconciliation.state.requestId,
+                        updateReconciliation.state.targetVersion,
+                        updateReconciliation.state.errorCode || 'DEVICE_UPDATE_FAILED',
+                        updateReconciliation.state.message || 'MCP Device update rolled back.'
+                    );
+                    await retireDeviceUpdateState(updateReconciliation.state).catch((error: any) => {
+                        console.warn('Failed update cleanup deferred:', error?.message || error);
+                    });
+                } catch (error: any) {
+                    // Keep durable failed state for a later reporting attempt; do not
+                    // make the restored runtime unavailable because reporting raced.
+                    console.warn('Failed update report deferred:', error?.message || error);
+                }
+            }
+
             console.log('✓ Device ready through direct Gateway channel');
         } catch (error: any) {
             console.error(' - ❌ Device startup failed:', error.message);

@@ -99,6 +99,7 @@ class UsageTracker {
    * keeps a saturated libuv threadpool from gating tool responses on every call.
    */
   private async saveStats(stats: ToolUsageStats): Promise<void> {
+    if (process.env.MCP_DEVICE_REMOTE === 'true') return;
     await configManager.setValueNonBlocking('usageStats', stats);
   }
 

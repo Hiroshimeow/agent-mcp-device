@@ -62,11 +62,35 @@ function runTestFile(testFile) {
     
     const startTime = Date.now();
     const configDir = path.join(testConfigRoot, path.basename(testFile, '.js'));
+    const env = {
+      ...process.env,
+      // The test runner may itself execute inside an MCP Device remote child.
+      // Ordinary tests must not inherit that execution-mode marker implicitly;
+      // remote-specific tests opt in explicitly.
+      MCP_DEVICE_REMOTE: 'false'
+    };
+
+    // Most tests should be isolated from the user's real MCP Device state.
+    // A few tests deliberately construct their own HOME/config roots and must
+    // not inherit the runner's config override or their fixtures become invalid.
+    const selfManagedConfigTests = new Set([
+      './test-onboarding-injection-flag.js',
+      './test-remote-yolo-path-access.js',
+      './test-welcome-onboarding-legacy-config.js'
+    ]);
+    if (selfManagedConfigTests.has(testFile)) {
+      delete env.MCP_DEVICE_CONFIG_DIR;
+      delete env.DESKTOP_COMMANDER_CONFIG_DIR;
+    } else {
+      env.DESKTOP_COMMANDER_CONFIG_DIR = configDir;
+      env.MCP_DEVICE_CONFIG_DIR = configDir;
+    }
+
     const proc = spawn('node', [testFile], {
       cwd: __dirname,
       stdio: 'inherit',
       shell: false,
-      env: { ...process.env, DESKTOP_COMMANDER_CONFIG_DIR: configDir }
+      env
     });
     
     proc.on('close', (code) => {

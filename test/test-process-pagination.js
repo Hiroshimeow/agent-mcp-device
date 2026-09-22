@@ -154,11 +154,18 @@ async function testRuntimeInfo() {
   const pid = extractPid(startResult);
   assert(pid, 'Should get PID');
   
-  // Wait for process to complete
-  await wait(1000);
-  
-  const read = await readProcessOutput({ pid, timeout_ms: 1000 });
-  assert(!read.isError, 'Read should succeed');
+  // Completion promotion is asynchronous and can take longer on a busy
+  // full-suite host. Poll for the observable completion contract instead of
+  // relying on a fixed 1s sleep.
+  const deadline = Date.now() + 5000;
+  let read;
+  do {
+    read = await readProcessOutput({ pid, timeout_ms: 500 });
+    assert(!read.isError, 'Read should succeed');
+    if (read.content[0].text.includes('Process completed')) break;
+    await wait(100);
+  } while (Date.now() < deadline);
+
   assert(read.content[0].text.includes('runtime:'), 'Should show runtime');
   assert(read.content[0].text.includes('Process completed'), 'Should show completion');
   

@@ -48,9 +48,13 @@ async function runServer() {
       await configManager.loadConfig();
       deferLog('info', 'Configuration loaded successfully');
 
-      // Initialize feature flags (non-blocking)
-      deferLog('info', 'Initializing feature flags...');
-      await featureFlagManager.initialize();
+      // Remote MCP Device children must not depend on legacy host
+      // feature flags or cached A/B state. Their execution surface is fixed by
+      // GatewayToolAdapter and remote-mode behavior must be deterministic.
+      if (process.env.MCP_DEVICE_REMOTE !== 'true') {
+        deferLog('info', 'Initializing feature flags...');
+        await featureFlagManager.initialize();
+      }
     } catch (configError) {
       deferLog('error', `Failed to load configuration: ${configError instanceof Error ? configError.message : String(configError)}`);
       if (configError instanceof Error && configError.stack) {

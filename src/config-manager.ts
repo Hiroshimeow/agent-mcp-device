@@ -1,3 +1,4 @@
+import { randomBytes } from 'crypto';
 import fs from 'fs/promises';
 import path from 'path';
 import { existsSync } from 'fs';
@@ -76,28 +77,47 @@ class ConfigManager {
         await mkdir(configDir, { recursive: true });
       }
 
-      // Check if config file exists
+      let configData: string | null = null;
       try {
-        await fs.access(this.configPath);
-        // Load existing config
-        const configData = await fs.readFile(this.configPath, 'utf8');
-        this.config = JSON.parse(configData);
-        this._isFirstRun = false;
+        configData = await fs.readFile(this.configPath, 'utf8');
+      } catch (error: any) {
+        if (error?.code !== 'ENOENT') throw error;
+      }
 
-        // Configs created before this marker existed must not receive the
-        // welcome page retroactively when client eligibility changes later.
-        // New configs get this field from getDefaultConfig() and remain
-        // eligible across restarts until their first initialization.
+      if (configData === null) {
+        // Only a genuinely missing file creates and persists defaults.
+        this.config = this.getDefaultConfig();
+        this._isFirstRun = true;
+        await this.saveConfig();
+      } else {
+        try {
+          this.config = JSON.parse(configData);
+          this._isFirstRun = false;
+        } catch (error: any) {
+          // Preserve corrupt evidence rather than silently replacing user
+          // settings with defaults. The remote execution plane can continue
+          // safely with in-memory defaults.
+          const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+          const corruptPath = path.join(
+            path.dirname(this.configPath),
+            `config.corrupt-${stamp}.json`
+          );
+          await fs.rename(this.configPath, corruptPath);
+          console.warn(`Invalid MCP Device config preserved at ${corruptPath}: ${error?.message || error}`);
+          this.config = this.getDefaultConfig();
+          this._isFirstRun = false;
+        }
+
+        // Legacy onboarding-marker migration is local-client state. Remote
+        // device children normalize it in memory only so parent/child startup
+        // does not create a second writer for config.json.
         if (this.config['welcomeOnboardingEligible'] === undefined) {
           this.config['welcomeOnboardingEligible'] = false;
           this.config['pendingWelcomeOnboarding'] = false;
-          await this.saveConfig();
+          if (process.env.MCP_DEVICE_REMOTE !== 'true') {
+            await this.saveConfig();
+          }
         }
-      } catch (error) {
-        // Config file doesn't exist, create default
-        this.config = this.getDefaultConfig();
-        this._isFirstRun = true; // This is a first run!
-        await this.saveConfig();
       }
       this.config['version'] = VERSION;
 
@@ -195,7 +215,24 @@ class ConfigManager {
    * own independent fs.writeFile of the same path.
    */
   private async writeConfigToDisk(): Promise<void> {
-    await fs.writeFile(this.configPath, JSON.stringify(this.config, null, 2), 'utf8');
+    const directory = path.dirname(this.configPath);
+    await fs.mkdir(directory, { recursive: true });
+    const temporary = path.join(
+      directory,
+      `.${path.basename(this.configPath)}.${process.pid}.${Date.now()}.${randomBytes(6).toString('hex')}.tmp`
+    );
+    try {
+      await fs.writeFile(temporary, JSON.stringify(this.config, null, 2), {
+        encoding: 'utf8',
+        mode: 0o600,
+        flag: 'wx'
+      });
+      await fs.rename(temporary, this.configPath);
+      try { await fs.chmod(this.configPath, 0o600); } catch { /* Windows ACLs inherit from the user profile. */ }
+    } catch (error) {
+      await fs.rm(temporary, { force: true }).catch(() => {});
+      throw error;
+    }
   }
 
   /**

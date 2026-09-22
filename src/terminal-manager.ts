@@ -258,6 +258,21 @@ export class TerminalManager {
     const childProcess = spawn(spawnConfig.executable, spawnConfig.args, spawnOptions);
     let output = '';
 
+    // spawn() reports resolution/launch failures asynchronously via 'error'.
+    // A listener-less ChildProcess error becomes an uncaughtException and kills
+    // the inherited MCP server. Attach before any early-return path and keep
+    // the listener for the process lifetime.
+    let forwardProcessError: ((err: Error) => void) | null = null;
+    let pendingProcessError: Error | null = null;
+    childProcess.on('error', (err: Error) => {
+      if (forwardProcessError) {
+        forwardProcessError(err);
+      } else {
+        pendingProcessError = err;
+        console.error(`Process error for "${command}": ${err.message}`);
+      }
+    });
+
     // Ensure childProcess.pid is defined before proceeding
     if (!childProcess.pid) {
       // Return a consistent error object instead of throwing
@@ -318,6 +333,31 @@ export class TerminalManager {
 
         resolve(result);
       };
+
+      // Once resolveOnce exists, route runtime/spawn errors into the normal
+      // command result path so callers do not hang and the session is retired.
+      forwardProcessError = (err: Error) => {
+        // A late ChildProcess 'error' can arrive after the caller has already
+        // received a live/background session. Do not silently retire that
+        // session; the normal 'exit' event remains authoritative for cleanup.
+        if (resolved) {
+          this.appendToLineBuffer(session, `\nProcess error: ${err.message}\n`);
+          console.error(`Process error for "${command}": ${err.message}`);
+          return;
+        }
+        if (childProcess.pid) this.sessions.delete(childProcess.pid);
+        exitReason = 'process_exit';
+        resolveOnce({
+          pid: childProcess.pid ?? -1,
+          output: output + `\nProcess error: ${err.message}`,
+          isBlocked: false
+        });
+      };
+      // Spawn failures normally arrive on the next tick, but replay any error
+      // emitted between spawn() and resolver initialization.
+      if (pendingProcessError) {
+        forwardProcessError(pendingProcessError);
+      }
 
       childProcess.stdout.on('data', (data: any) => {
         const text = data.toString();

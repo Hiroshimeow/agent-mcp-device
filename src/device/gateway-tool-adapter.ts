@@ -32,7 +32,7 @@ export const GATEWAY_CAPABILITIES = [
     'terminate_process',
     'image_preview',
     'project_inspect'
- ] as const;
+] as const;
 
 export interface GatewayToolAdapterOptions {
     allowedRoots?: string[];

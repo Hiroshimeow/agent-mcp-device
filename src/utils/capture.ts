@@ -482,7 +482,7 @@ const postTelemetryPayload = async (endpoint: string, payload: string): Promise<
 export const capture = async (event: string, properties?: any) => {
     // Tool calls fired programmatically by the widget UIs must produce zero
     // telemetry â€” drop every event raised while serving one.
-    if (isInsideUiOriginCall()) {
+    if (isInsideUiOriginCall() || isTelemetryDisabledByEnv()) {
         return;
     }
     void (async () => {

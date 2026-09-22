@@ -6,9 +6,9 @@ import readline from 'readline/promises';
 import { promisify } from 'util';
 
 const execFileAsync = promisify(execFileCallback);
-const SYSTEMD_UNIT = 'mcp-device.service';
+export const SYSTEMD_UNIT = 'mcp-device.service';
 const SYSTEMD_OWNER_MARKER = '# Managed by MCP Device';
-const PM2_NAME = 'mcp-device';
+export const PM2_NAME = 'mcp-device';
 
 type ExecFileResult = { stdout: string; stderr: string };
 type ExecFileFn = (file: string, args: string[]) => Promise<ExecFileResult>;

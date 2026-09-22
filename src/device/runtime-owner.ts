@@ -24,7 +24,7 @@ function endpointFor(paths: DeviceStatePaths, platform: NodeJS.Platform | string
     return path.join(paths.root, `runtime-${digest}.sock`);
 }
 
-function controlFileFor(paths: DeviceStatePaths): string {
+export function runtimeOwnerControlFileFor(paths: DeviceStatePaths): string {
     return path.join(paths.root, 'runtime-control.json');
 }
 
@@ -125,7 +125,7 @@ export class RuntimeOwner {
             this.server!.once('error', reject);
             this.server!.listen(this.endpoint, resolve);
         });
-        await fs.writeFile(controlFileFor(this.paths), JSON.stringify({ endpoint: this.endpoint, nonce: this.nonce }, null, 2), { mode: 0o600 });
+        await fs.writeFile(runtimeOwnerControlFileFor(this.paths), JSON.stringify({ endpoint: this.endpoint, nonce: this.nonce }, null, 2), { mode: 0o600 });
     }
 
     async bootstrap(): Promise<void> {
@@ -142,7 +142,7 @@ export class RuntimeOwner {
             this.server = undefined;
             await new Promise<void>(resolve => server.close(() => resolve()));
         }
-        try { await fs.unlink(controlFileFor(this.paths)); } catch (error: any) { if (error?.code !== 'ENOENT') throw error; }
+        try { await fs.unlink(runtimeOwnerControlFileFor(this.paths)); } catch (error: any) { if (error?.code !== 'ENOENT') throw error; }
         if (this.platform !== 'win32') {
             try { await fs.unlink(this.endpoint); } catch (error: any) { if (error?.code !== 'ENOENT') throw error; }
         }
@@ -151,7 +151,7 @@ export class RuntimeOwner {
 
 export async function stopRuntimeOwner(paths = deviceStatePaths(), platform: NodeJS.Platform | string = process.platform): Promise<boolean> {
     let control: any;
-    try { control = JSON.parse(await fs.readFile(controlFileFor(paths), 'utf8')); } catch (error: any) {
+    try { control = JSON.parse(await fs.readFile(runtimeOwnerControlFileFor(paths), 'utf8')); } catch (error: any) {
         if (error?.code === 'ENOENT') return false;
         throw error;
     }

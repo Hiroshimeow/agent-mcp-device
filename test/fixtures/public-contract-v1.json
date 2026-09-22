@@ -1,0 +1,45 @@
+{
+  "schema": 2,
+  "source": "gateway-public-schema",
+  "notes": "device_id is required at the gateway for initial routed tools and stripped before device dispatch; follow-up process calls use session_id only.",
+  "capabilities": [
+    "read_text_file",
+    "write_file",
+    "edit_file",
+    "shell_execute",
+    "start_process",
+    "read_process_output",
+    "interact_with_process",
+    "terminate_process",
+    "image_preview",
+    "project_inspect"
+  ],
+  "requiredArguments": {
+    "read_text_file": ["path", "device_id"],
+    "write_file": ["path", "content", "device_id"],
+    "edit_file": ["path", "old_text", "new_text", "device_id"],
+    "shell_execute": ["command", "working_directory", "device_id"],
+    "start_process": ["command", "working_directory", "device_id"],
+    "read_process_output": ["session_id"],
+    "interact_with_process": ["session_id", "input"],
+    "terminate_process": ["session_id"],
+    "image_preview": ["device_id"],
+    "project_inspect": ["device_id", "project_id", "view"]
+  },
+  "stringMinLength": {
+    "edit_file.old_text": 1,
+    "start_process.command": 1,
+    "shell_execute.device_id": 1,
+    "start_process.device_id": 1,
+    "read_process_output.session_id": 1,
+    "interact_with_process.session_id": 1,
+    "terminate_process.session_id": 1,
+    "image_preview.device_id": 1,
+    "project_inspect.device_id": 1
+  },
+  "emptyStringCompatibility": {
+    "write_file.content": true,
+    "edit_file.new_text": true,
+    "interact_with_process.input": true
+  }
+}

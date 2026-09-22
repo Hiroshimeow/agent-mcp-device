@@ -6,6 +6,7 @@
  * or async (content-based like BinaryFileHandler using isBinaryFile)
  */
 
+import fs from 'fs/promises';
 import { FileHandler } from './base.js';
 import { TextFileHandler } from './text.js';
 import { ImageFileHandler } from './image.js';
@@ -92,6 +93,24 @@ export async function getFileHandler(filePath: string): Promise<FileHandler> {
     // Check Image (extension-based, sync - images are binary but handled specially)
     if (getImageHandler().canHandle(filePath)) {
         return getImageHandler();
+    }
+
+    // UTF-16LE text contains many NUL bytes and generic binary sniffers
+    // often classify it as binary. A BOM is authoritative, so route it to the
+    // text handler before content-based binary detection.
+    try {
+        const fd = await fs.open(filePath, 'r');
+        try {
+            const bom = Buffer.alloc(2);
+            const { bytesRead } = await fd.read(bom, 0, bom.length, 0);
+            if (bytesRead === 2 && bom[0] === 0xff && bom[1] === 0xfe) {
+                return getTextHandler();
+            }
+        } finally {
+            await fd.close();
+        }
+    } catch {
+        // Preserve existing fallback behavior if the file cannot be sampled.
     }
 
     // Check Binary (content-based, async via isBinaryFile)

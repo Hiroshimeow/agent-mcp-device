@@ -16,8 +16,27 @@ export async function trackToolCall(toolName: string, args?: unknown): Promise<v
     // Get current timestamp
     const timestamp = new Date().toISOString();
     
-    // Format the log entry
-    const logEntry = `${timestamp} | ${toolName.padEnd(20, ' ')}${args ? `\t| Arguments: ${JSON.stringify(args)}` : ''}\n`;
+    // Remote MCP Device calls may contain commands, file contents, tokens or
+    // other secrets. Persist only bounded metadata in remote mode.
+    const remote = process.env.MCP_DEVICE_REMOTE === 'true';
+    let suffix = '';
+    if (args !== undefined) {
+      if (remote) {
+        let argBytes = 0;
+        let argCount = 0;
+        try {
+          const serialized = JSON.stringify(args);
+          argBytes = Buffer.byteLength(serialized || '', 'utf8');
+          argCount = args && typeof args === 'object' && !Array.isArray(args)
+            ? Object.keys(args as Record<string, unknown>).length
+            : 1;
+        } catch { /* metadata-only logging must never affect tool execution */ }
+        suffix = `\t| Args: count=${argCount} bytes=${argBytes}`;
+      } else {
+        suffix = `\t| Arguments: ${JSON.stringify(args)}`;
+      }
+    }
+    const logEntry = `${timestamp} | ${toolName.padEnd(20, ' ')}${suffix}\n`;
 
     // Check if file exists and get its size
     let fileSize = 0;

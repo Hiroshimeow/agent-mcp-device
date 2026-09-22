@@ -1,27 +1,18 @@
 /**
- * Test: onboarding_injection flag must be authoritative on cold starts
+ * Test: onboarding_injection flag must be authoritative on cold starts.
  *
- * Reproduces GitHub issues #303 / #538: the onboarding [SYSTEM INSTRUCTION]
- * is injected into tool results even though the remote feature flag serves
- * onboarding_injection: false. On a cold start (no feature-flags.json cache,
- * e.g. an ephemeral Docker MCP Gateway container) the first tool call races
- * the background flag fetch, the in-memory flag map is still empty, and the
- * check falls through to its fail-open default.
+ * The test drives the real dist/index.js through the official MCP SDK stdio
+ * transport. This avoids maintaining a second, hand-written MCP framing parser.
  *
- * Strategy: spawn dist/index.js as a real MCP client would (stdio transport)
- * with HOME pointed at a pristine temp directory, controlling flag delivery
- * via DC_FLAG_URL and a local HTTP server. Four scenarios:
- *
- *   1. Cold start, flag server unreachable            -> must NOT inject (any call)
- *   2. Cold start, flags(false) served slower than
- *      the first tool call (the race in the issues)   -> must NOT inject (any call)
- *   3. Cold start, flags(true) served slowly          -> MUST inject once flags load
- *      (guards that the fail-closed default doesn't kill the feature: the
- *      first call sees empty flags, but a later call must show onboarding)
- *   4. Warm cache with flags(false), no network       -> must NOT inject
+ * Scenarios:
+ * 1. Cold start, flag server unreachable -> no injection.
+ * 2. Cold start, flags(false) delayed -> no injection.
+ * 3. Cold start, flags(true) delayed -> injection appears after flags load.
+ * 4. Warm cache with flags(false), no network -> no injection.
  */
 
-import { spawn } from 'child_process';
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'fs';
 import { createServer } from 'http';
 import os from 'os';
@@ -29,226 +20,200 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DIST_INDEX = path.join(__dirname, '..', 'dist', 'index.js');
+const PROJECT_ROOT = path.resolve(__dirname, '..');
+const DIST_INDEX = path.join(PROJECT_ROOT, 'dist', 'index.js');
 const MARKER = 'NEW USER ONBOARDING REQUIRED';
-const SCENARIO_TIMEOUT_MS = 20000;
+const SCENARIO_TIMEOUT_MS = 30000;
 
-/**
- * Create a pristine "container" home dir. Config is seeded with telemetry
- * disabled (so tests emit no analytics) but deliberately has no
- * onboardingState and no feature-flags.json cache, matching a fresh
- * ephemeral container. Pass cachedFlags to simulate a warm cache instead.
- */
 function makeHome({ cachedFlags } = {}) {
   const home = mkdtempSync(path.join(os.tmpdir(), 'dc-onboarding-test-'));
   const cfgDir = path.join(home, '.claude-server-commander');
   mkdirSync(cfgDir, { recursive: true });
-  writeFileSync(path.join(cfgDir, 'config.json'), JSON.stringify({ telemetryEnabled: false }));
+  writeFileSync(
+    path.join(cfgDir, 'config.json'),
+    JSON.stringify({ telemetryEnabled: false })
+  );
   if (cachedFlags) {
     writeFileSync(
       path.join(cfgDir, 'feature-flags.json'),
       JSON.stringify({ version: 'cached-test', flags: cachedFlags })
     );
   }
-  return home;
+  return { home, cfgDir };
 }
 
-/** Serve feature flags after an optional delay (to lose the startup race on purpose) */
 function startFlagServer(flags, delayMs = 0) {
-  const server = createServer((req, res) => {
+  const server = createServer((_req, res) => {
     setTimeout(() => {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ version: 'live-test', flags }));
     }, delayMs);
   });
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
+    server.once('error', reject);
     server.listen(0, '127.0.0.1', () => resolve(server));
   });
 }
 
-/**
- * Spawn the MCP server with the given home/flag URL, perform the initialize
- * handshake as "docker-mcp-gateway" (the client from issue #538), and call a
- * tool immediately. When followUpDelayMs is set, a second tool call is made
- * after that delay — long enough for the background flag fetch to complete —
- * so scenarios can assert behavior both before and after flags load.
- * Returns the collected tool result texts.
- */
-function callToolOnFreshServer({ home, flagUrl, followUpDelayMs = null }) {
-  return new Promise((resolve) => {
-    const child = spawn('node', [DIST_INDEX], {
-      env: {
-        ...process.env,
-        HOME: home,
-        USERPROFILE: home, // Windows homedir
-        DC_FLAG_URL: flagUrl,
-      },
-      stdio: ['pipe', 'pipe', 'pipe'],
-    });
+async function callToolOnFreshServer({ home, cfgDir, flagUrl, followUpDelayMs = null }) {
+  const transport = new StdioClientTransport({
+    command: process.execPath,
+    args: [DIST_INDEX],
+    cwd: PROJECT_ROOT,
+    stderr: 'pipe',
+    env: {
+      ...process.env,
+      HOME: home,
+      USERPROFILE: home,
+      DESKTOP_COMMANDER_CONFIG_DIR: cfgDir,
+      DESKTOP_COMMANDER_DISABLE_TELEMETRY: 'true',
+      DC_FLAG_URL: flagUrl,
+      MCP_DEVICE_REMOTE: 'false',
+    },
+  });
 
-    let stdoutBuf = '';
-    let settled = false;
-    const texts = [];
-    const finish = (result) => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timeoutHandle);
-      child.kill('SIGTERM');
-      resolve(result);
+  const client = new Client(
+    { name: 'docker-mcp-gateway', version: '1.0.0' },
+    { capabilities: {} }
+  );
+
+  let stderrText = '';
+  try {
+    await client.connect(transport, { timeout: SCENARIO_TIMEOUT_MS });
+    if (transport.stderr) {
+      transport.stderr.on('data', chunk => {
+        stderrText += chunk.toString();
+      });
+    }
+
+    const call = async () => {
+      const result = await client.callTool(
+        { name: 'get_config', arguments: {} },
+        undefined,
+        { timeout: SCENARIO_TIMEOUT_MS }
+      );
+      return (result.content || [])
+        .map(item => item.text || '')
+        .join('\n');
     };
 
-    const timeoutHandle = setTimeout(
-      () => finish({ error: 'timeout waiting for tool result' }),
-      SCENARIO_TIMEOUT_MS
-    );
-
-    const send = (msg) => child.stdin.write(JSON.stringify(msg) + '\n');
-    const toolCall = (id) =>
-      send({
-        jsonrpc: '2.0',
-        id,
-        method: 'tools/call',
-        params: { name: 'get_config', arguments: {} },
-      });
-
-    child.stdout.on('data', (chunk) => {
-      stdoutBuf += chunk.toString();
-      let newlineIdx;
-      while ((newlineIdx = stdoutBuf.indexOf('\n')) >= 0) {
-        const line = stdoutBuf.slice(0, newlineIdx);
-        stdoutBuf = stdoutBuf.slice(newlineIdx + 1);
-        let msg;
-        try {
-          msg = JSON.parse(line);
-        } catch {
-          continue; // stray non-protocol output
-        }
-        if (msg.id === 1) {
-          send({ jsonrpc: '2.0', method: 'notifications/initialized' });
-          // Fire the first tool call immediately — on a cold start this is
-          // what races (and beats) the background flag fetch.
-          toolCall(2);
-        } else if (msg.id === 2 || msg.id === 3) {
-          texts.push(
-            (msg.result?.content ?? []).map((c) => c.text ?? '').join('\n')
-          );
-          if (msg.id === 2 && followUpDelayMs !== null) {
-            setTimeout(() => toolCall(3), followUpDelayMs);
-          } else {
-            finish({ texts });
-          }
-        }
-      }
-    });
-
-    child.on('error', (err) => finish({ error: err.message }));
-    child.on('exit', (code) => {
-      if (!settled) finish({ error: `server exited early with code ${code}` });
-    });
-
-    send({
-      jsonrpc: '2.0',
-      id: 1,
-      method: 'initialize',
-      params: {
-        protocolVersion: '2024-11-05',
-        capabilities: {},
-        clientInfo: { name: 'docker-mcp-gateway', version: '1.0.0' },
-      },
-    });
-  });
+    const texts = [await call()];
+    if (followUpDelayMs !== null) {
+      await new Promise(resolve => setTimeout(resolve, followUpDelayMs));
+      texts.push(await call());
+    }
+    return { texts };
+  } catch (error) {
+    return {
+      error:
+        String(error?.message || error) +
+        (stderrText ? '\nchild stderr:\n' + stderrText.slice(-4000) : '')
+    };
+  } finally {
+    await client.close().catch(() => {});
+  }
 }
 
-async function runScenario({ name, expectInjection, home, flagUrl, followUpDelayMs }) {
-  const result = await callToolOnFreshServer({ home, flagUrl, followUpDelayMs });
-  rmSync(home, { recursive: true, force: true });
+async function runScenario({
+  name,
+  expectInjection,
+  fixture,
+  flagUrl,
+  followUpDelayMs
+}) {
+  try {
+    const result = await callToolOnFreshServer({
+      home: fixture.home,
+      cfgDir: fixture.cfgDir,
+      flagUrl,
+      followUpDelayMs
+    });
 
-  if (result.error) {
-    console.error(`  ✗ ${name}: ERROR - ${result.error}`);
-    return false;
+    if (result.error) {
+      console.error('FAIL ' + name + ': ' + result.error);
+      return false;
+    }
+
+    const injected = result.texts.some(text => text.includes(MARKER));
+    const pass = injected === expectInjection;
+    console.log(
+      (pass ? 'PASS ' : 'FAIL ') +
+      name +
+      ': ' +
+      (injected ? 'injected' : 'no injection') +
+      ' (expected ' +
+      (expectInjection ? 'injected' : 'no injection') +
+      ')'
+    );
+    return pass;
+  } finally {
+    rmSync(fixture.home, { recursive: true, force: true });
   }
-
-  const injected = result.texts.some((t) => t.includes(MARKER));
-  const pass = injected === expectInjection;
-  const status = pass ? '✓' : '✗';
-  const detail = injected
-    ? 'onboarding [SYSTEM INSTRUCTION] injected'
-    : 'no injection';
-  console.log(
-    `  ${status} ${name}: ${detail} (expected: ${expectInjection ? 'injected' : 'no injection'})`
-  );
-  return pass;
 }
 
 async function main() {
-  console.log('Testing onboarding_injection flag authority on cold starts (#303/#538)\n');
+  console.log('Testing onboarding_injection flag authority on cold starts');
 
-  // Delay flag responses past the first tool call so the test deterministically
-  // reproduces the startup race from the issues. Must stay well under the flag
-  // manager's 3s fetch timeout, and under the follow-up call delay so second
-  // calls observe loaded flags.
-  const RACE_DELAY_MS = 1000;
-  const FOLLOW_UP_DELAY_MS = 2000;
+  const raceDelayMs = 1000;
+  const followUpDelayMs = 2000;
 
-  const flagsFalseServer = await startFlagServer({ onboarding_injection: false }, RACE_DELAY_MS);
-  const flagsTrueServer = await startFlagServer({ onboarding_injection: true }, RACE_DELAY_MS);
-  const unreachableUrl = 'http://127.0.0.1:9/'; // discard port: connection refused
+  const flagsFalseServer = await startFlagServer(
+    { onboarding_injection: false },
+    raceDelayMs
+  );
+  const flagsTrueServer = await startFlagServer(
+    { onboarding_injection: true },
+    raceDelayMs
+  );
+  const unreachableUrl = 'http://127.0.0.1:9/';
 
   const results = [];
   try {
-    results.push(
-      await runScenario({
-        name: 'cold start, flag server unreachable (two calls)',
-        expectInjection: false,
-        home: makeHome(),
-        flagUrl: unreachableUrl,
-        followUpDelayMs: FOLLOW_UP_DELAY_MS,
-      })
-    );
+    results.push(await runScenario({
+      name: 'cold start, flag server unreachable',
+      expectInjection: false,
+      fixture: makeHome(),
+      flagUrl: unreachableUrl,
+      followUpDelayMs
+    }));
 
-    results.push(
-      await runScenario({
-        name: 'cold start, flags(false) arrive after first tool call (two calls)',
-        expectInjection: false,
-        home: makeHome(),
-        flagUrl: `http://127.0.0.1:${flagsFalseServer.address().port}/`,
-        followUpDelayMs: FOLLOW_UP_DELAY_MS,
-      })
-    );
+    results.push(await runScenario({
+      name: 'cold start, flags(false) delayed',
+      expectInjection: false,
+      fixture: makeHome(),
+      flagUrl: 'http://127.0.0.1:' + flagsFalseServer.address().port + '/',
+      followUpDelayMs
+    }));
 
-    results.push(
-      await runScenario({
-        name: 'cold start, flags(true): onboarding fires once flags load',
-        expectInjection: true,
-        home: makeHome(),
-        flagUrl: `http://127.0.0.1:${flagsTrueServer.address().port}/`,
-        followUpDelayMs: FOLLOW_UP_DELAY_MS,
-      })
-    );
+    results.push(await runScenario({
+      name: 'cold start, flags(true) delayed',
+      expectInjection: true,
+      fixture: makeHome(),
+      flagUrl: 'http://127.0.0.1:' + flagsTrueServer.address().port + '/',
+      followUpDelayMs
+    }));
 
-    results.push(
-      await runScenario({
-        name: 'warm cache with flags(false), no network',
-        expectInjection: false,
-        home: makeHome({ cachedFlags: { onboarding_injection: false } }),
-        flagUrl: unreachableUrl,
-      })
-    );
+    results.push(await runScenario({
+      name: 'warm cache with flags(false), no network',
+      expectInjection: false,
+      fixture: makeHome({ cachedFlags: { onboarding_injection: false } }),
+      flagUrl: unreachableUrl
+    }));
   } finally {
-    flagsFalseServer.close();
-    flagsTrueServer.close();
+    await new Promise(resolve => flagsFalseServer.close(resolve));
+    await new Promise(resolve => flagsTrueServer.close(resolve));
   }
 
-  const failed = results.filter((r) => !r).length;
+  const failed = results.filter(value => !value).length;
   if (failed > 0) {
-    console.error(`\n${failed}/${results.length} scenarios failed — onboarding_injection flag is not authoritative (issue #538).`);
+    console.error(failed + '/' + results.length + ' onboarding scenarios failed');
     process.exit(1);
   }
-  console.log(`\nAll ${results.length} scenarios passed.`);
-  process.exit(0);
+
+  console.log('All ' + results.length + ' onboarding scenarios passed');
 }
 
-main().catch((err) => {
-  console.error('Test error:', err);
+main().catch(error => {
+  console.error('Test error:', error);
   process.exit(1);
 });

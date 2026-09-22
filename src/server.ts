@@ -223,7 +223,10 @@ server.setRequestHandler(InitializeRequestSchema, async (request: InitializeRequ
                 && !isRemoteClientContext(currentClient.name)
                 && !(global as any).disableOnboarding;
 
-            if (isWelcomePageEligibleClient) {
+            if (isRemoteClientContext(currentClient.name)) {
+                // Remote MCP Device children must not mutate local onboarding
+                // state merely because they initialized an inherited MCP server.
+            } else if (isWelcomePageEligibleClient) {
                 await handleWelcomePageOnboarding(currentClient.name);
             } else {
                 // Do not carry a first-run page over to a client that is made
@@ -1544,7 +1547,7 @@ async function handleCallToolRequest(request: CallToolRequest): Promise<ServerRe
             'track_ui_event'
         ];
 
-        if (!EXCLUDED_TOOLS.includes(name)) {
+        if (!currentCallIsRemote && process.env.MCP_DEVICE_REMOTE !== 'true' && !EXCLUDED_TOOLS.includes(name)) {
             toolHistory.addCall(name, args, result, duration);
         }
 
@@ -1560,6 +1563,7 @@ async function handleCallToolRequest(request: CallToolRequest): Promise<ServerRe
             await usageTracker.trackSuccess(name);
             console.log(`[FEEDBACK DEBUG] Tool ${name} succeeded, checking feedback...`);
 
+            if (!currentCallIsRemote && !isRemoteClientContext(currentClient.name)) {
             // Check if should show onboarding (before feedback - first-time users are priority)
             const shouldShowOnboarding = await usageTracker.shouldShowOnboarding();
             console.log(`[ONBOARDING DEBUG] Should show onboarding: ${shouldShowOnboarding}`);
@@ -1639,6 +1643,7 @@ async function handleCallToolRequest(request: CallToolRequest): Promise<ServerRe
 
             // Check if should prompt about Docker environment
             result = await processDockerPrompt(result, name);
+            }
         }
 
         // If the caller sent parameters this tool does not support, Zod silently

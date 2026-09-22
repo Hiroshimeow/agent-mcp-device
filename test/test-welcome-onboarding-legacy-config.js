@@ -64,7 +64,13 @@ class ExistingConfigClaudeCodeMigrationTest {
           stdout = stdout.slice(newline + 1);
           try {
             const message = JSON.parse(line);
-            if (message.id === 1) finish();
+            if (message.id === 1) {
+              // MCP SDK may flush the initialize response before filesystem
+              // side effects from the same initialization turn are visible to
+              // the parent process on Windows. Give the awaited config write a
+              // short grace period before terminating the child.
+              setTimeout(() => finish(), 250);
+            }
           } catch {
             // Ignore non-protocol output.
           }

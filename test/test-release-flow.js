@@ -47,7 +47,7 @@ function createFixture({ testsPass = true } = {}) {
     type: 'module',
     scripts: {
       test: 'node test-script.js',
-      version: 'node scripts/sync-version.js && git add server.json src/version.ts package-lock.json'
+      version: 'node scripts/sync-version.js && git add src/version.ts package-lock.json'
     }
   });
   writeJson(path.join(repo, 'package-lock.json'), {
@@ -155,7 +155,7 @@ function assertVersionUnchanged(dir) {
     assert.equal(pkg.version, '1.2.4');
     assert.equal(lock.version, '1.2.4');
     assert.equal(lock.packages[''].version, '1.2.4');
-    assert.equal(server.version, '1.2.4');
+    assert.equal(server.version, '1.2.3', 'release must not rewrite vendored upstream server.json');
     assert.match(versionTs, /VERSION = '1\.2\.4'/);
     assert.equal(git(f.repo, 'log', '-1', '--pretty=%s'), 'release: v1.2.4');
     assert.equal(git(f.repo, 'tag', '--points-at', 'HEAD'), 'v1.2.4');
