@@ -306,7 +306,7 @@ export class GatewayDeviceChannel {
         if (message.type !== 'tool_call') return;
         if (this.connectionEpoch === undefined || this.authenticatedDeviceId === undefined) throw new Error('Gateway tool_call arrived before authentication');
         if (String(message.connection_epoch) !== String(this.connectionEpoch)) throw new Error('Gateway tool_call connection_epoch mismatch');
-        await this.handleToolCall(message);
+        this.dispatchToolCall(message);
     }
 
     async logoutAccount(timeoutMs = 5000): Promise<any> {
@@ -442,28 +442,43 @@ export class GatewayDeviceChannel {
         }
     }
 
+    private dispatchToolCall(message: any): void {
+        void this.handleToolCall(message).catch(error => {
+            if (!this.shuttingDown) this.fail(error instanceof Error ? error : new Error(String(error)));
+        });
+    }
+
     private async handleToolCall(message: any): Promise<void> {
         if (this.connectionEpoch === undefined || !this.authenticatedDeviceId) throw new Error('Gateway tool_call arrived before authentication');
         const requestId = String(message.request_id || '');
         const tool = String(message.payload?.tool || '');
+        const deviceId = this.authenticatedDeviceId;
+        const connectionEpoch = this.connectionEpoch;
+        const socket = this.socket;
+        const connectionIsCurrent = () => Boolean(
+            socket && socket.readyState === WebSocket.OPEN && this.socket === socket &&
+            this.authenticatedDeviceId === deviceId && String(this.connectionEpoch) === String(connectionEpoch)
+        );
         try {
             const result = await this.options.adapter.call(tool, message.payload?.arguments || {});
+            if (!connectionIsCurrent()) return;
             this.send({
                 protocol_version: this.protocolVersion,
                 type: 'tool_result',
                 request_id: requestId,
-                device_id: this.authenticatedDeviceId,
-                connection_epoch: this.connectionEpoch,
+                device_id: deviceId,
+                connection_epoch: connectionEpoch,
                 timestamp: Date.now(),
                 payload: result
             });
         } catch (error: any) {
+            if (!connectionIsCurrent()) return;
             this.send({
                 protocol_version: this.protocolVersion,
                 type: 'tool_error',
                 request_id: requestId,
-                device_id: this.authenticatedDeviceId,
-                connection_epoch: this.connectionEpoch,
+                device_id: deviceId,
+                connection_epoch: connectionEpoch,
                 timestamp: Date.now(),
                 payload: {
                     message: String(error?.message || error),

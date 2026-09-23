@@ -686,6 +686,58 @@ async function testChannelEnrollmentToolAndReconnect() {
 }
 
 
+async function testParallelToolCallsDoNotHeadOfLineBlock() {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-gateway-parallel-tools-'));
+  const identity = new GatewayDeviceIdentity(path.join(root, 'identity.json'));
+  let releaseSlow;
+  const slowGate = new Promise(resolve => { releaseSlow = resolve; });
+  let slowStarted = false;
+  let fastStarted = false;
+  const results = [];
+  const adapter = {
+    async call(tool, args) {
+      assert.equal(tool, 'read_text_file');
+      if (args.lane === 'slow') {
+        slowStarted = true;
+        await slowGate;
+        return { content: [{ type: 'text', text: 'slow-result' }] };
+      }
+      fastStarted = true;
+      return { content: [{ type: 'text', text: 'fast-result' }] };
+    }
+  };
+  const wss = new WebSocketServer({ port: 0 });
+  await new Promise(resolve => wss.once('listening', resolve));
+  const address = wss.address();
+  const port = typeof address === 'object' && address ? address.port : 0;
+
+  wss.on('connection', ws => ws.on('message', raw => {
+    const message = JSON.parse(raw.toString());
+    if (message.type === 'enroll_hello') {
+      ws.send(JSON.stringify({ protocol_version: 1, type: 'auth_challenge', device_id: message.device_id, payload: { nonce: 'parallel-tools' } }));
+      return;
+    }
+    if (message.type === 'auth_response') {
+      ws.send(JSON.stringify({ protocol_version: 1, type: 'auth_ok', device_id: message.device_id, connection_epoch: 1, payload: { accepted: true } }));
+      ws.send(JSON.stringify({ protocol_version: 1, type: 'tool_call', request_id: 'slow-1', device_id: message.device_id, connection_epoch: 1, payload: { tool: 'read_text_file', arguments: { lane: 'slow' } } }));
+      ws.send(JSON.stringify({ protocol_version: 1, type: 'tool_call', request_id: 'fast-1', device_id: message.device_id, connection_epoch: 1, payload: { tool: 'read_text_file', arguments: { lane: 'fast' } } }));
+      return;
+    }
+    if (message.type === 'tool_result') results.push(message.request_id);
+  }));
+
+  const channel = new GatewayDeviceChannel({ gatewayUrl: `ws://127.0.0.1:${port}/device`, enrollmentToken: 'enroll-once', identity, adapter, agentVersion: 'test' });
+  await channel.start();
+  await waitFor(() => slowStarted && fastStarted, 1000);
+  await waitFor(() => results.includes('fast-1'), 1000);
+  assert.equal(results.includes('slow-1'), false);
+  releaseSlow();
+  await waitFor(() => results.includes('slow-1'), 1000);
+  await channel.stop();
+  await new Promise(resolve => wss.close(resolve));
+  await fs.rm(root, { recursive: true, force: true });
+}
+
 async function testRejectsMismatchedAuthDevice() {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-gateway-auth-device-'));
   const identity = new GatewayDeviceIdentity(path.join(root, 'identity.json'));
@@ -917,6 +969,7 @@ await testFloorTwoNeverFallsBackWhenV2SubprotocolIsNotSelected();
 await testOperatorPreEnrolledIdentityUsesAuthHello();
 await testNotReadyRuntimeIsAdvertisedOnHello();
 await testChannelEnrollmentToolAndReconnect();
+await testParallelToolCallsDoNotHeadOfLineBlock();
 await testRejectsMismatchedAuthDevice();
 await testRejectsStaleToolEpochAndReconnects();
 await testForgottenDeviceInitialAuthIsClassified();
