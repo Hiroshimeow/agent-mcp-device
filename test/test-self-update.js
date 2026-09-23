@@ -16,6 +16,7 @@ import {
   readDeviceUpdateState,
   reconcileDeviceUpdateAfterStart,
   resolveNpmCliPath,
+  findCurrentPackageRoot,
   retireDeviceUpdateState,
   signalDeviceUpdateHandoff
 } from '../dist/device/self-update.js';
@@ -66,6 +67,27 @@ async function testUnixNpmCliSymlinkResolution() {
   await fs.rm(home, { recursive: true, force: true });
   if (previousNpmExecPath === undefined) delete process.env.npm_execpath;
   else process.env.npm_execpath = previousNpmExecPath;
+}
+
+async function testPackageRootSymlinkEntrypointResolution() {
+  if (process.platform === 'win32') return;
+  const home = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-package-root-'));
+  const packageRoot = path.join(home, 'lib', 'node_modules', '@hcu-lab.me', 'mcp-device');
+  const entrypoint = path.join(packageRoot, 'dist', 'mcp-device.js');
+  const binDir = path.join(home, 'bin');
+  const symlink = path.join(binDir, 'mcp-device');
+  await fs.mkdir(path.dirname(entrypoint), { recursive: true });
+  await fs.mkdir(binDir, { recursive: true });
+  await fs.writeFile(path.join(packageRoot, 'package.json'), JSON.stringify({ name: MCP_DEVICE_PACKAGE, version: '1.0.7' }));
+  await fs.writeFile(entrypoint, '#!/usr/bin/env node\n');
+  await fs.symlink(entrypoint, symlink);
+
+  assert.equal(
+    await findCurrentPackageRoot(symlink),
+    packageRoot,
+    'self-update must resolve a global-bin symlink before walking to the installed package root'
+  );
+  await fs.rm(home, { recursive: true, force: true });
 }
 
 async function testPreparedUpdateContract() {
@@ -685,6 +707,7 @@ async function testPersistedUpdateStateRecovery() {
 }
 
 await testUnixNpmCliSymlinkResolution();
+await testPackageRootSymlinkEntrypointResolution();
 await testPreparedUpdateContract();
 await testLifecycleScopedLaunchers();
 await testHelperRefusesLiveRuntimeOwner();

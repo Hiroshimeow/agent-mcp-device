@@ -366,7 +366,9 @@ async function runNpm(
 }
 
 export async function findCurrentPackageRoot(entrypoint = process.argv[1]): Promise<string> {
-    let current = path.resolve(path.dirname(entrypoint || process.execPath));
+    const resolvedEntrypoint = path.resolve(entrypoint || process.execPath);
+    const canonicalEntrypoint = await fs.realpath(resolvedEntrypoint).catch(() => resolvedEntrypoint);
+    let current = path.dirname(canonicalEntrypoint);
     for (let i = 0; i < 8; i++) {
         const manifest = path.join(current, 'package.json');
         if (await exists(manifest)) {
