@@ -1,6 +1,6 @@
 # MCP Device v1.0.9 benchmark baseline
 
-Generated: 2026-10-02T01:24:50.462Z
+Generated: 2026-10-02T01:38:00.717Z
 
 This report is generated from raw JSONL. Timings are descriptive baseline evidence, not absolute pass/fail thresholds.
 Cross-host Windows/Linux timing differences are not interpreted as implementation improvements because hardware and Node versions differ.
@@ -8,6 +8,7 @@ Cross-host Windows/Linux timing differences are not interpreted as implementatio
 ## Result sets
 
 - **g6-win32**: baseline `ee87d0f3057e01e8087db99615d14bd1b4c626d4`, harness `df35db2c5c97017eaded61ef6739d919bd937dd9`, package `1.0.9`, win32/x64, Node v22.22.2, npm 11.17.0, samples 557, invalid measured 50.
+- **g8-linux**: baseline `ee87d0f3057e01e8087db99615d14bd1b4c626d4`, harness `5c4710aa06871ee8f4e79a0b21d12349d9bd0eb9`, package `1.0.9`, linux/x64, Node v24.18.0, npm 11.16.0, samples 557, invalid measured 0.
 
 ## g6-win32
 
@@ -47,6 +48,41 @@ Cross-host Windows/Linux timing differences are not interpreted as implementatio
 - Completed-session repeated `offset=0` retained-output observation: median 1, p95 1, max 1.
 - Windows process termination left benchmark-owned child processes after the MCP session disappeared in at least one measured sample. The harness recorded the sample invalid, then killed only children whose command line contained the isolated benchmark fixture root.
 
+## g8-linux
+
+| Scenario | Samples valid/total | Elapsed ms | Response bytes | CPU user us | RSS peak bytes |
+|---|---:|---|---|---|---|
+| edit.expected_count_mismatch | 25/25 | median 6.89, p95 8.26, max 95.71 | median 558, p95 559, max 559 | NOT_MEASURED | NOT_MEASURED |
+| edit.multiple_exact | 25/25 | median 4.04, p95 7.56, max 9.65 | median 989, p95 989, max 989 | NOT_MEASURED | NOT_MEASURED |
+| edit.multiple_exact.resource | 2/2 | median 12.44, p95 13.00, max 13.00 | median 989, p95 989, max 989 | median 7732, p95 15463, max 15463 | median 377217024, p95 389267456, max 389267456 |
+| edit.small_exact | 25/25 | median 4.17, p95 7.26, max 7.38 | median 991, p95 991, max 991 | NOT_MEASURED | NOT_MEASURED |
+| files.read_large_response | 25/25 | median 13.56, p95 19.99, max 21.13 | median 1060335, p95 1060335, max 1060335 | NOT_MEASURED | NOT_MEASURED |
+| files.read_large_window_tail | 25/25 | median 1.57, p95 2.31, max 2.80 | median 18052, p95 18052, max 18052 | NOT_MEASURED | NOT_MEASURED |
+| files.read_large_window_tail.resource | 2/2 | median 2.71, p95 2.90, max 2.90 | median 18052, p95 18052, max 18052 | median 1239, p95 2478, max 2478 | median 377217024, p95 389267456, max 389267456 |
+| files.read_medium_window | 25/25 | median 2.49, p95 4.77, max 6.48 | median 9212, p95 9212, max 9212 | NOT_MEASURED | NOT_MEASURED |
+| files.read_multiple | 25/25 | median 1.46, p95 8.84, max 10.32 | median 17641, p95 140847, max 140847 | NOT_MEASURED | NOT_MEASURED |
+| files.read_small | 25/25 | median 0.99, p95 1.44, max 2.40 | median 4245, p95 4245, max 4245 | NOT_MEASURED | NOT_MEASURED |
+| process.absolute_and_tail | 25/25 | median 28.16, p95 30.67, max 35.52 | median 741, p95 741, max 741 | NOT_MEASURED | NOT_MEASURED |
+| process.background_and_no_output | 25/25 | median 354.26, p95 363.17, max 368.16 | median 507, p95 507, max 507 | NOT_MEASURED | NOT_MEASURED |
+| process.completed_repeat_offset0 | 25/25 | median 27.85, p95 30.56, max 31.89 | median 451, p95 451, max 451 | NOT_MEASURED | NOT_MEASURED |
+| process.concurrent_sessions | 25/25 | median 338.97, p95 483.82, max 504.50 | median 3053, p95 12605, max 15830 | NOT_MEASURED | NOT_MEASURED |
+| process.incremental_offset0 | 25/25 | median 1146.07, p95 1149.13, max 1149.24 | median 725, p95 725, max 725 | NOT_MEASURED | NOT_MEASURED |
+| process.large_stdout_stderr | 25/25 | median 52.26, p95 205.51, max 207.49 | median 770388, p95 5520038, max 5524889 | NOT_MEASURED | NOT_MEASURED |
+| process.large_stdout_stderr.resource | 2/2 | median 126.23, p95 199.31, max 199.31 | median 3145213, p95 5520038, max 5520038 | median 29622, p95 59243, max 59243 | median 374398976, p95 389267456, max 389267456 |
+| process.short_completed | 25/25 | median 26.07, p95 29.72, max 29.84 | median 130, p95 130, max 130 | NOT_MEASURED | NOT_MEASURED |
+| search.content_dense | 25/25 | median 41.81, p95 47.37, max 47.42 | median 85458, p95 87096, max 87239 | NOT_MEASURED | NOT_MEASURED |
+| search.content_sparse | 25/25 | median 40.88, p95 42.36, max 42.93 | median 13708, p95 15307, max 15895 | NOT_MEASURED | NOT_MEASURED |
+| search.filename_hit | 25/25 | median 6.88, p95 8.47, max 9.84 | median 2447, p95 4053, max 4199 | NOT_MEASURED | NOT_MEASURED |
+| search.filename_miss | 25/25 | median 48.47, p95 50.00, max 50.58 | median 5358, p95 6942, max 7086 | NOT_MEASURED | NOT_MEASURED |
+
+### Correctness / invalid evidence
+
+- No measured sample was invalid.
+
+### Observed baseline behavior
+
+- Completed-session repeated `offset=0` retained-output observation: median 1, p95 1, max 1.
+
 ## Baseline semantics and falsification notes
 
 - Completed-session repeated `offset=0` reads are benchmarked as the observed v1.0.9 behavior; repeated retained output is not treated as a harness failure.
@@ -62,23 +98,32 @@ Cross-host Windows/Linux timing differences are not interpreted as implementatio
 - Search and read_multiple_files are not exposed by the current remote @md surface; Linux source runs must exercise them through the real stdio MCP server.
 - Cross-host g6 versus g8 absolute timing is descriptive only.
 
-## DEV execution evidence
-
-Canonical Windows commands actually run:
-
-```text
-node bench/run.mjs --profile standard --out bench/results/v1.0.9/g6-win32 --host g6-win32
-node bench/run.mjs --profile stress --out bench/results/v1.0.9/g6-win32 --host g6-win32
-```
-
-- Standard profile: 3 warmups + 20 measured iterations per scenario; 440 raw records including 3 separate resource-instrumented samples; 383 measured records; 40 measured invalid, all from process child-leak assertions.
-- Stress profile: 1 warmup + 5 measured iterations per scenario; 117 raw records including 3 separate resource-instrumented samples; 98 measured records; 10 measured invalid, all from process child-leak assertions.
-- Mixed stdout/stderr completeness passed on all final measured samples using marker set/count assertions; ordering across stdout/stderr is intentionally not assumed.
-- Benchmark-owned cleanup left 0 fixture child processes after the final standard and stress runs.
-- Existing terminal flood guard passed: 576 MB emitted, 49.0 MB retained under the 50 MB cap, maximum event-loop stall 21 ms.
-- Existing edit performance guard passed: parallel workflow total 7049 ms; 150 markdown same-file edits 6152 ms; 150 Python same-file edits 6242 ms; fuzzy event-loop scan 10937 ms with 6 ms max ping latency.
-- `npm test` was run and was **not green**: 60/63 passed. Failures were `test-green-hardening.js` (Windows temp cleanup EBUSY), `test-linux-device-service.js` (Windows-path escaping assertion in the Linux service fixture), and `test-self-update.js` (assertion at test-self-update.js:313, actual 1 vs expected 0). These failures are retained as unresolved baseline guard evidence; the benchmark lane did not modify production sources to hide or repair them.
-
 ## Reproduction
 
 See `bench/README.md`. Each result directory contains `raw.jsonl` and `summary.json`; profile-specific raw files are retained alongside the consolidated raw file.
+
+## Actual @md remote evidence — g8 v1.0.9
+
+TEST ran one isolated supported-surface matrix against device `hp450-79844b90` after fixture setup and bracketed it with device usage snapshots. Expected and observed tool-call delta were both 8; success delta was 8, failure delta 0, request bytes +2440, response bytes +14467. Small/large bounded reads, exact edit, dry-run occurrence count, incremental process reads, no-new-output, termination, and post-termination process absence all satisfied their assertions.
+
+Actual @md end-to-end latency remains **NOT_MEASURED** because the connector exposes no trustworthy per-call elapsed field. Remote CPU/RSS remains **NOT_MEASURED**. Remote `search` and `read_multiple_files` are **NOT_MEASURED** because they are not exposed by the current remote surface. Raw evidence: `bench/results/v1.0.9/g8-md-remote/raw.jsonl`.
+
+## TEST verification commands and outcomes
+
+Linux source checkout: `/tmp/mcp-device-110-bench-test-714a38a4` at harness revision `5c4710aa06871ee8f4e79a0b21d12349d9bd0eb9`; baseline under test `ee87d0f3057e01e8087db99615d14bd1b4c626d4`; Node v24.18.0; npm 11.16.0; installed remote package `@hcu-lab.me/mcp-device@1.0.9`.
+
+Canonical Linux commands executed:
+
+```text
+npm ci
+npm run build
+node bench/run.mjs --profile standard --out bench/results/v1.0.9/g8-linux --host g8-linux
+node bench/run.mjs --profile stress --out bench/results/v1.0.9/g8-linux --host g8-linux
+node bench/run.mjs --out bench/results/v1.0.9/g8-linux --summarize-only
+```
+
+Linux result counts: standard 440 raw records with 383 measured and 0 invalid measured; stress 117 raw records with 98 measured and 0 invalid measured; consolidated 557 raw records / 481 measured / 0 invalid measured.
+
+Fresh Linux guard commands also executed and passed: `node bench/test/core.test.mjs`, `node test/test-process-pagination.js`, `node test/test-read-completed-process.js`, `node test/test-file-handlers.js`, `node test/test-search-code.js`, `node test/integration/terminal-output-buffer-leak.js`, `node test/integration/edit-block-performance.js`, and `npm test`. Linux `npm test` result: 63/63 passed. The terminal buffer guard emitted 576 MB and retained 49.0 MB under the 50 MB cap; maximum observed event-loop stall was 3 ms.
+
+Windows evidence remains the committed g6 baseline: standard/stress combined 557 raw / 481 measured / 50 invalid measured, all invalid measured records attributed to the reproduced process-lifetime leak cases documented above. The prior Windows `npm test` result remained 60/63 with three pre-existing/out-of-scope failures; this TEST turn did not reinterpret those failures as PASS.

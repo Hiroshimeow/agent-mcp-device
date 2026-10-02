@@ -1,0 +1,989 @@
+{
+  "schema_version": 1,
+  "benchmark_suite_version": "1.0.0",
+  "generated_at": "2026-10-02T01:38:00.714Z",
+  "raw_path": "/tmp/mcp-device-110-bench-test-714a38a4/bench/results/v1.0.9/g8-linux/raw.jsonl",
+  "sample_count": 557,
+  "measured_count": 481,
+  "invalid_count": 0,
+  "environments": [
+    {
+      "host_label": "g8-linux",
+      "platform": "linux",
+      "arch": "x64",
+      "node_version": "v24.18.0",
+      "npm_version": "11.16.0",
+      "cpu_model": "11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz",
+      "cpu_count": 8,
+      "total_memory_bytes": 33252212736,
+      "baseline_commit": "ee87d0f3057e01e8087db99615d14bd1b4c626d4",
+      "harness_commit": "5c4710aa06871ee8f4e79a0b21d12349d9bd0eb9",
+      "package_version": "1.0.9",
+      "git_dirty": false
+    },
+    {
+      "host_label": "g8-linux",
+      "platform": "linux",
+      "arch": "x64",
+      "node_version": "v24.18.0",
+      "npm_version": "11.16.0",
+      "cpu_model": "11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz",
+      "cpu_count": 8,
+      "total_memory_bytes": 33252212736,
+      "baseline_commit": "ee87d0f3057e01e8087db99615d14bd1b4c626d4",
+      "harness_commit": "5c4710aa06871ee8f4e79a0b21d12349d9bd0eb9",
+      "package_version": "1.0.9",
+      "git_dirty": true
+    }
+  ],
+  "scenarios": {
+    "edit.expected_count_mismatch": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 2.6471930000043358,
+        "median": 6.88853399999789,
+        "p95": 8.258782999997493,
+        "max": 95.70741399999679
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 558,
+        "median": 558,
+        "p95": 559,
+        "max": 559
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "file_bytes": {
+          "count": 25,
+          "min": 524347,
+          "median": 524347,
+          "p95": 524347,
+          "max": 524347
+        }
+      },
+      "invalid_reasons": []
+    },
+    "edit.multiple_exact": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 3.6320380000033765,
+        "median": 4.042889999996987,
+        "p95": 7.561515000001236,
+        "max": 9.649524000000383
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 989,
+        "median": 989,
+        "p95": 989,
+        "max": 989
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "file_bytes": {
+          "count": 25,
+          "min": 524341,
+          "median": 524341,
+          "p95": 524341,
+          "max": 524341
+        }
+      },
+      "invalid_reasons": []
+    },
+    "edit.multiple_exact.resource": {
+      "warmup_count": 0,
+      "measured_count": 2,
+      "valid_count": 2,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 2,
+        "min": 11.876409999997122,
+        "median": 12.436945999997988,
+        "p95": 12.997481999998854,
+        "max": 12.997481999998854
+      },
+      "response_bytes": {
+        "count": 2,
+        "min": 989,
+        "median": 989,
+        "p95": 989,
+        "max": 989
+      },
+      "cpu_user_us": {
+        "count": 2,
+        "min": 0,
+        "median": 7731.5,
+        "p95": 15463,
+        "max": 15463
+      },
+      "cpu_system_us": {
+        "count": 2,
+        "min": 0,
+        "median": 3106.5,
+        "p95": 6213,
+        "max": 6213
+      },
+      "rss_peak_bytes": {
+        "count": 2,
+        "min": 365166592,
+        "median": 377217024,
+        "p95": 389267456,
+        "max": 389267456
+      },
+      "metrics": {
+        "file_bytes": {
+          "count": 2,
+          "min": 524341,
+          "median": 524341,
+          "p95": 524341,
+          "max": 524341
+        }
+      },
+      "invalid_reasons": []
+    },
+    "edit.small_exact": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 3.5822249999982887,
+        "median": 4.16812100000061,
+        "p95": 7.261235999998462,
+        "max": 7.37660699999833
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 991,
+        "median": 991,
+        "p95": 991,
+        "max": 991
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "file_bytes": {
+          "count": 25,
+          "min": 524346,
+          "median": 524346,
+          "p95": 524346,
+          "max": 524346
+        }
+      },
+      "invalid_reasons": []
+    },
+    "files.read_large_response": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 12.400176999995892,
+        "median": 13.560889000000316,
+        "p95": 19.992505999995046,
+        "max": 21.130169000000024
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 1060335,
+        "median": 1060335,
+        "p95": 1060335,
+        "max": 1060335
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "returned_bytes": {
+          "count": 25,
+          "min": 1048576,
+          "median": 1048576,
+          "p95": 1048576,
+          "max": 1048576
+        }
+      },
+      "invalid_reasons": []
+    },
+    "files.read_large_window_tail": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 1.3981870000061463,
+        "median": 1.5664289999986067,
+        "p95": 2.3093170000011014,
+        "max": 2.802625000000262
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 18052,
+        "median": 18052,
+        "p95": 18052,
+        "max": 18052
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "file_bytes": {
+          "count": 25,
+          "min": 16777216,
+          "median": 16777216,
+          "p95": 16777216,
+          "max": 16777216
+        },
+        "head_bytes": {
+          "count": 25,
+          "min": 8931,
+          "median": 8931,
+          "p95": 8931,
+          "max": 8931
+        },
+        "tail_bytes": {
+          "count": 25,
+          "min": 8841,
+          "median": 8841,
+          "p95": 8841,
+          "max": 8841
+        }
+      },
+      "invalid_reasons": []
+    },
+    "files.read_large_window_tail.resource": {
+      "warmup_count": 0,
+      "measured_count": 2,
+      "valid_count": 2,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 2,
+        "min": 2.5197490000009566,
+        "median": 2.708047000000988,
+        "p95": 2.89634500000102,
+        "max": 2.89634500000102
+      },
+      "response_bytes": {
+        "count": 2,
+        "min": 18052,
+        "median": 18052,
+        "p95": 18052,
+        "max": 18052
+      },
+      "cpu_user_us": {
+        "count": 2,
+        "min": 0,
+        "median": 1239,
+        "p95": 2478,
+        "max": 2478
+      },
+      "cpu_system_us": {
+        "count": 2,
+        "min": 0,
+        "median": 4.5,
+        "p95": 9,
+        "max": 9
+      },
+      "rss_peak_bytes": {
+        "count": 2,
+        "min": 365166592,
+        "median": 377217024,
+        "p95": 389267456,
+        "max": 389267456
+      },
+      "metrics": {
+        "file_bytes": {
+          "count": 2,
+          "min": 16777216,
+          "median": 16777216,
+          "p95": 16777216,
+          "max": 16777216
+        },
+        "head_bytes": {
+          "count": 2,
+          "min": 8931,
+          "median": 8931,
+          "p95": 8931,
+          "max": 8931
+        },
+        "tail_bytes": {
+          "count": 2,
+          "min": 8841,
+          "median": 8841,
+          "p95": 8841,
+          "max": 8841
+        }
+      },
+      "invalid_reasons": []
+    },
+    "files.read_medium_window": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 2.1304229999987,
+        "median": 2.4909019999977318,
+        "p95": 4.765974999994796,
+        "max": 6.479105999998865
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 9212,
+        "median": 9212,
+        "p95": 9212,
+        "max": 9212
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "file_bytes": {
+          "count": 25,
+          "min": 1048576,
+          "median": 1048576,
+          "p95": 1048576,
+          "max": 1048576
+        },
+        "returned_bytes": {
+          "count": 25,
+          "min": 9072,
+          "median": 9072,
+          "p95": 9072,
+          "max": 9072
+        }
+      },
+      "invalid_reasons": []
+    },
+    "files.read_multiple": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 1.277298000000883,
+        "median": 1.4636450000034529,
+        "p95": 8.83662799999911,
+        "max": 10.315961000000243
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 17641,
+        "median": 17641,
+        "p95": 140847,
+        "max": 140847
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "fanout": {
+          "count": 25,
+          "min": 4,
+          "median": 4,
+          "p95": 32,
+          "max": 32
+        }
+      },
+      "invalid_reasons": []
+    },
+    "files.read_small": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 0.8558889999985695,
+        "median": 0.989676999997755,
+        "p95": 1.444855000001553,
+        "max": 2.396632000003592
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 4245,
+        "median": 4245,
+        "p95": 4245,
+        "max": 4245
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "file_bytes": {
+          "count": 25,
+          "min": 4096,
+          "median": 4096,
+          "p95": 4096,
+          "max": 4096
+        }
+      },
+      "invalid_reasons": []
+    },
+    "process.absolute_and_tail": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 25.382792000000336,
+        "median": 28.1616869999998,
+        "p95": 30.670498000003136,
+        "max": 35.52290400000038
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 741,
+        "median": 741,
+        "p95": 741,
+        "max": 741
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "absolute_bytes": {
+          "count": 25,
+          "min": 145,
+          "median": 145,
+          "p95": 145,
+          "max": 145
+        },
+        "tail_bytes": {
+          "count": 25,
+          "min": 112,
+          "median": 112,
+          "p95": 112,
+          "max": 112
+        }
+      },
+      "invalid_reasons": []
+    },
+    "process.background_and_no_output": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 305.18938999999955,
+        "median": 354.2614239999966,
+        "p95": 363.1662000000015,
+        "max": 368.15604299999904
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 428,
+        "median": 507,
+        "p95": 507,
+        "max": 507
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "idle_response_bytes": {
+          "count": 25,
+          "min": 49,
+          "median": 49,
+          "p95": 49,
+          "max": 49
+        },
+        "no_new_output_read_ms": {
+          "count": 25,
+          "min": 0,
+          "median": 2,
+          "p95": 2,
+          "max": 2
+        },
+        "start_return_ms": {
+          "count": 25,
+          "min": 103,
+          "median": 104,
+          "p95": 105,
+          "max": 105
+        }
+      },
+      "invalid_reasons": []
+    },
+    "process.completed_repeat_offset0": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 25.868201000001136,
+        "median": 27.850350000000617,
+        "p95": 30.55721799999992,
+        "max": 31.887716999997792
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 451,
+        "median": 451,
+        "p95": 451,
+        "max": 451
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "first_contains_marker": {
+          "count": 25,
+          "min": 1,
+          "median": 1,
+          "p95": 1,
+          "max": 1
+        },
+        "repeated_retained_output": {
+          "count": 25,
+          "min": 1,
+          "median": 1,
+          "p95": 1,
+          "max": 1
+        },
+        "second_contains_marker": {
+          "count": 25,
+          "min": 1,
+          "median": 1,
+          "p95": 1,
+          "max": 1
+        }
+      },
+      "invalid_reasons": []
+    },
+    "process.concurrent_sessions": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 284.700033000001,
+        "median": 338.9667879999979,
+        "p95": 483.8217430000004,
+        "max": 504.5011709999999
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 2766,
+        "median": 3053,
+        "p95": 12605,
+        "max": 15830
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "concurrent_sessions": {
+          "count": 25,
+          "min": 8,
+          "median": 8,
+          "p95": 32,
+          "max": 32
+        }
+      },
+      "invalid_reasons": []
+    },
+    "process.incremental_offset0": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 1091.0520629999992,
+        "median": 1146.0747819999997,
+        "p95": 1149.1332149999998,
+        "max": 1149.2368230000002
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 725,
+        "median": 725,
+        "p95": 725,
+        "max": 725
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "overlap_markers_start_vs_reads": {
+          "count": 25,
+          "min": 0,
+          "median": 0,
+          "p95": 0,
+          "max": 0
+        },
+        "read_calls": {
+          "count": 25,
+          "min": 4,
+          "median": 4,
+          "p95": 4,
+          "max": 4
+        }
+      },
+      "invalid_reasons": []
+    },
+    "process.large_stdout_stderr": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 45.822886999998445,
+        "median": 52.26444999999876,
+        "p95": 205.50770999999986,
+        "max": 207.48803299999963
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 770388,
+        "median": 770388,
+        "p95": 5520038,
+        "max": 5524889
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "approx_emitted_bytes": {
+          "count": 25,
+          "min": 380000,
+          "median": 380000,
+          "p95": 3800000,
+          "max": 3800000
+        },
+        "emitted_lines": {
+          "count": 25,
+          "min": 5000,
+          "median": 5000,
+          "p95": 50000,
+          "max": 50000
+        },
+        "retained_marker_count": {
+          "count": 25,
+          "min": 5000,
+          "median": 5000,
+          "p95": 50000,
+          "max": 50000
+        },
+        "retained_output_bytes": {
+          "count": 25,
+          "min": 380102,
+          "median": 380102,
+          "p95": 3800104,
+          "max": 3800104
+        }
+      },
+      "invalid_reasons": []
+    },
+    "process.large_stdout_stderr.resource": {
+      "warmup_count": 0,
+      "measured_count": 2,
+      "valid_count": 2,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 2,
+        "min": 53.141923999995925,
+        "median": 126.226338999998,
+        "p95": 199.3107540000001,
+        "max": 199.3107540000001
+      },
+      "response_bytes": {
+        "count": 2,
+        "min": 770388,
+        "median": 3145213,
+        "p95": 5520038,
+        "max": 5520038
+      },
+      "cpu_user_us": {
+        "count": 2,
+        "min": 0,
+        "median": 29621.5,
+        "p95": 59243,
+        "max": 59243
+      },
+      "cpu_system_us": {
+        "count": 2,
+        "min": 0,
+        "median": 14325,
+        "p95": 28650,
+        "max": 28650
+      },
+      "rss_peak_bytes": {
+        "count": 2,
+        "min": 359530496,
+        "median": 374398976,
+        "p95": 389267456,
+        "max": 389267456
+      },
+      "metrics": {
+        "approx_emitted_bytes": {
+          "count": 2,
+          "min": 380000,
+          "median": 2090000,
+          "p95": 3800000,
+          "max": 3800000
+        },
+        "emitted_lines": {
+          "count": 2,
+          "min": 5000,
+          "median": 27500,
+          "p95": 50000,
+          "max": 50000
+        },
+        "retained_marker_count": {
+          "count": 2,
+          "min": 5000,
+          "median": 27500,
+          "p95": 50000,
+          "max": 50000
+        },
+        "retained_output_bytes": {
+          "count": 2,
+          "min": 380102,
+          "median": 2090103,
+          "p95": 3800104,
+          "max": 3800104
+        }
+      },
+      "invalid_reasons": []
+    },
+    "process.short_completed": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 24.664773999999852,
+        "median": 26.07183800000007,
+        "p95": 29.720844999999827,
+        "max": 29.84217600000011
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 130,
+        "median": 130,
+        "p95": 130,
+        "max": 130
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "initial_output_bytes": {
+          "count": 25,
+          "min": 88,
+          "median": 88,
+          "p95": 88,
+          "max": 88
+        }
+      },
+      "invalid_reasons": []
+    },
+    "search.content_dense": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 33.91638600000442,
+        "median": 41.813122999999905,
+        "p95": 47.36831699999857,
+        "max": 47.423603999999614
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 76468,
+        "median": 85458,
+        "p95": 87096,
+        "max": 87239
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "completion_ms": {
+          "count": 25,
+          "min": 27,
+          "median": 30,
+          "p95": 32,
+          "max": 32
+        },
+        "first_results_ms": {
+          "count": 25,
+          "min": 1,
+          "median": 3,
+          "p95": 4,
+          "max": 5
+        },
+        "start_call_ms": {
+          "count": 25,
+          "min": 5,
+          "median": 9,
+          "p95": 14,
+          "max": 15
+        }
+      },
+      "invalid_reasons": []
+    },
+    "search.content_sparse": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 32.88465699999506,
+        "median": 40.88361799999984,
+        "p95": 42.35566799999651,
+        "max": 42.92786299999716
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 6822,
+        "median": 13708,
+        "p95": 15307,
+        "max": 15895
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "completion_ms": {
+          "count": 25,
+          "min": 26,
+          "median": 28,
+          "p95": 28,
+          "max": 28
+        },
+        "first_results_ms": {
+          "count": 25,
+          "min": 0,
+          "median": 1,
+          "p95": 2,
+          "max": 2
+        },
+        "start_call_ms": {
+          "count": 25,
+          "min": 5,
+          "median": 11,
+          "p95": 13,
+          "max": 13
+        }
+      },
+      "invalid_reasons": []
+    },
+    "search.filename_hit": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 6.575120999994397,
+        "median": 6.875077999997302,
+        "p95": 8.468473000000813,
+        "max": 9.842221000006248
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 1136,
+        "median": 2447,
+        "p95": 4053,
+        "max": 4199
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "completion_ms": {
+          "count": 25,
+          "min": 0,
+          "median": 0,
+          "p95": 1,
+          "max": 1
+        },
+        "first_results_ms": {
+          "count": 25,
+          "min": 0,
+          "median": 0,
+          "p95": 1,
+          "max": 1
+        },
+        "start_call_ms": {
+          "count": 25,
+          "min": 5,
+          "median": 6,
+          "p95": 7,
+          "max": 9
+        }
+      },
+      "invalid_reasons": []
+    },
+    "search.filename_miss": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 45.91497700000036,
+        "median": 48.46754399999918,
+        "p95": 49.99666199999956,
+        "max": 50.57717800000137
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 1578,
+        "median": 5358,
+        "p95": 6942,
+        "max": 7086
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "completion_ms": {
+          "count": 25,
+          "min": 44,
+          "median": 46,
+          "p95": 48,
+          "max": 48
+        },
+        "start_call_ms": {
+          "count": 25,
+          "min": 44,
+          "median": 46,
+          "p95": 48,
+          "max": 48
+        }
+      },
+      "invalid_reasons": []
+    }
+  }
+}
