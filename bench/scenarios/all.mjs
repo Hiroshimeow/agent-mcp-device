@@ -145,9 +145,18 @@ export function createScenarios({ fixtures, profile, projectRoot }) {
       try {
         const started = await call(client, 'start_process', { command: helperCommand(fixtures.procHelper, 'large', [lines]), timeout_ms: 3000, working_directory: fixtures.root }, { timeout: 120000 });
         pid = parsePid(textOf(started));
-        const tail = textOf(await call(client, 'read_process_output', { pid, offset: -100, length: 100, timeout_ms: 100 }, { timeout: 120000 }));
-        assertions.match('large output contains terminal marker', tail, new RegExp(`(?:OUT_|ERR_)${String(lines - 1).padStart(6, '0')}`));
-        return { metrics: { emitted_lines: lines, approx_emitted_bytes: lines * 76, tail_bytes: Buffer.byteLength(tail) } };
+        const sessionsAfterWait = await waitForPidGone(call, client, pid, 15000);
+        assertions.ok('large output process completed', !sessionsAfterWait.includes(`PID: ${pid}`), { expected: false, actual: sessionsAfterWait.includes(`PID: ${pid}`) });
+        const full = textOf(await call(client, 'read_process_output', { pid, offset: 0, length: lines + 1000, timeout_ms: 100 }, { timeout: 120000 }));
+        const markers = [...full.matchAll(/(OUT|ERR)_(\d{6})_/g)];
+        const indexes = new Set(markers.map((match) => Number(match[2])));
+        const stdoutCount = markers.filter((match) => match[1] === 'OUT').length;
+        const stderrCount = markers.filter((match) => match[1] === 'ERR').length;
+        assertions.equal('large output marker count', markers.length, lines);
+        assertions.equal('large output unique index count', indexes.size, lines);
+        assertions.equal('large stdout marker count', stdoutCount, Math.ceil(lines / 2));
+        assertions.equal('large stderr marker count', stderrCount, Math.floor(lines / 2));
+        return { metrics: { emitted_lines: lines, approx_emitted_bytes: lines * 76, retained_marker_count: markers.length, retained_output_bytes: Buffer.byteLength(full) } };
       } finally {
         await terminatePid(call, client, pid);
       }
