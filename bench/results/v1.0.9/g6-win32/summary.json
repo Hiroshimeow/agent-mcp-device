@@ -1,0 +1,987 @@
+{
+  "schema_version": 1,
+  "benchmark_suite_version": "1.0.0",
+  "generated_at": "2026-10-02T01:24:50.454Z",
+  "raw_path": "E:\\git-project\\wt-mcp-device-110-bench\\bench\\results\\v1.0.9\\g6-win32\\raw.jsonl",
+  "sample_count": 557,
+  "measured_count": 481,
+  "invalid_count": 50,
+  "environments": [
+    {
+      "host_label": "g6-win32",
+      "platform": "win32",
+      "arch": "x64",
+      "node_version": "v22.22.2",
+      "npm_version": "11.17.0",
+      "cpu_model": "Intel(R) Core(TM) Ultra 7 155H",
+      "cpu_count": 22,
+      "total_memory_bytes": 33945935872,
+      "baseline_commit": "ee87d0f3057e01e8087db99615d14bd1b4c626d4",
+      "harness_commit": "df35db2c5c97017eaded61ef6739d919bd937dd9",
+      "package_version": "1.0.9",
+      "git_dirty": false
+    },
+    {
+      "host_label": "g6-win32",
+      "platform": "win32",
+      "arch": "x64",
+      "node_version": "v22.22.2",
+      "npm_version": "11.17.0",
+      "cpu_model": "Intel(R) Core(TM) Ultra 7 155H",
+      "cpu_count": 22,
+      "total_memory_bytes": 33945935872,
+      "baseline_commit": "ee87d0f3057e01e8087db99615d14bd1b4c626d4",
+      "harness_commit": "df35db2c5c97017eaded61ef6739d919bd937dd9",
+      "package_version": "1.0.9",
+      "git_dirty": true
+    }
+  ],
+  "scenarios": {
+    "edit.expected_count_mismatch": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 10.12489999999525,
+        "median": 14.460899999947287,
+        "p95": 31.243699999991804,
+        "max": 31.589700000011362
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 594,
+        "median": 594,
+        "p95": 595,
+        "max": 595
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "file_bytes": {
+          "count": 25,
+          "min": 524347,
+          "median": 524347,
+          "p95": 524347,
+          "max": 524347
+        }
+      },
+      "invalid_reasons": []
+    },
+    "edit.multiple_exact": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 10.7333000000217,
+        "median": 14.351299999980256,
+        "p95": 25.894700000004377,
+        "max": 31.466199999995297
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 989,
+        "median": 989,
+        "p95": 989,
+        "max": 989
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "file_bytes": {
+          "count": 25,
+          "min": 524341,
+          "median": 524341,
+          "p95": 524341,
+          "max": 524341
+        }
+      },
+      "invalid_reasons": []
+    },
+    "edit.multiple_exact.resource": {
+      "warmup_count": 0,
+      "measured_count": 2,
+      "valid_count": 2,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 2,
+        "min": 78.55530000000726,
+        "median": 105.29960000001302,
+        "p95": 132.04390000001877,
+        "max": 132.04390000001877
+      },
+      "response_bytes": {
+        "count": 2,
+        "min": 989,
+        "median": 989,
+        "p95": 989,
+        "max": 989
+      },
+      "cpu_user_us": {
+        "count": 2,
+        "min": 0,
+        "median": 0,
+        "p95": 0,
+        "max": 0
+      },
+      "cpu_system_us": {
+        "count": 2,
+        "min": 0,
+        "median": 8000,
+        "p95": 16000,
+        "max": 16000
+      },
+      "rss_peak_bytes": {
+        "count": 2,
+        "min": 162320384,
+        "median": 173074432,
+        "p95": 183828480,
+        "max": 183828480
+      },
+      "metrics": {
+        "file_bytes": {
+          "count": 2,
+          "min": 524341,
+          "median": 524341,
+          "p95": 524341,
+          "max": 524341
+        }
+      },
+      "invalid_reasons": []
+    },
+    "edit.small_exact": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 10.682499999995343,
+        "median": 14.51420000003418,
+        "p95": 22.876699999993434,
+        "max": 23.904300000023795
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 991,
+        "median": 991,
+        "p95": 991,
+        "max": 991
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "file_bytes": {
+          "count": 25,
+          "min": 524346,
+          "median": 524346,
+          "p95": 524346,
+          "max": 524346
+        }
+      },
+      "invalid_reasons": []
+    },
+    "files.read_large_response": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 28.46779999998398,
+        "median": 36.8243000000366,
+        "p95": 64.15580000000773,
+        "max": 65.18570000000182
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 1060335,
+        "median": 1060335,
+        "p95": 1060335,
+        "max": 1060335
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "returned_bytes": {
+          "count": 25,
+          "min": 1048576,
+          "median": 1048576,
+          "p95": 1048576,
+          "max": 1048576
+        }
+      },
+      "invalid_reasons": []
+    },
+    "files.read_large_window_tail": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 7.817099999985658,
+        "median": 9.612000000022817,
+        "p95": 38.57850000000326,
+        "max": 46.00050000002375
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 18052,
+        "median": 18052,
+        "p95": 18052,
+        "max": 18052
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "file_bytes": {
+          "count": 25,
+          "min": 16777216,
+          "median": 16777216,
+          "p95": 16777216,
+          "max": 16777216
+        },
+        "head_bytes": {
+          "count": 25,
+          "min": 8931,
+          "median": 8931,
+          "p95": 8931,
+          "max": 8931
+        },
+        "tail_bytes": {
+          "count": 25,
+          "min": 8841,
+          "median": 8841,
+          "p95": 8841,
+          "max": 8841
+        }
+      },
+      "invalid_reasons": []
+    },
+    "files.read_large_window_tail.resource": {
+      "warmup_count": 0,
+      "measured_count": 2,
+      "valid_count": 2,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 2,
+        "min": 25.232399999978952,
+        "median": 51.270349999991595,
+        "p95": 77.30830000000424,
+        "max": 77.30830000000424
+      },
+      "response_bytes": {
+        "count": 2,
+        "min": 18052,
+        "median": 18052,
+        "p95": 18052,
+        "max": 18052
+      },
+      "cpu_user_us": {
+        "count": 2,
+        "min": 0,
+        "median": 0,
+        "p95": 0,
+        "max": 0
+      },
+      "cpu_system_us": {
+        "count": 2,
+        "min": 0,
+        "median": 0,
+        "p95": 0,
+        "max": 0
+      },
+      "rss_peak_bytes": {
+        "count": 2,
+        "min": 162103296,
+        "median": 172926976,
+        "p95": 183750656,
+        "max": 183750656
+      },
+      "metrics": {
+        "file_bytes": {
+          "count": 2,
+          "min": 16777216,
+          "median": 16777216,
+          "p95": 16777216,
+          "max": 16777216
+        },
+        "head_bytes": {
+          "count": 2,
+          "min": 8931,
+          "median": 8931,
+          "p95": 8931,
+          "max": 8931
+        },
+        "tail_bytes": {
+          "count": 2,
+          "min": 8841,
+          "median": 8841,
+          "p95": 8841,
+          "max": 8841
+        }
+      },
+      "invalid_reasons": []
+    },
+    "files.read_medium_window": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 6.5957000000053085,
+        "median": 10.229599999962375,
+        "p95": 38.76250000001164,
+        "max": 79.05079999999725
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 9212,
+        "median": 9212,
+        "p95": 9212,
+        "max": 9212
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "file_bytes": {
+          "count": 25,
+          "min": 1048576,
+          "median": 1048576,
+          "p95": 1048576,
+          "max": 1048576
+        },
+        "returned_bytes": {
+          "count": 25,
+          "min": 9072,
+          "median": 9072,
+          "p95": 9072,
+          "max": 9072
+        }
+      },
+      "invalid_reasons": []
+    },
+    "files.read_multiple": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 5.743199999968056,
+        "median": 7.165500000002794,
+        "p95": 56.62260000000242,
+        "max": 56.90419999998994
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 17937,
+        "median": 17937,
+        "p95": 143215,
+        "max": 143215
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "fanout": {
+          "count": 25,
+          "min": 4,
+          "median": 4,
+          "p95": 32,
+          "max": 32
+        }
+      },
+      "invalid_reasons": []
+    },
+    "files.read_small": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 5.357000000018161,
+        "median": 7.2832000000053085,
+        "p95": 32.4890000000014,
+        "max": 66.10169999999925
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 4245,
+        "median": 4245,
+        "p95": 4245,
+        "max": 4245
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "file_bytes": {
+          "count": 25,
+          "min": 4096,
+          "median": 4096,
+          "p95": 4096,
+          "max": 4096
+        }
+      },
+      "invalid_reasons": []
+    },
+    "process.absolute_and_tail": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 257.803899999999,
+        "median": 292.63560000000143,
+        "p95": 529.1512999999977,
+        "max": 733.5161000000007
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 744,
+        "median": 744,
+        "p95": 744,
+        "max": 744
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "absolute_bytes": {
+          "count": 25,
+          "min": 145,
+          "median": 145,
+          "p95": 145,
+          "max": 145
+        },
+        "tail_bytes": {
+          "count": 25,
+          "min": 112,
+          "median": 112,
+          "p95": 112,
+          "max": 112
+        }
+      },
+      "invalid_reasons": []
+    },
+    "process.background_and_no_output": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 0,
+      "invalid_count": 25,
+      "elapsed_ms": null,
+      "response_bytes": null,
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {},
+      "invalid_reasons": [
+        "background OS child leak count: expected 0, actual 1",
+        "background OS child leak count: expected 0, actual 1",
+        "background OS child leak count: expected 0, actual 1",
+        "background OS child leak count: expected 0, actual 1",
+        "background OS child leak count: expected 0, actual 1",
+        "background OS child leak count: expected 0, actual 1",
+        "background OS child leak count: expected 0, actual 1",
+        "background OS child leak count: expected 0, actual 1",
+        "background OS child leak count: expected 0, actual 1",
+        "background OS child leak count: expected 0, actual 1",
+        "background OS child leak count: expected 0, actual 1",
+        "background OS child leak count: expected 0, actual 1",
+        "background OS child leak count: expected 0, actual 1",
+        "background OS child leak count: expected 0, actual 1",
+        "background OS child leak count: expected 0, actual 1",
+        "background OS child leak count: expected 0, actual 1",
+        "background OS child leak count: expected 0, actual 1",
+        "background OS child leak count: expected 0, actual 1",
+        "background OS child leak count: expected 0, actual 1",
+        "background OS child leak count: expected 0, actual 1",
+        "background OS child leak count: expected 0, actual 1",
+        "background OS child leak count: expected 0, actual 1",
+        "background OS child leak count: expected 0, actual 1",
+        "background OS child leak count: expected 0, actual 1",
+        "background OS child leak count: expected 0, actual 1"
+      ]
+    },
+    "process.completed_repeat_offset0": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 268.42779999999766,
+        "median": 324.77070000000094,
+        "p95": 738.4606999999996,
+        "max": 877.8150999999998
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 453,
+        "median": 454,
+        "p95": 454,
+        "max": 454
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "first_contains_marker": {
+          "count": 25,
+          "min": 1,
+          "median": 1,
+          "p95": 1,
+          "max": 1
+        },
+        "repeated_retained_output": {
+          "count": 25,
+          "min": 1,
+          "median": 1,
+          "p95": 1,
+          "max": 1
+        },
+        "second_contains_marker": {
+          "count": 25,
+          "min": 1,
+          "median": 1,
+          "p95": 1,
+          "max": 1
+        }
+      },
+      "invalid_reasons": []
+    },
+    "process.concurrent_sessions": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 0,
+      "invalid_count": 25,
+      "elapsed_ms": null,
+      "response_bytes": null,
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {},
+      "invalid_reasons": [
+        "concurrent OS child leak count: expected 0, actual 8",
+        "concurrent OS child leak count: expected 0, actual 8",
+        "concurrent OS child leak count: expected 0, actual 8",
+        "concurrent OS child leak count: expected 0, actual 8",
+        "concurrent OS child leak count: expected 0, actual 8",
+        "concurrent OS child leak count: expected 0, actual 8",
+        "concurrent OS child leak count: expected 0, actual 8",
+        "concurrent OS child leak count: expected 0, actual 8",
+        "concurrent OS child leak count: expected 0, actual 8",
+        "concurrent OS child leak count: expected 0, actual 8",
+        "concurrent OS child leak count: expected 0, actual 8",
+        "concurrent OS child leak count: expected 0, actual 8",
+        "concurrent OS child leak count: expected 0, actual 8",
+        "concurrent OS child leak count: expected 0, actual 8",
+        "concurrent OS child leak count: expected 0, actual 8",
+        "concurrent OS child leak count: expected 0, actual 8",
+        "concurrent OS child leak count: expected 0, actual 8",
+        "concurrent OS child leak count: expected 0, actual 8",
+        "concurrent OS child leak count: expected 0, actual 8",
+        "concurrent OS child leak count: expected 0, actual 8",
+        "concurrent OS child leak count: expected 0, actual 32",
+        "concurrent OS child leak count: expected 0, actual 32",
+        "concurrent OS child leak count: expected 0, actual 32",
+        "concurrent OS child leak count: expected 0, actual 32",
+        "concurrent OS child leak count: expected 0, actual 32"
+      ]
+    },
+    "process.incremental_offset0": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 1299.7112999999954,
+        "median": 1368.3276999999944,
+        "p95": 1730.4332000000031,
+        "max": 1803.4293000000007
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 726,
+        "median": 726,
+        "p95": 726,
+        "max": 726
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "overlap_markers_start_vs_reads": {
+          "count": 25,
+          "min": 0,
+          "median": 0,
+          "p95": 0,
+          "max": 0
+        },
+        "read_calls": {
+          "count": 25,
+          "min": 4,
+          "median": 4,
+          "p95": 4,
+          "max": 4
+        }
+      },
+      "invalid_reasons": []
+    },
+    "process.large_stdout_stderr": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 309.0735999999888,
+        "median": 393.2070999999996,
+        "p95": 827.0145000000011,
+        "max": 1395.6476999999977
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 770387,
+        "median": 770389,
+        "p95": 5574811,
+        "max": 5574811
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "approx_emitted_bytes": {
+          "count": 25,
+          "min": 380000,
+          "median": 380000,
+          "p95": 3800000,
+          "max": 3800000
+        },
+        "emitted_lines": {
+          "count": 25,
+          "min": 5000,
+          "median": 5000,
+          "p95": 50000,
+          "max": 50000
+        },
+        "retained_marker_count": {
+          "count": 25,
+          "min": 5000,
+          "median": 5000,
+          "p95": 50000,
+          "max": 50000
+        },
+        "retained_output_bytes": {
+          "count": 25,
+          "min": 380102,
+          "median": 380102,
+          "p95": 3800104,
+          "max": 3800104
+        }
+      },
+      "invalid_reasons": []
+    },
+    "process.large_stdout_stderr.resource": {
+      "warmup_count": 0,
+      "measured_count": 2,
+      "valid_count": 2,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 2,
+        "min": 301.52109999995446,
+        "median": 505.05384999998205,
+        "p95": 708.5866000000096,
+        "max": 708.5866000000096
+      },
+      "response_bytes": {
+        "count": 2,
+        "min": 770389,
+        "median": 3172600,
+        "p95": 5574811,
+        "max": 5574811
+      },
+      "cpu_user_us": {
+        "count": 2,
+        "min": 16000,
+        "median": 187500,
+        "p95": 359000,
+        "max": 359000
+      },
+      "cpu_system_us": {
+        "count": 2,
+        "min": 16000,
+        "median": 39000,
+        "p95": 62000,
+        "max": 62000
+      },
+      "rss_peak_bytes": {
+        "count": 2,
+        "min": 175304704,
+        "median": 179527680,
+        "p95": 183750656,
+        "max": 183750656
+      },
+      "metrics": {
+        "approx_emitted_bytes": {
+          "count": 2,
+          "min": 380000,
+          "median": 2090000,
+          "p95": 3800000,
+          "max": 3800000
+        },
+        "emitted_lines": {
+          "count": 2,
+          "min": 5000,
+          "median": 27500,
+          "p95": 50000,
+          "max": 50000
+        },
+        "retained_marker_count": {
+          "count": 2,
+          "min": 5000,
+          "median": 27500,
+          "p95": 50000,
+          "max": 50000
+        },
+        "retained_output_bytes": {
+          "count": 2,
+          "min": 380102,
+          "median": 2090103,
+          "p95": 3800104,
+          "max": 3800104
+        }
+      },
+      "invalid_reasons": []
+    },
+    "process.short_completed": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 270.6736000000001,
+        "median": 317.836299999999,
+        "p95": 707.3541000000005,
+        "max": 777.4896000000008
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 133,
+        "median": 133,
+        "p95": 133,
+        "max": 133
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "initial_output_bytes": {
+          "count": 25,
+          "min": 91,
+          "median": 91,
+          "p95": 91,
+          "max": 91
+        }
+      },
+      "invalid_reasons": []
+    },
+    "search.content_dense": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 64.93379999999888,
+        "median": 69.40749999997206,
+        "p95": 88.61520000000019,
+        "max": 129.8300000000163
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 66067,
+        "median": 72911,
+        "p95": 80767,
+        "max": 114701
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "completion_ms": {
+          "count": 25,
+          "min": 29,
+          "median": 34,
+          "p95": 45,
+          "max": 62
+        },
+        "first_results_ms": {
+          "count": 25,
+          "min": 1,
+          "median": 2,
+          "p95": 3,
+          "max": 31
+        },
+        "start_call_ms": {
+          "count": 25,
+          "min": 30,
+          "median": 33,
+          "p95": 43,
+          "max": 64
+        }
+      },
+      "invalid_reasons": []
+    },
+    "search.content_sparse": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 65.23099999997066,
+        "median": 82.09749999997439,
+        "p95": 100.92910000000848,
+        "max": 134.73889999999665
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 7977,
+        "median": 13549,
+        "p95": 15453,
+        "max": 18317
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "completion_ms": {
+          "count": 25,
+          "min": 28,
+          "median": 39,
+          "p95": 62,
+          "max": 64
+        },
+        "first_results_ms": {
+          "count": 25,
+          "min": 0,
+          "median": 2,
+          "p95": 2,
+          "max": 63
+        },
+        "start_call_ms": {
+          "count": 25,
+          "min": 32,
+          "median": 38,
+          "p95": 50,
+          "max": 68
+        }
+      },
+      "invalid_reasons": []
+    },
+    "search.filename_hit": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 66.3340999999782,
+        "median": 73.21769999997923,
+        "p95": 91.47609999999986,
+        "max": 94.64509999999427
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 1615,
+        "median": 2927,
+        "p95": 4533,
+        "max": 4679
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "completion_ms": {
+          "count": 25,
+          "min": 30,
+          "median": 38,
+          "p95": 43,
+          "max": 46
+        },
+        "first_results_ms": {
+          "count": 25,
+          "min": 0,
+          "median": 1,
+          "p95": 3,
+          "max": 31
+        },
+        "start_call_ms": {
+          "count": 25,
+          "min": 29,
+          "median": 34,
+          "p95": 49,
+          "max": 53
+        }
+      },
+      "invalid_reasons": []
+    },
+    "search.filename_miss": {
+      "warmup_count": 4,
+      "measured_count": 25,
+      "valid_count": 25,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 25,
+        "min": 48.26509999996051,
+        "median": 56.38570000004256,
+        "p95": 187.75860000000102,
+        "max": 228.07050000003073
+      },
+      "response_bytes": {
+        "count": 25,
+        "min": 1614,
+        "median": 5538,
+        "p95": 8251,
+        "max": 8396
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "completion_ms": {
+          "count": 25,
+          "min": 47,
+          "median": 54,
+          "p95": 183,
+          "max": 224
+        },
+        "start_call_ms": {
+          "count": 25,
+          "min": 47,
+          "median": 54,
+          "p95": 63,
+          "max": 66
+        }
+      },
+      "invalid_reasons": []
+    }
+  }
+}
