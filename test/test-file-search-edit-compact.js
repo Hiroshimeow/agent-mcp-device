@@ -68,6 +68,54 @@ try {
     assert.equal(after.content[0].text, before.content[0].text);
   });
 
+  await check('search_once context does not consume maxResults match quota', async () => {
+    const file = path.join(TEST_DIR, 'search-context-single.txt');
+    await fs.writeFile(file, 'before one\nbefore two\nNEEDLE_ONE\nafter one\nafter two\n', 'utf8');
+
+    const result = await searchHandlers.handleSearchOnce({
+      path: file,
+      pattern: 'NEEDLE',
+      searchType: 'content',
+      literalSearch: true,
+      maxResults: 1,
+      maxBytes: 4096,
+      timeout_ms: 2000,
+      contextLines: 2,
+    });
+    const text = result.content.map(item => item.text ?? '').join('\n');
+
+    assert.match(text, /search-context-single\.txt:3 - NEEDLE/);
+    assert.match(text, /before one/);
+    assert.match(text, /after two/);
+    assert.match(text, /truncated=false/);
+  });
+
+  await check('search_once truncates by match count with context present', async () => {
+    const file = path.join(TEST_DIR, 'search-context-multiple.txt');
+    await fs.writeFile(
+      file,
+      'ctx a\nNEEDLE_ONE\nctx b\nNEEDLE_TWO\nctx c\nNEEDLE_THREE\nctx d\n',
+      'utf8'
+    );
+
+    const result = await searchHandlers.handleSearchOnce({
+      path: file,
+      pattern: 'NEEDLE',
+      searchType: 'content',
+      literalSearch: true,
+      maxResults: 2,
+      maxBytes: 4096,
+      timeout_ms: 2000,
+      contextLines: 1,
+    });
+    const text = result.content.map(item => item.text ?? '').join('\n');
+
+    assert.match(text, /search-context-multiple\.txt:2 - NEEDLE/);
+    assert.match(text, /search-context-multiple\.txt:4 - NEEDLE/);
+    assert.doesNotMatch(text, /search-context-multiple\.txt:6 - NEEDLE/);
+    assert.match(text, /truncated=true/);
+  });
+
   await check('edit_block batch applies exact edits with one deterministic call', async () => {
     const file = path.join(TEST_DIR, 'batch.txt');
     await fs.writeFile(file, 'alpha\r\nbeta\r\ngamma\r\n', 'utf8');
