@@ -675,12 +675,12 @@ export interface MultiFileResult {
     payload?: FileResultPayloads;
 }
 
-export async function readMultipleFiles(paths: string[]): Promise<MultiFileResult[]> {
+export async function readMultipleFiles(paths: string[], options?: ReadOptions): Promise<MultiFileResult[]> {
     return Promise.all(
         paths.map(async (filePath: string) => {
             try {
                 const validPath = await validatePath(filePath);
-                const fileResult = await readFile(validPath);
+                const fileResult = await readFile(validPath, options);
                 // Handle content conversion properly for images vs text
                 let content: string;
                 if (typeof fileResult.content === 'string') {

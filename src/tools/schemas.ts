@@ -70,6 +70,9 @@ export const ReadFileArgsSchema = z.object({
 
 export const ReadMultipleFilesArgsSchema = z.object({
   paths: z.array(z.string()),
+  offset: z.number().optional().default(0),
+  length: z.number().optional().default(1000),
+  maxBytes: z.number().int().positive().optional().default(256 * 1024),
 });
 
 export const WriteFileArgsSchema = z.object({
@@ -141,17 +144,22 @@ export const GetFileInfoArgsSchema = z.object({
   path: z.string(),
 });
 
-// Edit tools schema - SIMPLIFIED from three modes to two
-// Previously supported: text replacement, location-based edits (edits array), and range rewrites
-// Now supports only: text replacement and range rewrites
-// Removed 'edits' array parameter - location-based surgical edits were complex and unnecessary
-// Range rewrites are more powerful and cover all structured file editing needs
+// Edit tool schema. Legacy text replacement and structured range rewrites remain.
+// The additive edits[] mode is exact-only and batches multiple text replacements
+// into one validated read/write cycle.
+const ExactEditSchema = z.object({
+  old_string: z.string().min(1),
+  new_string: z.string(),
+  expected_replacements: z.number().int().positive().optional().default(1),
+});
+
 export const EditBlockArgsSchema = z.object({
   file_path: z.string(),
   // Text file string replacement
   old_string: z.string().optional(),
   new_string: z.string().optional(),
   expected_replacements: z.number().optional().default(1),
+  edits: z.array(ExactEditSchema).min(1).optional(),
   // Structured file range rewrite (Excel, etc.)
   range: z.string().optional(),
   content: z.any().optional(),
@@ -164,9 +172,10 @@ export const EditBlockArgsSchema = z.object({
     // Helper to check if value is actually provided (not undefined, not empty string)
     const hasValue = (v: unknown) => v !== undefined && v !== '';
     return (hasValue(data.old_string) && data.new_string !== undefined) ||
+           (data.edits !== undefined && data.edits.length > 0) ||
            (hasValue(data.range) && hasValue(data.content));
   },
-  { message: "Must provide either (old_string + new_string) or (range + content)" }
+  { message: "Must provide either (old_string + new_string), edits, or (range + content)" }
 );
 
 // Send input to process schema
@@ -198,6 +207,10 @@ export const StartSearchArgsSchema = z.object({
   // 'ui' marks widget-fired calls (e.g. markdown link-target search);
   // excluded from tool-call telemetry (see isUiOriginCall in server.ts).
   origin: z.enum(['ui', 'llm']).optional(),
+});
+
+export const SearchOnceArgsSchema = StartSearchArgsSchema.extend({
+  maxBytes: z.number().int().positive().optional().default(256 * 1024),
 });
 
 export const GetMoreSearchResultsArgsSchema = z.object({
@@ -249,6 +262,7 @@ export const toolArgSchemas: Record<string, z.ZodTypeAny> = {
   list_directory: ListDirectoryArgsSchema,
   move_file: MoveFileArgsSchema,
   start_search: StartSearchArgsSchema,
+  search_once: SearchOnceArgsSchema,
   get_more_search_results: GetMoreSearchResultsArgsSchema,
   stop_search: StopSearchArgsSchema,
   list_searches: ListSearchesArgsSchema,

@@ -43,6 +43,7 @@ import {
     EditBlockArgsSchema,
     GetUsageStatsArgsSchema,
     StartSearchArgsSchema,
+    SearchOnceArgsSchema,
     GetMoreSearchResultsArgsSchema,
     StopSearchArgsSchema,
     ListSearchesArgsSchema,
@@ -392,8 +393,9 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                         Read the contents of multiple files simultaneously.
                         
                         Each file's content is returned with its path as a reference.
-                        Handles text files normally and renders images as viewable content.
-                        Recognized image types: PNG, JPEG, GIF, WebP.
+                        Text files support shared offset/length pagination and the whole response
+                        is bounded by maxBytes with deterministic continuation metadata.
+                        Handles images as viewable content; recognized types: PNG, JPEG, GIF, WebP.
                         
                         Failed reads for individual files won't stop the entire operation.
                         Only works within allowed directories.
@@ -676,6 +678,24 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                 inputSchema: zodToJsonSchema(StartSearchArgsSchema),
                 annotations: {
                     title: "Start Search",
+                    readOnlyHint: true,
+                },
+            },
+            {
+                name: "search_once",
+                description: `
+                        Run a bounded one-shot ripgrep search and return results in this call.
+
+                        Prefer this for ordinary text/file searches that do not need progressive polling.
+                        Limits are enforced with maxResults, maxBytes, and timeout_ms, and the child
+                        process is terminated before the tool call finishes. Use start_search for
+                        progressive searches and Office-file search behavior.
+
+                        ${PATH_GUIDANCE}
+                        ${CMD_PREFIX_DESCRIPTION}`,
+                inputSchema: zodToJsonSchema(SearchOnceArgsSchema),
+                annotations: {
+                    title: "Search Once",
                     readOnlyHint: true,
                 },
             },
@@ -1417,6 +1437,10 @@ async function handleCallToolRequest(request: CallToolRequest): Promise<ServerRe
 
             case "start_search":
                 result = await handlers.handleStartSearch(args);
+                break;
+
+            case "search_once":
+                result = await handlers.handleSearchOnce(args);
                 break;
 
             case "get_more_search_results":
