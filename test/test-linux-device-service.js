@@ -20,6 +20,20 @@ async function testManagerChoicePromptsEveryInstall() {
   assert.equal(asks, 2);
 }
 
+function testQuoteSystemdArgLiteralExpectations() {
+  // quoteSystemdArg is private; exercise it through pure unit serialization.
+  // Expected strings are literals, not values calculated by a quoting helper.
+  for (const [runtimeDir, expected] of [
+    ['/usr/bin/node', 'WorkingDirectory=/usr/bin/node'],
+    ['/opt/my app/bin', 'WorkingDirectory="/opt/my app/bin"'],
+    ['C:\\a"b', 'WorkingDirectory="C:\\\\a\\"b"']
+  ]) {
+    const service = new SystemdUserDeviceService({ platform: 'linux', runtimeDir });
+    const unit = service.unitText();
+    assert.equal(unit.split(/\r?\n/).find(line => line.startsWith('WorkingDirectory=')), expected);
+  }
+}
+
 async function testSystemdUserLifecycleUsesOwnedUnitWithoutSecrets() {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-systemd-'));
   const unitPath = path.join(root, 'mcp-device.service');
@@ -50,7 +64,13 @@ async function testSystemdUserLifecycleUsesOwnedUnitWithoutSecrets() {
     const unit = await fs.readFile(unitPath, 'utf8');
     assert.match(unit, /ExecStart=\/usr\/bin\/node \/opt\/mcp-device\/dist\/mcp-device\.js --service --manager=systemd/);
     assert.match(unit, /Environment="PATH=\/usr\/local\/bin:\/usr\/bin:\/bin"/);
-    assert.match(unit, new RegExp(`WorkingDirectory=${path.join(root, 'runtime').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
+    const escapeRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    function quoteSystemdArg(value) {
+      if (/^[A-Za-z0-9_@%+=:,./-]+$/.test(value)) return value;
+      return `"${value.replace(/([\\"])/g, '\\$1')}"`;
+    }
+    const expected = quoteSystemdArg(path.join(root, 'runtime'));
+    assert.match(unit, new RegExp(`^WorkingDirectory=${escapeRe(expected)}\\r?$`, 'm'));
     assert.doesNotMatch(unit, /proxy|bearer|token|private.?key/i);
     assert(calls.some(call => call.args.join(' ').includes('--user daemon-reload')));
     assert(calls.some(call => call.args.join(' ').includes('--user enable --now mcp-device.service')));
@@ -201,6 +221,7 @@ async function testPm2LifecycleRequiresMatchingStartupEvidenceAndSavesState() {
 }
 
 await testManagerChoicePromptsEveryInstall();
+await testQuoteSystemdArgLiteralExpectations();
 await testSystemdUserLifecycleUsesOwnedUnitWithoutSecrets();
 await testSystemdLeavesLookalikeUnitUntouched();
 await testPm2PreflightFailsBeforeMutationWhenUnavailableOrStartupUnproven();

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { fileURLToPath } from 'url';
+import { randomUUID } from 'crypto';
 import os from 'os';
 import path from 'path';
 
@@ -26,6 +27,7 @@ import { VERSION } from '../version.js';
 
 export class MCPDevice {
     private isShuttingDown = false;
+    private bootNonce = '';
     private executionEngine = new LocalExecutionEngine();
     private gatewayChannel?: GatewayDeviceChannel;
     private gatewayProxyAgent?: { destroy: () => void };
@@ -78,6 +80,7 @@ export class MCPDevice {
     }
 
     async start(options: { confirmTakeover?: (existing: RuntimeOwnerStatus) => Promise<boolean> | boolean } = {}) {
+        this.bootNonce = randomUUID();
         try {
             console.log('🚀 Starting MCP Device...');
             if (process.env.DEBUG_MODE === 'true') console.log('  - 🐞 DEBUG_MODE');
@@ -95,7 +98,8 @@ export class MCPDevice {
             await acquireRuntimeOwner(this.runtimeOwner, { confirmTakeover: options.confirmTakeover });
             await this.runtimeOwner.bootstrap();
             await bootstrapOfficialGatewayTrust(new GatewayDeviceConfigStore());
-            await this.executionEngine.initialize();
+            // Remote mode uses direct in-process dispatch (tool-dispatcher.ts).
+            // Do not eagerly initialize LocalExecutionEngine, avoiding child dist/index.js process spawn.
 
             const gatewayStatus = new GatewayDeviceStatusStore();
             const storedGatewayStatus = await gatewayStatus.load();
@@ -141,9 +145,14 @@ export class MCPDevice {
                 proxyAgent: proxy.agent,
                 securityProtocolFloor: gatewayConfig.securityProtocolFloor,
                 appCaPem: gatewayConfig.appCaPem || undefined,
-                adapter: new GatewayToolAdapter(this.executionEngine, { allowedRoots: gatewayConfig.allowedRoots }),
-                runtimeState: () => this.executionEngine.getRuntimeState(),
-                agentVersion: process.env.npm_package_version,
+                adapter: new GatewayToolAdapter(undefined, { allowedRoots: gatewayConfig.allowedRoots }),
+                // In remote direct-dispatch mode, the daemon is ready once the gateway channel & dispatch are established.
+                runtimeState: () => ({
+                    runtime_ready: true,
+                    runtime_reason: null,
+                    execution_runtime_generation: `direct-in-process:${this.bootNonce}`
+                }),
+                agentVersion: VERSION || process.env.npm_package_version || '1.0.10',
                 onUpdateRequest: async (targetVersion, { requestId }) => {
                     const record = await identity.loadOrCreate();
                     const prepared = await prepareDevicePackageUpdate({

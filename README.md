@@ -5,7 +5,7 @@ The gateway owns accounts, OAuth, device ownership, MCP tool contracts, routing,
 ## Install
 
 ```powershell
-npm install -g @hcu-lab.me/mcp-device@1.0.7
+npm install -g @hcu-lab.me/mcp-device@1.0.10
 mcp-device login
 mcp-device install
 mcp-device status

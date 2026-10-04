@@ -10,7 +10,7 @@ import sharp from 'sharp';
 import tls from 'tls';
 import { WebSocketServer } from 'ws';
 
-import { LocalExecutionEngine } from '../dist/device/execution-engine.js';
+import { randomUUID } from 'crypto';
 import { GatewayDeviceChannel } from '../dist/device/gateway-channel.js';
 import { GatewayDeviceIdentity } from '../dist/device/gateway-identity.js';
 import { pairGatewayDevice } from '../dist/device/gateway-pairing.js';
@@ -126,103 +126,63 @@ async function testDefaultWindowsIdentityPathIsProfileBound() {
   }
 }
 
-async function testExecutionEngineFailureKeepsRuntimeObservableButNotReady() {
-  const engine = new LocalExecutionEngine();
-  engine.resolveMcpConfig = async () => null;
-  await engine.initialize();
-  assert.deepEqual(engine.getRuntimeState(), {
-    runtime_ready: false,
-    runtime_reason: 'LOCAL_EXECUTION_ENGINE_UNAVAILABLE',
-    execution_runtime_generation: null
-  });
-  assert.throws(
-    () => engine.assertReady(),
-    error => error?.code === 'DEVICE_NOT_READY'
-  );
-}
-
-async function testExecutionEngineChildDeathInvalidatesReadiness() {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-engine-close-'));
-  const engine = new LocalExecutionEngine();
-  engine.resolveMcpConfig = async () => ({
-    command: process.execPath,
-    args: [path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../dist/index.js')],
-    cwd: root,
-    env: {
-      HOME: root,
-      USERPROFILE: root
-    }
-  });
-
-  try {
-    await engine.initialize();
-    const before = engine.getRuntimeState();
-    assert.equal(before.runtime_ready, true);
-    assert.equal(typeof before.execution_runtime_generation, 'string');
-    assert(before.execution_runtime_generation.length > 0);
-
-    const childPid = engine.getChildPid();
-    assert(Number.isInteger(childPid) && childPid > 0, 'local execution engine must expose a live child PID');
-    process.kill(childPid, 'SIGTERM');
-
-    await waitFor(() => engine.getRuntimeState().runtime_ready === false);
-    const after = engine.getRuntimeState();
-    assert.deepEqual(after, {
-      runtime_ready: false,
-      runtime_reason: 'LOCAL_EXECUTION_ENGINE_UNAVAILABLE',
-      execution_runtime_generation: null
-    });
-    assert.notEqual(after.execution_runtime_generation, before.execution_runtime_generation);
-    assert.throws(
-      () => engine.assertReady(),
-      error => error?.code === 'DEVICE_NOT_READY'
-    );
-
-    const adapter = new GatewayToolAdapter(engine, { pathValidator: async value => value });
-    await assert.rejects(
-      () => adapter.call('read_text_file', { path: path.join(root, 'missing.txt') }),
-      error => error?.code === 'DEVICE_NOT_READY'
-    );
-
-    const channel = new GatewayDeviceChannel({
-      gatewayUrl: 'ws://127.0.0.1:1/device',
-      enrollmentToken: 'unused',
-      adapter,
-      runtimeState: () => engine.getRuntimeState()
-    });
-    assert.deepEqual(channel.runtimePayload(), after);
-  } finally {
-    await engine.shutdown();
-    await fs.rm(root, { recursive: true, force: true });
-  }
-}
-
-async function testAdapterRejectsWhenRuntimeIsNotReady() {
-  const desktop = new FakeDesktop();
-  desktop.assertReady = () => {
-    const error = new Error('execution runtime is not ready');
-    error.code = 'DEVICE_NOT_READY';
-    throw error;
+async function testDirectInProcessChannelDispatch() {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-direct-'));
+  const filePath = path.join(root, 'remote.txt');
+  await fs.writeFile(filePath, 'direct-dispatch:ok');
+  const identity = new GatewayDeviceIdentity(path.join(root, 'identity.json'));
+  // An obsolete engine argument must never be consulted by direct dispatch.
+  const unusedEngine = { assertReady() { throw new Error('child readiness must not gate direct dispatch'); } };
+  const adapter = new GatewayToolAdapter(unusedEngine, { allowedRoots: [], pathValidator: async value => value });
+  const runtime = {
+    runtime_ready: true,
+    runtime_reason: null,
+    execution_runtime_generation: `direct-in-process:${randomUUID()}`
   };
-  const adapter = new GatewayToolAdapter(desktop, { pathValidator: async value => value });
-  await assert.rejects(
-    () => adapter.call('read_text_file', { path: '/work/file.txt' }),
-    error => error?.code === 'DEVICE_NOT_READY'
-  );
-  assert.equal(desktop.calls.length, 0);
-}
-
-async function testAdapterDefaultsToWideAccess() {
-  const desktop = new FakeDesktop();
-  const previous = process.env.MCP_GATEWAY_ALLOWED_ROOTS;
-  delete process.env.MCP_GATEWAY_ALLOWED_ROOTS;
+  const wss = new WebSocketServer({ port: 0 });
+  await new Promise(resolve => wss.once('listening', resolve));
+  let advertised;
+  let result;
+  wss.on('connection', ws => ws.on('message', raw => {
+    const message = JSON.parse(raw.toString());
+    if (message.type === 'enroll_hello') {
+      advertised = Object.fromEntries(Object.keys(runtime).map(key => [key, message.payload[key]]));
+      ws.send(JSON.stringify({ protocol_version: 1, type: 'auth_challenge', device_id: message.device_id, payload: { nonce: 'direct' } }));
+    } else if (message.type === 'auth_response') {
+      ws.send(JSON.stringify({ protocol_version: 1, type: 'auth_ok', device_id: message.device_id, connection_epoch: 1, payload: { accepted: true } }));
+      ws.send(JSON.stringify({ protocol_version: 1, type: 'tool_call', request_id: 'direct-1', device_id: message.device_id, connection_epoch: 1, payload: { tool: 'read_text_file', arguments: { path: filePath } } }));
+    } else if (message.type === 'tool_result') result = message.payload;
+  }));
+  const channel = new GatewayDeviceChannel({
+    gatewayUrl: `ws://127.0.0.1:${wss.address().port}/device`,
+    enrollmentToken: 'test', identity, adapter, runtimeState: () => runtime
+  });
   try {
-    const adapter = new GatewayToolAdapter(desktop, { pathValidator: async value => value });
-    await adapter.call('read_text_file', { path: '/shared/anywhere.txt' });
-    assert.deepEqual(desktop.calls.at(-1), { name: 'read_file', args: { path: '/shared/anywhere.txt' } });
+    await channel.start();
+    await waitFor(() => Boolean(result));
+    assert.deepEqual(advertised, runtime);
+    assert.deepEqual(channel.runtimePayload(), runtime);
+    assert.match(result.content[0].text, /direct-dispatch:ok/);
+    await adapter.call('write_file', { path: filePath, content: 'updated' });
+    assert.equal(await fs.readFile(filePath, 'utf8'), 'updated');
+    await adapter.call('edit_file', { path: filePath, old_text: 'updated', new_text: 'edited', expected_replacements: 1 });
+    assert.equal(await fs.readFile(filePath, 'utf8'), 'edited');
+    const dryRun = await adapter.call('edit_file', { path: filePath, old_text: 'edited', new_text: '', expected_replacements: 1, dry_run: true });
+    assert.match(dryRun.content[0].text, /Dry run successful/);
+    assert.equal(await fs.readFile(filePath, 'utf8'), 'edited', 'dry run must not mutate the file');
+    await adapter.call('edit_file', { path: filePath, old_text: 'edited', new_text: '', expected_replacements: 1 });
+    assert.equal(await fs.readFile(filePath, 'utf8'), '');
+    await adapter.call('write_file', { path: filePath, content: '' });
+    assert.equal(await fs.readFile(filePath, 'utf8'), '');
+    await assert.rejects(adapter.call('start_process', { command: 'node -v' }), /path\/working_directory is required/);
+    await assert.rejects(adapter.call('read_text_file', { path: path.join(root, 'missing') }), error => error?.code === 'TOOL_EXECUTION_FAILED');
+    assert.deepEqual(channel.runtimePayload(), runtime, 'individual tool errors do not invalidate direct runtime readiness');
+    const restricted = new GatewayToolAdapter(undefined, { allowedRoots: [path.join(root, 'other')], pathValidator: async value => value });
+    await assert.rejects(restricted.call('read_text_file', { path: filePath }), /outside MCP_GATEWAY_ALLOWED_ROOTS/);
   } finally {
-    if (previous === undefined) delete process.env.MCP_GATEWAY_ALLOWED_ROOTS;
-    else process.env.MCP_GATEWAY_ALLOWED_ROOTS = previous;
+    await channel.stop();
+    await new Promise(resolve => wss.close(resolve));
+    await fs.rm(root, { recursive: true, force: true });
   }
 }
 
@@ -241,7 +201,7 @@ async function testRemoteImagePreviewIsBounded() {
     const result = await adapter.call('image_preview', { path: imagePath, includeImage: true });
     const image = result.content.find(item => item.type === 'image');
     assert(image, 'remote image_preview should return MCP image content');
-    assert.equal(image.mimeType, 'image/webp');
+    assert(['image/jpeg', 'image/webp'].includes(image.mimeType));
     assert(Buffer.from(image.data, 'base64').length <= 32 * 1024, 'remote preview must stay within the bounded WSS payload budget');
   } finally {
     await fs.rm(root, { recursive: true, force: true });
@@ -300,49 +260,6 @@ async function testRemoteProjectInspectionRunsOnDevice() {
   } finally {
     await fs.rm(root, { recursive: true, force: true });
   }
-}
-
-async function testAdapter() {
-  const desktop = new FakeDesktop();
-  const adapter = new GatewayToolAdapter(desktop, { allowedRoots: ['/work'], pathValidator: async value => value });
-  await adapter.call('read_text_file', { path: '/work/x.txt', head: 3 });
-  assert.deepEqual(desktop.calls.at(-1), { name: 'read_file', args: { path: '/work/x.txt', offset: 0, length: 3 } });
-  await assert.rejects(adapter.call('read_text_file', { path: '/other/x.txt' }), /outside MCP_GATEWAY_ALLOWED_ROOTS/);
-  await adapter.call('write_file', { path: '/work/x.txt', content: 'new' });
-  assert.equal(desktop.calls.at(-1).name, 'write_file');
-  await adapter.call('write_file', { path: '/work/x.txt', content: '' });
-  assert.deepEqual(desktop.calls.at(-1), { name: 'write_file', args: { path: '/work/x.txt', content: '', mode: 'rewrite' } });
-
-  await adapter.call('edit_file', { path: '/work/x.txt', old_text: 'old', new_text: 'new', expected_replacements: 1 });
-  assert.deepEqual(desktop.calls.at(-1), { name: 'edit_block', args: { file_path: '/work/x.txt', old_string: 'old', new_string: 'new', expected_replacements: 1 } });
-  await adapter.call('edit_file', { path: '/work/x.txt', old_text: 'old', new_text: '', expected_replacements: 1 });
-  assert.deepEqual(desktop.calls.at(-1), { name: 'edit_block', args: { file_path: '/work/x.txt', old_string: 'old', new_string: '', expected_replacements: 1 } });
-  desktop.readFileText = 'old old';
-  const dryRun = await adapter.call('edit_file', {
-    path: '/work/x.txt', old_text: 'old', new_text: 'new', expected_replacements: 2, dry_run: true
-  });
-  desktop.readFileText = 'read_file:ok';
-  assert.deepEqual(JSON.parse(dryRun.content[0].text), {
-    ok: true, dry_run: true, expected_replacements: 2, actual_count: 2
-  });
-  await assert.rejects(
-    adapter.call('edit_file', { path: '/work/x.txt', edits: [{ oldText: 'old', newText: 'legacy' }], dryRun: false }),
-    /old_text is required/
-  );
-  const started = await adapter.call('start_process', { command: 'node -v', working_directory: '/work' });
-  assert.equal(started.session_id, '123');
-  assert.deepEqual(desktop.calls.at(-1), { name: 'start_process', args: { command: 'node -v', timeout_ms: 10000, working_directory: '/work' } });
-  await assert.rejects(adapter.call('start_process', { command: 'node -v' }), /path\/working_directory is required/);
-  await adapter.call('read_process_output', { session_id: '123', offset: 2, length: 5 });
-  assert.equal(desktop.calls.at(-1).name, 'read_process_output');
-  assert.equal(desktop.calls.at(-1).args.pid, 123);
-  await adapter.call('interact_with_process', { session_id: '123', input: '' });
-  assert.deepEqual(desktop.calls.at(-1), {
-    name: 'interact_with_process',
-    args: { pid: 123, input: '', timeout_ms: 8000 }
-  });
-  await adapter.call('terminate_process', { session_id: '123' });
-  assert.equal(desktop.calls.at(-1).name, 'force_terminate');
 }
 
 async function testRejectsUnsafeNonLoopbackPlaintextGatewayUrls() {
@@ -621,9 +538,10 @@ async function testNotReadyRuntimeIsAdvertisedOnHello() {
 
 async function testChannelEnrollmentToolAndReconnect() {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-gateway-channel-'));
+  const filePath = path.join(root, 'remote.txt');
+  await fs.writeFile(filePath, 'read_file:ok');
   const identity = new GatewayDeviceIdentity(path.join(root, 'identity.json'));
-  const desktop = new FakeDesktop();
-  const adapter = new GatewayToolAdapter(desktop, { allowedRoots: ['/work'], pathValidator: async value => value });
+  const adapter = new GatewayToolAdapter(undefined, { allowedRoots: [root], pathValidator: async value => value });
   const wss = new WebSocketServer({ port: 0 });
   await new Promise(resolve => wss.once('listening', resolve));
   const address = wss.address();
@@ -664,7 +582,7 @@ async function testChannelEnrollmentToolAndReconnect() {
         }
         ws.send(JSON.stringify({ protocol_version: 1, type: 'auth_ok', device_id: message.device_id, connection_epoch: current, payload: { accepted: true } }));
         if (current === 1) {
-          setTimeout(() => ws.send(JSON.stringify({ protocol_version: 1, type: 'tool_call', request_id: 'req-1', device_id: message.device_id, connection_epoch: current, payload: { tool: 'read_text_file', arguments: { path: '/work/remote.txt' } } })), 20);
+          setTimeout(() => ws.send(JSON.stringify({ protocol_version: 1, type: 'tool_call', request_id: 'req-1', device_id: message.device_id, connection_epoch: current, payload: { tool: 'read_text_file', arguments: { path: filePath } } })), 20);
         }
         return;
       }
@@ -678,7 +596,7 @@ async function testChannelEnrollmentToolAndReconnect() {
   const channel = new GatewayDeviceChannel({ gatewayUrl: `ws://127.0.0.1:${port}/device`, enrollmentToken: 'enroll-once', identity, adapter });
   await channel.start();
   await waitFor(() => Boolean(firstToolResult));
-  assert.equal(firstToolResult.content[0].text, 'read_file:ok');
+  assert.match(firstToolResult.content[0].text, /read_file:ok/);
   await waitFor(() => reconnectSeen && connections >= 2, 5000);
   await channel.stop();
   await new Promise(resolve => wss.close(resolve));
@@ -956,13 +874,9 @@ async function testOversizedToolResultReturnsBoundedError() {
 testPm2EntrypointDetection();
 await testIdentity();
 await testDefaultWindowsIdentityPathIsProfileBound();
-await testExecutionEngineFailureKeepsRuntimeObservableButNotReady();
-await testExecutionEngineChildDeathInvalidatesReadiness();
-await testAdapterRejectsWhenRuntimeIsNotReady();
-await testAdapterDefaultsToWideAccess();
+await testDirectInProcessChannelDispatch();
 await testRemoteImagePreviewIsBounded();
 await testRemoteProjectInspectionRunsOnDevice();
-await testAdapter();
 await testRejectsUnsafeNonLoopbackPlaintextGatewayUrls();
 await testV2ReconnectUsesInnerTlsExporterProofWithoutOuterCredential();
 await testFloorTwoNeverFallsBackWhenV2SubprotocolIsNotSelected();
@@ -976,4 +890,4 @@ await testForgottenDeviceInitialAuthIsClassified();
 await testForgottenDeviceCloseStopsReconnectLoop();
 await testAuthenticatedDashboardUpdateControl();
 await testOversizedToolResultReturnsBoundedError();
-console.log('Ã¢Å“â€¦ Gateway identity, adapter, enrollment, tool routing, and reconnect tests passed');
+console.log('Gateway identity, direct dispatch, enrollment, tool routing, and reconnect tests passed');

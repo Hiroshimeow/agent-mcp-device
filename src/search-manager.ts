@@ -219,6 +219,142 @@ export interface SearchSessionOptions {
     };
   }
 
+  async searchOnce(
+    options: SearchSessionOptions,
+    maxResults: number = 100,
+    maxBytes: number = 256 * 1024
+  ): Promise<{ results: SearchResult[]; runtime: number; truncated: boolean; timedOut: boolean }> {
+    const startTime = Date.now();
+    const validPath = await validatePath(options.rootPath);
+    const args = this.buildRipgrepArgs({
+      ...options,
+      rootPath: validPath,
+      maxResults: maxResults + 1,
+    });
+    const rgPath = await getRipgrepPath();
+
+    return new Promise((resolve, reject) => {
+      const child = spawn(rgPath, args, { windowsHide: true });
+      const results: SearchResult[] = [];
+      const pendingContext: Array<{ result: SearchResult; bytes: number }> = [];
+      let buffered = '';
+      let capturedBytes = 0;
+      let matchCount = 0;
+      let truncated = false;
+      let timedOut = false;
+      let settled = false;
+      let timer: NodeJS.Timeout | undefined;
+
+      const stopForTruncation = () => {
+        truncated = true;
+        if (!child.killed) child.kill('SIGTERM');
+      };
+
+      const flushPendingContext = (reservedBytes = 0): boolean => {
+        let dropped = false;
+        for (const item of pendingContext) {
+          if (capturedBytes + item.bytes + reservedBytes > maxBytes) {
+            dropped = true;
+            continue;
+          }
+          results.push(item.result);
+          capturedBytes += item.bytes;
+        }
+        pendingContext.length = 0;
+        return dropped;
+      };
+
+      const finish = () => {
+        if (settled) return;
+        if (pendingContext.length > 0 && matchCount > 0) {
+          if (flushPendingContext()) truncated = true;
+        }
+        settled = true;
+        if (timer) clearTimeout(timer);
+        resolve({
+          results,
+          runtime: Date.now() - startTime,
+          truncated,
+          timedOut,
+        });
+      };
+      const fail = (error: Error) => {
+        if (settled) return;
+        settled = true;
+        if (timer) clearTimeout(timer);
+        reject(error);
+      };
+
+      const acceptLine = (line: string) => {
+        if (!line.trim() || truncated) return;
+        const result = this.parseLine(line, options.searchType);
+        if (!result) return;
+
+        const resultBytes = Buffer.byteLength(
+          `${result.file}\n${result.match ?? ''}\n`,
+          'utf8'
+        );
+        const isContext =
+          options.searchType === 'content' && line.includes('"type":"context"');
+
+        if (isContext) {
+          pendingContext.push({ result, bytes: resultBytes });
+          return;
+        }
+
+        if (matchCount >= maxResults) {
+          pendingContext.length = 0;
+          stopForTruncation();
+          return;
+        }
+
+        if (capturedBytes + resultBytes > maxBytes) {
+          pendingContext.length = 0;
+          stopForTruncation();
+          return;
+        }
+
+        const droppedContext = flushPendingContext(resultBytes);
+        results.push(result);
+        capturedBytes += resultBytes;
+        matchCount++;
+
+        if (droppedContext) {
+          stopForTruncation();
+        }
+      };
+
+      child.stdout?.on('data', (data: Buffer) => {
+        buffered += data.toString();
+        const lines = buffered.split(/\r?\n/);
+        buffered = lines.pop() ?? '';
+        for (const line of lines) acceptLine(line);
+      });
+
+      let stderr = '';
+      child.stderr?.on('data', (data: Buffer) => {
+        stderr += data.toString();
+      });
+
+      child.once('error', fail);
+      child.once('close', code => {
+        if (buffered) acceptLine(buffered);
+        if (code && code !== 1 && !truncated && !timedOut) {
+          fail(new Error(stderr.trim() || `ripgrep exited with code ${code}`));
+          return;
+        }
+        finish();
+      });
+
+      const timeoutMs = options.timeout ?? 5000;
+      timer = setTimeout(() => {
+        timedOut = true;
+        truncated = true;
+        if (!child.killed) child.kill('SIGTERM');
+      }, timeoutMs);
+    });
+  }
+
   /**
    * Read search results with offset-based pagination (like read_file)
    * Supports both range reading and tail behavior

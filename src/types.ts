@@ -18,7 +18,10 @@ export interface TerminalSession {
   pid: number;
   process: ChildProcess;
   outputLines: string[];      // Line-based buffer (persistent, capped — oldest lines evicted)
-  lastReadIndex: number;      // Track where "new" output starts for default reads
+  lastReadIndex: number;      // Track line containing the next unread output
+  lastReadOffset: number;     // Character offset within lastReadIndex for partial-line drains
+  outputVersion: number;      // Monotonic progress counter for output/completion waits
+  outputWaiters: Set<() => void>;
   isBlocked: boolean;
   startTime: Date;
   bufferedChars: number;      // Joined length of outputLines (content + separators)
@@ -30,6 +33,7 @@ export interface CommandExecutionResult {
   pid: number;
   output: string;
   isBlocked: boolean;
+  deliveredCursor?: { lineIndex: number; lineOffset: number };
   timingInfo?: TimingInfo;
 }
 

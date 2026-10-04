@@ -45,7 +45,7 @@ assert.equal(fs.existsSync(new URL('../PUBLISH.md', import.meta.url)), false);
 const readme = fs.readFileSync(new URL('../README.md', import.meta.url), 'utf8');
 assert.match(readme, /^# MCP Device/m);
 assert.match(readme, /The gateway owns accounts, OAuth, device ownership, MCP tool contracts, routing, and usage aggregation\. MCP Device owns local device identity, pairing, reconnect lifecycle, bounded execution, background registration, and local status\./);
-assert.match(readme, /npm install -g @hcu-lab\.me\/mcp-device@1\.0\.7/);
+assert.match(readme, /npm install -g @hcu-lab\.me\/mcp-device@1\.0\.10/);
 for (const command of ['login', 'logout', 'status', 'install', 'stop', 'uninstall']) {
   assert.match(readme, new RegExp(`mcp-device ${command}\\b`));
 }

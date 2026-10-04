@@ -113,7 +113,27 @@ function getCharacterCodeData(expected: string, actual: string): {
     };
 }
 
-export async function performSearchReplace(filePath: string, block: SearchReplace, expectedReplacements: number = 1, origin?: 'ui' | 'llm'): Promise<ServerResult> {
+const editChains = new Map<string, Promise<void>>();
+
+async function withFileEditLock<T>(filePath: string, operation: () => Promise<T>): Promise<T> {
+    const resolved = path.resolve(filePath);
+    const key = process.platform === 'win32' ? resolved.toLowerCase() : resolved;
+    const previous = editChains.get(key) ?? Promise.resolve();
+    let release!: () => void;
+    const current = new Promise<void>(resolve => { release = resolve; });
+    const tail = previous.then(() => current);
+    editChains.set(key, tail);
+
+    await previous;
+    try {
+        return await operation();
+    } finally {
+        release();
+        if (editChains.get(key) === tail) editChains.delete(key);
+    }
+}
+
+async function performSearchReplaceUnlocked(filePath: string, block: SearchReplace, expectedReplacements: number = 1, origin?: 'ui' | 'llm'): Promise<ServerResult> {
     // Get file extension for telemetry using path module
     const fileExtension = path.extname(filePath).toLowerCase();
     
@@ -348,6 +368,63 @@ RECOMMENDATION: For large search/replace operations, consider breaking them into
     throw new Error("Unexpected error during search and replace operation.");
 }
 
+export async function performSearchReplace(filePath: string, block: SearchReplace, expectedReplacements: number = 1, origin?: 'ui' | 'llm'): Promise<ServerResult> {
+    return withFileEditLock(filePath, () =>
+        performSearchReplaceUnlocked(filePath, block, expectedReplacements, origin)
+    );
+}
+
+async function performExactBatch(
+    filePath: string,
+    edits: Array<{ old_string: string; new_string: string; expected_replacements: number }>,
+    origin?: 'ui' | 'llm'
+): Promise<ServerResult> {
+    return withFileEditLock(filePath, async () => {
+        const validPath = await validatePath(filePath);
+        const original = await readFileInternal(validPath, 0, Number.MAX_SAFE_INTEGER);
+        const fileLineEnding = detectLineEnding(original);
+        let next = original;
+
+        for (const edit of edits) {
+            const search = normalizeLineEndings(edit.old_string, fileLineEnding);
+            const replacement = normalizeLineEndings(edit.new_string, fileLineEnding);
+            let count = 0;
+            let pos = next.indexOf(search);
+            while (pos !== -1) {
+                count++;
+                pos = next.indexOf(search, pos + Math.max(1, search.length));
+            }
+
+            if (count !== edit.expected_replacements) {
+                return createErrorResponse(
+                    `Expected ${edit.expected_replacements} occurrences but found ${count} for batched edit in ${filePath}. No changes were written.`
+                );
+            }
+
+            next = count === 1
+                ? next.replace(search, replacement)
+                : next.split(search).join(replacement);
+        }
+
+        await writeFile(filePath, next);
+        const resolvedEditPath = resolveAbsolutePath(filePath);
+        return {
+            content: [{
+                type: "text",
+                text: `Successfully applied ${edits.length} exact edit(s) to ${filePath}`
+            }],
+            ...(origin === 'ui' ? {
+                structuredContent: {
+                    fileName: path.basename(resolvedEditPath),
+                    filePath: resolvedEditPath,
+                    fileType: resolvePreviewFileType(resolvedEditPath),
+                    ...await getDefaultEditorMetadata(resolvedEditPath),
+                },
+            } : {}),
+        };
+    });
+}
+
 /**
  * Generates a character-level diff using standard {-removed-}{+added+} format
  * @param expected The string that was searched for
@@ -419,6 +496,18 @@ export async function handleEditBlock(args: unknown): Promise<ServerResult> {
     }
 
     const hasEditRange = 'editRange' in handler && typeof handler.editRange === 'function';
+
+    // Compact hot path: multiple exact text replacements share one read/write.
+    // Structured handlers keep their existing editRange behavior and do not
+    // opt into this text-only batch contract.
+    if (parsed.edits) {
+        if (hasEditRange) {
+            return createErrorResponse(
+                `Batched exact text edits are not supported for structured file ${parsed.file_path}; use the existing range/text edit contract for that file type.`
+            );
+        }
+        return performExactBatch(parsed.file_path, parsed.edits, parsed.origin);
+    }
 
     // Path 1: Range rewrite (Excel, etc.) — range + content
     if (hasRange && hasContent) {

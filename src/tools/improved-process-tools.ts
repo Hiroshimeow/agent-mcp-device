@@ -21,6 +21,24 @@ const mcpRoot = path.resolve(__dirname, '..', '..');
 const virtualNodeSessions = new Map<number, { timeout_ms: number }>();
 let virtualPidCounter = -1000; // Use negative PIDs for virtual sessions
 
+const processOperationTails = new Map<number, Promise<void>>();
+async function acquireProcessOperation(pid: number): Promise<() => void> {
+  const previous = processOperationTails.get(pid) ?? Promise.resolve();
+  let release!: () => void;
+  const current = new Promise<void>((resolve) => { release = resolve; });
+  const tail = previous.catch(() => {}).then(() => current);
+  processOperationTails.set(pid, tail);
+  await previous.catch(() => {});
+  return () => {
+    release();
+    if (processOperationTails.get(pid) === tail) {
+      tail.finally(() => {
+        if (processOperationTails.get(pid) === tail) processOperationTails.delete(pid);
+      });
+    }
+  };
+}
+
 /**
  * Execute Node.js code via temp file (fallback when Python unavailable)
  * Creates temp .mjs file in MCP directory for ES module import access
@@ -174,7 +192,7 @@ export async function startProcess(args: unknown): Promise<ServerResult> {
 
   const result = await terminalManager.executeCommand(
     commandToRun,
-    parsed.data.timeout_ms,
+    parsed.data.background ? 0 : (parsed.data.yield_ms ?? parsed.data.timeout_ms),
     shellUsed,
     parsed.data.verbose_timing || false,
     workingDirectory
@@ -185,6 +203,12 @@ export async function startProcess(args: unknown): Promise<ServerResult> {
       content: [{ type: "text", text: result.output }],
       isError: true,
     };
+  }
+
+  // Initial output returned here is already delivered to the consuming caller.
+  // Note: Only mark consumed for active running processes; completed processes retain baseline replayability.
+  if (terminalManager.getSession(result.pid)) {
+    terminalManager.markOutputConsumed(result.pid, result.deliveredCursor);
   }
 
   // Analyze the process state to detect if it's waiting for input
@@ -268,51 +292,15 @@ export async function readProcessOutput(args: unknown): Promise<ServerResult> {
   // Timing telemetry
   const startTime = Date.now();
 
-  // For active sessions with no new output yet, optionally wait for output
+  // For active sessions with no unread bytes yet, wait on output/completion progress.
   const session = terminalManager.getSession(pid);
   if (session && offset === 0) {
-    // Wait for new output to arrive (only for "new output" reads, not absolute/tail)
-    const waitForOutput = (): Promise<void> => {
-      return new Promise((resolve) => {
-        // Check if there's already new output
-        const currentLines = terminalManager.getOutputLineCount(pid) || 0;
-        if (currentLines > session.lastReadIndex) {
-          resolve();
-          return;
-        }
-
-        let resolved = false;
-        let interval: NodeJS.Timeout | null = null;
-        let timeout: NodeJS.Timeout | null = null;
-
-        const cleanup = () => {
-          if (interval) clearInterval(interval);
-          if (timeout) clearTimeout(timeout);
-        };
-
-        const resolveOnce = () => {
-          if (resolved) return;
-          resolved = true;
-          cleanup();
-          resolve();
-        };
-
-        // Poll for new output
-        interval = setInterval(() => {
-          const newLineCount = terminalManager.getOutputLineCount(pid) || 0;
-          if (newLineCount > session.lastReadIndex) {
-            resolveOnce();
-          }
-        }, 50);
-
-        // Timeout
-        timeout = setTimeout(() => {
-          resolveOnce();
-        }, timeout_ms);
-      });
-    };
-
-    await waitForOutput();
+    const currentLine = session.outputLines[session.lastReadIndex];
+    const hasUnread = currentLine !== undefined && session.lastReadOffset < currentLine.length
+      || session.outputLines.length - 1 > session.lastReadIndex;
+    if (!hasUnread) {
+      await terminalManager.waitForOutputProgress(pid, session.outputVersion, timeout_ms);
+    }
   }
 
   // Read output with pagination
@@ -361,9 +349,8 @@ export async function readProcessOutput(args: unknown): Promise<ServerResult> {
       : '';
     processStateMessage = `\n✅ Process completed with exit code ${result.exitCode}${runtimeStr}`;
   } else if (session) {
-    // Analyze state for running processes
-    const fullOutput = session.outputLines.join('\n');
-    const processState = analyzeProcessState(fullOutput, pid);
+    // Analyze only the newly returned/bounded output; never rescan retained history here.
+    const processState = analyzeProcessState(output, pid);
     if (processState.isWaitingForInput) {
       processStateMessage = `\n🔄 ${formatProcessStateMessage(processState, pid)}`;
     }
@@ -410,9 +397,12 @@ export async function interactWithProcess(args: unknown): Promise<ServerResult> 
     verbose_timing = false
   } = parsed.data;
 
-  // Get config for output line limit
+  // Get config for output line limit and cap a single blocking interaction below client ceilings.
   const config = await configManager.getConfig();
   const maxOutputLines = config.fileReadLineLimit ?? 1000;
+  const configuredWaitCap = Number(await configManager.getValue('maxProcessWaitMs'));
+  const waitCapMs = Number.isFinite(configuredWaitCap) && configuredWaitCap > 0 ? configuredWaitCap : 180000;
+  const effectiveTimeoutMs = Math.min(Math.max(0, timeout_ms), waitCapMs);
 
   // Check if this is a virtual Node session (node:local)
   if (virtualNodeSessions.has(pid)) {
@@ -434,6 +424,7 @@ export async function interactWithProcess(args: unknown): Promise<ServerResult> 
   let lastOutputTime: number | undefined;
   const outputEvents: any[] = [];
   let exitReason: 'early_exit_quick_pattern' | 'early_exit_periodic_check' | 'process_finished' | 'timeout' | 'no_wait' = 'timeout';
+  const releaseOperation = await acquireProcessOperation(pid);
 
   try {
     capture('server_interact_with_process', {
@@ -488,80 +479,59 @@ export async function interactWithProcess(args: unknown): Promise<ServerResult> 
     // Quick prompt patterns for immediate detection
     const quickPromptPatterns = />>>\s*$|>\s*$|\$\s*$|#\s*$/;
     
-    const waitForResponse = (): Promise<void> => {
-      return new Promise((resolve) => {
-        let resolved = false;
-        let attempts = 0;
-        const pollIntervalMs = 50; // Poll every 50ms for faster response
-        const maxAttempts = Math.ceil(timeout_ms / pollIntervalMs);
-        let interval: NodeJS.Timeout | null = null;
-        let lastOutputLength = 0; // Track output length to detect new output
+    const waitForResponse = async (): Promise<void> => {
+      const deadline = Date.now() + effectiveTimeoutMs;
+      let lastOutputLength = 0;
 
-        let resolveOnce = () => {
-          if (resolved) return;
-          resolved = true;
-          if (interval) clearInterval(interval);
-          resolve();
-        };
+      while (Date.now() < deadline) {
+        const active = terminalManager.getSession(pid);
+        const version = active?.outputVersion ?? -1;
+        const newOutput = outputSnapshot
+          ? terminalManager.getOutputSinceSnapshot(pid, outputSnapshot)
+          : terminalManager.getNewOutput(pid);
 
-        // Fast-polling check - check every 50ms for quick responses
-        interval = setInterval(() => {
-          if (resolved) return;
+        if (newOutput && newOutput.length > lastOutputLength) {
+          const now = Date.now();
+          if (!firstOutputTime) firstOutputTime = now;
+          lastOutputTime = now;
 
-          // Use snapshot-based reading to handle REPL prompt line appending
-          const newOutput = outputSnapshot 
-            ? terminalManager.getOutputSinceSnapshot(pid, outputSnapshot)
-            : terminalManager.getNewOutput(pid);
-            
-          if (newOutput && newOutput.length > lastOutputLength) {
-            const now = Date.now();
-            if (!firstOutputTime) firstOutputTime = now;
-            lastOutputTime = now;
-
-            if (verbose_timing) {
-              outputEvents.push({
-                timestamp: now,
-                deltaMs: now - startTime,
-                source: 'periodic_poll',
-                length: newOutput.length - lastOutputLength,
-                snippet: newOutput.slice(lastOutputLength, lastOutputLength + 50).replace(/\n/g, '\\n')
-              });
-            }
-
-            output = newOutput; // Replace with full output since snapshot
-            lastOutputLength = newOutput.length;
-
-            // Analyze current state
-            processState = analyzeProcessState(output, pid);
-
-            // Exit early if we detect the process is waiting for input
-            if (processState.isWaitingForInput) {
-              earlyExit = true;
-              exitReason = 'early_exit_periodic_check';
-
-              if (verbose_timing && outputEvents.length > 0) {
-                outputEvents[outputEvents.length - 1].matchedPattern = 'periodic_check';
-              }
-
-              resolveOnce();
-              return;
-            }
-
-            // Also exit if process finished
-            if (processState.isFinished) {
-              exitReason = 'process_finished';
-              resolveOnce();
-              return;
-            }
+          if (verbose_timing) {
+            outputEvents.push({
+              timestamp: now,
+              deltaMs: now - startTime,
+              source: 'output_event',
+              length: newOutput.length - lastOutputLength,
+              snippet: newOutput.slice(lastOutputLength, lastOutputLength + 50).replace(/\n/g, '\\n')
+            });
           }
 
-          attempts++;
-          if (attempts >= maxAttempts) {
-            exitReason = 'timeout';
-            resolveOnce();
+          output = newOutput;
+          lastOutputLength = newOutput.length;
+          processState = analyzeProcessState(output, pid);
+
+          if (processState.isWaitingForInput) {
+            earlyExit = true;
+            exitReason = 'early_exit_periodic_check';
+            if (verbose_timing && outputEvents.length > 0) {
+              outputEvents[outputEvents.length - 1].matchedPattern = 'output_event';
+            }
+            return;
           }
-        }, pollIntervalMs);
-      });
+          if (processState.isFinished) {
+            exitReason = 'process_finished';
+            return;
+          }
+        }
+
+        const remaining = deadline - Date.now();
+        if (remaining <= 0) break;
+        if (!active) {
+          exitReason = 'process_finished';
+          return;
+        }
+        await terminalManager.waitForOutputProgress(pid, version, remaining);
+      }
+      exitReason = 'timeout';
     };
     
     await waitForResponse();
@@ -657,6 +627,8 @@ export async function interactWithProcess(args: unknown): Promise<ServerResult> 
       content: [{ type: "text", text: `Error interacting with process: ${errorMessage}` }],
       isError: true,
     };
+  } finally {
+    releaseOperation();
   }
 }
 

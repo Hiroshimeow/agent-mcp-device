@@ -260,7 +260,9 @@ async function runHelperCase({ failInstall, stripPath = false }) {
     errorCode: null,
     message: null,
     deviceId: 'device-helper',
-    managerKind: 'pm2',
+    // Windows execFile cannot execute a .cmd fixture; exercise the native
+    // detached PowerShell runner there, and the PM2 fixture on Unix.
+    managerKind: process.platform === 'win32' ? 'windows-foreground' : 'pm2',
     pm2Path: fakeManager,
     pm2Name: 'mcp-device-test',
     parentPid: 99999999,
@@ -310,7 +312,7 @@ async function runHelperCase({ failInstall, stripPath = false }) {
     assert.equal(finalState.state, 'failed');
     assert.equal(finalPackage.version, '1.0.5', 'failed install must restore old package offline');
   } else {
-    assert.equal(exitCode, 0);
+    assert.equal(exitCode, 0, JSON.stringify(finalState));
     assert.equal(finalState.state, 'installed_waiting_reconnect');
     assert.equal(finalPackage.version, '1.0.6');
     assert.equal(

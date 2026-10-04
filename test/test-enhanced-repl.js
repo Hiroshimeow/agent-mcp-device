@@ -51,7 +51,7 @@ async function testEnhancedREPL() {
   }
   
   console.log(`Started Python session with PID: ${pid}`);
-  
+  try {
   // Test read_process_output with timeout
   console.log('Testing read_process_output with timeout...');
   const initialOutput = await readProcessOutput({ 
@@ -102,7 +102,7 @@ for i in range(3):
     print(greet(f"Guest {i+1}"))`;
   
   // Send the multi-line code
-  await interactWithProcess({
+  const blockResult = await interactWithProcess({
     pid,
     input: multilineCode,
     wait_for_prompt: true,
@@ -116,22 +116,32 @@ for i in range(3):
     wait_for_prompt: true,
     timeout_ms: 5000
   });
-  console.log('Python multi-line output with wait_for_prompt:', multilineResult.content[0].text);
+  // Windows may report a continuation prompt before the final output arrives.
+  // Preserve output from both calls and poll for the actual block result, not
+  // the presence of a prompt (which can be stale).
+  let multilineOutput = blockResult.content[0].text + multilineResult.content[0].text;
+  const deadline = Date.now() + 10000;
+  while (!multilineOutput.includes('Hello, Guest 3!') && Date.now() < deadline) {
+    const next = await readProcessOutput({ pid, timeout_ms: 500 });
+    multilineOutput += next.content[0].text;
+    if (!multilineOutput.includes('Hello, Guest 3!')) await new Promise(resolve => setTimeout(resolve, 100));
+  }
+  console.log('Python multi-line output with wait_for_prompt:', multilineOutput);
   
   // Check that the output contains all three greetings
-  assert(multilineResult.content[0].text.includes('Hello, Guest 1!'), 
+  assert(multilineOutput.includes('Hello, Guest 1!'),
     'Output should contain greeting for Guest 1');
-  assert(multilineResult.content[0].text.includes('Hello, Guest 2!'), 
+  assert(multilineOutput.includes('Hello, Guest 2!'),
     'Output should contain greeting for Guest 2');
-  assert(multilineResult.content[0].text.includes('Hello, Guest 3!'), 
+  assert(multilineOutput.includes('Hello, Guest 3!'),
     'Output should contain greeting for Guest 3');
   
-  // Terminate the session
-  console.log("Terminating session...");
-  await forceTerminate({ pid });
-  console.log('Python session terminated');
-  
   return true;
+  } finally {
+    console.log('Terminating session...');
+    await forceTerminate({ pid });
+    console.log('Python session terminated');
+  }
 }
 
 // Run the test

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import './bootstrap.js';
 
 // MCP Device publishes only the authenticated device runtime surface.
 if (process.argv[2] !== 'remote') process.argv.splice(2, 0, 'remote');
