@@ -1,11 +1,13 @@
 import { searchManager } from '../search-manager.js';
 import {
   StartSearchArgsSchema,
+  SearchOnceArgsSchema,
   GetMoreSearchResultsArgsSchema,
   StopSearchArgsSchema
 } from '../tools/schemas.js';
 import { ServerResult } from '../types.js';
 import { capture } from '../utils/capture.js';
+import { takeUtf8Budget } from '../utils/output-budget.js';
 
 /**
  * Handle start_search command
@@ -74,6 +76,58 @@ export async function handleStartSearch(args: unknown): Promise<ServerResult> {
     
     return {
       content: [{ type: "text", text: `Error starting search session: ${errorMessage}` }],
+      isError: true,
+    };
+  }
+}
+
+export async function handleSearchOnce(args: unknown): Promise<ServerResult> {
+  const parsed = SearchOnceArgsSchema.safeParse(args);
+  if (!parsed.success) {
+    return {
+      content: [{ type: "text", text: `Invalid arguments for search_once: ${parsed.error}` }],
+      isError: true,
+    };
+  }
+
+  try {
+    const maxResults = parsed.data.maxResults ?? 100;
+    const result = await searchManager.searchOnce({
+      rootPath: parsed.data.path,
+      pattern: parsed.data.pattern,
+      searchType: parsed.data.searchType,
+      filePattern: parsed.data.filePattern,
+      ignoreCase: parsed.data.ignoreCase,
+      maxResults,
+      includeHidden: parsed.data.includeHidden,
+      contextLines: parsed.data.contextLines,
+      timeout: parsed.data.timeout_ms,
+      earlyTermination: parsed.data.earlyTermination,
+      literalSearch: parsed.data.literalSearch,
+    }, maxResults, parsed.data.maxBytes);
+
+    let body = '';
+    for (const item of result.results) {
+      body += item.type === 'content'
+        ? `${item.file}:${item.line ?? 0} - ${item.match ?? ''}\n`
+        : `${item.file}\n`;
+    }
+    if (!body) body = 'No matches found.\n';
+
+    const status = `[search_once truncated=${result.truncated} timedOut=${result.timedOut} results=${result.results.length} runtimeMs=${result.runtime}]`;
+    const bodyBudget = Math.max(0, parsed.data.maxBytes - Buffer.byteLength(status, 'utf8') - 1);
+    const bounded = takeUtf8Budget(body, bodyBudget);
+    const truncated = result.truncated || bounded.truncated;
+    const finalStatus = `[search_once truncated=${truncated} timedOut=${result.timedOut} results=${result.results.length} runtimeMs=${result.runtime}]`;
+
+    return {
+      content: [{ type: "text", text: `${bounded.text}${finalStatus}` }],
+    };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    capture('search_once_error', { error: errorMessage });
+    return {
+      content: [{ type: "text", text: `Error running one-shot search: ${errorMessage}` }],
       isError: true,
     };
   }

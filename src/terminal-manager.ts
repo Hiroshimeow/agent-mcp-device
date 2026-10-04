@@ -43,6 +43,9 @@ interface CompletedSession {
   endTime: Date;
   evictedLines: number;        // Carried over from the active session (see TerminalSession)
   evictedChars: number;
+  lastReadIndex: number;
+  lastReadOffset: number;
+  bufferedChars: number;
 }
 
 /**
@@ -175,6 +178,10 @@ export class TerminalManager {
   }
   
   async executeCommand(command: string, timeoutMs: number = DEFAULT_COMMAND_TIMEOUT, shell?: string, collectTiming: boolean = false, workingDirectory?: string): Promise<CommandExecutionResult> {
+    const configuredWaitCap = Number(await configManager.getValue('maxProcessWaitMs'));
+    const waitCapMs = Number.isFinite(configuredWaitCap) && configuredWaitCap > 0 ? configuredWaitCap : 180000;
+    const effectiveWaitMs = Math.min(Math.max(0, timeoutMs), waitCapMs);
+
     // Get the shell from config if not specified
     let shellToUse: string | boolean | undefined = shell;
     if (!shellToUse) {
@@ -288,6 +295,9 @@ export class TerminalManager {
       process: childProcess,
       outputLines: [],           // Line-based buffer
       lastReadIndex: 0,          // Track where "new" output starts
+      lastReadOffset: 0,         // Character offset inside a partially consumed line
+      outputVersion: 0,
+      outputWaiters: new Set(),
       isBlocked: false,
       startTime: new Date(),
       bufferedChars: 0,
@@ -314,6 +324,10 @@ export class TerminalManager {
       const resolveOnce = (result: CommandExecutionResult) => {
         if (resolved) return;
         resolved = true;
+        if (session.outputLines.length > 0) {
+          const lineIndex = session.outputLines.length - 1;
+          result.deliveredCursor = { lineIndex, lineOffset: session.outputLines[lineIndex].length };
+        }
         if (periodicCheck) clearInterval(periodicCheck);
 
         // Add timing info if requested
@@ -458,35 +472,36 @@ export class TerminalManager {
           output,
           isBlocked: true
         });
-      }, timeoutMs);
+      }, effectiveWaitMs);
 
+      let processExitCode: number | null = null;
       childProcess.on('exit', (code: any) => {
-        if (childProcess.pid) {
-          // Store completed session before removing active session
-          this.completedSessions.set(childProcess.pid, {
-            pid: childProcess.pid,
-            outputLines: [...session.outputLines], // Copy line buffer
-            exitCode: code,
-            startTime: session.startTime,
-            endTime: new Date(),
-            evictedLines: session.evictedLines,
-            evictedChars: session.evictedChars
-          });
-
-          // Keep only last 100 completed sessions
-          if (this.completedSessions.size > 100) {
-            const oldestKey = Array.from(this.completedSessions.keys())[0];
-            this.completedSessions.delete(oldestKey);
-          }
-
-          this.sessions.delete(childProcess.pid);
-        }
+        processExitCode = code;
         exitReason = 'process_exit';
-        resolveOnce({
-          pid: childProcess.pid!,
-          output,
-          isBlocked: false
+        resolveOnce({ pid: childProcess.pid!, output, isBlocked: false });
+      });
+
+      // Finalize only after stdio has closed so fast-exit stdout/stderr cannot be lost.
+      childProcess.on('close', (code: any) => {
+        if (!childProcess.pid) return;
+        this.completedSessions.set(childProcess.pid, {
+          pid: childProcess.pid,
+          outputLines: [...session.outputLines],
+          exitCode: processExitCode ?? code,
+          startTime: session.startTime,
+          endTime: new Date(),
+          evictedLines: session.evictedLines,
+          evictedChars: session.evictedChars,
+          lastReadIndex: session.lastReadIndex,
+          lastReadOffset: session.lastReadOffset,
+          bufferedChars: session.bufferedChars
         });
+        if (this.completedSessions.size > 100) {
+          const oldestKey = Array.from(this.completedSessions.keys())[0];
+          this.completedSessions.delete(oldestKey);
+        }
+        this.notifyOutputProgress(session);
+        this.sessions.delete(childProcess.pid);
       });
     });
   }
@@ -495,6 +510,27 @@ export class TerminalManager {
    * Append text to a session's line buffer
    * Handles partial lines and newline splitting
    */
+  private notifyOutputProgress(session: TerminalSession): void {
+    session.outputVersion++;
+    for (const waiter of session.outputWaiters) waiter();
+    session.outputWaiters.clear();
+  }
+
+  async waitForOutputProgress(pid: number, sinceVersion: number, timeoutMs: number): Promise<void> {
+    const session = this.sessions.get(pid);
+    if (!session || session.outputVersion !== sinceVersion) return;
+    await new Promise<void>((resolve) => {
+      let timer: NodeJS.Timeout;
+      const done = () => {
+        session.outputWaiters.delete(done);
+        clearTimeout(timer);
+        resolve();
+      };
+      session.outputWaiters.add(done);
+      timer = setTimeout(done, timeoutMs);
+    });
+  }
+
   private appendToLineBuffer(session: TerminalSession, text: string): void {
     if (!text) return;
 
@@ -544,6 +580,7 @@ export class TerminalManager {
       session.evictedLines++;
       if (session.lastReadIndex > 0) session.lastReadIndex--;
     }
+    this.notifyOutputProgress(session);
   }
 
   /**
@@ -553,9 +590,33 @@ export class TerminalManager {
    * @param length Max lines to return
    * @param updateReadIndex Whether to update lastReadIndex (default: true for offset=0)
    */
+  markOutputConsumed(pid: number, cursor?: { lineIndex: number; lineOffset: number }): void {
+    if (!cursor) return;
+    const session = this.sessions.get(pid);
+    if (session) {
+      session.lastReadIndex = Math.min(cursor.lineIndex, Math.max(0, session.outputLines.length - 1));
+      session.lastReadOffset = cursor.lineOffset;
+      return;
+    }
+    const completed = this.completedSessions.get(pid);
+    if (completed) {
+      completed.lastReadIndex = Math.min(cursor.lineIndex, Math.max(0, completed.outputLines.length - 1));
+      completed.lastReadOffset = cursor.lineOffset;
+    }
+  }
+
   readOutputPaginated(pid: number, offset: number = 0, length: number = 1000): PaginatedOutputResult | null {
     // First check active sessions
     const session = this.sessions.get(pid);
+    if (session && offset === 0 && session.outputLines.length > 0) {
+      const start = Math.min(session.lastReadIndex, session.outputLines.length - 1);
+      const first = session.outputLines[start].slice(session.lastReadOffset);
+      const tail = session.outputLines.slice(start + 1, start + length);
+      const lines = first || tail.length === 0 ? [first, ...tail] : tail;
+      session.lastReadIndex = Math.min(start + lines.length - 1, session.outputLines.length - 1);
+      session.lastReadOffset = session.outputLines[session.lastReadIndex].length;
+      return { lines, totalLines: session.outputLines.length, readFrom: start, readCount: lines.length, remaining: Math.max(0, session.outputLines.length - start - lines.length), isComplete: false, evictedLines: session.evictedLines };
+    }
     if (session) {
       const result = this.readFromLineBuffer(
         session.outputLines,
@@ -578,7 +639,7 @@ export class TerminalManager {
         completedSession.outputLines,
         offset,
         length,
-        0,  // Completed sessions don't track read position
+        0,  // Protected baseline: completed sessions read from beginning and remain replayable
         () => {},  // No-op for completed sessions
         true,
         completedSession.exitCode,
@@ -699,17 +760,11 @@ export class TerminalManager {
    */
   captureOutputSnapshot(pid: number): { totalChars: number; lineCount: number } | null {
     const session = this.sessions.get(pid);
-    if (session) {
-      const fullOutput = session.outputLines.join('\n');
-      return {
-        // Absolute since process start (includes evicted output), so the
-        // offset stays valid even if the cap evicts lines between
-        // snapshot and read.
-        totalChars: session.evictedChars + fullOutput.length,
-        lineCount: session.evictedLines + session.outputLines.length
-      };
-    }
-    return null;
+    if (!session) return null;
+    return {
+      totalChars: session.evictedChars + session.bufferedChars,
+      lineCount: session.evictedLines + session.outputLines.length
+    };
   }
 
   /**
@@ -721,13 +776,13 @@ export class TerminalManager {
     // Check active session first
     const session = this.sessions.get(pid);
     if (session) {
-      return TerminalManager.outputSinceSnapshot(session.outputLines, session.evictedChars, snapshot.totalChars);
+      return TerminalManager.outputSinceSnapshot(session.outputLines, session.bufferedChars, session.evictedChars, snapshot.totalChars);
     }
 
     // Fallback to completed sessions - process may have finished between snapshot and poll
     const completedSession = this.completedSessions.get(pid);
     if (completedSession) {
-      return TerminalManager.outputSinceSnapshot(completedSession.outputLines, completedSession.evictedChars, snapshot.totalChars);
+      return TerminalManager.outputSinceSnapshot(completedSession.outputLines, completedSession.bufferedChars, completedSession.evictedChars, snapshot.totalChars);
     }
 
     return null;
@@ -738,13 +793,26 @@ export class TerminalManager {
    * If eviction dropped part of the unseen output, returns what the buffer
    * still holds — the oldest unseen chars are lost to the cap.
    */
-  private static outputSinceSnapshot(outputLines: string[], evictedChars: number, snapshotTotalChars: number): string {
-    const fullOutput = outputLines.join('\n');
-    const newChars = evictedChars + fullOutput.length - snapshotTotalChars;
-    if (newChars <= 0) {
-      return ''; // No new output
+  private static outputSinceSnapshot(outputLines: string[], bufferedChars: number, evictedChars: number, snapshotTotalChars: number): string {
+    const newChars = evictedChars + bufferedChars - snapshotTotalChars;
+    if (newChars <= 0) return '';
+
+    let remaining = newChars;
+    const parts: string[] = [];
+    for (let i = outputLines.length - 1; i >= 0 && remaining > 0; i--) {
+      const line = outputLines[i];
+      const separator = i < outputLines.length - 1 ? 1 : 0;
+      const available = line.length + separator;
+      if (remaining >= available) {
+        parts.push((separator ? '\n' : '') + line);
+        remaining -= available;
+      } else {
+        const suffixLength = Math.max(0, remaining - separator);
+        parts.push((separator ? '\n' : '') + line.slice(Math.max(0, line.length - suffixLength)));
+        remaining = 0;
+      }
     }
-    return fullOutput.substring(Math.max(0, fullOutput.length - newChars));
+    return parts.reverse().join('');
   }
 
     /**

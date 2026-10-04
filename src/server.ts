@@ -148,7 +148,7 @@ let currentCallIsRemote = false;
  * Set whether the current tool call is from a remote device.
  * Called once per tool call by the CallTool handler.
  */
-function setCurrentCallIsRemote(isRemote: boolean) {
+export function setCurrentCallIsRemote(isRemote: boolean) {
     currentCallIsRemote = isRemote;
 }
 
@@ -163,7 +163,7 @@ let currentRemoteClient: { name?: string; version?: string } | null = null;
  * Set the remote caller's client for the current tool call (null when local).
  * Called once per tool call by the CallTool handler.
  */
-function setCurrentRemoteClient(clientInfo: { name?: string; version?: string } | null) {
+export function setCurrentRemoteClient(clientInfo: { name?: string; version?: string } | null) {
     currentRemoteClient = clientInfo;
 }
 

@@ -143,7 +143,7 @@ export class MCPDevice {
                 appCaPem: gatewayConfig.appCaPem || undefined,
                 adapter: new GatewayToolAdapter(this.executionEngine, { allowedRoots: gatewayConfig.allowedRoots }),
                 runtimeState: () => this.executionEngine.getRuntimeState(),
-                agentVersion: process.env.npm_package_version,
+                agentVersion: VERSION || process.env.npm_package_version || '1.0.10',
                 onUpdateRequest: async (targetVersion, { requestId }) => {
                     const record = await identity.loadOrCreate();
                     const prepared = await prepareDevicePackageUpdate({

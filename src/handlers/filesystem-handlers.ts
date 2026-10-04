@@ -31,6 +31,7 @@ import {
 import path from 'path';
 import os from 'os';
 import { resolvePreviewFileType } from '../ui/file-preview/shared/preview-file-types.js';
+import { takeUtf8Budget } from '../utils/output-budget.js';
 
 /**
  * Expand home directory (~) in a file path
@@ -244,58 +245,75 @@ export async function handleReadFile(args: unknown): Promise<ServerResult> {
  */
 export async function handleReadMultipleFiles(args: unknown): Promise<ServerResult> {
     const parsed = ReadMultipleFilesArgsSchema.parse(args);
-    const fileResults = await readMultipleFiles(parsed.paths);
+    const fileResults = await readMultipleFiles(parsed.paths, {
+        offset: parsed.offset,
+        length: parsed.length,
+    });
 
-    // Create a text summary of all files
+    const nextOffset = parsed.offset >= 0 ? parsed.offset + parsed.length : undefined;
     const textSummary = fileResults.map(result => {
         if (result.error) {
             return `${result.path}: Error - ${result.error}`;
         } else if (result.isPdf) {
             return `${result.path}: PDF file with ${result.payload?.pages?.length} pages`;
         } else if (result.mimeType) {
-            return `${result.path}: ${result.mimeType} ${result.isImage ? '(image)' : '(text)'}`;
+            const continuation = !result.isImage && nextOffset !== undefined ? ` nextOffset=${nextOffset}` : '';
+            return `${result.path}: ${result.mimeType} ${result.isImage ? '(image)' : '(text)'}${continuation}`;
         } else {
             return `${result.path}: Unknown type`;
         }
     }).join("\n");
 
-    // Create content items for each file
     const contentItems: Array<{ type: string, text?: string, data?: string, mimeType?: string }> = [];
+    const truncationStatus = `\n[read_multiple_files truncated=true maxBytes=${parsed.maxBytes}${nextOffset !== undefined ? ` nextOffset=${nextOffset}` : ''}]`;
+    const reservedStatusBytes = Buffer.byteLength(truncationStatus, 'utf8');
+    let remainingBytes = Math.max(0, parsed.maxBytes - reservedStatusBytes);
+    let truncated = false;
 
-    // Add the text summary
-    contentItems.push({ type: "text", text: textSummary });
+    const appendText = (text: string): void => {
+        if (remainingBytes <= 0) {
+            truncated = true;
+            return;
+        }
+        const bounded = takeUtf8Budget(text, remainingBytes);
+        if (bounded.text) {
+            contentItems.push({ type: "text", text: bounded.text });
+            remainingBytes -= bounded.bytes;
+        }
+        truncated ||= bounded.truncated;
+    };
 
-    // Add each file content
+    const appendImage = (data: string, mimeType: string): void => {
+        const bytes = Buffer.byteLength(data, 'utf8');
+        if (bytes > remainingBytes) {
+            truncated = true;
+            return;
+        }
+        contentItems.push({ type: "image", data, mimeType });
+        remainingBytes -= bytes;
+    };
+
+    appendText(textSummary);
+
     for (const result of fileResults) {
-        if (!result.error && result.content !== undefined) {
-            if (result.isPdf) {
-                result.payload?.pages.forEach((page, i) => {
-                    page.images.forEach((image, i) => {
-                        contentItems.push({
-                            type: "image",
-                            data: image.data,
-                            mimeType: image.mimeType
-                        });
-                    });
-                    contentItems.push({
-                        type: "text",
-                        text: page.text,
-                    });
-                });
-            } else if (result.isImage && result.mimeType) {
-                // For image files, add an image content item
-                contentItems.push({
-                    type: "image",
-                    data: result.content,
-                    mimeType: result.mimeType
-                });
-            } else {
-                // For text files, add a text summary
-                contentItems.push({
-                    type: "text",
-                    text: `\n--- ${result.path} contents: ---\n${result.content}`
-                });
+        if (result.error || result.content === undefined || remainingBytes <= 0) continue;
+
+        if (result.isPdf) {
+            for (const page of result.payload?.pages ?? []) {
+                for (const image of page.images) appendImage(image.data, image.mimeType);
+                appendText(page.text);
             }
+        } else if (result.isImage && result.mimeType) {
+            appendImage(result.content, result.mimeType);
+        } else {
+            appendText(`\n--- ${result.path} contents: ---\n${result.content}`);
+        }
+    }
+
+    if (truncated) {
+        const boundedStatus = takeUtf8Budget(truncationStatus, Math.min(reservedStatusBytes, parsed.maxBytes));
+        if (boundedStatus.text) {
+            contentItems.push({ type: "text", text: boundedStatus.text });
         }
     }
 
