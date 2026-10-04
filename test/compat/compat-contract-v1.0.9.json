@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "contractVersion": "1.0.9",
+  "baseline": {
+    "version": "1.0.9",
+    "commit": "ee87d0f3057e01e8087db99615d14bd1b4c626d4"
+  },
+  "normalization": {
+    "unstableFields": ["pid", "sessionId", "tempPath", "timestamp", "latencyMs", "rssBytes"],
+    "pathSeparatorsEquivalent": true,
+    "caseFoldWindowsDriveLetterOnly": true
+  },
+  "performanceGuardrails": {
+    "latencyP95RatioMax": 1.5,
+    "latencyP95AbsoluteSlackMs": 50,
+    "rssDeltaRatioMax": 1.2,
+    "rssDeltaAbsoluteSlackBytes": 33554432
+  },
+  "intentionalDrift": [],
+  "nonComparable": [
+    {
+      "id": "filesystem.edit.dry_run",
+      "reason": "v1.0.9 edit_block has no dry_run argument in its public schema; candidate additions must be additive and separately tested."
+    },
+    {
+      "id": "remote.real_device",
+      "reason": "Real-device transport requires an authorized online device and is reported separately by the TEST role."
+    }
+  ],
+  "contracts": [
+    {"id":"public.gateway.schema","group":"remote","compare":"exact","platform":"all"},
+    {"id":"process.fast_exit_output","group":"process","compare":"semantic","platform":"all"},
+    {"id":"process.delayed_output","group":"process","compare":"semantic","platform":"all"},
+    {"id":"process.absolute_offset","group":"process","compare":"semantic","platform":"all"},
+    {"id":"process.tail","group":"process","compare":"semantic","platform":"all"},
+    {"id":"process.interact_order_100","group":"process","compare":"semantic","platform":"all"},
+    {"id":"process.terminate","group":"process","compare":"semantic","platform":"all"},
+    {"id":"process.parallel_1_4_16","group":"process","compare":"semantic","platform":"all"},
+    {"id":"process.randomized_cycles","group":"process","compare":"semantic","platform":"all"},
+    {"id":"process.large_output","group":"process","compare":"semantic","platform":"all"},
+    {"id":"filesystem.roundtrip_matrix","group":"filesystem","compare":"exact","platform":"all"},
+    {"id":"filesystem.range_tail_large","group":"filesystem","compare":"semantic","platform":"all"},
+    {"id":"filesystem.edit_exact","group":"filesystem","compare":"exact","platform":"all"},
+    {"id":"filesystem.edit_mismatch","group":"filesystem","compare":"semantic","platform":"all"},
+    {"id":"filesystem.edit_empty_replacement","group":"filesystem","compare":"exact","platform":"all"},
+    {"id":"filesystem.parallel_independent","group":"filesystem","compare":"exact","platform":"all"},
+    {"id":"security.allowed_root","group":"security","compare":"semantic","platform":"all"},
+    {"id":"security.sibling_prefix_denied","group":"security","compare":"semantic","platform":"all"},
+    {"id":"security.traversal_denied","group":"security","compare":"semantic","platform":"all"},
+    {"id":"security.symlink_escape","group":"security","compare":"semantic","platform":"all"},
+    {"id":"search.literal_regex_unicode","group":"search","compare":"semantic","platform":"all"},
+    {"id":"search.pagination_tail","group":"search","compare":"semantic","platform":"all"},
+    {"id":"search.randomized_30","group":"search","compare":"semantic","platform":"all"},
+    {"id":"search.cleanup","group":"search","compare":"semantic","platform":"all"},
+    {"id":"stress.mixed_30","group":"stress","compare":"semantic","platform":"all"},
+    {"id":"resource.rss_trend","group":"resource","compare":"guardrail","platform":"all"},
+    {"id":"resource.no_live_process_sessions","group":"resource","compare":"semantic","platform":"all"}
+  ]
+}
