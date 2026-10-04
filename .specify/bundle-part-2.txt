@@ -1,0 +1,307 @@
+graph repo-scoped. Không sở hữu execution loop. |
+| `src/context/store.ts`, `migrations/` | SQLite và transaction/version/retention; không để adapters viết SQL trực tiếp. |
+| `src/context/repositories.ts` | Resolve UUID/owner/worktree, current policy và relink có kiểm chứng. Reuse path guards. |
+| `src/context/capture.ts` | Subscriber tại observer do 001 cung cấp; chuẩn hóa public event một lần, tránh observer recursion. |
+| `src/context/indexer.ts`, `graph.ts`, `search.ts` | Incremental extraction/FTS, typed edges, query bounded/deterministic. Có thể gom file nếu trách nhiệm nhỏ; không scaffold cả framework. |
+| `src/context/cli.ts` | CLI command adapter; gọi service, không gateway. |
+| `src/context/wiki.ts` | Optional helper adapter, request/job/budget, manual-only; không copy full wiki platform. |
+| `src/mcp-device.ts` hoặc entrypoint CLI hiện hữu | Chỉ đăng ký command group; mapping thật xác định ở G-110. |
+| `src/device/gateway-tool-adapter.ts`, `gateway-channel.ts`, `device.ts` | Chỉ context capability/dispatch/ownership/lifecycle sau handoff; không đổi behavior file/process. |
+| `src/utils/toolHistory.ts` | Import/compatibility handoff của JSONL; không hai canonical recorders cùng ghi. |
+| `skills/mcp-device-context/` | Portable usage skill được đóng gói khi implementation; không ghi vào ~/.agents ngay ở vòng spec. |
+| `test/context/` | Test fixtures/contracts/security/recovery/perf correctness; dùng helper hiện có. |
+| Gateway repo `scripts/custom-tools/index.mjs`, routing/risk modules | Năm public schemas + dispatch, không store/index ở gateway. Cần change set và review riêng. |
+
+New-file rationale bắt buộc tại implementation: kiểm tra module tương đương trước khi thêm. Không tạo `src/runtime/*` mới để vượt quyết định kiến trúc của 001.
+
+## Phase 0: Research and Dependency Decisions
+
+[research.md](research.md) chốt D-01..D-10 và ghi rõ unknown theo gate, không dùng dữ liệu ngoài để thay yêu cầu user. Deliverables trước code integration: handoff contract 001; Node/SQLite/parser feasibility; policy retention/bounds; schema inventory; wiki reuse/license.
+
+Không cần đợi 1.0.10 release để duyệt contracts. Cần một boundary version được chấp nhận hoặc explicit experimental trial authorization trước khi chạm vùng source chung. Nếu 001 đổi signature/result model sau đó, test và evidence phụ thuộc phải chạy lại.
+
+## Phase 1: Design and Contracts
+
+### A. Capture source events
+
+Tại boundary sau authorize và trước dispatch ghi invocation identity/outcome lifecycle theo observer 001. Outcome thực thi và transport delivery là hai trạng thái. Capture normalized public request, actual result/error và bounded evidence. Với process dài, lưu execution UUID/generation và output ranges; PID không là khóa bền duy nhất. Không tạo modified edge từ attempted edit/dry-run.
+
+Storage failure không biến tool đã chạy thành failed-to-execute. Thiết kế báo recording degraded qua status/metadata được duyệt, không chèn prompt prose. Side effect không thể transaction chung với SQLite; crash ambiguity được giữ là `unknown`, không auto-replay.
+
+Không capture body kết quả `local_*`, wiki, status hay backup vào corpus. Trường metadata đếm request được phép nhưng không thành semantic event để loại vòng “search lại chính search result”.
+
+### B. Repository/owner resolution
+
+Request remote được gắn identity bởi gateway đã xác thực; device resolve path/cwd trong quyền hiện tại. Local CLI dùng OS user + paired owner namespace đã lưu, không nhận account tùy ý từ câu lệnh. Worktree path map tới repository UUID và worktree UUID. Current source graph không trộn symbol của hai branch.
+
+Global origin/root commit không là authority. Ambiguous parent-cwd/multi-repo command trả unscoped/ambiguous event, không đoán. Re-pair không expose owner namespace cũ. Remote offline trả offline, không server fallback. Registry metadata discovery local có kiểm soát, không quét toàn ổ đĩa.
+
+### C. Persistence/concurrency
+
+Per-repo SQLite cho event/index/graph/job metadata; blobs content-addressed trong cùng store. WAL + short transactions; bounded pool và retry; migration/rebuild khóa riêng có timeout và crash recovery. CLI không phụ thuộc daemon nhưng phải tuân thủ cùng locks/transaction contract.
+
+Parse/source IO/provider diễn ra ngoài write transaction. Publish index/wiki generation bằng staged result và commit pointer; không xóa last-good trước khi thế hệ mới hợp lệ. Không backup bằng copy riêng file `.sqlite` đang có WAL; dùng coherent snapshot theo binding được chọn.
+
+Retention ưu tiên metadata nhỏ/provenance và bounded payload archive. Policy sản phẩm không “vô hạn”: phải có quota tổng/metadata/payload/jobs/handles và hành vi khi đầy. Không prune pending unindexed events mà không báo gap. `purge` có manifest/xác nhận, cascade derivatives/jobs và không thay repo files.
+
+### D. Search/index/graph
+
+`search` đọc generation hiện có, lexical/exact trước rồi mở rộng graph trong budget; trả coverage/pending/degraded. Chưa có index thì báo `INDEX_MISSING`; không tự build. `sync` incremental là tác vụ có chủ đích: import new events, normalize output, update FTS, build observed relations, parse file đã chọn/thay đổi và publish generation.
+
+Code parser xử lý content hash; references giữ unresolved nếu không đủ thông tin. Chỉ đọc full file khi policy/command cho phép; tool snippet không chứng minh biết toàn file. Rename/delete/branch switch tạo stale markers đúng worktree. SQL parameterized và safe FTS query compiler; không nhận raw SQL/Cypher từ agent.
+
+Duyệt graph giới hạn frontier/visited/edges/time ngay trong thuật toán; không chỉ LIMIT sau recursive query. High-degree repo/tool/error nodes không là seed mặc định. Không gán nhân quả “fixed_by” từ hai command liên tiếp. Lịch sử và code hiện tại có source-kind riêng.
+
+### E. Skill/local access
+
+Một skill dạy `mcp-device context search/read/status/sync/checkpoint/graph/wiki`; commands map về cùng domain operations. Install/update/remove kiểm tra hash/version, preview và không ghi đè chỉnh sửa cá nhân. Ưu tiên CLI khi đúng môi trường; WSL/container/remote VS Code cần xác định storage root thật, không xem hostname là chứng cứ.
+
+Skill dùng native file/shell tools để code; không cần hooks. Chỉ summary/checkpoint được báo `reported`. Không bảo đảm skill tự kích hoạt trên mọi model/client; có hướng dẫn explicit invocation và compatibility tests từng harness.
+
+### F. Wiki manual
+
+`local_wiki` estimate/generate/update/status/cancel/export/lint dùng helper tùy chọn. Chọn đúng một backend đã review, ưu tiên phần core tái sử dụng; không autostart watcher hay copy tool surface upstream. Request ghi provider profile, source manifest, budgets và explicit user authorization; secret lấy từ config an toàn, không arguments/log.
+
+Wiki cho người đọc: architecture/modules/flows/testing/work-history tách biệt, unknown/coverage, evidence links và editable overlay. Không generate architecture toàn repo từ một vài tool call. Source file snapshots/graph coverage thiếu thì page phải thừa nhận. Hỏng/rỗng/conflict giữ last-good. Model không được gọi arbitrary tools hoặc đi ngoài source manifest.
+
+## Dependency-Ordered Delivery
+
+1. Phê duyệt feature design và dependency handoff; chưa source changes.
+2. Trong nhánh thử nghiệm được phép: chốt DB/runtime/policy/schema và executable test fixtures.
+3. Store/repo identity + capture through accepted observer; CLI read/search đầu tiên.
+4. Sync FTS/activity graph; bounded relational queries; local checkpoint/skill.
+5. Code graph incremental, invalidation/worktree isolation và cancellation.
+6. Gateway manifest/parity/security; rollout đồng bộ năm tool, không remove tool cũ tự động.
+7. Optional manual wiki bằng backend được ghim; có thể nghiệm thu riêng không chặn core.
+8. Windows/Linux adverse/recovery/perf/raw evidence, independent review và release decision riêng.
+
+### Parallel Boundaries
+
+Sau schema/data model freeze, fixture tests, CLI adapter, graph/parser và skill content có thể làm theo lane riêng. Shared `store.ts`, migration, dispatcher hook, gateway tool manifest mỗi thời điểm một owner; không đánh dấu `[P]` cho hai task sửa cùng file hoặc phụ thuộc gate chưa qua. Wiki lane chỉ bắt đầu sau source-manifest contract và G-WIKI. Xem tasks cho thứ tự cụ thể.
+
+## Risks and Rollback
+
+| Rủi ro | Mitigation / stop condition |
+| --- | --- |
+| 001 thay canonical dispatcher/output | Dừng integration, refresh handoff và chạy lại parity; không code fallback self-MCP riêng. |
+| SQLite binding không hỗ trợ Node/native target | Không nâng floor âm thầm; G-DB fail, core context chưa enable. |
+| Context lock/IO kéo dài tool latency | Capture-only budget và queue/degraded policy; maintenance không block lifecycle/heartbeat. |
+| Log/code chứa secret/instructions | Redact/exclude trước store, source-kind untrusted; không execute text tìm được; test output gateway/provider. |
+| Repo/account leakage | Resolve scope trước storage/ref lookup; owner association immutable; test re-pair/symlink/clone. |
+| Retention làm graph orphan | Reference-state explicit và tombstone; không phản hồi nội dung đã bị purge từ cache/wiki. |
+| Wiki helper nặng/auto network | Optional install, manual run, egress allowlist/budget, no watcher. |
+
+Rollback của feature: ngừng capture/context capability theo configuration đã duyệt, giữ DB/evidence để điều tra; không downgrade destructive schema, không xóa dữ liệu tự động. Old tool execution vẫn phải có regression gate. Không dùng rollback làm lý do lưu history lên server.
+
+## Complexity Tracking
+
+Per-repo stores là lựa chọn có chi phí connection/registry/migration, không phải “miễn phí”. Additional service/library cần vì chưa có repo-scoped evidence engine; không cần graph database daemon, vector store hay multi-agent runtime. Mỗi gate chưa qua được ghi rõ trong [implementation checklist](checklists/implementation-gates.md), không giả làm exception đã được chấp thuận.
+
+
+===== FILE: specs\002-device-local-context\research.md =====
+
+# Research — Device-local Context
+
+**Ngày kiểm tra**: 2026-10-04. Đây là nghiên cứu/thiết kế, không phải kết quả triển khai.
+
+## 1. Nguồn và độ tin cậy
+
+### Nội bộ, kiểm tra bằng connector trên g6
+
+| ID | Nguồn | Điều thực sự chứng minh |
+| --- | --- | --- |
+| I-01 | `wt-mcp-device-110-integrate/.specify/memory/constitution.md` | Constitution 2.0.0-proposed chưa ratify; compatibility/bounds/Windows/Linux/independent review/canonical dispatch là tiêu chí đề xuất. |
+| I-02 | `specs/001-mcp-runtime-review/spec.md`, `plan.md`, `tasks.md` trong worktree trên | 1.0.10 ở trạng thái NOT READY FOR IMPLEMENTATION; dispatcher, process output, bounds và benchmark đang là phần review. |
+| I-03 | Source baseline `ee87d0f3057e01e8087db99615d14bd1b4c626d4` | `src/device/gateway-channel.ts` gọi adapter; adapter xử lý trực tiếp shell; `src/server.ts` ghi toolHistory; không có một recorder outer đầy đủ ở baseline này. |
+| I-04 | `src/utils/toolHistory.ts` cùng baseline | JSONL có payload, queue, trim; không phải kho lịch sử vô hạn hoặc đầy đủ mọi public route. |
+| I-05 | Gateway `scripts/custom-tools/index.mjs`, public schemas đã đọc trong phiên | `project_list` và `project_inspect` là discovery/inspection dựa registry; không đủ evidence để xóa đơn thuần. |
+| I-06 | Live `md.list_devices` ngày nghiên cứu | Gateway báo 19 tools, 26.573 schema bytes; đây là snapshot catalog, không chứng minh client refresh schema thế nào. |
+| I-07 | Microbenchmark tạm ở các lượt trước trong hội thoại | Chỉ là thử synthetic; không đủ để đưa vào SLA. Xem mục 5. |
+
+Snapshot I-01/I-02 được sao chép không sửa vào `references/runtime-110/`, kèm `runtime-110-manifest.json`. Source docs đang untracked ở worktree chủ sở hữu; commit SHA không thay cho hash tài liệu. Không xem status “lane done” là gate tích hợp đã qua. Bản tasks snapshot có chỗ còn đề xuất đường `src/runtime/*` trong khi plan ưu tiên thích nghi module hiện có: feature này không tự sửa bất nhất của nhánh 1.0.10; handoff phải được chủ nhánh chốt trước integration.
+
+### Nguồn public chính thức, đã mở
+
+| ID | URL | Phạm vi sử dụng |
+| --- | --- | --- |
+| P-01 | https://github.github.com/spec-kit/reference/agentic-sdd.html | Workflow specify/plan/tasks và analysis giữa các artifact. |
+| P-02 | https://sqlite.org/fts5.html | FTS5, tokenizer, BM25, rebuild/maintenance. Không có SLA cho dữ liệu của dự án. |
+| P-03 | https://sqlite.org/wal.html | WAL cho reader/writer đồng thời, vẫn có một writer; checkpoint/durability là lựa chọn có đánh đổi. |
+| P-04 | https://nodejs.org/download/release/v22.13.1/docs/api/sqlite.html | `DatabaseSync` là synchronous, có từ 22.5; không suy ra hoạt động trên Node 18. |
+| P-05 | https://git-scm.com/docs/git-rev-parse | Resolve worktree root/git-common-dir; không định nghĩa UUID repository an toàn cho mọi clone. |
+| P-06 | https://tree-sitter.github.io/tree-sitter/using-parsers/2-basic-parsing.html | Parser và incremental tree cập nhật theo edit; không tự giải nghĩa toàn bộ dynamic dispatch. |
+| P-07 | https://aider.chat/docs/repomap.html | Dùng graph/reference để chọn context dưới token budget; tham khảo ranking, không copy kết quả benchmark. |
+| P-08 | https://github.com/microsoft/llmwiki | Core wiki I/O/index/lint/search, tách nguồn khỏi wiki; upstream có auto behaviors không hợp default của feature. |
+| P-09 | https://github.com/FSoft-AI4Code/CodeWiki | Tài liệu repo có cấu trúc và provider options; chỉ tham khảo, chưa chọn dependency hay duyệt license/code reuse. |
+| P-10 | https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/skills.md | Pi hỗ trợ skill folder và `.agents/skills`; discovery không bảo đảm tự invocation. |
+| P-11 | https://code.visualstudio.com/docs/agent-customization/agent-skills | VS Code hỗ trợ Agent Skills; location/optional behavior tùy harness và trust. |
+| P-12 | https://developers.openai.com/codex/skills/ | URL chuyển tới ChatGPT Learn ở lần mở này; không dùng redirect làm bằng chứng độc lập cho discovery của từng bản Codex. |
+
+Nguồn public biến đổi theo thời gian. Trước reuse code phải pin commit/version và LICENSE/NOTICE của chính phần code được chọn. Không dựa vào đường link main như một lockfile. Không có tải repo/codegraph mới hoặc benchmark production trong vòng đặc tả.
+
+## 2. Decisions
+
+### D-01 — Feature thuộc device, không phải memory service trên gateway
+**Decision**: Một `ContextService` nằm ở device; CLI và MCP là hai adapter. Gateway xác thực/route và không persist payload context.
+**Rationale**: Đây là yêu cầu trực tiếp của user và khớp source boundary I-03. Agent từ xa truy xuất cùng dữ liệu qua device, local agent không cần gateway.
+**Alternative rejected**: Một memory server chung trên gateway; thêm provider/agent loop riêng.
+**Limit**: Kết quả search gửi tới client và wiki gửi tới provider được phép vẫn rời device trên network. “Không lưu server” không đồng nghĩa “không truyền”.
+
+### D-02 — Store dưới device home, partition vật lý theo repository
+**Decision**: `~/.mcp-device/context/registry.sqlite` và `repos/<opaque-store-key>/context.sqlite`, `blobs/`, `wiki/`. Respect `MCP_DEVICE_CONFIG_DIR`.
+**Rationale**: Store không bị xóa cùng source checkout và hoạt động cho read-only repo/worktree. Key gắn owner namespace + repository identity, không để agent chọn đường DB.
+**Alternative rejected**: DB trong repo là canonical; một graph global không scope.
+**Trade-off**: Nhiều DB cần bounded connection pool, backup/migration per-store và registry recovery. Partition không tự thay thế ACL: API vẫn phải validate scope/ref.
+
+### D-03 — Repository UUID local, không hash origin+root-commit làm khóa toàn cục
+**Decision**: Cấp UUID local; map canonical worktree/git-common-dir vào UUID. Origin/root commit chỉ là metadata/candidate match. Separate clones không tự gộp; move/relink có kiểm chứng và yêu cầu rõ.
+**Rationale**: Cùng origin không đủ chứng minh cùng quyền hoặc cùng worktree state. Shallow/history rewritten có thể đổi lineage metadata.
+**Alternative rejected**: Định danh duy nhất bằng absolute path hoặc remote URL.
+
+### D-04 — Ghi event ngay; graph/FTS enrichment theo lệnh
+**Decision**: Capture tự động lưu source event có bounds và mark pending. `sync` mới normalize/index/graph/cập nhật source đã chọn. Search không có hidden writes/build. Không idle timer ở phiên bản này.
+**Rationale**: Đây là yêu cầu mới nhất, thay cho đề xuất “per-tool activity graph”/“idle 10 phút” trước đó. Tìm kiếm có thể báo pending chứ không trả vẻ đầy đủ giả.
+**Alternative considered**: FTS update inline rất nhẹ có thể là tối ưu sau này, nhưng không âm thầm mở lại trong spec này.
+
+### D-05 — Graph kỹ thuật có provenance, không graph trí nhớ bằng suy diễn
+**Decision**: Tách event graph và source-code graph; có node/range/hash và observed/parsed/reported. Không LLM trong build/sync/search/graph. FTS + exact identifiers + bounded expansion là baseline.
+**Rationale**: P-02/P-06/P-07 hỗ trợ primitives này. Dynamic call resolution/causal diagnosis không được suy ra chỉ từ parser hay thời gian.
+**Alternative rejected**: Đổ mọi dòng output vào neuron và chạy inference mỗi turn; tuyên bố tương đương Honcho/Letta toàn bộ.
+
+### D-06 — Không scan `.pi`/`.codex`; skill không intercept tools
+**Decision**: Agent local dùng native tools như cũ. Skill gọi CLI, sync current source hoặc checkpoint reported khi có ích; không nhập session provider-specific.
+**Rationale**: Yêu cầu phạm vi của user. Native edit có thể được nhìn thấy qua source hash/Git; native command/output không được phục hồi từ đó.
+**Alternative rejected**: Hooks riêng từng agent hoặc silent transcript ingestion.
+
+### D-07 — Concurrency bằng DB transaction/lock, không assume chỉ một process
+**Decision**: CLI mở cùng repo store bằng thư viện chung, không network; WAL, timeout/retry hữu hạn, maintenance lease và atomic index-generation publication. Capture ưu tiên source event; maintenance không giữ write lock trong khi parse code hoặc gọi model.
+**Rationale**: P-03. Nhiều CLI/device cùng tồn tại nên “single writer process” trong sơ đồ cũ không phải điều kiện thực tế.
+**Alternative rejected**: Lock file không expiry; ghi trực tiếp DB qua skill; local HTTP daemon bắt buộc.
+
+### D-08 — Wiki optional/manual, reuse có gate
+**Decision**: Ưu tiên adapter mỏng tới phần phù hợp của LLMWiki core cho I/O/index/lint, vô hiệu hoàn toàn auto watcher/ingestion của upstream. CodeWiki là alternative nếu reuse core không đáp ứng repo documentation. Không bật cả hai engine mặc định.
+**Rationale**: P-08/P-09. Upstream LLMWiki đang nêu Node 20+ và extension dùng VS Code LM API; không giả định module đó nhận được endpoint của mcp-device ngay.
+**Gate**: Pin commit, LICENSE/NOTICE, API boundary, endpoint adapter và Node/dependency matrix trước lựa chọn. Không copy speculative prompt/code vào runtime trong vòng này.
+
+### D-09 — 5 tool mới, không vội xóa tool cũ
+**Decision**: Đặc tả đủ `local_search/read/graph/index/wiki`; mô tả đầy đủ action/CLI trong contracts. `project_list` merge và NMem tool removal là migration riêng.
+**Rationale**: User muốn công bố schema ít lần; I-06 không chứng minh phải reinstall trên mọi client. 19 + 5 = 24 là snapshot tính toán tạm nếu không thay tool cũ, không cam kết manifest cuối. Nếu NMem/project migration hoàn tất riêng thì count khác.
+**Alternative rejected**: Bỏ project_list chỉ từ vài call ít dùng; gộp read/write broker làm mờ quyền.
+
+### D-10 — Không đồng thời viết lại runtime 1.0.10
+**Decision**: Feature 002 chỉ tiêu thụ observer/dispatcher/process contracts đã được chủ 001 chốt. Không tự loại child MCP hop, không cherry-pick file/process candidate, không đổi limits của 001.
+**Rationale**: I-01/I-02 đã sở hữu việc đó. Tài liệu có thể tiến song song, source integration có gate.
+**Alternative rejected**: Gọi mọi component cũ là legacy rồi viết một `LocalRuntime` thứ hai.
+
+## 3. Những quyết định implementation còn có gate
+
+| Gate | Cần có trước khi qua | Công việc phụ thuộc |
+| --- | --- | --- |
+| G-110 | Handoff commit/contract từ 001; outcome/process/budget lifecycle ổn định; hoặc owner phê duyệt branch trial riêng | Capture integration, lifecycle, end-to-end benchmark |
+| G-DB | SQLite binding/version và Node floor đã pin/test; giữ declared support hoặc có migration được duyệt | Store implementation/packaging |
+| G-POLICY | Quota metadata/payload/jobs/DB cache, redaction, retention và disk-full behavior đã định lượng/duyệt | Bật auto capture/maintenance cho dữ liệu thật |
+| G-SCHEMA | Full MCP+CLI manifest, annotation, action authorization, rollout backward compatibility được duyệt | Publish tool catalog/gateway changes |
+| G-WIKI | Mã upstream/version/license và provider/data-egress/budget được duyệt | Cài helper, generate wiki thật |
+| G-ACCEPT | Windows/Linux correctness/security/perf và review độc lập hoàn tất | Integration/release eligibility |
+
+Việc ghi những gate này không phải lý do hoãn đặc tả. Nó ngăn tài liệu bị hiểu nhầm là đã có quyền triển khai/phát hành.
+
+## 4. Không gộp NMem vào context
+
+NMem giữ explicit preference/rule/quyết định không xuất hiện trong tool output. Context local giữ event/code/evidence. Không tự upload graph. Không sửa tools/skill/credentials NMem trong feature này. Chỉ tham chiếu luận điểm này như quyết định scope của user; không cần engine NMem để chạy test.
+
+## 5. Điều chỉnh evidence hiệu năng trước đây
+
+Không đưa con số “0,096 ms cho 2-hop graph” vào tiêu chí. Trong mã microbenchmark ở hội thoại, lần chạy nhanh dùng node file mà không có cạnh đi ra theo hướng traversal; nó không chứng minh chi phí duyệt một neighborhood hữu ích. Trường `bulk_50k_events_ms` cũng chưa đổi tên sau khi seed giảm xuống 10k. Các lần thử dùng WAL `synchronous=NORMAL`; không đo crash/power-loss durability, memory thật, concurrent load hoặc workload Việt/large output. Một vòng thử còn timeout.
+
+Do đó chỉ giữ kết luận nghiên cứu: event insert, FTS và graph là các phần có thể đo riêng; chưa có SLA hoặc bảo đảm chi phí “không đáng kể”. Benchmark mới cần kiểm tra số node/edge thật đã thăm, ground-truth hit, log provenance, DB/WAL bytes, p95/p99/max và contention. Không đo lại trên production trong vòng tài liệu.
+
+## 6. Chi phí wiki và search
+
+Core graph/FTS không cần token model theo thiết kế. Chi phí máy phụ thuộc bytes ingest, node/edge density, tokenizer/parser, IO và locks. Chi phí wiki = token input/output được tính theo đơn giá của provider do user cấu hình + retry/embedding nếu helper thực sự dùng; phải báo rõ unknown nếu provider thiếu usage. Không hardcode USD hay số giây từ một repo khác. Wiki chạy ngoài critical execution path và không nhận write lock DB trong lúc chờ mạng.
+
+
+===== FILE: specs\002-device-local-context\data-model.md =====
+
+# Data Model — đề xuất, chưa có migration thực thi
+
+**Related**: [spec](spec.md), [plan](plan.md), [API](contracts/context-api.md).
+
+## 1. Storage layout
+
+```text
+<device-state-root>/context/
+  registry.sqlite
+  repos/<opaque-store-key>/
+    context.sqlite
+    blobs/<content-address>
+    wiki/revisions/<run-id>/
+    wiki/user-overrides/
+    exports/
+```
+
+State root lấy từ cấu hình chuẩn của device; `~/.mcp-device` là default, không hardcode HOME riêng cho engine/CLI. `store-key` được registry cấp, không là tên repo, URL hoặc đường dẫn do caller đưa vào. Namespace owner nằm trong registry/store metadata; khác owner không dùng chung store-key dù path giống nhau.
+
+Không để provider credentials ở registry/searchable rows. Directory/file permission theo OS user; bảo vệ local user không thay thế sandbox cho process chạy cùng OS user. Không gửi registry/history lên gateway.
+
+## 2. Registry entities
+
+| Entity | Trường chính | Invariants |
+| --- | --- | --- |
+| OwnerNamespace | `owner_key`, `gateway_identity_hash`, `account_identity_hash`, `created_at`, `status` | Tạo từ identity tin cậy trong local pairing; không do LLM truyền. Không chứa bearer token. Re-pair tạo/reselect namespace theo explicit identity; không tự reassociate lịch sử. |
+| Repository | `repo_uuid`, `owner_key`, `store_key`, `display_name`, `created_at`, `last_seen`, `status`, `schema_version` | UUID local ngẫu nhiên; origin metadata không là authority; store_key unique. |
+| Worktree | `worktree_uuid`, `repo_uuid`, `canonical_root`, `git_common_dir`, `observed_head`, `observed_branch`, `last_verified_at`, `resolution_kind` | Cùng common-dir có thể map một repo; mỗi worktree giữ current version riêng. Branch/HEAD có thể unknown, không dùng như primary key repo. |
+| RootAlias | `repo_uuid`, `old_root`, `new_root`, `verification`, `approved_at` | Relink/move explicit; alias hết quyền không mở đường đọc lịch sử. Non-Git workspace cần explicit root. |
+
+Quy trình resolve: validate caller/device -> canonicalize allowed path -> xác định root/worktree -> resolve owner/store -> kiểm tra quyền hiện hành -> mở DB. Không lookup `ref` trước rồi mới filter repo. Lệnh ở thư mục cha chạm nhiều repo phải giữ `scope_status=ambiguous`, không gán tất cả cho repo gần nhất.
+
+Registry metadata phải có thể phục hồi từ store manifests không chứa content. Rebuild registry không tự gộp hai store.
+
+## 3. Canonical event entities
+
+### ToolEvent
+
+`event_id`, `schema_version`, `repo_uuid?`, `worktree_uuid?`, `scope_status`, `owner_key`, `request_correlation`, `invocation_id`, `runtime_generation`, `source_kind`, `public_tool`, `accepted_at`, `started_at?`, `completed_at?`, `execution_status`, `transport_status`, `recording_status`, `duration_ms?`, `normalized_args`, `arg_redaction`, `outcome_metadata`, `payload_ref?`, `observed_git_revision?`, `provenance`.
+
+`source_kind`: `remote_tool`, `local_mcp_tool` nếu đường đó thực sự được observer hỗ trợ, `imported_legacy`, `reported_checkpoint`. Native Codex/Pi tools không nằm trong scope auto capture.
+
+`execution_status`: `accepted`, `running`, `succeeded`, `failed`, `cancelled`, `unknown_after_restart`. `transport_status` độc lập: reply có thể mất dù execution thành công. `recording_status`: committed/partial/degraded; không trả committed khi mới ở RAM queue.
+
+Khóa uniqueness dựa invocation/attempt identity do canonical dispatcher cung cấp, không chỉ hash command hay timestamp. Hai lần user cố ý chạy cùng command phải là hai event; ghi lại cùng event vì recorder retry không nhân đôi. Không dedup side effects.
+
+Arguments lưu phiên bản đã redact. Error text và log stdout cũng đi qua redaction. Raw secret đã lọc không được giữ ở hidden blob. Không hứa mọi secret được regex nhận diện; allowlist/exclusions và payload opt-out là lớp bổ sung.
+
+### EvidencePayload
+
+`payload_id`, `storage_kind`, `content_hash`, `media_type`, `encoding`, `captured_bytes`, `original_bytes_known?`, `compression`, `redaction_state`, `retention_state`, `expires_at?`, `source_ranges`, `created_at`.
+
+`retention_state`: `available`, `partial`, `expired`, `purged`, `capture_failed`. Payload lớn dedup theo bytes đã redact và namespace; không dedup xuyên account. Không decode/expose arbitrary blobs bằng đường filesystem do caller đưa.
+
+Compression không phải ngữ nghĩa merge; phải đọc lại đúng captured bytes trong range. Hash xác minh bytes, không chứng minh nội dung thật/đáng tin. Tool output đã bị upstream cắt thì `partial` ngay từ đầu.
+
+### ProcessExecution / OutputChunk
+
+Process: `execution_id`, `runtime_generation`, `platform_pid?`, `start_event_id`, `repo_uuid?`, `worktree_uuid?`, `cwd`, `command_redacted`, `start_time`, `terminal_state`, `exit_code?`, `output_completeness`.
+Chunk: `execution_id`, `stream`, `start_offset`, `end_offset`, `payload_ref`, `capture_event_id`, `truncation`.
+
+PID không unique xuyên restart. Chunks trùng range do polling/read lại không tăng nội dung corpus; quan hệ event đọc lại vẫn tồn tại nếu cần audit. Retention session 1.0.10 và retention history là hai chính sách khác nhau, không giữ process sống chỉ để đọc history. Range mất phải báo gap.
+
+### Checkpoint
+
+`checkpoint_id`, `repo_uuid`, `worktree_uuid`, `at`, `head`, `branch`, `git_status_digest`, `changed_file_refs`, `reported_summary?`, `reported_claims?`, `observed_metadata`, `evidence_refs`.
+
+Git state được CLI đo là `observed`; “tests passed” do agent ghi không có output nguồn phải là `reported`. Không tạo command/test-run giả từ summary. Checkpoint không phải snapshot đầy đủ của repo và không suy được nội dung reasoning.
+
+## 4. Derived indexes
+
+### IndexGeneration / Progress
+
+`generation_id`, `schema_version`, `extractor_version`, `repo_uuid`, `worktree_uuid?`, `started_at`, `published_at?`, `status`, `source_high_watermark`, `source_manifest_hash`, `coverage`, `error`, `pending_events`.
+
+Status: `building -> staged -> validated -> published`; lỗi -> `failed` và giữ previous published. Sau crash job -> `interrupted`, không auto-resume khi device startup. Cursor/read dùng generation đã pin; nếu thế hệ được compact thì trả stale cursor.
+
+Không advance watermark qua event parse thất bại mà không ghi partial/failure. New events arriving during sync nằm sau watermark batch, không bị coi là đã index.
+
+### SearchDocument / FTS
+
+`document_id`, `generation_id`, `source_ref`, `source_kind`

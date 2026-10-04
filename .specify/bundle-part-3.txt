@@ -1,0 +1,299 @@
+, `title`, `normalized_search_text`, `path_tokens`, `identifier_tokens`, `timestamp`, `worktree_uuid?`, `revision?`, `coverage`.
+
+FTS5 cấu hình tokenizer phải được test tiếng Việt có dấu, Unicode normalization, identifier nguyên bản/camelCase/snake_case. Display giữ nguyên source text; normalized tokens không thay evidence. Compile truy vấn an toàn, không xem user query là SQL/FTS syntax tin cậy. Code current/wiki/history tách source_kind; default search không ưu tiên wiki chỉ vì nó dài hơn.
+
+FTS là per-repo store, không query global rồi filter. Score là ranking nội bộ, không calibrated confidence hoặc probability.
+
+### Node
+
+`node_id`, `generation_id`, `repo_uuid`, `worktree_uuid?`, `kind`, `stable_key`, `label`, `source_ref?`, `revision?`, `content_hash?`, `range?`, `extractor`, `evidence_class`, `resolution_status`, `status`.
+
+Kinds ban đầu: `event`, `file`, `file_version`, `symbol`, `reference`, `process`, `command`, `error_signature`, `test_run`, `commit`, `checkpoint`. Repo là scope/metadata; không mặc định duyệt từ supernode repo.
+
+`evidence_class`: `observed`, `parsed`, `reported`. Không có `inferred_by_llm` trong core. `resolution_status`: resolved/unresolved/partial/not_applicable. Dynamic reference có thể giữ tên mà không giả định target.
+
+### Edge / EdgeEvidence
+
+Edge: `edge_id`, `generation_id`, `src`, `dst`, `relation`, `worktree_uuid?`, `revision?`, `evidence_class`, `first_seen`, `last_seen`.
+EdgeEvidence: `edge_id`, `source_ref`, `extractor_version`, `source_hash`, `source_range`, `retention_state`.
+
+Dedup adjacency theo tuple ngữ nghĩa; bằng chứng nhiều lần nằm ở EdgeEvidence. Không nhân ba cạnh identical cho mỗi poll rồi gọi đó là graph chất lượng.
+
+Relations allowed ban đầu:
+- `read_from`, `edit_succeeded`, `write_succeeded`, `attempted`, `started_process`, `observed_output`, `mentions` từ tool/evidence thực.
+- `declares`, `imports`, `references`, `calls_resolved` từ parser đã đủ chứng cứ.
+- `has_revision`, `recorded_in`, `checkpoint_of` từ metadata có kiểm chứng.
+
+Không sinh `caused_by`, `fixes`, `implements_decision` chỉ vì gần thời gian. Parsed `calls_resolved` yêu cầu resolver thực; tên xuất hiện trong text chỉ là `mentions`/unresolved reference.
+
+## 5. Jobs và wiki
+
+### MaintenanceJob
+
+`job_id`, `owner_key`, `repo_uuid`, `worktree_uuid?`, `action`, `request_origin`, `explicit_request_id`, `state`, `lease_owner`, `lease_expiry`, `source_generation`, `budget_profile`, `progress`, `cancel_requested`, `error`, `created_at`, `finished_at`.
+
+Một job modify index per store tại một thời điểm; capture vẫn có queue/transaction policy riêng. Lease kiểm tra OS process/runtime generation để không giữ lock sau crash. User retry request có idempotency key trả cùng job khi phù hợp, không tạo full rebuild mới. Automatic startup cleanup chỉ đánh dấu interrupted/release expired leases, không chạy enrichment.
+
+### WikiRun / WikiPage
+
+Run: `run_id`, `job_id`, `repo_uuid`, `worktree_uuid`, `provider_profile_id`, `helper_commit`, `source_manifest`, `explicit_user_request`, `budget`, `usage_actual?`, `cost_estimate?`, `status`, `output_revision`.
+Page: `page_ref`, `title`, `kind`, `revision`, `content_hash`, `source_refs`, `source_revision`, `coverage`, `unknowns`, `generated_at`, `human_modified`, `lint_result`.
+
+Provider config/key ở local secret mechanism, không searchable. Wiki writes staged, lint nguồn/liên kết rồi atomic publish. Last-good không bị xóa trước. Human override không là input được âm thầm ghi đè. Nếu exporter xuất vào repo, chỉ làm khi user chọn destination và path guard cho phép.
+
+## 6. Query/return invariants
+
+Một response có `schema_version`, `scope`, `generation`, `coverage`, `items`, `partial`, `next_cursor`, `warnings`. Mỗi item có source ref và evidence class. `index_age` không đủ để gọi fresh: code snapshot còn cần source revision/hash check. Khi chưa kiểm tra source hiện tại, trả `freshness=unknown`.
+
+Ref chứa opaque identity, không path traversal. Reader xác thực owner/store/worktree/scope và quyền current trước resolve. Một DB per repo giảm nhầm lẫn query nhưng không phải security boundary nếu thư viện cho mở arbitrary store.
+
+## 7. Lifecycle và migration
+
+1. Fresh install: chưa tạo index/wiki nếu chưa có dữ liệu/yêu cầu; capture tạo store tối thiểu theo policy đã duyệt.
+2. Legacy import: đọc JSONL ở local state root, hash/checkpoint importer, copy/backup nguồn; validate từng record, unknown owner/repo đưa quarantine không searchable qua account mới.
+3. Sync: event batch -> typed extraction/FTS -> source snapshots được chọn -> staged graph generation -> validate -> publish.
+4. Rebuild: từ nguồn còn giữ; báo `coverage_limited_by_retention` nếu không đủ. Không hứa tái tạo bytes đã xóa.
+5. Compact: tối ưu physical/index/blob refs theo policy; không semantic merge làm đổi nội dung nguồn.
+6. Purge: preview manifest -> explicit confirmation bound to manifest -> delete payload/events/indices/graph/wiki/queued jobs liên quan -> verify không còn marker qua các đường đọc.
+7. Downgrade: nếu schema mới không được reader cũ hiểu thì fail with version error; không tạo DB rỗng ghi đè và không destructive migration ngược.
+
+Giới hạn thực tế và durability mode là gate G-POLICY/G-DB; WAL `NORMAL` không được mô tả như bảo đảm không mất commit khi mất điện. Không có bảo đảm secure erase trên mọi SSD/backup; sản phẩm phải nói rõ phạm vi purge và backup retention.
+
+
+===== FILE: specs\002-device-local-context\integration-110.md =====
+
+# Handoff với 1.0.10 — phần nào độc lập, phần nào không
+
+**Kết luận**: Chạy Spec Kit cho feature này ngay được. Không thể nói implementation hoàn toàn không ảnh hưởng 1.0.10.
+
+## Evidence snapshot
+
+Worktree 1.0.10 được kiểm tra: `wt-mcp-device-110-integrate`, branch `feat/mcp-device-1.0.10-integrate`, base `ee87d0f3057e01e8087db99615d14bd1b4c626d4`. Tài liệu `.specify/` và `specs/` đang untracked; constitution/spec/plan ghi proposed, chưa ready implement. Snapshot và hash giữ trong [manifest](references/runtime-110-manifest.json).
+
+Worktree tài liệu mới: `wt-mcp-device-local-context`, branch `002-device-local-context`, tạo từ cùng baseline code đã xác định. Không lấy old main 1.0.5 làm kết luận implementation hiện tại. Không cherry-pick candidate file/process/bench và không đổi branch đang mở của người dùng.
+
+## Ownership matrix
+
+| Vùng | Owner 001 / 1.0.10 | Owner 002 / Context | Gate trước source integration |
+| --- | --- | --- | --- |
+| Canonical dispatcher, bỏ self-MCP hop | Thiết kế/migration/equivalence | Tiêu thụ observer, không viết dispatcher thứ hai | Dispatcher/result/context signature đã chốt |
+| `gateway-tool-adapter.ts`, `gateway-channel.ts` | Mapping/readiness/error/bounds | Capability context và observer attachment | Một owner tích hợp patch, parity tests |
+| Process/session/output offsets | Semantics PID/generation/EOF/retention | Chỉ lưu evidence theo process contract | UUID/generation/range/completeness được bàn giao |
+| Resource/output budgets | Shared runtime accounting | Thêm dimensions DB/blob/index jobs, không bypass | Hữu hạn, được duyệt; no extra unbounded queue |
+| `toolHistory.ts` | Canonical logging location phối hợp | Migration/record suppression/dedup | Không double record/không sót direct shell route |
+| CLI/lifecycle | Startup/shutdown/update | Context CLI close/flush/busy behavior | Regression start/stop/update không giữ lock/process rác |
+| Gateway catalog/auth | Gateway change set riêng | Năm schema local_ + no-content-persistence | Snapshot catalog/security và rollout owner approval |
+| Core context store/search/graph/skill docs | Không thuộc 001 | Thuộc 002 | Có thể thiết kế/test fixtures riêng, implementation cần authorization |
+| NMem HTTP skill / removal | Phiên khác theo user | Không làm | Explicit separate change request |
+
+## Có thể làm song song ngay
+
+Viết constitution proposal/spec/plan/tasks; review API/data model/security; thiết kế fixture và benchmark methodology; chọn phương án backend và reuse wiki trên giấy; kiểm tra điều kiện runtime từ tài liệu. Vòng này chỉ thực hiện những thao tác tạo/kiểm tra tài liệu.
+
+Sau khi được phép code thử riêng, các pure module/tests có thể phát triển trên fixture trong feature worktree. Chúng không được gắn vào production hoặc public tool catalog trước G-110/G-SCHEMA. “Có thể phát triển” không phải “đã được phép implement” trong lượt này.
+
+## Không làm chồng
+
+Không tự sửa self-hop, process manager, budgets, package version hoặc migration root của 001. Không merge/cherry-pick lane đang làm, không cleanup file untracked của agent khác. Không dùng branch riêng làm lý do miễn compatibility: khi hợp nhất vẫn phải rebase/reconcile trên commit đã nhận bàn giao.
+
+## Handoff record cần có
+
+1. Commit và working-tree state được chủ 001 chốt; manifest source/contracts/evidence đã nghiệm thu.
+2. Canonical invoke observer: tool public name, invocation identity, current auth/local context, timing, execution outcome và error normalization.
+3. Process correlation: execution/runtime generation, output stream ranges, truncation/completeness, retention và terminal states.
+4. Shared resource ownership: allowed queue/write pressure, output byte ceiling, shutdown/degraded behavior và không giữ event-loop bởi synchronous heavy work.
+5. Route coverage: remote direct tools, stdio adapter nếu còn, native CLI context và unknown/unsupported device.
+6. Pin comparator/regression suite. Thay đổi contract sau handoff invalidates affected tests/evidence.
+
+## Stop rules
+
+- 001 chưa chốt boundary: dừng task integration của 002, không tạo wrapper fallback rồi gọi “độc lập”.
+- 001 sửa fields/semantics: cập nhật data model/contract/fixtures trước khi nhận code.
+- Schema/tool removal cần owner decision: không xóa chỉ để bù số tools.
+- Runtime/Node dependency có drift: cần decision riêng, không nâng floor trong patch một cách âm thầm.
+- Source 001 thay đổi trong lúc viết spec: manifest snapshot vẫn dùng để audit, không tự đồng bộ/rewrite tài liệu của 001.
+
+## Release placement
+
+Không chốt version sản phẩm trong bộ này. Context có thể là feature sau 1.0.10 hoặc một increment được chủ dự án chủ động đưa vào 1.0.10. Cả hai đều cần handoff/regression gates. Không ép năm tool mới, SQLite migration hoặc skill install vào bản 1.0.10 chỉ vì spec hoàn tất trước implementation.
+
+
+===== FILE: specs\002-device-local-context\quickstart.md =====
+
+# Quickstart nghiệm thu — sau implementation
+
+**Cảnh báo trạng thái**: Đây là run guide cho phần mềm tương lai. `mcp-device context ...` và `local_*` chưa được tạo trong vòng Spec Kit này. Không chạy ví dụ trên dữ liệu production để “thử xem có hoạt động”.
+
+## Preconditions
+
+Owner đã cho phép implementation; các gate tương ứng đã qua. Dùng commit 1.0.10 bàn giao và phiên bản Node/SQLite đã pin. Chuẩn bị hai repo fixture A/B, hai worktree của A, một clone khác cùng origin, owner namespace thử nghiệm và provider giả. Dùng `MCP_DEVICE_CONFIG_DIR` trỏ tới thư mục tạm riêng; không chạm `.mcp-device` thật.
+
+## Q1. Capture/retrieval remote
+
+Chạy read, dry-run edit, successful edit, failed shell và process có output paginated trên A; chạy marker khác trên B. Trước sync, search phải báo missing/pending, không tự dựng index. Gọi `local_index` sync scope A, sau đó `local_search` và `local_read`.
+
+Expected: một event cho mỗi invocation ở tất cả public routes; dry-run không thành modified; command failed không thành success; ref đọc đúng bytes đã capture; B không xuất hiện. Restart runtime và kiểm tra lại. Gateway filesystem/network spies phải chứng minh không có content persisted hoặc provider calls.
+
+## Q2. CLI parity và không cần gateway
+
+Các lệnh dự kiến:
+
+```text
+mcp-device context status --cwd <fixture-A> --json
+mcp-device context sync --cwd <fixture-A> --source-scope captured --json
+mcp-device context search --cwd <fixture-A> --query "fixture-marker" --json
+mcp-device context read --cwd <fixture-A> --ref <returned-ref> --json
+```
+
+Chặn mạng tới gateway. CLI vẫn hoạt động với cùng state root. So CLI với MCP trên cùng generation; loại timestamp vận chuyển/request id khỏi comparator nhưng không loại content, scope, evidence class, errors hoặc coverage.
+
+Không được gọi access denied rồi fallback remote để tránh quyền. Container khác state root không được tuyên bố đang đọc cùng device.
+
+## Q3. Cooperative skill
+
+Sau khi runtime commands có thật, cài skill vào thư mục agent test qua installer có preview. Kiểm tra discovery/explicit invocation trên từng phiên bản Codex/Pi/VS Code.
+
+Scenario: “xem công việc hôm trước” -> search/read; “đổi vài file cần hiểu cấu trúc” -> sync incremental có chọn lọc; ordinary read -> không sync; “update graph” -> không wiki; “tạo wiki repo này” -> riêng manual wiki workflow. Không có .pi/.codex/transcript reads.
+
+Native edit + checkpoint phải báo Git metadata observed, summary reported. Không tự ghi event `npm test succeeded` khi chưa có evidence output.
+
+## Q4. Graph correctness và hiệu năng hữu ích
+
+Fixture có imports, static calls resolve được, dynamic call không resolve được, cycles, high-degree hubs, Unicode identifiers và file rename. Xác nhận neighbor/path/impact trả node/edge thật với evidence refs; query seed không có cạnh phải ghi visited/edge counts bằng 0, không dùng nó làm benchmark traversal có ích.
+
+Sửa một file ở worktree A1 và branch khác ở A2, sync A1. Không thay source graph current của A2. Generation đã publish có source hash; source đổi giữa parse/publish trả stale/conflict hoặc retry trong budget rõ, không tự kết luận current.
+
+## Q5. Recovery/retention/privacy
+
+Dừng process ở các mốc event accepted/executed/recorded và index staged/published. Không replay tác dụng phụ; last-good giữ được; interrupted job không auto-run. Hai CLI sync + device capture gặp contention phải bounded và báo BUSY/degraded.
+
+Import JSONL hai lần, có invalid line, thiếu owner/repo: không duplicate, có quarantine/gap report. Purge preview rồi đổi selection/generation: token cũ bị reject. Purge hợp lệ làm marker biến mất khỏi event/blob/FTS/graph/wiki/cache/job. Không xóa repo files. Backup đang có WAL phải phục hồi coherent snapshot.
+
+## Q6. Wiki manual và last-good
+
+Dùng mock provider ghi số request. Startup/search/read/sync/checkpoint/idle -> 0 requests. Explicit generate/update có profile/source manifest/budget và confirmation mới được chạy.
+
+Thử provider trả rỗng/lỗi, user sửa page, source đổi giữa run, budget hết, cancellation và restart. Last-good không mất; không overwrite user edits; cost thiếu usage phải unknown. Lint mọi ref/link/coverage trước publish. Không cài hay gọi provider thật để hoàn tất thử này.
+
+## Q7. Performance protocol
+
+Reuse harness từ 1.0.10 sau gate, chạy cùng host/runtime/workload với capture off/on, sync no-op/dirty/cold, exact/FTS/hybrid, graph depth/high-degree và concurrency. Mỗi sample phải check content/visited counts và bounds trước tính latency.
+
+Ghi warmups, repeats, sample counts, median/p95/p99 khi đủ mẫu, max, RSS/CPU nếu đo được, DB+WAL/blob bytes, queue depth và event-loop delay. Mark NOT_MEASURED thay vì 0. Tách mock/wiki-provider token+network cost khỏi core query cost. Chốt thresholds/calibration trước chạy acceptance; không lựa số tốt sau khi đã xem kết quả.
+
+## Exit criteria
+
+Tất cả scenario bắt buộc qua trên Windows/Linux; schema/help/skill docs khớp implementation; old tools regression không đổi ngoài drift được duyệt; no-server-persistence check qua; không còn gate implementation bắt buộc mở. Review độc lập và owner quyết định release riêng. Bản guide này không tự cho phép rollout.
+
+
+===== FILE: specs\002-device-local-context\tasks.md =====
+
+# Tasks: Device-local Context
+
+**Input**: spec.md, plan.md, research.md, data-model.md, contracts/, quickstart.md.
+**Status**: Tất cả task chưa thực hiện. Đây là implementation backlog sau khi được phép, không lệnh chạy implement trong vòng hiện tại.
+
+## Format and Path Conventions
+
+`- [ ] Tnnn [P?] [USn?] Mô tả + path`. `[P]` chỉ trong cùng phase sau prerequisites và khi không sửa cùng file. Task tests viết trước implementation liên quan. Paths tương đối với device repo; `gateway:` là repository agent-mcp-gateway riêng, phải có worktree/authorization riêng trước sửa. `evidence/context/` là artifacts của thử nghiệm tương lai, không evidence đã có.
+
+## Phase 1: Setup — owner decisions và baseline
+
+**Goal**: Không bắt đầu code từ giả định rằng 1.0.10 đã ổn định. Không task nào bên dưới được chạy chỉ vì có tasks.md.
+
+- [ ] T001 Ghi authorization triển khai và decision register G-110/G-DB/G-POLICY/G-SCHEMA, owner từng gate, trial root và stop rules trong `evidence/context/decisions.md`; không tự ratify constitution.
+- [ ] T002 Chụp handoff 1.0.10 theo `integration-110.md`, gồm dispatcher/outcome/process/budgets/source hashes và diff hiện hành vào `evidence/context/handoff-110.json`; nếu chưa có handoff chỉ cho phép thiết kế/fixture độc lập được duyệt.
+- [ ] T003 [P] Inventory catalog thật và phân loại old/new/read/write/provider actions trong `test/context/fixtures/tool-manifest.json`; không remove project_list/NMem/external broker từ snapshot giả định.
+- [ ] T004 [P] Chọn và ghim SQLite binding/parser dependencies dựa install/Node/Windows/Linux matrix trong `evidence/context/dependencies.md`; giữ floor hoặc xin duyệt migration riêng, không dùng latest.
+- [ ] T005 [P] Định lượng capture/index/DB pool/blob/queue/job/retention/budget/redaction và measurement targets trong `evidence/context/policy.md`; đóng G-POLICY trước bật dữ liệu thật.
+- [ ] T006 [P] Review/pin wiki helper core version, LICENSE/NOTICE, API/provider adapter và Node compatibility trong `evidence/context/wiki-upstream.md`; G-WIKI là optional lane, không kéo watcher/server vào core.
+
+**Checkpoint**: T001-T005 và gates nền đã được owner review trước source integration. T006 chỉ cần hoàn tất trước US6.
+
+## Phase 2: Foundational — store, scope, ownership
+
+**Prerequisites**: G-DB/G-POLICY và authorization; mọi capture hook integration còn phụ thuộc G-110.
+
+- [ ] T007 [P] Viết fixture tests UUID/worktree/clone/move/non-Git/ambiguous root trong `test/context/repositories.test.js`, gồm separate clones cùng origin và hai worktree khác HEAD.
+- [ ] T008 [P] Viết tests owner/account switch/path/ref/cursor authorization trong `test/context/access.test.js`, gồm local OS trust boundary và sandbox denied không bypass bằng remote fallback.
+- [ ] T009 [P] Viết model tests execution outcome/delivery/recording/crash ambiguity trong `test/context/event-model.test.js`; khẳng định không replay side effects vì recorder thất bại.
+- [ ] T010 [P] Viết SQLite transaction/WAL/contention/schema-version fixture tests trong `test/context/store.test.js`; kiểm tra byte/hash preservation và bounded connections.
+- [ ] T011 Triển khai `src/context/store.ts` và migration khởi tạo trong `src/context/migrations/`, gồm per-store transactions, schema checks, manifests và parameterized queries; không store nào ở gateway.
+- [ ] T012 Triển khai `src/context/repositories.ts` theo T007/T008: resolve scope trước mở store, UUID local, current authorization, worktree metadata và owner namespace; reuse path guards của 001.
+- [ ] T013 Triển khai job/lease/resource ownership trong `src/context/service.ts` theo policy đã duyệt; giới hạn queue/cancel/busy/handles, không idle scheduler hoặc auto-resume after crash.
+- [ ] T014 Chạy independent foundation review và tests T007-T013, ghi kết quả/remaining blockers ở `evidence/context/foundation-review.md`; không cho consumer bypass store/scope contract.
+
+## Phase 3: US1 — Capture và tìm bằng chứng từ xa (P1)
+
+**Independent test**: Q1 trong quickstart; A/B marker, mọi public route, restart, exact read, không cross-scope.
+
+- [ ] T015 [P] [US1] Viết route-coverage tests trong `test/context/capture-routes.test.js` cho read/write/edit/dry-run/shell/process/project/image/error; kiểm tra một invocation chỉ một event và no local_* result self-ingestion.
+- [ ] T016 [US1] Gắn `src/context/capture.ts` vào observer canonical đã bàn giao và wiring trong `src/device/device.ts`/adapter cần thiết; không refactor dispatcher hoặc nhân đôi inner logging.
+- [ ] T017 [P] [US1] Viết tests import JSONL có partial line/invalid JSON/duplicate/unknown owner/unknown repo trong `test/context/import.test.js`; bảo đảm không sửa nguồn thật.
+- [ ] T018 [US1] Triển khai importer trong `src/context/importer.ts`, migration handoff từ `src/utils/toolHistory.ts`, quarantine và idempotent progress; duplicate execution không bị collapse thành một event.
+- [ ] T019 [P] [US1] Tạo ground-truth corpus/query tests trong `test/context/retrieval.test.js` và `test/context/fixtures/retrieval.json` cho tiếng Việt/identifier/error/path/negative match/source-kind.
+- [ ] T020 [US1] Triển khai sync phần event normalization/FTS trong `src/context/indexer.ts`; chỉ chạy từ maintenance request, watermark/coverage đúng, không hidden index trong read/search.
+- [ ] T021 [US1] Triển khai evidence `search`/`read` trong `src/context/search.ts` và service dispatch; trả scoped snippets/refs/coverage/generation, safe FTS compiler và aggregate bytes.
+- [ ] T022 [US1] Viết/chạy pagination-retention tests trong `test/context/read.test.js`: ref bị expire/purge, Unicode byte boundary, per-ref failure, stale cursor, missing index và không fetch current source thay lịch sử.
+- [ ] T023 [US1] Nghiệm thu Q1 end-to-end trên fixtures qua adapter được phép, lưu raw route traces và decision vào `evidence/context/us1.md`; chưa gọi production acceptance nếu chỉ mock.
+
+## Phase 4: US2 — CLI và portable skill (P1)
+
+**Independent test**: Q2/Q3; gateway unavailable nhưng local CLI đọc cùng generation; native tools không bị giả lập history.
+
+- [ ] T024 [P] [US2] Viết CLI/domain parity tests trong `test/context/cli.test.js`, gồm JSON stdout/stderr/exit codes, missing CLI feature, wrong state root và gateway offline.
+- [ ] T025 [US2] Triển khai `src/context/cli.ts` và command group trong CLI entrypoint hiện hữu sau handoff; tất cả operations dùng ContextService, không network loopback/gateway.
+- [ ] T026 [P] [US2] Viết checkpoint tests trong `test/context/checkpoint.test.js`, phân biệt Git metadata observed và summary/test claim reported; không đọc transcript client.
+- [ ] T027 [US2] Triển khai checkpoint trong `src/context/service.ts`, lưu refs/metadata/summary và bind repo/worktree; không fabricate native tool calls hoặc test-run success.
+- [ ] T028 [P] [US2] Viết skill contract scenario checks trong `test/context/skill-contract.test.js`: search-first, selective sync, no per-turn maintenance, explicit wiki, denied fallback và no direct DB access.
+- [ ] T029 [US2] Tạo portable `skills/mcp-device-context/SKILL.md` và references theo contract; chỉ hướng dẫn flags/commands đã qua tests, không hardcode host/key/DB schema.
+- [ ] T030 [US2] Viết installer preview/hash-aware install/update/remove trong `scripts/install-context-skill.mjs`, kèm tests; không overwrite user edits hoặc tự cài ở startup.
+- [ ] T031 [US2] Thử skill discovery/explicit invocation trên Codex/Pi/VS Code ở profile test được phép, ghi version/trust/location và Q2/Q3 results vào `evidence/context/us2.md`; không suy universal auto-invocation.
+
+## Phase 5: US3 — Recovery, retention, privacy (P1)
+
+**Independent test**: Q5 và re-pair/clone/worktree boundaries; no lost evidence claims, no gateway payload persistence.
+
+- [ ] T032 [P] [US3] Viết crash/restart/migration-interruption tests trong `test/context/recovery.test.js`, gồm tool success trước record failure và index staged chưa publish.
+- [ ] T033 [US3] Hoàn thiện store generation/last-good migration/recovery trong `src/context/store.ts` và migrations; interrupted jobs chờ lệnh rõ, không destructive downgrade.
+- [ ] T034 [P] [US3] Viết retention/backup/export/purge tests trong `test/context/retention.test.js`, gồm active WAL snapshot, stale confirmation token, orphan derivatives và source repo untouched.
+- [ ] T035 [US3] Triển khai compact/retention/coherent backup/export/purge trong `src/context/service.ts` và store utilities theo policy; không cap evidence duy nhất ở 1.000 entry hoặc semantic rewrite.
+- [ ] T036 [P] [US3] Viết secret/large-output/untrusted-content fixtures trong `test/context/privacy.test.js`; kiểm tra store/blob/FTS/wiki/export/error surfaces, redaction state và opt-out.
+- [ ] T037 [US3] Hoàn thiện re-pair/relink/permission-refresh và scoped refs trong `src/context/repositories.ts`; không auto reassociate legacy unknown-owner records; purge cascade invalidates caches/jobs.
+- [ ] T038 [US3] Chạy concurrent CLI/device, disk full, locked/corrupt DB, canceled jobs và connection-pool limits trong `test/context/concurrency.test.js`; đo logical resources trước/sau, không cleanup hộ rồi gọi pass.
+- [ ] T039 [US3] Independent privacy/recovery review T032-T038, ghi raw hashes và scope limitations ở `evidence/context/us3.md`; không tuyên bố secure erase của mọi SSD/backup.
+
+## Phase 6: US4 — Graph/FTS cấu trúc theo yêu cầu (P2)
+
+**Independent test**: Q4; verified neighbor/path, dynamic unresolved, worktree generations và exact evidence.
+
+- [ ] T040 [P] [US4] Viết activity-graph truth tests trong `test/context/activity-graph.test.js`: attempted versus succeeded, process chunk dedup, no causal edge từ thời gian, no fake test success.
+- [ ] T041 [US4] Triển khai typed nodes/edges/edge-evidence trong `src/context/graph.ts`, dedup adjacency và giữ provenance; gọi từ sync, không capture hook.
+- [ ] T042 [P] [US4] Tạo parser fixtures/tests trong `test/context/code-graph.test.js` và `test/context/fixtures/code/` cho declarations/import/static/dynamic/unsupported language/Unicode/ranges.
+- [ ] T043 [US4] Triển khai parser integration được pin trong `src/context/indexer.ts`; giữ unresolved/partial, source hashes và không parse excerpt như full file.
+- [ ] T044 [P] [US4] Viết invalidation tests trong `test/context/invalidation.test.js` cho rename/delete/edit/rebase/two-worktree/source-change-during-sync và no-op sync.
+- [ ] T045 [US4] Hoàn thiện incremental source manifests/generation publish trong `src/context/indexer.ts`; không full scan mặc định, không rewrite historical events theo code mới.
+- [ ] T046 [P] [US4] Viết traversal tests trong `test/context/graph-query.test.js` có cycles/hubs/zero-degree seeds/edge budgets; assert actual visited/examined/returned counts.
+- [ ] T047 [US4] Triển khai neighbors/path/impact/timeline và search expansion trong `src/context/graph.ts`/`search.ts`; budget frontier/visited/time bên trong thuật toán, deterministic partial results.
+- [ ] T048 [US4] Viết/chạy no-auto-maintenance/cancel/retry tests trong `test/context/index-jobs.test.js`; startup/idle/read/search không sync, job interrupted không auto-run.
+- [ ] T049 [US4] Nghiệm thu graph/source coverage, correctness-first query set và update costs, lưu raw metrics + limitations tại `evidence/context/us4.md`; không lấy empty traversal làm latency representative.
+
+## Phase 7: US5 — MCP catalog và gateway integration (P2)
+
+**Prerequisites**: G-110 và G-SCHEMA; gateway worktree được owner cho phép, không sửa deployment đang phục vụ.
+**Independent test**: Q1/Q2 parity và gateway persistence scan, old devices unsupported.
+
+- [ ] T050 [P] [US5] Viết schema/action/error/annotation tests trong `test/context/mcp-contract.test.js` dùng manifest T003; chỉ năm tên local_ và conservative mixed-action permissions.
+- [ ] T051 [US5] Thêm context capabilities/route adapter trong `src/device/gateway-tool-adapter.ts` và `gateway:scripts/custom-tools/index.mjs` cùng routing/risk modules liên quan; không store/search implementation trên gateway.
+- [ ] T052 [P] [US5] Viết gateway no-content-persistence tests ở `gateway:tests/context-no-persistence.test.mjs`, gồm success/error/truncation/debug/metrics/spill; dùng marker canary, không secret production.
+- [ ] T053 [US5] Hoàn thiện unsupported-device, permission checks, redacted error/telemetry routing và action gate ở gateway theo T050/T052; không fallback execution lên server.
+- [ ] T054 [US5] Chạy full CLI/MCP domain parity và help/schema consistency trong `test/context/adapter-parity.test.js`; normalize chỉ transport metadata, không normalize mất content/error/scope.
+- [ ] T055 [US5] Xác minh catalog refresh/re-registration behavior trên clients được chọn trong test accounts và ghi rollout plan ở `evidence/context/catalog-rollout.md`; không reinstall mọi account mặc định, không remove tools cũ ngoài approval.
+- [ ] T056 [US5] Chạy baseline compatibility của 1.0.10 và context combined trên runtime bàn giao, ghi `evidence/context/us5.md`; nếu runtime đổi sau đó invalidates dependent evidence.
+
+## Phase 8: US6 — Wiki human-readable, manual (P3, optional)
+
+**Prerequisites**: G-WIKI; core source-manifest/scope/job contracts đã ổn định. Không chặn core rollout nếu wiki giữ disabled.
+**Independent test**: Q6 với fake provider, last-good/user edit/coverage/cost gates.
+
+- [ ] T057 [P] [US6] Viết wiki-helper API/license/dependency compatibility tests trong `test/context/wiki-helper.test.js` theo upstream pin T006; kiểm tra không au
