@@ -221,6 +221,8 @@ export class GatewayToolAdapter {
             const result = assertSuccess(await this.engine.callClientTool('start_process', {
                 command: args.command,
                 timeout_ms: Number(args.timeout_ms || 10000),
+                ...(args.yield_ms !== undefined ? { yield_ms: Number(args.yield_ms) } : {}),
+                ...(args.background !== undefined ? { background: Boolean(args.background) } : {}),
                 working_directory: workingDirectory
             }), 'start_process');
             return { ...result, pid: parsePid(result), session_id: String(parsePid(result)) };

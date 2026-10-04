@@ -60,16 +60,18 @@ async function testImmediateCompletion() {
   // Small delay to ensure process completed
   await new Promise(resolve => setTimeout(resolve, 100));
   
-  // Should be able to read from immediately completed process
+  // start_process already delivered the immediate output, so the consuming
+  // read path must not replay it after completion.
+  assert(startResult.content[0].text.includes('IMMEDIATE OUTPUT'),
+    'start_process should contain immediate output');
   const readResult = await readProcessOutput({ pid, timeout_ms: 1000 });
   
-  assert(!readResult.isError, 
+  assert(!readResult.isError,
     'Should be able to read from immediately completed process');
+  assert(!readResult.content[0].text.includes('IMMEDIATE OUTPUT'),
+    'Completed default read must not replay output already delivered by start_process');
     
-  assert(readResult.content[0].text.includes('IMMEDIATE OUTPUT'), 
-    'Should contain immediate output from completed process');
-    
-  console.log('✅ Successfully read from immediately completed process');
+  console.log('✅ Immediately completed output is delivered exactly once');
 }
 
 // Run tests

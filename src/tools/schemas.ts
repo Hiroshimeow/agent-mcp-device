@@ -27,6 +27,8 @@ export const ListProcessesArgsSchema = z.object({});
 export const StartProcessArgsSchema = z.object({
   command: z.string(),
   timeout_ms: z.number(),
+  yield_ms: z.number().positive().optional(),
+  background: z.boolean().optional(),
   working_directory: z.string().optional(),
   shell: z.string().optional(),
   verbose_timing: z.boolean().optional(),
