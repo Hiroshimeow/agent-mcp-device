@@ -1,0 +1,102 @@
+diff --git a/test/test-enhanced-repl.js b/test/test-enhanced-repl.js
+index 40b07ec..0f944d6 100644
+--- a/test/test-enhanced-repl.js
++++ b/test/test-enhanced-repl.js
+@@ -51,7 +51,7 @@ async function testEnhancedREPL() {
+   }
+   
+   console.log(`Started Python session with PID: ${pid}`);
+-  
++  try {
+   // Test read_process_output with timeout
+   console.log('Testing read_process_output with timeout...');
+   const initialOutput = await readProcessOutput({ 
+@@ -102,7 +102,7 @@ for i in range(3):
+     print(greet(f"Guest {i+1}"))`;
+   
+   // Send the multi-line code
+-  await interactWithProcess({
++  const blockResult = await interactWithProcess({
+     pid,
+     input: multilineCode,
+     wait_for_prompt: true,
+@@ -116,22 +116,32 @@ for i in range(3):
+     wait_for_prompt: true,
+     timeout_ms: 5000
+   });
+-  console.log('Python multi-line output with wait_for_prompt:', multilineResult.content[0].text);
++  // Windows may report a continuation prompt before the final output arrives.
++  // Preserve output from both calls and poll for the actual block result, not
++  // the presence of a prompt (which can be stale).
++  let multilineOutput = blockResult.content[0].text + multilineResult.content[0].text;
++  const deadline = Date.now() + 10000;
++  while (!multilineOutput.includes('Hello, Guest 3!') && Date.now() < deadline) {
++    const next = await readProcessOutput({ pid, timeout_ms: 500 });
++    multilineOutput += next.content[0].text;
++    if (!multilineOutput.includes('Hello, Guest 3!')) await new Promise(resolve => setTimeout(resolve, 100));
++  }
++  console.log('Python multi-line output with wait_for_prompt:', multilineOutput);
+   
+   // Check that the output contains all three greetings
+-  assert(multilineResult.content[0].text.includes('Hello, Guest 1!'), 
++  assert(multilineOutput.includes('Hello, Guest 1!'),
+     'Output should contain greeting for Guest 1');
+-  assert(multilineResult.content[0].text.includes('Hello, Guest 2!'), 
++  assert(multilineOutput.includes('Hello, Guest 2!'),
+     'Output should contain greeting for Guest 2');
+-  assert(multilineResult.content[0].text.includes('Hello, Guest 3!'), 
++  assert(multilineOutput.includes('Hello, Guest 3!'),
+     'Output should contain greeting for Guest 3');
+   
+-  // Terminate the session
+-  console.log("Terminating session...");
+-  await forceTerminate({ pid });
+-  console.log('Python session terminated');
+-  
+   return true;
++  } finally {
++    console.log('Terminating session...');
++    await forceTerminate({ pid });
++    console.log('Python session terminated');
++  }
+ }
+ 
+ // Run the test
+diff --git a/test/test-linux-device-service.js b/test/test-linux-device-service.js
+index f7b4b3d..f07e5aa 100644
+--- a/test/test-linux-device-service.js
++++ b/test/test-linux-device-service.js
+@@ -50,7 +50,8 @@ async function testSystemdUserLifecycleUsesOwnedUnitWithoutSecrets() {
+     const unit = await fs.readFile(unitPath, 'utf8');
+     assert.match(unit, /ExecStart=\/usr\/bin\/node \/opt\/mcp-device\/dist\/mcp-device\.js --service --manager=systemd/);
+     assert.match(unit, /Environment="PATH=\/usr\/local\/bin:\/usr\/bin:\/bin"/);
+-    assert.match(unit, new RegExp(`WorkingDirectory=${path.join(root, 'runtime').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
++    const workingDirectory = path.join(root, 'runtime').replace(/\\/g, '\\\\');
++    assert.match(unit, new RegExp(`^WorkingDirectory="?${workingDirectory.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"?$`, 'm'));
+     assert.doesNotMatch(unit, /proxy|bearer|token|private.?key/i);
+     assert(calls.some(call => call.args.join(' ').includes('--user daemon-reload')));
+     assert(calls.some(call => call.args.join(' ').includes('--user enable --now mcp-device.service')));
+diff --git a/test/test-self-update.js b/test/test-self-update.js
+index 5202512..015c0af 100644
+--- a/test/test-self-update.js
++++ b/test/test-self-update.js
+@@ -260,7 +260,9 @@ async function runHelperCase({ failInstall, stripPath = false }) {
+     errorCode: null,
+     message: null,
+     deviceId: 'device-helper',
+-    managerKind: 'pm2',
++    // Windows execFile cannot execute a .cmd fixture; exercise the native
++    // detached PowerShell runner there, and the PM2 fixture on Unix.
++    managerKind: process.platform === 'win32' ? 'windows-foreground' : 'pm2',
+     pm2Path: fakeManager,
+     pm2Name: 'mcp-device-test',
+     parentPid: 99999999,
+@@ -310,7 +312,7 @@ async function runHelperCase({ failInstall, stripPath = false }) {
+     assert.equal(finalState.state, 'failed');
+     assert.equal(finalPackage.version, '1.0.5', 'failed install must restore old package offline');
+   } else {
+-    assert.equal(exitCode, 0);
++    assert.equal(exitCode, 0, JSON.stringify(finalState));
+     assert.equal(finalState.state, 'installed_waiting_reconnect');
+     assert.equal(finalPackage.version, '1.0.6');
+     assert.equal(

@@ -1,0 +1,33 @@
+Worktree: E:/git-project/wt-mcp-device-111-context
+H1 run HEAD: f58b95ae1c1be735f3f9601d8a8695e445a8b101
+Code X_final: a95a7dce03fc8e80bab99af8f90597213f527fd3
+
+$ git rev-parse f58b95a^
+a95a7dce03fc8e80bab99af8f90597213f527fd3
+
+$ git diff --stat a95a7dc f58b95a
+ .gitattributes                                     |    2 +
+ evidence/context/checkpoint3-artifacts.sha256      |    5 +
+ evidence/context/checkpoint3-build.txt             |  318 +++++
+ evidence/context/checkpoint3-context.tap           | 1280 ++++++++++++++++++++
+ evidence/context/checkpoint3-footers.txt           |   45 +
+ evidence/context/checkpoint3-raw-evidence.txt      |  241 ++++
+ evidence/context/checkpoint3-regression.tap        | 1150 ++++++++++++++++++
+ evidence/context/checkpoint3-review-packet.md      |  119 ++
+ evidence/context/checkpoint3-targeted-red.tap      |   86 ++
+ evidence/context/generate-checkpoint3-evidence.mjs |   18 +
+ 10 files changed, 3264 insertions(+)
+
+$ git diff --name-only a95a7dc f58b95a
+.gitattributes
+evidence/context/checkpoint3-artifacts.sha256
+evidence/context/checkpoint3-build.txt
+evidence/context/checkpoint3-context.tap
+evidence/context/checkpoint3-footers.txt
+evidence/context/checkpoint3-raw-evidence.txt
+evidence/context/checkpoint3-regression.tap
+evidence/context/checkpoint3-review-packet.md
+evidence/context/checkpoint3-targeted-red.tap
+evidence/context/generate-checkpoint3-evidence.mjs
+
+Pre-finalization git status --short: only evidence/context paths were modified or untracked; no production, test, harness, package or .gitattributes changes.

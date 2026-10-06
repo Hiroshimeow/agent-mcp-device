@@ -1,0 +1,157 @@
+[
+  {
+    "label": "WSL2 environment",
+    "executable": "wsl.exe",
+    "args": [
+      "--distribution",
+      "Ubuntu-22.04",
+      "--exec",
+      "sh",
+      "-lc",
+      "cd /mnt/e/git-project/wt-mcp-device-111-context && export GIT_DIR=/mnt/e/git-project/agent-mcp-device/.git/worktrees/wt-mcp-device-111-context GIT_WORK_TREE=$PWD CONTEXT_RECORD_ACCEPTANCE=0 NO_COLOR=1 FORCE_COLOR=0 && uname -a; command -v node; node --version; npm --version; git rev-parse HEAD; node -p \"JSON.stringify({platform:process.platform,arch:process.arch,sqlite:process.versions.sqlite})\""
+    ],
+    "started_at": "2026-10-05T23:41:10.752Z",
+    "finished_at": "2026-10-05T23:41:17.855Z",
+    "exit_code": 0,
+    "signal": null,
+    "error": null,
+    "stdout": "evidence/context/phase9-h1-xfinal-linux-environment.txt",
+    "stderr": "evidence/context/phase9-h1-xfinal-linux-environment.stderr.txt"
+  },
+  {
+    "label": "Windows build",
+    "executable": "cmd.exe",
+    "args": [
+      "/d",
+      "/s",
+      "/c",
+      "npm.cmd run build"
+    ],
+    "started_at": "2026-10-05T23:41:17.860Z",
+    "finished_at": "2026-10-05T23:41:48.028Z",
+    "exit_code": 0,
+    "signal": null,
+    "error": null,
+    "stdout": "evidence/context/checkpoint3-build-xfinal.txt",
+    "stderr": "evidence/context/checkpoint3-build-xfinal.stderr.txt"
+  },
+  {
+    "label": "Windows full context suite",
+    "executable": "C:\\Program Files\\nodejs\\node.exe",
+    "args": [
+      "--test",
+      "--test-reporter=tap",
+      "test/context/*.test.js"
+    ],
+    "started_at": "2026-10-05T23:41:48.029Z",
+    "finished_at": "2026-10-05T23:42:42.977Z",
+    "exit_code": 0,
+    "signal": null,
+    "error": null,
+    "stdout": "evidence/context/phase9-windows-context-xfinal.tap",
+    "stderr": "evidence/context/phase9-windows-context-xfinal.stderr.txt"
+  },
+  {
+    "label": "Windows benchmark",
+    "executable": "C:\\Program Files\\nodejs\\node.exe",
+    "args": [
+      "bench/scenarios/context.mjs",
+      "evidence/context/phase9-windows-benchmark-xfinal.jsonl"
+    ],
+    "started_at": "2026-10-05T23:42:42.978Z",
+    "finished_at": "2026-10-05T23:43:00.598Z",
+    "exit_code": 0,
+    "signal": null,
+    "error": null,
+    "stdout": "evidence/context/phase9-windows-benchmark-xfinal.stdout.txt",
+    "stderr": "evidence/context/phase9-windows-benchmark-xfinal.stderr.txt"
+  },
+  {
+    "label": "WSL2 full context suite",
+    "executable": "wsl.exe",
+    "args": [
+      "--distribution",
+      "Ubuntu-22.04",
+      "--exec",
+      "sh",
+      "-lc",
+      "cd /mnt/e/git-project/wt-mcp-device-111-context && export GIT_DIR=/mnt/e/git-project/agent-mcp-device/.git/worktrees/wt-mcp-device-111-context GIT_WORK_TREE=$PWD CONTEXT_RECORD_ACCEPTANCE=0 NO_COLOR=1 FORCE_COLOR=0 && node --test --test-reporter=tap \"test/context/*.test.js\""
+    ],
+    "started_at": "2026-10-05T23:43:00.598Z",
+    "finished_at": "2026-10-05T23:47:31.945Z",
+    "exit_code": 1,
+    "signal": null,
+    "error": null,
+    "stdout": "evidence/context/phase9-linux-context-xfinal.tap",
+    "stderr": "evidence/context/phase9-linux-context-xfinal.stderr.txt"
+  },
+  {
+    "label": "WSL2 benchmark",
+    "executable": "wsl.exe",
+    "args": [
+      "--distribution",
+      "Ubuntu-22.04",
+      "--exec",
+      "sh",
+      "-lc",
+      "cd /mnt/e/git-project/wt-mcp-device-111-context && export GIT_DIR=/mnt/e/git-project/agent-mcp-device/.git/worktrees/wt-mcp-device-111-context GIT_WORK_TREE=$PWD CONTEXT_RECORD_ACCEPTANCE=0 NO_COLOR=1 FORCE_COLOR=0 && node bench/scenarios/context.mjs evidence/context/phase9-linux-benchmark-xfinal.jsonl"
+    ],
+    "started_at": "2026-10-05T23:47:31.946Z",
+    "finished_at": "2026-10-05T23:48:21.530Z",
+    "exit_code": 0,
+    "signal": null,
+    "error": null,
+    "stdout": "evidence/context/phase9-linux-benchmark-xfinal.stdout.txt",
+    "stderr": "evidence/context/phase9-linux-benchmark-xfinal.stderr.txt"
+  },
+  {
+    "label": "Context acceptance consistency",
+    "executable": "C:\\Program Files\\nodejs\\node.exe",
+    "args": [
+      "scripts/check-context-acceptance.mjs"
+    ],
+    "started_at": "2026-10-05T23:48:21.530Z",
+    "finished_at": "2026-10-05T23:48:21.621Z",
+    "exit_code": 0,
+    "signal": null,
+    "error": null,
+    "stdout": "evidence/context/phase9-speckit-consistency-xfinal.json",
+    "stderr": "evidence/context/phase9-speckit-consistency-xfinal.stderr.txt"
+  },
+  {
+    "label": "WSL2 corrected full suite (no inherited Git overrides)",
+    "executable": "wsl.exe",
+    "args": [
+      "--distribution",
+      "Ubuntu-22.04",
+      "--exec",
+      "sh",
+      "-lc",
+      "cd /mnt/e/git-project/wt-mcp-device-111-context && unset GIT_DIR GIT_WORK_TREE && export CONTEXT_RECORD_ACCEPTANCE=0 NO_COLOR=1 FORCE_COLOR=0 && node --test --test-reporter=tap \"test/context/*.test.js\""
+    ],
+    "started_at": "2026-10-05T23:49:09.539Z",
+    "finished_at": "2026-10-05T23:50:13.525Z",
+    "exit_code": 1,
+    "signal": null,
+    "stdout": "evidence/context/phase9-linux-context-xfinal-verified.tap",
+    "stderr": "evidence/context/phase9-linux-context-xfinal-verified.tap.stderr.txt"
+  },
+  {
+    "label": "WSL2 benchmark corrected HEAD identity",
+    "executable": "wsl.exe",
+    "args": [
+      "--distribution",
+      "Ubuntu-22.04",
+      "--exec",
+      "sh",
+      "-lc",
+      "cd /mnt/e/git-project/wt-mcp-device-111-context && unset GIT_DIR GIT_WORK_TREE && export CONTEXT_RECORD_ACCEPTANCE=0 NO_COLOR=1 FORCE_COLOR=0 && GIT_DIR=/mnt/e/git-project/agent-mcp-device/.git/worktrees/wt-mcp-device-111-context GIT_WORK_TREE=$PWD node bench/scenarios/context.mjs evidence/context/phase9-linux-benchmark-xfinal-verified.jsonl"
+    ],
+    "started_at": "2026-10-05T23:50:13.528Z",
+    "finished_at": "2026-10-05T23:50:54.645Z",
+    "exit_code": 0,
+    "signal": null,
+    "stdout": "evidence/context/phase9-linux-benchmark-xfinal-verified.stdout.txt",
+    "stderr": "evidence/context/phase9-linux-benchmark-xfinal-verified.stdout.txt.stderr.txt"
+  }
+]

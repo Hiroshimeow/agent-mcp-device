@@ -1,0 +1,225 @@
+TAP version 13
+# (node:15440) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: C2-3 reap revokes epoch and late worker cannot commit even before another admission
+ok 1 - C2-3 reap revokes epoch and late worker cannot commit even before another admission
+  ---
+  duration_ms: 334.3253
+  type: 'test'
+  ...
+# Subtest: C2-3 allocation automatically reclaims dead quota leases before QUOTA_EXCEEDED
+ok 2 - C2-3 allocation automatically reclaims dead quota leases before QUOTA_EXCEEDED
+  ---
+  duration_ms: 298.8027
+  type: 'test'
+  ...
+# Subtest: C2-2 admission refuses a second living writer lease for the same repository
+ok 3 - C2-2 admission refuses a second living writer lease for the same repository
+  ---
+  duration_ms: 215.8505
+  type: 'test'
+  ...
+# Subtest: C2-2 two out-of-order reservations cannot overwrite the newer committed watermark
+ok 4 - C2-2 two out-of-order reservations cannot overwrite the newer committed watermark
+  ---
+  duration_ms: 189.5828
+  type: 'test'
+  ...
+# Subtest: C2-2 commit gate rejects watermark update outside a repository transaction
+ok 5 - C2-2 commit gate rejects watermark update outside a repository transaction
+  ---
+  duration_ms: 169.077
+  type: 'test'
+  ...
+# Subtest: C2-5/6 FEATURE_LIVE_CAPTURE defaults off and refuses initialization/execution without signed SOC approval
+ok 6 - C2-5/6 FEATURE_LIVE_CAPTURE defaults off and refuses initialization/execution without signed SOC approval
+  ---
+  duration_ms: 179.6342
+  type: 'test'
+  ...
+# Subtest: C2-5/6 FEATURE_LIVE_CAPTURE validates pinned signature, expiry, feature scope and rechecks execution
+ok 7 - C2-5/6 FEATURE_LIVE_CAPTURE validates pinned signature, expiry, feature scope and rechecks execution
+  ---
+  duration_ms: 213.8863
+  type: 'test'
+  ...
+# Subtest: C2-5/6 FEATURE_PUBLIC_GATEWAY defaults off and refuses initialization/execution without signed SOC approval
+ok 8 - C2-5/6 FEATURE_PUBLIC_GATEWAY defaults off and refuses initialization/execution without signed SOC approval
+  ---
+  duration_ms: 166.7633
+  type: 'test'
+  ...
+# Subtest: C2-5/6 FEATURE_PUBLIC_GATEWAY validates pinned signature, expiry, feature scope and rechecks execution
+ok 9 - C2-5/6 FEATURE_PUBLIC_GATEWAY validates pinned signature, expiry, feature scope and rechecks execution
+  ---
+  duration_ms: 183.628
+  type: 'test'
+  ...
+# (node:39032) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: B1 maintenance uses incremental reclamation and explicit WAL truncate
+ok 10 - B1 maintenance uses incremental reclamation and explicit WAL truncate
+  ---
+  duration_ms: 218.5986
+  type: 'test'
+  ...
+# Subtest: B1 concurrent purge waits for an active writer and preserves every event
+ok 11 - B1 concurrent purge waits for an active writer and preserves every event
+  ---
+  duration_ms: 1060.54
+  type: 'test'
+  ...
+# Subtest: B1 capture writer waits for purge lock release with zero lost events
+ok 12 - B1 capture writer waits for purge lock release with zero lost events
+  ---
+  duration_ms: 1516.3907
+  type: 'test'
+  ...
+# Subtest: B2 admin purge rejects agent environments even with TTY input and output
+ok 13 - B2 admin purge rejects agent environments even with TTY input and output
+  ---
+  duration_ms: 483.2754
+  type: 'test'
+  ...
+# Subtest: B3 killed cross-database writer reconciles exact committed evidence bytes on restart
+ok 14 - B3 killed cross-database writer reconciles exact committed evidence bytes on restart
+  ---
+  duration_ms: 540.5928
+  type: 'test'
+  ...
+# Subtest: B3 reconciliation waits for a separate-process admission and retains sealed evidence totals
+ok 15 - B3 reconciliation waits for a separate-process admission and retains sealed evidence totals
+  ---
+  duration_ms: 2603.4602
+  type: 'test'
+  ...
+# Subtest: B1 migrated auto-vacuum NONE purge clears indexed payload bytes and logical quota without rebuilding
+ok 16 - B1 migrated auto-vacuum NONE purge clears indexed payload bytes and logical quota without rebuilding
+  ---
+  duration_ms: 421.7887
+  type: 'test'
+  ...
+# C2-1 scanned fragment byte lengths: canarytokenprefix:17, alphaunique:11, betaunique:10, canarytoken:11, tokenprefix:11, alphauniq:9, betauniq:8, canarytokenprefixalphaunique:28, canarytokenprefixbetaunique:27
+# Subtest: B2 stripped agent markers in TTY-capable child rejects generic PURGE
+ok 17 - B2 stripped agent markers in TTY-capable child rejects generic PURGE
+  ---
+  duration_ms: 311.8487
+  type: 'test'
+  ...
+# Subtest: B2 stripped agent markers in TTY-capable child rejects repository challenge with extra whitespace
+ok 18 - B2 stripped agent markers in TTY-capable child rejects repository challenge with extra whitespace
+  ---
+  duration_ms: 272.4507
+  type: 'test'
+  ...
+# Subtest: B2 stripped agent markers in TTY-capable child accepts exact repository challenge with one-time admin token
+ok 19 - B2 stripped agent markers in TTY-capable child accepts exact repository challenge with one-time admin token
+  ---
+  duration_ms: 391.4159
+  type: 'test'
+  ...
+# Subtest: B2 stripped agent markers in TTY-capable child rejects PTY agent without admin token despite exact challenge
+ok 20 - B2 stripped agent markers in TTY-capable child rejects PTY agent without admin token despite exact challenge
+  ---
+  duration_ms: 260.6549
+  type: 'test'
+  ...
+# Subtest: P2 argv admin token is rejected even with a local TTY
+ok 21 - P2 argv admin token is rejected even with a local TTY
+  ---
+  duration_ms: 130.2943
+  type: 'test'
+  ...
+# Subtest: P2 admin token replay is rejected with TOKEN_ALREADY_USED
+ok 22 - P2 admin token replay is rejected with TOKEN_ALREADY_USED
+  ---
+  duration_ms: 140.7152
+  type: 'test'
+  ...
+# Subtest: P2 expired token is rejected with TOKEN_EXPIRED
+ok 23 - P2 expired token is rejected with TOKEN_EXPIRED
+  ---
+  duration_ms: 127.3802
+  type: 'test'
+  ...
+# Subtest: P2 token comparison uses constant-time crypto primitive and never argv
+ok 24 - P2 token comparison uses constant-time crypto primitive and never argv
+  ---
+  duration_ms: 1.3737
+  type: 'test'
+  ...
+# Subtest: P3 every production SQLite connection uses the hardened factory
+ok 25 - P3 every production SQLite connection uses the hardened factory
+  ---
+  duration_ms: 174.6374
+  type: 'test'
+  ...
+# Subtest: P3 blocked truncate checkpoint fails closed with PURGE_CHECKPOINT_BUSY
+ok 26 - P3 blocked truncate checkpoint fails closed with PURGE_CHECKPOINT_BUSY
+  ---
+  duration_ms: 334.1531
+  type: 'test'
+  ...
+# Subtest: P4 expired reservation fences repository commit and rolls back evidence
+ok 27 - P4 expired reservation fences repository commit and rolls back evidence
+  ---
+  duration_ms: 212.2765
+  type: 'test'
+  ...
+# Subtest: P4 real append commit outliving lease is rejected before COMMIT
+ok 28 - P4 real append commit outliving lease is rejected before COMMIT
+  ---
+  duration_ms: 214.0224
+  type: 'test'
+  ...
+# Subtest: P4 EPERM preserves same-host lease and foreign host does not probe PID
+ok 29 - P4 EPERM preserves same-host lease and foreign host does not probe PID
+  ---
+  duration_ms: 122.8416
+  type: 'test'
+  ...
+# Subtest: C2-2 stale monotonic epoch rejects a still-live reservation before repo commit
+ok 30 - C2-2 stale monotonic epoch rejects a still-live reservation before repo commit
+  ---
+  duration_ms: 2598.4491
+  type: 'test'
+  ...
+# Subtest: C2-2 repo fence rejects an epoch older than its committed watermark
+ok 31 - C2-2 repo fence rejects an epoch older than its committed watermark
+  ---
+  duration_ms: 227.5074
+  type: 'test'
+  ...
+# Subtest: C2-3 continuing process explicitly recovers committed bytes and reaps abandoned leases
+ok 32 - C2-3 continuing process explicitly recovers committed bytes and reaps abandoned leases
+  ---
+  duration_ms: 460.049
+  type: 'test'
+  ...
+# Subtest: quota rejection bursts create one deduplicated gap per minute
+ok 33 - quota rejection bursts create one deduplicated gap per minute
+  ---
+  duration_ms: 533.3766
+  type: 'test'
+  ...
+# Subtest: graph neighbor SQL fetch is bounded by remaining examined-edge budget plus one
+ok 34 - graph neighbor SQL fetch is bounded by remaining examined-edge budget plus one
+  ---
+  duration_ms: 0.594
+  type: 'test'
+  ...
+# Subtest: graph path cannot traverse a purged intermediate node
+ok 35 - graph path cannot traverse a purged intermediate node
+  ---
+  duration_ms: 312.4654
+  type: 'test'
+  ...
+1..35
+# tests 35
+# suites 0
+# pass 35
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 13860.6367

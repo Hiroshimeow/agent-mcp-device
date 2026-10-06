@@ -1,0 +1,45 @@
+# MCP Device 1.0.10 claims matrix
+
+Verification date: 2026-10-04. Tested source revision: `53f1a8f4a0faac64446d3397c663037f53d56d69`; final release-sign-off changes are documentation/evidence only. Host: Windows, Node v22.22.2. This matrix supersedes historical trial claims for shipped 1.0.10 scope; it does not certify the older proposal's full immutable-build protocol, independent acceptance, native Linux stress, or performance targets.
+
+| Claim | Status | Implementation / exact test file and verification evidence | Scope and limitations |
+| --- | --- | --- | --- |
+| Zero child processes on remote startup | Shipped | `src/device/device.ts`; `test/test-remote-startup-no-child.js`: `✓ Test passed: ./test-remote-startup-no-child.js` in [suite-final.log](suite-final.log) | Instrumented compiled startup with stubbed gateway/persistence boundaries counts zero spawn calls; no eager execution-engine child. User-requested process tools can spawn children later. |
+| Readiness definition | Shipped | `runtime_ready: true`, null reason, `direct-in-process:<bootNonce>`; `test/test-gateway-device-channel.js`, `test/test-remote-startup-no-child.js`: both corresponding `✓ Test passed` module records in [suite-final.log](suite-final.log) | Channel starts and a real local file call succeeds via GatewayToolAdapter/tool-dispatcher. Every start generates a fresh UUID. No child-readiness prerequisite or child-death invalidation. |
+| PID-collision evict/reject | Shipped | `src/terminal-manager.ts`; `test/test-pid-collision-guard.js`: `✓ Test passed: ./test-pid-collision-guard.js` in [suite-final.log](suite-final.log) | Evicts reused completed PID records; rejects active PID collisions and attempts to kill the newly spawned child. Does not guarantee immutable session identity or verified process-tree cleanup. |
+| Opaque session_id adapter surface | Shipped | `src/device/gateway-tool-adapter.ts`; `test/test-pid-collision-guard.js`: `✓ Test passed: ./test-pid-collision-guard.js` in [suite-final.log](suite-final.log) | Public string IDs must be treated opaquely by clients. Device internals still use canonical positive PID strings (legacy numeric IDs accepted), not sessionNonce. Stale-handle isolation across PID reuse/restarts is not claimed. |
+| Per-call caps | Shipped | `src/utils/output-budget.ts`; `test/test-inprocess-per-call-caps.js`, `test/test-output-budget.js`, `test/test-gateway-device-channel.js` (oversize-result case): corresponding three `✓ Test passed` module records in [suite-final.log](suite-final.log) | Existing in-process response budgets; no inference to total RSS, aggregate memory/disk/count or all-route acquisition accounting. |
+| Version sync | Shipped | `test/test-version-consistency.js`, `test/test-mcp-device-branding.js`: both corresponding `✓ Test passed` module records in [suite-final.log](suite-final.log); real package manifest in [pack-final.log](pack-final.log) | package.json, lock roots, source version and README identify 1.0.10. |
+| Aggregate resource accounting | Deferred -> 1.0.11 | `resource-accounting.ts` removed; [resource-accounting-scan.txt](resource-accounting-scan.txt), [tarball-files.txt](tarball-files.txt) | Zero filename/content matches in `src/`, clean `dist/`, and unpacked real tarball. No runtime aggregate reservation/enforcement guarantee. Historical synthetic-core evidence is not shipment proof. |
+| G5: Offset Pinning / per-stream text ranges | Deferred -> 1.0.11 | `specs/001-mcp-runtime-review/tasks.md`, amended runtime contract; `test/test-process-pagination.js` module record in [suite-final.log](suite-final.log), with its Python interaction subtest skip disclosed below | Current single-stream offset contract preserved for 1.0.10. No stream-local range or offset-pinning guarantee claimed. |
+| T034-T038: Process sessionNonce, raw global ranges, per-stream text ranges | Deferred -> 1.0.11 | `specs/001-mcp-runtime-review/tasks.md`, amended runtime contract | Legacy PID/line semantics retained; no raw-byte or stream-local range contract claimed. |
+
+## Evidence
+
+### Final test suite
+
+- [suite-final.log](suite-final.log): complete stdout/stderr from `node test/run-all-tests.js` on the tested revision above, exit **0**. **66 modules passed, 0 modules failed, 0 modules skipped**. The runner tracks module exit codes rather than individual assertions.
+- **One internal subtest was skipped**: `test/test-process-pagination.js`, Test 6 (`interact_with_process output truncation`), reported `Test 6 skipped: Python interaction failed`. This is not an assertion pass and is not hidden by the module's exit 0. No native Linux/cross-platform stress certification is inferred.
+- [repl-10x-summary.txt](repl-10x-summary.txt): `node test/test-enhanced-repl.js` repeated sequentially 10 times; **10 passed, 0 failed**, every exit code 0, no skip markers. Complete per-run logs: [1](repl-run-1.log), [2](repl-run-2.log), [3](repl-run-3.log), [4](repl-run-4.log), [5](repl-run-5.log), [6](repl-run-6.log), [7](repl-run-7.log), [8](repl-run-8.log), [9](repl-run-9.log), [10](repl-run-10.log). This establishes 100% success in the requested 10-run sample, not a mathematical guarantee of all future runs.
+
+### Clean build and real packaging
+
+- [build-final.log](build-final.log): `rm -rf dist && npm run build`, exit **0**.
+- [pack-final.log](pack-final.log): real `npm pack`, exit **0**, including lifecycle rebuild and production-trust verification. Generated `hcu-lab.me-mcp-device-1.0.10.tgz` at repository root; **264 packed files**. No publication or upload performed.
+- [tarball-sha256.txt](tarball-sha256.txt): SHA-256 `c8368f4ab716d2019c996b020159de08d645efc2ca0e023878bf1ba9cbea73ee`.
+- [tarball-files.txt](tarball-files.txt): complete `tar -tf hcu-lab.me-mcp-device-1.0.10.tgz` listing.
+- [resource-accounting-scan.txt](resource-accounting-scan.txt): recursive literal filename/content scan of `src/`, `dist/`, and all unpacked archive files; **0 matches in each**, 0 total. Direct source/dist grep likewise returned no matches.
+- [entrypoint-smoke.log](entrypoint-smoke.log): `node dist/mcp-device.js --help`, exit **0**, prints CLI usage. This is the actual `package.json` bin target, rather than the MCP stdio-server `dist/index.js`.
+- [tarball-entrypoint-smoke.log](tarball-entrypoint-smoke.log): additional standalone-temp unpacked CLI attempt, exit **1**, `ERR_MODULE_NOT_FOUND` for `ws`. npm tarballs do not bundle `node_modules`; no dependencies were installed in that temp location.
+- [tarball-entrypoint-smoke-with-workspace-deps.log](tarball-entrypoint-smoke-with-workspace-deps.log): same tarball unpacked beneath the workspace and `node <unpacked>/package/dist/mcp-device.js --help`, exit **0**, using existing workspace dependencies through normal Node resolution. This is entrypoint execution evidence, not a clean dependency-install test.
+
+### T3 and T4 reconciliation
+
+- **T3 — `test/test-self-update.js`:** Windows `execFile` cannot directly execute the fake PM2 `.cmd` fixture. `runHelperCase` therefore uses `managerKind: 'windows-foreground'` and an absolute native Windows PowerShell path with a temporary `run-device.ps1`; Unix retains the executable PM2 fixture. It still asserts successful install/reconnect-wait state, stripped-PATH execution via absolute binaries, retained rollback package, and failure-triggered offline restoration. Launchers, live RuntimeOwner/tracked-PID refusal, and persisted-state recovery are also exercised. The Unix global-bin symlink subtest returns early on Windows (not emitted as a SKIP marker). Final evidence: `✓ Test passed: ./test-self-update.js` in [suite-final.log](suite-final.log). This is isolated fixture coverage, not a live registry update or native Unix certification.
+- **T4 — `test/test-linux-device-service.js` Windows path quoting:** The injected Linux service uses a real host temporary runtime path, so on Windows the generated systemd `WorkingDirectory` contains escaped backslashes and may be quoted. The assertion first doubles backslashes, escapes regex metacharacters, permits optional surrounding quotes, and anchors the complete `WorkingDirectory` line. This checks the generated representation rather than assuming Unix path spelling. Other assertions preserve owned-unit lifecycle, secret exclusion, lookalike protection, and PM2 startup evidence. Final evidence: `✓ Test passed: ./test-linux-device-service.js` in [suite-final.log](suite-final.log). All manager commands are injected mocks; no real systemd daemon runs on Windows.
+
+## Historical evidence
+
+[suite.log](suite.log), [build.log](build.log), and [pack-dry-run.log](pack-dry-run.log) remain historical Phase 6 artifacts. Their earlier skip-free/green claims are not substituted for the fresh final suite and real packaging evidence above.
+
+Regression reconciliation: gateway tests use real in-process file dispatch rather than fake execution-engine calls; image assertions allow bounded JPEG/WebP. Python multiline assertions collect both call outputs and poll for greetings instead of assuming prompt timing; session cleanup is in finally.

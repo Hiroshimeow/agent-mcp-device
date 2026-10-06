@@ -1,0 +1,382 @@
+# MCP Device 1.0.10 — Spec Revision Cycle After Independent Reviews
+
+Repository:
+E:\git-project\wt-mcp-device-110-integrate
+
+Current feature directory:
+specs\001-mcp-runtime-review
+
+Baseline:
+v1.0.9 commit ee87d0f3057e01e8087db99615d14bd1b4c626d4
+
+## Hard stop and scope
+
+This is a DOCUMENT REVISION / SPEC-KIT REVIEW CYCLE ONLY.
+
+You MUST:
+1. amend constitution
+2. amend the EXISTING specification in specs/001-mcp-runtime-review/spec.md
+3. amend the EXISTING plan/design/contracts/research artifacts
+4. regenerate/amend the EXISTING tasks.md
+5. run a consistency/analyze pass after tasks if the installed Spec Kit integration supports it
+6. STOP BEFORE IMPLEMENTATION for human review
+
+You MUST NOT:
+- run speckit.implement
+- modify application production code under src/
+- modify product tests as implementation work
+- create a second feature directory
+- change .specify/feature.json away from specs/001-mcp-runtime-review
+- merge/cherry-pick sibling worktrees
+- commit, push, publish, tag, release, deploy, or merge
+- mark candidate implementation work complete merely because it exists in a sibling worktree
+
+Use the authoritative Pi templates in:
+.pi\prompts\speckit.constitution.md
+.pi\prompts\speckit.specify.md
+.pi\prompts\speckit.plan.md
+.pi\prompts\speckit.tasks.md
+and speckit.analyze.md for the final consistency pass if appropriate.
+
+For each stage, read the authoritative template in full and follow its required checks, but AMEND the existing feature artifacts in place instead of generating a new feature.
+
+## Review inputs you MUST incorporate
+
+### A. Independent Astra review
+
+Read the final review contained in:
+C:\Users\admin\AppData\Local\Temp\pi-subagents-0\git-project-wt-mcp-device-110-integrate\01a1040a-7a1a-7024-8f46-29485b94141d\tasks\1f2d1b2e-7d51-47d.output
+
+That reviewer concluded NOT READY and identified these material issues:
+
+1. Global bounded-runtime requirements conflict with preserving unbounded legacy semantics. Define exactly which routes share accounting/admission and which legacy behavior is preserved, approved drift, or explicitly outside a guarantee.
+2. Resource policy lacks count/metadata/queue/lease bounds and abandoned-session/lease expiry semantics. Bound both bytes and counts where justified; do not invent values without evidence.
+3. Process contract is incomplete around lost response after consume, retry retention, root exit vs pipe close, inherited descendants holding pipes, lifetime cleanup, close escalation, stdin EOF, and final drain.
+4. Exact-edit contract over-promises external-writer conflict detection. State the actual guarantee: cooperative lock / atomic primitive if proven, otherwise best-effort snapshot conflict detection with explicit race limitations.
+5. Batch/patch tasks contain a dependency cycle: they require benchmark evidence before a semantically equivalent candidate/prototype exists. Separate prototype/equivalence/exploratory measurement/scope decision/production acceptance.
+6. Search contract does not fully define ordering, snapshot consistency, continuation, large-match behavior, or exact match-vs-context byte reservation.
+7. Quantitative thresholds and sample counts are proposals, not ratified truth. Statistical procedure needs calibration; correctness fixes need an acceptance path independent of a 10% performance win.
+8. Requirements checklist and plan gates overstate readiness. Distinguish design decisions still requiring owner review from discovery tasks and post-implementation evidence.
+
+### B. Additional architecture review from ChatGPT
+
+You MUST also correct these issues:
+
+#### B1. Remove the internal self-MCP hop from the remote Gateway path
+
+Current remote architecture is actually:
+
+Gateway
+  -> GatewayDeviceChannel
+  -> GatewayToolAdapter
+  -> DesktopCommanderIntegration
+  -> @modelcontextprotocol/sdk Client
+  -> StdioClientTransport
+  -> spawned node dist/index.js
+  -> MCP Server
+  -> local tool implementation
+
+Evidence exists in:
+src/device/execution-engine.ts
+src/device/gateway-tool-adapter.ts
+src/device/device.ts
+src/server.ts
+
+For Gateway-originated device calls, this internal MCP client + stdio + spawned self-MCP-server is redundant architecture.
+
+The TARGET architecture for remote calls MUST be:
+
+Gateway
+  -> GatewayDeviceChannel
+  -> Gateway adapter
+  -> canonical in-process Tool Dispatcher / Tool Registry
+  -> local implementation
+
+External stdio MCP operation MUST remain supported as an adapter over the SAME canonical dispatcher/registry.
+
+Non-negotiable invariant:
+"One canonical tool implementation/dispatcher, multiple transport adapters."
+
+Do NOT interpret this as "remove MCP server support". The public/external stdio MCP server remains supported and behavior-compatible. The requirement is specifically to eliminate the internal self-MCP round trip for Gateway remote execution.
+
+Add explicit functional requirements, architecture design, differential acceptance cases, and dependency-ordered tasks for:
+- inventory current self-MCP call path
+- extract/reuse canonical in-process dispatcher or registry
+- route stdio MCP server through it
+- route Gateway adapter directly through it
+- remove DesktopCommanderIntegration internal MCP Client/StdioClientTransport from remote runtime after migration
+- prove remote mcp-device starts no self-MCP-server child
+- verify Gateway vs stdio schemas/results/errors/security semantics
+- benchmark startup process count, RSS, startup time, call latency, and serialization overhead
+- delete execution-engine.ts only if no remaining legitimate caller exists and compatibility evidence is green
+
+Treat this as an architectural simplification candidate with correctness/compatibility gates, not an automatic performance claim.
+
+#### B2. Reconcile existing candidate work instead of reimplementing it
+
+Sibling worktrees are not merely research. They contain candidate code/evidence that MUST be reconciled before proposing replacement implementations.
+
+Read-only sibling state:
+- wt-mcp-device-110-file
+  - commit 2968280 perf: add bounded file search edit hot paths
+  - commit 6a5f43f fix: count one-shot search limits by matches
+  - lane has durable DONE evidence and clean Git state
+- wt-mcp-device-110-process
+  - candidate implementation exists as dirty tracked/untracked changes; latest DEV report routes to TEST
+  - it is NOT accepted yet
+- wt-mcp-device-110-bench
+  - benchmark harness/evidence commits through d388843 exist; canonical evidence is still incomplete
+- wt-mcp-device-110-compat
+  - contract/fixtures exist; runner/comparator acceptance is incomplete
+- wt-mcp-device-110-review
+  - no completed adversarial REVIEW report
+- wt-mcp-device-110-stress
+  - no final stress acceptance
+
+The revised plan MUST use a "reconcile -> verify -> keep/revise/revert -> integrate" strategy.
+
+Do NOT automatically invent a second implementation under src/runtime/* if an existing candidate can be integrated/hardened with less risk.
+
+For every proposed new source file or architectural abstraction, require a concrete reason why adapting the existing candidate is insufficient.
+
+File/Search/Edit should start from the accepted candidate commits, then independently revalidate/integrate them; it should NOT be rewritten merely because the previous spec invented a cleaner abstraction.
+
+Process should start by capturing/hash-identifying the current dirty candidate, reviewing its semantics, testing it independently, and only then revise/rewrite proven deficiencies.
+
+Benchmark/compat should extend or repair existing harness/contracts where practical rather than build unrelated duplicate stacks.
+
+#### B3. Constitution is not ratified yet
+
+The current constitution incorrectly states:
+Version 1.0.0 | Ratified: 2026-10-04
+
+Human reviewers have NOT ratified it.
+
+Amend it so it is clearly PROPOSED / UNRATIFIED. Do not invent a historical ratification date. If the template requires a ratification date, use an explicit TODO/unratified marker consistent with the authoritative constitution workflow.
+
+Move cycle-specific operational restrictions such as:
+"this cycle only runs constitution/specify/plan/tasks" and blanket "no commit/push" instructions OUT of durable governance unless they represent a real long-term project principle.
+
+Keep durable principles such as compatibility, evidence, boundedness, cross-platform acceptance, security, independent gates, and architecture simplicity.
+
+#### B4. Avoid premature process architecture complexity
+
+The current spec strongly commits to server-side consumer IDs + destructive consume cursors + generations.
+
+Re-evaluate this choice.
+
+Prefer the simpler model unless concrete requirements disprove it:
+- process output is an append-only logical byte stream
+- read(session, absoluteOffset, maxBytes) is idempotent
+- response returns nextOffset and oldestAvailableOffset
+- observers/tail are views over offsets
+- spill/retention preserve absolute positions
+- an expired offset returns explicit OFFSET_EXPIRED / gap metadata
+- optional acknowledgement may exist only as a GC watermark, not as delivery semantics
+
+Do not mandate this alternative blindly either. Compare both models against:
+- multiple readers
+- retry after lost response
+- memory reclamation
+- completed replay compatibility
+- observer semantics
+- transport reconnect
+- implementation complexity
+
+Choose the simpler design that satisfies actual requirements and document the rationale/alternatives.
+
+#### B5. Numeric resource/performance/stress policies are provisional
+
+Values such as:
+- 256 KiB response
+- 1 MiB/session retained output
+- 32 MiB aggregate
+- 64 MiB spill/session
+- 16 processes
+- 4 file/search workers
+- 64 queue entries
+- 10% median improvement
+- <=5% p95 regression
+- 5 warmups / 30 samples
+- 10,000 operations / 60 minutes
+
+MUST NOT be represented as ratified product policy unless supported by existing transport limits, baseline variance, or explicit human approval.
+
+Classify each as one of:
+- externally constrained hard limit
+- baseline-compatible observed limit
+- proposed starting value requiring calibration
+- acceptance tier workload
+- owner decision required
+
+Tasks may discover/calibrate these values before activation.
+
+#### B6. Correctness fixes need a separate gate from performance optimizations
+
+A necessary correctness/security/compatibility fix does not need to demonstrate >=10% performance improvement.
+
+Model at least:
+- correctness/security fix acceptance
+- performance optimization KEEP/REVERT/INCONCLUSIVE
+- architectural simplification acceptance
+
+Each has different evidence requirements.
+
+## Required revised architecture principles
+
+The artifacts should converge toward:
+
+External MCP Client
+        |
+        v
+  MCP stdio adapter ----\
+                         \
+                          > Canonical Tool Dispatcher / Registry -> implementations
+                         /
+Gateway adapter --------/
+
+Avoid duplicated tool business logic across transport adapters.
+
+Preserve public schemas/behavior unless intentional drift is approved.
+
+The remote Gateway path MUST NOT require an internal MCP client or a spawned copy of this same MCP server after the simplification is accepted.
+
+## Required revised execution strategy
+
+Prefer:
+
+1. Freeze and capture external baseline contracts.
+2. Inventory current architecture, including self-MCP remote hop.
+3. Identify and hash existing candidate patches/evidence.
+4. Reconcile candidates one increment at a time.
+5. Differential-test candidate vs baseline and Gateway vs stdio.
+6. Calibrate/discover resource and transport bounds.
+7. Independently classify each increment:
+   - correctness/security acceptance
+   - architecture simplification acceptance
+   - performance KEEP / REVERT / INCONCLUSIVE
+8. Integrate only accepted increments.
+9. Run independent compatibility/adversarial review.
+10. Run final native Windows + Linux stress.
+11. Produce release-eligibility report only.
+12. STOP for human authorization before publish/tag/release/deploy.
+
+Do NOT prefer:
+"design a new runtime from scratch -> rewrite all candidate lanes -> rebuild a duplicate benchmark stack."
+
+## Existing facts to preserve accurately
+
+- Baseline: ee87d0f3057e01e8087db99615d14bd1b4c626d4.
+- Windows historical benchmark count: 75 invalid measured samples / 551 measured = 13.61%; this is harness-invalid evidence, NOT general product failure probability.
+- Linux old raw data has zero raw-invalid measured samples but known resource attribution gaps in the historical summary.
+- File candidate's earlier 2-warmup/7-sample performance claims are descriptive, not independent acceptance.
+- Completed-process replay is observable legacy behavior.
+- Stateful/document search and specialized file/media handlers remain compatibility surfaces.
+- Fuzzy edit is diagnostic behavior and must not be removed by assumption.
+- Context must never hide actual search matches because of quota/rendering.
+- Missing Windows/Linux evidence is NOT a pass.
+- Historical failure families remain investigation inputs until reproduced/disposed.
+- Emergency harness cleanup is not proof of product cleanup.
+
+## Required artifact corrections
+
+### Constitution
+- mark proposed/unratified honestly
+- keep durable principles only
+- remove temporary cycle instructions from governance
+- add architecture simplicity / avoid redundant self-proxy layers if appropriate as a durable principle, without prescribing one implementation prematurely
+
+### spec.md
+- add explicit user story / requirements for direct in-process Gateway dispatch and shared canonical dispatcher
+- clarify legacy/global-bounds scope
+- distinguish three decision classes: correctness/security, architecture simplification, performance optimization
+- mark numeric policy as provisional/owner-review where not evidenced
+- encode actual unresolved owner decisions instead of claiming no design ambiguities
+- do not claim existing candidate lanes are unimplemented blank slates
+
+### research.md
+- add current self-MCP architecture evidence from execution-engine.ts/device.ts/gateway-tool-adapter.ts/server.ts
+- record accepted file candidate and incomplete process/bench/compat/review/stress states
+- distinguish durable evidence from CDPA tracker state
+- incorporate Astra review findings as independent review input
+- compare simple absolute-offset output model vs consumer-state model
+
+### plan.md
+- replace "new runtime abstractions first" with candidate-reconciliation-first sequencing
+- include canonical dispatcher/transport adapter architecture
+- identify migration/removal path for DesktopCommanderIntegration self-MCP layer
+- make resource/statistical values provisional until calibrated/approved
+- move shared-primitives gates before consumers that depend on them
+- define rollback criteria for every increment
+- avoid big-bang rewrite
+
+### runtime-contract.md / data-model.md
+- resolve or explicitly mark for owner review:
+  - legacy/global bound interaction
+  - count + byte bounds
+  - abandoned leases and max age
+  - root exit vs pipe close vs drained state
+  - lost-response retry semantics
+  - stdin EOF and kill escalation
+  - actual external edit conflict guarantee
+  - search ordering/snapshot/continuation/large-match behavior
+  - canonical dispatcher/adapters and transport-equivalence contract
+- simplify process cursor model if the consumer registry is not justified
+
+### evidence-contract.md
+- separate correctness/security acceptance from performance and architecture simplification
+- make statistical thresholds/calibration explicit
+- reuse/extend existing bench harness where practical
+- define Gateway-vs-stdio differential evidence
+- add evidence that remote runtime has no self-MCP-server child after accepted migration
+
+### tasks.md
+Regenerate dependency ordering so tasks are immediately executable after human authorization.
+
+It MUST:
+- start with reconcile/inventory/decision tasks, not speculative rewrites
+- explicitly adopt/revalidate file commits 2968280 + 6a5f43f as candidate input
+- capture/hash process dirty candidate before any modification
+- extend existing benchmark and compat artifacts where practical
+- include self-MCP removal as its own gated increment
+- move shared primitive acceptance before dependent consumer implementation
+- fix batch/patch prototype/benchmark dependency cycle
+- separate prototype/exploratory tasks from production implementation
+- preserve independent reviewers and Windows/Linux final gates
+- contain a clear HUMAN REVIEW STOP before any release action
+- remain entirely unchecked after regeneration
+
+## Checklist correction
+
+The requirements checklist MUST NOT claim everything is unambiguous/accepted if owner decisions remain.
+
+Explicitly list unresolved pre-implementation owner-review items. It is acceptable and preferred for the revised artifacts to say "NOT READY FOR IMPLEMENTATION" until those decisions are reviewed.
+
+## Final validation
+
+After revising constitution -> spec -> plan/design -> tasks:
+- run the Spec Kit analyze/consistency workflow if available
+- inspect git status --short
+- inspect git diff --stat plus untracked artifact summary
+- verify no production/test implementation files changed
+- verify no second spec directory was created
+- verify .specify/feature.json still points to specs/001-mcp-runtime-review
+- verify every task remains unchecked
+- verify no implementation command was invoked
+
+## Final terminal response
+
+End with exactly the conceptual state:
+
+STOPPED BEFORE IMPLEMENTATION — REVISED ARTIFACTS READY FOR HUMAN REVIEW
+
+Then report:
+1. files amended
+2. major changes made
+3. owner decisions still unresolved
+4. analyze/consistency findings
+5. git status --short
+6. confirmation that no production implementation/build/test/release action occurred
+7. recommended review order
+
+Do not proceed further.

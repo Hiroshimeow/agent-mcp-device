@@ -16,7 +16,8 @@ assert.equal(pkg.bin?.md, 'dist/mcp-device.js');
 assert.deepEqual(Object.keys(pkg.bin || {}).sort(), ['mcp-device', 'md']);
 assert.equal(pkg.mcpName, undefined);
 assert.equal(pkg.repository?.url, 'git+https://github.com/Hiroshimeow/agent-mcp-device.git');
-assert.deepEqual(pkg.files, ['dist'], 'published device package must not ship upstream marketing assets');
+assert.deepEqual(pkg.files, ['dist', 'config/revoked-approvals.json', 'skills/mcp-device-context'],
+  'published package includes only runtime, approval revocations and the local context skill; no upstream marketing assets');
 for (const name of ['release:dry', 'release:mcp', 'release:alpha', 'release:skip-mcp', 'build:mcpb', 'validate:tools', 'open-chat', 'setup', 'setup:debug', 'remove']) {
   assert.equal(pkg.scripts?.[name], undefined, `upstream product script ${name} must not remain in MCP Device`);
 }

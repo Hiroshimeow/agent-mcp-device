@@ -1,0 +1,345 @@
+TAP version 13
+# (node:38008) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: B1 maintenance uses incremental reclamation and explicit WAL truncate
+ok 1 - B1 maintenance uses incremental reclamation and explicit WAL truncate
+  ---
+  duration_ms: 171.1454
+  type: 'test'
+  ...
+# Subtest: B1 concurrent purge waits for an active writer and preserves every event
+ok 2 - B1 concurrent purge waits for an active writer and preserves every event
+  ---
+  duration_ms: 922.7182
+  type: 'test'
+  ...
+# Subtest: B1 capture writer waits for purge lock release with zero lost events
+ok 3 - B1 capture writer waits for purge lock release with zero lost events
+  ---
+  duration_ms: 1261.4901
+  type: 'test'
+  ...
+# Subtest: B2 admin purge rejects agent environments even with TTY input and output
+ok 4 - B2 admin purge rejects agent environments even with TTY input and output
+  ---
+  duration_ms: 353.8333
+  type: 'test'
+  ...
+# Subtest: B3 killed cross-database writer reconciles exact committed evidence bytes on restart
+ok 5 - B3 killed cross-database writer reconciles exact committed evidence bytes on restart
+  ---
+  duration_ms: 422.9635
+  type: 'test'
+  ...
+# Subtest: B3 reconciliation waits for a separate-process admission and retains sealed evidence totals
+ok 6 - B3 reconciliation waits for a separate-process admission and retains sealed evidence totals
+  ---
+  duration_ms: 1059.1655
+  type: 'test'
+  ...
+# Subtest: B1 migrated auto-vacuum NONE purge clears indexed payload bytes and logical quota without rebuilding
+not ok 7 - B1 migrated auto-vacuum NONE purge clears indexed payload bytes and logical quota without rebuilding
+  ---
+  duration_ms: 309.1977
+  type: 'test'
+  location: 'E:\\git-project\\wt-mcp-device-111-context\\test\\context\\review-blockers.test.js:112:1'
+  failureType: 'hookFailed'
+  error: 'database is not open'
+  code: 'ERR_INVALID_STATE'
+  stack: |-
+    ContextStore.close (file:///E:/git-project/wt-mcp-device-111-context/dist/context/store.js:673:23)
+    TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/test/context/review-blockers.test.js:22:69)
+    TestHook.runInAsyncScope (node:async_hooks:214:14)
+    TestHook.run (node:internal/test_runner/test:1047:25)
+    TestHook.run (node:internal/test_runner/test:1354:18)
+    TestHook.run (node:internal/util:569:20)
+    Test.runHook (node:internal/test_runner/test:965:20)
+    after (node:internal/test_runner/test:1005:20)
+    Test.run (node:internal/test_runner/test:1070:13)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+  ...
+# C2-1 scanned fragment byte lengths: canarytokenprefix:17, alphaunique:11, betaunique:10, canarytoken:11, tokenprefix:11, alphauniq:9, betauniq:8, canarytokenprefixalphaunique:28, canarytokenprefixbetaunique:27
+# Subtest: B2 stripped agent markers in TTY-capable child rejects generic PURGE
+ok 8 - B2 stripped agent markers in TTY-capable child rejects generic PURGE
+  ---
+  duration_ms: 196.178
+  type: 'test'
+  ...
+# Subtest: B2 stripped agent markers in TTY-capable child rejects repository challenge with extra whitespace
+ok 9 - B2 stripped agent markers in TTY-capable child rejects repository challenge with extra whitespace
+  ---
+  duration_ms: 205.3879
+  type: 'test'
+  ...
+# Subtest: B2 stripped agent markers in TTY-capable child accepts exact repository challenge with one-time admin token
+ok 10 - B2 stripped agent markers in TTY-capable child accepts exact repository challenge with one-time admin token
+  ---
+  duration_ms: 1528.6752
+  type: 'test'
+  ...
+# Subtest: B2 stripped agent markers in TTY-capable child rejects PTY agent without admin token despite exact challenge
+ok 11 - B2 stripped agent markers in TTY-capable child rejects PTY agent without admin token despite exact challenge
+  ---
+  duration_ms: 185.1281
+  type: 'test'
+  ...
+# Subtest: P2 argv admin token is rejected even with a local TTY
+ok 12 - P2 argv admin token is rejected even with a local TTY
+  ---
+  duration_ms: 91.5667
+  type: 'test'
+  ...
+# Subtest: P2 admin token replay is rejected with TOKEN_ALREADY_USED
+ok 13 - P2 admin token replay is rejected with TOKEN_ALREADY_USED
+  ---
+  duration_ms: 104.5171
+  type: 'test'
+  ...
+# Subtest: P2 expired token is rejected with TOKEN_EXPIRED
+ok 14 - P2 expired token is rejected with TOKEN_EXPIRED
+  ---
+  duration_ms: 104.8478
+  type: 'test'
+  ...
+# Subtest: P2 token comparison uses constant-time crypto primitive and never argv
+ok 15 - P2 token comparison uses constant-time crypto primitive and never argv
+  ---
+  duration_ms: 0.4362
+  type: 'test'
+  ...
+# Subtest: P3 every production SQLite connection uses the hardened factory
+ok 16 - P3 every production SQLite connection uses the hardened factory
+  ---
+  duration_ms: 139.2829
+  type: 'test'
+  ...
+# Subtest: P3 blocked truncate checkpoint fails closed with PURGE_CHECKPOINT_BUSY
+ok 17 - P3 blocked truncate checkpoint fails closed with PURGE_CHECKPOINT_BUSY
+  ---
+  duration_ms: 280.468
+  type: 'test'
+  ...
+# Subtest: P4 expired reservation fences repository commit and rolls back evidence
+ok 18 - P4 expired reservation fences repository commit and rolls back evidence
+  ---
+  duration_ms: 173.1354
+  type: 'test'
+  ...
+# Subtest: P4 real append commit outliving lease is rejected before COMMIT
+ok 19 - P4 real append commit outliving lease is rejected before COMMIT
+  ---
+  duration_ms: 171.0778
+  type: 'test'
+  ...
+# Subtest: P4 EPERM preserves same-host lease and foreign host does not probe PID
+ok 20 - P4 EPERM preserves same-host lease and foreign host does not probe PID
+  ---
+  duration_ms: 104.0956
+  type: 'test'
+  ...
+# Subtest: C2-2 stale monotonic epoch rejects a still-live reservation before repo commit
+ok 21 - C2-2 stale monotonic epoch rejects a still-live reservation before repo commit
+  ---
+  duration_ms: 223.6259
+  type: 'test'
+  ...
+# Subtest: C2-2 repo fence rejects an epoch older than its committed watermark
+ok 22 - C2-2 repo fence rejects an epoch older than its committed watermark
+  ---
+  duration_ms: 196.4701
+  type: 'test'
+  ...
+# Subtest: C2-3 continuing process explicitly recovers committed bytes and reaps abandoned leases
+ok 23 - C2-3 continuing process explicitly recovers committed bytes and reaps abandoned leases
+  ---
+  duration_ms: 362.1439
+  type: 'test'
+  ...
+# Subtest: B2 repo.sqlite is authoritative and a separate reaper fences an in-flight worker
+not ok 24 - B2 repo.sqlite is authoritative and a separate reaper fences an in-flight worker
+  ---
+  duration_ms: 179.327
+  type: 'test'
+  location: 'E:\\git-project\\wt-mcp-device-111-context\\test\\context\\review-blockers.test.js:378:1'
+  failureType: 'testCodeFailure'
+  error: 'repository authority lives in repo.sqlite'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/test/context/review-blockers.test.js:382:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: B3 tampered SOC signature is rejected
+not ok 25 - B3 tampered SOC signature is rejected
+  ---
+  duration_ms: 106.0171
+  type: 'test'
+  location: 'E:\\git-project\\wt-mcp-device-111-context\\test\\context\\review-blockers.test.js:419:1'
+  failureType: 'testCodeFailure'
+  error: 'authorization.isFeatureAuthorized is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    isFeatureAuthorized (file:///E:/git-project/wt-mcp-device-111-context/test/context/review-blockers.test.js:17:56)
+    TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/test/context/review-blockers.test.js:421:16)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: B3 expired signed SOC artifact is rejected
+not ok 26 - B3 expired signed SOC artifact is rejected
+  ---
+  duration_ms: 103.702
+  type: 'test'
+  location: 'E:\\git-project\\wt-mcp-device-111-context\\test\\context\\review-blockers.test.js:426:1'
+  failureType: 'testCodeFailure'
+  error: 'authorization.isFeatureAuthorized is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    isFeatureAuthorized (file:///E:/git-project/wt-mcp-device-111-context/test/context/review-blockers.test.js:17:56)
+    TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/test/context/review-blockers.test.js:428:16)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: B3 Phase 7 approval cannot authorize Phase 8 gateway
+not ok 27 - B3 Phase 7 approval cannot authorize Phase 8 gateway
+  ---
+  duration_ms: 103.8387
+  type: 'test'
+  location: 'E:\\git-project\\wt-mcp-device-111-context\\test\\context\\review-blockers.test.js:431:1'
+  failureType: 'testCodeFailure'
+  error: 'authorization.isFeatureAuthorized is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    isFeatureAuthorized (file:///E:/git-project/wt-mcp-device-111-context/test/context/review-blockers.test.js:17:56)
+    TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/test/context/review-blockers.test.js:433:16)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: B3 forced env/config flag and caller key cannot bypass invalid approval
+ok 28 - B3 forced env/config flag and caller key cannot bypass invalid approval
+  ---
+  duration_ms: 101.8806
+  type: 'test'
+  ...
+# Subtest: B3 direct capture import is initialization-gated
+not ok 29 - B3 direct capture import is initialization-gated
+  ---
+  duration_ms: 1.6465
+  type: 'test'
+  location: 'E:\\git-project\\wt-mcp-device-111-context\\test\\context\\review-blockers.test.js:446:46'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /FEATURE_GATE_LOCKED/. Input:
+    
+    "Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'E:\\git-project\\wt-mcp-device-111-context\\dist\\context\\capture.js' imported from E:\\git-project\\wt-mcp-device-111-context\\test\\context\\review-blockers.test.js"
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+  error: "Cannot find module 'E:\\git-project\\wt-mcp-device-111-context\\dist\\context\\capture.js' imported from E:\\git-project\\wt-mcp-device-111-context\\test\\context\\review-blockers.test.js"
+  stack: |-
+    finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    moduleResolve (node:internal/modules/esm/resolve:861:10)
+    defaultResolve (node:internal/modules/esm/resolve:985:11)
+    #cachedDefaultResolve (node:internal/modules/esm/loader:731:20)
+    ModuleLoader.resolve (node:internal/modules/esm/loader:708:38)
+    ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:310:38)
+    onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:664:36)
+    TracingChannel.tracePromise (node:diagnostics_channel:350:14)
+    ModuleLoader.import (node:internal/modules/esm/loader:663:21)
+    defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:222:31)
+  operator: 'rejects'
+  stack: |-
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/test/context/review-blockers.test.js:447:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: B3 direct gateway import is initialization-gated
+not ok 30 - B3 direct gateway import is initialization-gated
+  ---
+  duration_ms: 0.8118
+  type: 'test'
+  location: 'E:\\git-project\\wt-mcp-device-111-context\\test\\context\\review-blockers.test.js:446:46'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /FEATURE_GATE_LOCKED/. Input:
+    
+    "Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'E:\\git-project\\wt-mcp-device-111-context\\dist\\context\\gateway.js' imported from E:\\git-project\\wt-mcp-device-111-context\\test\\context\\review-blockers.test.js"
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+  error: "Cannot find module 'E:\\git-project\\wt-mcp-device-111-context\\dist\\context\\gateway.js' imported from E:\\git-project\\wt-mcp-device-111-context\\test\\context\\review-blockers.test.js"
+  stack: |-
+    finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    moduleResolve (node:internal/modules/esm/resolve:861:10)
+    defaultResolve (node:internal/modules/esm/resolve:985:11)
+    #cachedDefaultResolve (node:internal/modules/esm/loader:731:20)
+    ModuleLoader.resolve (node:internal/modules/esm/loader:708:38)
+    ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:310:38)
+    onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:664:36)
+    TracingChannel.tracePromise (node:diagnostics_channel:350:14)
+    ModuleLoader.import (node:internal/modules/esm/loader:663:21)
+    defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:222:31)
+  operator: 'rejects'
+  stack: |-
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/test/context/review-blockers.test.js:447:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: quota rejection bursts create one deduplicated gap per minute
+ok 31 - quota rejection bursts create one deduplicated gap per minute
+  ---
+  duration_ms: 427.2178
+  type: 'test'
+  ...
+# Subtest: graph neighbor SQL fetch is bounded by remaining examined-edge budget plus one
+ok 32 - graph neighbor SQL fetch is bounded by remaining examined-edge budget plus one
+  ---
+  duration_ms: 0.4435
+  type: 'test'
+  ...
+# Subtest: graph path cannot traverse a purged intermediate node
+ok 33 - graph path cannot traverse a purged intermediate node
+  ---
+  duration_ms: 263.4412
+  type: 'test'
+  ...
+1..33
+# tests 33
+# suites 0
+# pass 26
+# fail 7
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 9988.0586

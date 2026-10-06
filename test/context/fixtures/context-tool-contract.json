@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "register_public_tools": false,
+  "sources": ["specs/002-device-local-context/contracts/context-api.md", "evidence/context/decisions.md"],
+  "common": {
+    "remote_routing": "authenticated owned online device; require device_id and cwd or approved project_id before ref/cursor/job lookup",
+    "local_cli": "local cwd/project only; no device_id, DB path, arbitrary account or gateway fallback",
+    "scope_alternatives": ["cwd", "project_id"],
+    "envelope_fields": ["schema_version", "ok", "scope", "index", "coverage", "items", "partial", "next_cursor", "warnings"],
+    "errors": ["DEVICE_UNSUPPORTED", "DEVICE_OFFLINE", "SCOPE_REQUIRED", "SCOPE_AMBIGUOUS", "ACCESS_DENIED", "LOCAL_STATE_UNAVAILABLE", "REPOSITORY_NOT_FOUND", "INDEX_MISSING", "INDEX_INCOMPATIBLE", "REF_NOT_FOUND", "EVIDENCE_EXPIRED", "CURSOR_INVALID", "CURSOR_STALE", "BUSY", "BUDGET_EXCEEDED", "STORAGE_DEGRADED", "ACTION_UNSUPPORTED", "WIKI_DISABLED"],
+    "budget_fixture": "policy-v1.json",
+    "forbidden_inputs": ["DB path", "account_id", "llm", "auto_sync", "arbitrary SQL", "raw FTS syntax", "confirm"],
+    "forbidden_index_actions": ["purge", "adopt", "relink", "backup", "export"],
+    "old_device": {"error": "DEVICE_UNSUPPORTED", "server_fallback": false},
+    "schema_token_max": 10000,
+    "note": "Proposed input shapes only. Routing/scope for minimal wiki is gateway context, not additional wiki fields. No handlers or public registration in Phase 1."
+  },
+  "tools": [
+    {
+      "name": "local_status",
+      "description": "Inspect bounded local context freshness, storage, capture gaps and jobs. No indexing.",
+      "actions": [],
+      "risk_lane": "read",
+      "annotations": {"readOnlyHint": true, "idempotentHint": true, "destructiveHint": false, "openWorldHint": false},
+      "provider_calls": 0,
+      "inputSchema": {"type": "object", "properties": {"device_id": {"type": "string", "minLength": 1}, "cwd": {"type": "string"}, "project_id": {"type": "string"}, "check_current": {"type": "boolean"}, "job_id": {"type": "string"}}, "required": ["device_id"], "additionalProperties": false},
+      "output": ["storage availability", "active namespace", "repository/worktree refs", "generation", "freshness", "pending_events", "capture health/gap counters including RAM fallback", "job summary", "wiki_enabled=false"]
+    },
+    {
+      "name": "local_search",
+      "description": "Search retained history, checkpoints and activity in the published generation. No hidden sync.",
+      "actions": [],
+      "risk_lane": "read",
+      "annotations": {"readOnlyHint": true, "idempotentHint": true, "destructiveHint": false, "openWorldHint": false},
+      "provider_calls": 0,
+      "inputSchema": {"type": "object", "properties": {"device_id": {"type": "string", "minLength": 1}, "cwd": {"type": "string"}, "project_id": {"type": "string"}, "query": {"type": "string", "minLength": 1}, "source_types": {"type": "array", "items": {"type": "string", "enum": ["history", "checkpoint", "activity"]}}, "since": {"type": "string"}, "until": {"type": "string"}, "limit": {"type": "integer", "minimum": 1, "maximum": 50, "default": 8}, "max_bytes": {"type": "integer", "minimum": 1, "maximum": 131072, "default": 32768}, "cursor": {"type": "string"}, "include_related": {"type": "boolean"}}, "required": ["device_id", "query"], "additionalProperties": false},
+      "output": ["ref", "source/evidence class", "timestamp", "label", "snippet", "safe relative location", "revision/worktree", "match_reason", "related_refs?", "rank_score (not confidence)", "continuation/coverage"],
+      "cursor_visibility": "first_indexed_generation <= G AND last_indexed_generation <= G"
+    },
+    {
+      "name": "local_read",
+      "description": "Read retained evidence in ref order within aggregate byte bounds, never current source substitution.",
+      "actions": [],
+      "risk_lane": "read",
+      "annotations": {"readOnlyHint": true, "idempotentHint": true, "destructiveHint": false, "openWorldHint": false},
+      "provider_calls": 0,
+      "inputSchema": {"type": "object", "properties": {"device_id": {"type": "string", "minLength": 1}, "cwd": {"type": "string"}, "project_id": {"type": "string"}, "refs": {"type": "array", "minItems": 1, "maxItems": 20, "items": {"type": "string"}}, "max_bytes": {"type": "integer", "minimum": 1, "maximum": 1048576, "default": 262144}, "cursor": {"type": "string"}, "ranges": {"type": "array", "items": {"type": "object", "properties": {"ref": {"type": "string"}, "start": {"type": "integer", "minimum": 0}, "end": {"type": "integer", "minimum": 0}}, "required": ["ref", "start"], "additionalProperties": false}, "maxItems": 20}}, "required": ["device_id", "refs"], "additionalProperties": false},
+      "deferred_shape": "Finalized T050: optional ranges [{ref,start,end?}], UTF-8 byte offsets; continuation binds refs and ranges.",
+      "output": ["ref", "source_kind", "evidence_class", "content", "retained hash", "captured range", "known total bytes", "retention/redaction", "truncated", "continuation", "per-ref error"]
+    },
+    {
+      "name": "local_graph",
+      "description": "Query bounded activity/provenance relations, not source-code or causal similarity.",
+      "actions": ["neighbors", "path", "timeline", "related"],
+      "risk_lane": "read",
+      "annotations": {"readOnlyHint": true, "idempotentHint": true, "destructiveHint": false, "openWorldHint": false},
+      "provider_calls": 0,
+      "inputSchema": {"type": "object", "properties": {"device_id": {"type": "string", "minLength": 1}, "cwd": {"type": "string"}, "project_id": {"type": "string"}, "action": {"type": "string", "enum": ["neighbors", "path", "timeline", "related"]}, "refs": {"type": "array", "items": {"type": "string"}}, "target": {"type": "string"}, "relations": {"type": "array", "items": {"type": "string"}}, "direction": {"type": "string", "enum": ["in", "out", "both"]}, "max_hops": {"type": "integer", "minimum": 1, "maximum": 4, "default": 2}, "max_nodes": {"type": "integer", "minimum": 1, "maximum": 200, "default": 50}, "max_edges": {"type": "integer", "minimum": 1, "maximum": 2000, "default": 500}, "max_bytes": {"type": "integer", "minimum": 1, "maximum": 131072, "default": 65536}, "wall_ms": {"type": "integer", "minimum": 1, "maximum": 100, "default": 25}, "cursor": {"type": "string"}}, "required": ["device_id", "action", "refs"], "additionalProperties": false},
+      "output": ["nodes/edges", "visited_nodes", "examined_edges", "returned_nodes", "truncated_by", "coverage/continuation"]
+    },
+    {
+      "name": "local_index",
+      "description": "Explicit retained-event sync, checkpoint, derived rebuild or job cancel. No destructive administration.",
+      "actions": ["sync", "checkpoint", "rebuild", "cancel"],
+      "risk_lane": "write",
+      "annotations": {"readOnlyHint": false, "idempotentHint": false, "destructiveHint": false, "openWorldHint": false},
+      "provider_calls": 0,
+      "inputSchema": {"type": "object", "properties": {"device_id": {"type": "string", "minLength": 1}, "cwd": {"type": "string"}, "project_id": {"type": "string"}, "action": {"type": "string", "enum": ["sync", "checkpoint", "rebuild", "cancel"]}, "budget_profile": {"type": "string"}, "idempotency_key": {"type": "string"}, "job_id": {"type": "string"}, "summary": {"type": "string"}, "evidence_refs": {"type": "array", "items": {"type": "string"}}}, "required": ["device_id", "action"], "additionalProperties": false},
+      "semantics": {"sync": "retained pending current-repo events; no file scan", "checkpoint": "observed Git metadata and explicitly reported summary/evidence", "rebuild": "shadow derived generation only; source events/blobs unchanged", "cancel": "scoped index job, never user process"},
+      "output": ["job ref/state or bounded completion", "source/target generation", "progress", "coverage", "retryability"]
+    },
+    {
+      "name": "local_wiki",
+      "description": "Reserved disabled wiki status. No provider calls in feature 002.",
+      "actions": ["status"],
+      "risk_lane": "read",
+      "annotations": {"readOnlyHint": true, "idempotentHint": true, "destructiveHint": false, "openWorldHint": false},
+      "provider_calls": 0,
+      "inputSchema": {"type": "object", "properties": {"action": {"type": "string", "enum": ["status"]}}, "required": ["action"], "additionalProperties": false},
+      "result": {"ok": false, "code": "WIKI_DISABLED", "enabled": false, "implementation_feature": "003-manual-repo-wiki"},
+      "rejected_actions": ["generate", "read", "export", "provider"],
+      "errors": ["WIKI_DISABLED", "ACTION_UNSUPPORTED"]
+    }
+  ]
+}

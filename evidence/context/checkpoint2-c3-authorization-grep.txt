@@ -1,0 +1,10 @@
+src/context/authorization.ts:57:export function requireFeatureAuthorized(scope: GatedFeature, configDirectory?: string): void {
+src/context/capture.ts:1:import { requireFeatureAuthorized } from './authorization.js';
+src/context/capture.ts:6:  requireFeatureAuthorized('FEATURE_LIVE_CAPTURE');
+src/context/gateway.ts:1:import { requireFeatureAuthorized } from './authorization.js';
+src/context/gateway.ts:6:  requireFeatureAuthorized('FEATURE_PUBLIC_GATEWAY');
+src/context/service.ts:2:import { requireFeatureAuthorized, GATE_ERROR, type GatedFeature } from './authorization.js';
+src/context/service.ts:35:    this.requireFeatureAuthorized(feature);
+src/context/service.ts:38:  requireFeatureAuthorized(feature: GatedFeature): void {
+src/context/service.ts:40:    requireFeatureAuthorized(feature);
+src/context/service.ts:46:    this.requireFeatureAuthorized(feature);

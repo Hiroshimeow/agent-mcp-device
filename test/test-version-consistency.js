@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
-const expectedVersion = '1.0.10';
+const expectedVersion = '1.0.11';
 const read = relativePath => readFile(new URL(relativePath, import.meta.url), 'utf8');
 
 const packageJson = JSON.parse(await read('../package.json'));

@@ -1,0 +1,52 @@
+TAP version 13
+# (node:37796) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: context benchmarks verify nonzero work for all five workloads
+not ok 1 - context benchmarks verify nonzero work for all five workloads
+  ---
+  duration_ms: 1704.2758
+  type: 'test'
+  location: 'E:\\git-project\\wt-mcp-device-111-context\\bench\\test\\context.test.mjs:5:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Error: BUDGET_EXCEEDED
+        at queryActivityGraph (file:///E:/git-project/wt-mcp-device-111-context/dist/context/graph.js:76:15)
+        at ContextService.graph (file:///E:/git-project/wt-mcp-device-111-context/dist/context/service.js:40:40)
+        at file:///E:/git-project/wt-mcp-device-111-context/bench/scenarios/context.mjs:51:34
+        at runMeasuredSample (file:///E:/git-project/wt-mcp-device-111-context/.archive-worktrees-docs/wt-mcp-device-110-bench/bench/lib/core.mjs:332:25)
+        at measure (file:///E:/git-project/wt-mcp-device-111-context/bench/scenarios/context.mjs:19:23)
+        at runContextBenchmarks (file:///E:/git-project/wt-mcp-device-111-context/bench/scenarios/context.mjs:50:13)
+        at async TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/bench/test/context.test.mjs:6:16)
+        at async Test.run (node:internal/test_runner/test:1054:7)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+    
+    false !== true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: 'strictEqual'
+  stack: |-
+    queryActivityGraph (file:///E:/git-project/wt-mcp-device-111-context/dist/context/graph.js:76:15)
+    ContextService.graph (file:///E:/git-project/wt-mcp-device-111-context/dist/context/service.js:40:40)
+    file:///E:/git-project/wt-mcp-device-111-context/bench/scenarios/context.mjs:51:34
+    runMeasuredSample (file:///E:/git-project/wt-mcp-device-111-context/.archive-worktrees-docs/wt-mcp-device-110-bench/bench/lib/core.mjs:332:25)
+    measure (file:///E:/git-project/wt-mcp-device-111-context/bench/scenarios/context.mjs:19:23)
+    runContextBenchmarks (file:///E:/git-project/wt-mcp-device-111-context/bench/scenarios/context.mjs:50:13)
+    async TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/bench/test/context.test.mjs:6:16)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+    TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/bench/test/context.test.mjs:9:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1833.0107

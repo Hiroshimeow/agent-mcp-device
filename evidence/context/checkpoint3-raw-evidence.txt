@@ -1,0 +1,241 @@
+Code Commit X_final: a95a7dce03fc8e80bab99af8f90597213f527fd3
+$ git merge-base --is-ancestor 2cb91fc 6652abf; echo $?
+0
+$ git rev-parse 6652abf^
+2cb91fca03b3a57f144541d515146b9d00bcd216
+$ git log --oneline 2cb91fc..HEAD
+a95a7dc fix(context): enforce per-event revocation teardown and public route gates
+ed06063 docs(context): record reconciliation of 48-hex ref format in acceptance and review records
+f48fedd fix(context): use 48-hex opaque refs for captured evidence to match graph contract
+6f914ba feat(context): add 1.0.11 acceptance benchmarks and platform evidence
+1809349 feat(context): implement Phase 8 six public tools and gateway rollout seams
+1c6408a feat(context): complete Phase 7 canonical live capture (Code Commit X)
+6652abf docs(context): record Checkpoint 2 formal READY_TO_PROCEED verdict from Opus
+$ git grep -nE "executeLiveCapture|executePublicGateway|executeFeature\\(" -- src
+src/context/capture.ts:8:export function executeLiveCapture<T>(action: () => T): T {
+src/context/capture.ts:33:  if (observer) executeLiveCapture(() => { liveObserver = observer; });
+src/context/capture.ts:65:      executeLiveCapture(() => service.requireFeatureAuthorized('FEATURE_LIVE_CAPTURE'));
+src/context/capture.ts:68:      return executeLiveCapture(() => {
+src/context/capture.ts:93:      executeLiveCapture(() => service.requireFeatureAuthorized('FEATURE_LIVE_CAPTURE'));
+src/context/capture.ts:99:        return executeLiveCapture(() => {
+src/context/capture.ts:133:        try { executeLiveCapture(() => bounded(() => {
+src/context/device-adapter.ts:1:import { executePublicGateway } from './gateway.js';
+src/context/device-adapter.ts:16:  return executePublicGateway(async () => {
+src/context/gateway.ts:7:export function executePublicGateway<T>(action: () => T): T {
+src/context/gateway.ts:13:export function contextToolCatalog() { return executePublicGateway(buildContextCatalog); }
+src/context/gateway.ts:24:  return executePublicGateway(async () => {
+src/device/gateway-tool-adapter.ts:13:import { executePublicGateway } from '../context/gateway.js';
+src/device/gateway-tool-adapter.ts:253:            return executePublicGateway(() => this.context
+$ git grep -nE "from ['\"].*context/(capture|gateway|store|service)" -- src
+src/device/gateway-tool-adapter.ts:12:import { observePublicInvocation, type CanonicalObserver } from '../context/capture.js';
+src/device/gateway-tool-adapter.ts:13:import { executePublicGateway } from '../context/gateway.js';
+src/server.ts:66:import { observePublicInvocation, isCapturingInvocation } from './context/capture.js';
+src/tool-dispatcher.ts:10:import { observePublicInvocation, isCapturingInvocation } from './context/capture.js';
+
+src/device/gateway-tool-adapter.ts:29-44
+29: export const GATEWAY_CAPABILITIES = [
+30:     'read_text_file',
+31:     'write_file',
+32:     'edit_file',
+33:     'shell_execute',
+34:     'start_process',
+35:     'read_process_output',
+36:     'interact_with_process',
+37:     'terminate_process',
+38:     'image_preview',
+39:     'project_inspect'
+40: ] as const;
+41: 
+42: export function gatewayCapabilities(): string[] {
+43:     return [...GATEWAY_CAPABILITIES, ...(isFeatureAuthorized('FEATURE_PUBLIC_GATEWAY') ? CONTEXT_TOOL_NAMES : [])];
+44: }
+
+src/device/gateway-tool-adapter.ts:251-256
+251:     async call(tool: string, args: any = {}): Promise<any> {
+252:         if (tool.startsWith('local_')) {
+253:             return executePublicGateway(() => this.context
+254:                 ? callDeviceContext(tool, args, this.context, requested => this.guardPath(requested))
+255:                 : Promise.resolve({ ok: false, error: { code: 'DEVICE_UNSUPPORTED' } }));
+256:         }
+
+src/context/tool-contract.ts:1-24
+1: import { z } from 'zod';
+2: import { zodToJsonSchema } from 'zod-to-json-schema';
+3: 
+4: const scope = { device_id: z.string().min(1), cwd: z.string().optional(), project_id: z.string().optional() };
+5: const strings = z.array(z.string());
+6: const cap = (maximum: number, fallback: number) => z.number().int().min(1).max(maximum).default(fallback).optional();
+7: export const CONTEXT_INPUTS = {
+8:   local_status: z.object({ ...scope, check_current: z.boolean().optional(), job_id: z.string().optional() }).strict(),
+9:   local_search: z.object({ ...scope, query: z.string().min(1), source_types: z.array(z.enum(['history', 'checkpoint', 'activity'])).optional(), since: z.string().optional(), until: z.string().optional(), limit: cap(50, 8), max_bytes: cap(131072, 32768), cursor: z.string().optional(), include_related: z.boolean().optional() }).strict(),
+10:   local_read: z.object({ ...scope, refs: strings.min(1).max(20), max_bytes: cap(1048576, 262144), cursor: z.string().optional(), ranges: z.array(z.object({ ref: z.string(), start: z.number().int().min(0), end: z.number().int().min(0).optional() }).strict()).max(20).optional() }).strict(),
+11:   local_graph: z.object({ ...scope, action: z.enum(['neighbors', 'path', 'timeline', 'related']), refs: strings, target: z.string().optional(), relations: strings.optional(), direction: z.enum(['in', 'out', 'both']).optional(), max_hops: cap(4, 2), max_nodes: cap(200, 50), max_edges: cap(2000, 500), max_bytes: cap(131072, 65536), wall_ms: cap(100, 25), cursor: z.string().optional() }).strict(),
+12:   local_index: z.object({ ...scope, action: z.enum(['sync', 'checkpoint', 'rebuild', 'cancel']), budget_profile: z.string().optional(), idempotency_key: z.string().optional(), job_id: z.string().optional(), summary: z.string().optional(), evidence_refs: strings.optional() }).strict(),
+13:   local_wiki: z.object({ action: z.enum(['status']) }).strict(),
+14: } as const;
+15: export type ContextToolName = keyof typeof CONTEXT_INPUTS;
+16: export const CONTEXT_TOOL_NAMES = Object.keys(CONTEXT_INPUTS) as ContextToolName[];
+17: const descriptions: Record<ContextToolName, string> = {
+18:   local_status: 'Inspect bounded local context freshness, storage, capture gaps and jobs. No indexing.',
+19:   local_search: 'Search retained history, checkpoints and activity in the published generation. No hidden sync.',
+20:   local_read: 'Read retained evidence in ref order within aggregate byte bounds, never current source substitution.',
+21:   local_graph: 'Query bounded activity/provenance relations, not source-code or causal similarity.',
+22:   local_index: 'Explicit retained-event sync, checkpoint, derived rebuild or job cancel. No destructive administration.',
+23:   local_wiki: 'Reserved disabled wiki status. No provider calls in feature 002.',
+24: };
+
+src/context/authorization.ts:1-61
+1: import { createHash } from 'node:crypto';
+2: import { readFileSync, statSync } from 'node:fs';
+3: import { join } from 'node:path';
+4: import { fileURLToPath } from 'node:url';
+5: import { verifyOfficialApproval } from '../device/official-trust.js';
+6: export { SOC_PUBLIC_KEY } from '../device/official-trust.js';
+7: 
+8: export type GatedFeature = 'FEATURE_LIVE_CAPTURE' | 'FEATURE_PUBLIC_GATEWAY';
+9: export const GATE_ERROR = 'FEATURE_GATE_LOCKED: Phase 7/8 requires valid SOC security approval artifact';
+10: 
+11: // Anchor trust configuration to the installed module, never the caller's cwd.
+12: const CONFIG_DIRECTORY = fileURLToPath(new URL('../../config/', import.meta.url));
+13: 
+14: function approvalFailure(scope: GatedFeature): string | undefined {
+15:   try {
+16:     if (!['FEATURE_LIVE_CAPTURE', 'FEATURE_PUBLIC_GATEWAY'].includes(scope)) return GATE_ERROR;
+17:     const path = join(CONFIG_DIRECTORY, 'soc-approval.json');
+18:     if (statSync(path).size > 16384) return GATE_ERROR;
+19:     const artifact = JSON.parse(readFileSync(path, 'utf8'));
+20:     if (artifact.schema_version !== 1 || !Array.isArray(artifact.features) || artifact.features.length < 1 || artifact.features.length > 2 ||
+21:         !artifact.features.every((value: unknown) => value === 'FEATURE_LIVE_CAPTURE' || value === 'FEATURE_PUBLIC_GATEWAY') ||
+22:         new Set(artifact.features).size !== artifact.features.length || !artifact.features.includes(scope) ||
+23:         !Number.isSafeInteger(artifact.expires_at) || artifact.expires_at <= Date.now() || typeof artifact.signature !== 'string') return GATE_ERROR;
+24: 
+25:     // RFC 8785 JCS for this closed schema: lexicographically sorted ASCII keys,
+26:     // safe integer time, ASCII enum strings, and order-preserving arrays. JSON's
+27:     // ECMAScript serialization is canonical for these validated value types.
+28:     if (!verifyOfficialApproval(artifact)) return `${GATE_ERROR}: SOC_KEY_UNTRUSTED`;
+29:     // Digest the canonical signed artifact, not file formatting: whitespace or
+30:     // insertion-order changes cannot resurrect a revoked approval.
+31:     const digest = createHash('sha256').update(JSON.stringify({
+32:       expires_at: artifact.expires_at, features: artifact.features,
+33:       schema_version: artifact.schema_version, signature: artifact.signature
+34:     })).digest('hex');
+35:     const revokedPath = join(CONFIG_DIRECTORY, 'revoked-approvals.json');
+36:     let revokedText: string;
+37:     try {
+38:       if (statSync(revokedPath).size > 1048576) return GATE_ERROR;
+39:       revokedText = readFileSync(revokedPath, 'utf8');
+40:     } catch {
+41:       return 'FEATURE_GATE_LOCKED: revocation list missing or unreadable';
+42:     }
+43:     let revoked;
+44:     try { revoked = JSON.parse(revokedText); }
+45:     catch { return 'FEATURE_GATE_LOCKED: revocation list malformed'; }
+46:     if (!Array.isArray(revoked)) return 'FEATURE_GATE_LOCKED: revocation list malformed';
+47:     if (!revoked.every((value: unknown) => typeof value === 'string' && /^[0-9a-f]{64}$/.test(value))) return 'FEATURE_GATE_LOCKED: revocation list malformed';
+48:     if (revoked.includes(digest)) return 'FEATURE_GATE_LOCKED: artifact revoked';
+49:     return undefined;
+50:   } catch { return GATE_ERROR; }
+51: }
+52: 
+53: export function isFeatureAuthorized(scope: GatedFeature): boolean {
+54:   return approvalFailure(scope) === undefined;
+55: }
+56: 
+57: export function requireFeatureAuthorized(scope: GatedFeature): void {
+58:   const failure = approvalFailure(scope);
+59:   if (failure) throw new Error(failure);
+60: }
+61: 
+
+src/context/device-adapter.ts:1-67
+1: import { executePublicGateway } from './gateway.js';
+2: import { CONFIG_DIR } from '../config.js';
+3: import { ContextStore } from './store.js';
+4: import { ContextService } from './service.js';
+5: import { resolveRepository } from './repositories.js';
+6: import { validateContextInput, contextError, WIKI_DISABLED } from './tool-contract.js';
+7: import type { GraphOptions } from './graph.js';
+8: 
+9: export interface DeviceContextOptions {
+10:   stateRoot?: string;
+11:   deviceId: string;
+12:   /** Trusted configured project lookup, never caller-provided filesystem mapping. */
+13:   resolveProject?: (projectId: string) => Promise<string | undefined>;
+14: }
+15: export async function callDeviceContext(tool: string, input: unknown, options: DeviceContextOptions, guard: (path: string) => Promise<string>) {
+16:   return executePublicGateway(async () => {
+17:   let store: ContextStore | undefined;
+18:   try {
+19:     const args = validateContextInput(tool, input);
+20:     if (tool === 'local_wiki') return WIKI_DISABLED;
+21:     if (args.device_id !== options.deviceId) throw new Error('ACCESS_DENIED');
+22:     if (!args.cwd && !args.project_id) throw new Error('SCOPE_REQUIRED');
+23:     if (args.cwd && args.project_id) throw new Error('SCOPE_AMBIGUOUS');
+24:     const cwd = args.cwd ?? await options.resolveProject?.(args.project_id);
+25:     if (!cwd) throw new Error('ACCESS_DENIED');
+26:     const resolution = await resolveRepository(cwd, guard);
+27:     if (!resolution) throw new Error('REPOSITORY_NOT_FOUND');
+28:     const write = tool === 'local_index' && args.action !== 'cancel';
+29:     store = new ContextStore(options.stateRoot ?? CONFIG_DIR, { readOnly: !write });
+30:     const owner = store.activeOwner();
+31:     if (!owner) throw new Error('ACCESS_DENIED');
+32:     const repo = write ? store.repository(owner, resolution.identity) : store.findRepository(owner, resolution.identity);
+33:     if (!repo) throw new Error('INDEX_MISSING');
+34:     const service = new ContextService(store);
+35:     switch (tool) {
+36:       case 'local_status':
+37:         if (args.job_id && !service.status(owner, repo).active_jobs.some(job => job.job_ref === args.job_id)) throw new Error('ACCESS_DENIED');
+38:         return service.status(owner, repo);
+39:       case 'local_search': {
+40:         const timestamp = (value: string | undefined) => {
+41:           if (value === undefined) return undefined;
+42:           const number = /^\d+$/.test(value) ? Number(value) : Date.parse(value);
+43:           if (!Number.isSafeInteger(number)) throw new Error('BUDGET_EXCEEDED');
+44:           return number;
+45:         };
+46:         return service.search(owner, repo, { ...args, query: args.query, since: timestamp(args.since), until: timestamp(args.until) });
+47:       }
+48:       case 'local_read': return service.read(owner, repo, { ...args, refs: args.refs });
+49:       case 'local_graph':
+50:         if (args.cursor !== undefined) throw new Error('CURSOR_INVALID');
+51:         return service.graph(owner, repo, args as GraphOptions);
+52:       case 'local_index':
+53:         // Foreground-only jobs; don't silently claim unsupported orchestration semantics.
+54:         if (args.budget_profile !== undefined || args.idempotency_key !== undefined) throw new Error('ACTION_UNSUPPORTED');
+55:         switch (args.action) {
+56:           case 'sync': return service.sync(owner, repo);
+57:           case 'rebuild': return service.rebuild(owner, repo);
+58:           case 'cancel': return service.cancel(owner, repo, args.job_id ?? '');
+59:           case 'checkpoint': return service.checkpoint(owner, repo, { repository_root: resolution.root, worktree_ref: resolution.worktree, summary: args.summary, evidence_refs: args.evidence_refs });
+60:         }
+61:     }
+62:     throw new Error('ACTION_UNSUPPORTED');
+63:   } catch (error) { return contextError(error); }
+64:   finally { try { store?.close(); } catch { /* Do not leak paths through close errors. */ } }
+65:   });
+66: }
+67: 
+
+test/context/pinned-gates.test.js:40-52
+40: // Redirect installed-config reads only within this isolated test process.
+41: // Public production entry points expose no configuration injection parameter.
+42: function moduleConfig(t, f) {
+43:   const installed = fileURLToPath(new URL('../../config/', import.meta.url));
+44:   const originals = { statSync: fs.statSync, readFileSync: fs.readFileSync };
+45:   for (const name of Object.keys(originals)) fs[name] = (path, ...args) => {
+46:     const mapped = typeof path === 'string' && path.startsWith(installed) ? join(f.config, path.slice(installed.length)) : path;
+47:     return originals[name](mapped, ...args);
+48:   };
+49:   syncBuiltinESMExports();
+50:   t.after(() => { Object.assign(fs, originals); syncBuiltinESMExports(); });
+51: }
+52: 
+
+package.json files:
+{
+  "files": [
+    "dist",
+    "config/revoked-approvals.json",
+    "skills/mcp-device-context"
+  ]
+}

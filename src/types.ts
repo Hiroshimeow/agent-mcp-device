@@ -15,6 +15,7 @@ export interface ProcessInfo {
 }
 
 export interface TerminalSession {
+  executionId: string;
   pid: number;
   process: ChildProcess;
   outputLines: string[];      // Line-based buffer (persistent, capped — oldest lines evicted)

@@ -1,0 +1,258 @@
+{
+  "schema_version": 1,
+  "benchmark_suite_version": "1.0.0",
+  "generated_at": "2026-10-05T06:27:08.301Z",
+  "raw_path": "evidence/context/phase9-windows-benchmark.jsonl",
+  "sample_count": 15,
+  "measured_count": 15,
+  "invalid_count": 0,
+  "environments": [
+    {
+      "host_label": "context-local",
+      "platform": "win32",
+      "arch": "x64",
+      "node_version": "v22.22.2",
+      "npm_version": "11.17.0",
+      "cpu_model": "Intel(R) Core(TM) Ultra 7 155H",
+      "cpu_count": 22,
+      "total_memory_bytes": 33945935872,
+      "baseline_commit": "ee87d0f3057e01e8087db99615d14bd1b4c626d4",
+      "harness_commit": "1809349f6b30b72712179af4b2aaae92d3404e94",
+      "package_version": "1.0.11",
+      "git_dirty": true
+    }
+  ],
+  "scenarios": {
+    "context::context.activity": {
+      "profile": "context",
+      "scenario": "context.activity",
+      "warmup_count": 0,
+      "measured_count": 3,
+      "valid_count": 3,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 3,
+        "min": 1827.0370999999996,
+        "median": 2075.3604000000014,
+        "p95": 2661.3928000000005,
+        "max": 2661.3928000000005
+      },
+      "response_bytes": {
+        "count": 3,
+        "min": 19199,
+        "median": 19199,
+        "p95": 19199,
+        "max": 19199
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "examined_edges": {
+          "count": 3,
+          "min": 43,
+          "median": 43,
+          "p95": 43,
+          "max": 43
+        },
+        "returned_edges": {
+          "count": 3,
+          "min": 41,
+          "median": 41,
+          "p95": 41,
+          "max": 41
+        },
+        "visited_nodes": {
+          "count": 3,
+          "min": 42,
+          "median": 42,
+          "p95": 42,
+          "max": 42
+        }
+      },
+      "invalid_reasons": []
+    },
+    "context::context.capture": {
+      "profile": "context",
+      "scenario": "context.capture",
+      "warmup_count": 0,
+      "measured_count": 3,
+      "valid_count": 3,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 3,
+        "min": 3347.2637000000004,
+        "median": 3444.2657,
+        "p95": 3996.0659000000014,
+        "max": 3996.0659000000014
+      },
+      "response_bytes": {
+        "count": 3,
+        "min": 0,
+        "median": 0,
+        "p95": 0,
+        "max": 0
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "durable_events": {
+          "count": 3,
+          "min": 40,
+          "median": 40,
+          "p95": 40,
+          "max": 40
+        },
+        "executions": {
+          "count": 3,
+          "min": 40,
+          "median": 40,
+          "p95": 40,
+          "max": 40
+        }
+      },
+      "invalid_reasons": []
+    },
+    "context::context.contention": {
+      "profile": "context",
+      "scenario": "context.contention",
+      "warmup_count": 0,
+      "measured_count": 3,
+      "valid_count": 3,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 3,
+        "min": 99.42580000000089,
+        "median": 108.7514999999994,
+        "p95": 111.30190000000039,
+        "max": 111.30190000000039
+      },
+      "response_bytes": {
+        "count": 3,
+        "min": 0,
+        "median": 0,
+        "p95": 0,
+        "max": 0
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "capture_gaps": {
+          "count": 3,
+          "min": 1,
+          "median": 1,
+          "p95": 1,
+          "max": 1
+        },
+        "executions": {
+          "count": 3,
+          "min": 1,
+          "median": 1,
+          "p95": 1,
+          "max": 1
+        },
+        "locked_writes": {
+          "count": 3,
+          "min": 1,
+          "median": 1,
+          "p95": 1,
+          "max": 1
+        }
+      },
+      "invalid_reasons": []
+    },
+    "context::context.search": {
+      "profile": "context",
+      "scenario": "context.search",
+      "warmup_count": 0,
+      "measured_count": 3,
+      "valid_count": 3,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 3,
+        "min": 158.56519999999728,
+        "median": 167.14700000000084,
+        "p95": 266.78759999999966,
+        "max": 266.78759999999966
+      },
+      "response_bytes": {
+        "count": 3,
+        "min": 15172,
+        "median": 15172,
+        "p95": 15172,
+        "max": 15172
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "corpus_events": {
+          "count": 3,
+          "min": 40,
+          "median": 40,
+          "p95": 40,
+          "max": 40
+        },
+        "queries": {
+          "count": 3,
+          "min": 2,
+          "median": 2,
+          "p95": 2,
+          "max": 2
+        },
+        "returned_hits": {
+          "count": 3,
+          "min": 40,
+          "median": 40,
+          "p95": 40,
+          "max": 40
+        }
+      },
+      "invalid_reasons": []
+    },
+    "context::context.sync": {
+      "profile": "context",
+      "scenario": "context.sync",
+      "warmup_count": 0,
+      "measured_count": 3,
+      "valid_count": 3,
+      "invalid_count": 0,
+      "elapsed_ms": {
+        "count": 3,
+        "min": 61.263600000000224,
+        "median": 63.897799999998824,
+        "p95": 112.26770000000033,
+        "max": 112.26770000000033
+      },
+      "response_bytes": {
+        "count": 3,
+        "min": 0,
+        "median": 0,
+        "p95": 0,
+        "max": 0
+      },
+      "cpu_user_us": null,
+      "cpu_system_us": null,
+      "rss_peak_bytes": null,
+      "metrics": {
+        "fts_documents": {
+          "count": 3,
+          "min": 40,
+          "median": 40,
+          "p95": 40,
+          "max": 40
+        },
+        "indexed_events": {
+          "count": 3,
+          "min": 40,
+          "median": 40,
+          "p95": 40,
+          "max": 40
+        }
+      },
+      "invalid_reasons": []
+    }
+  }
+}

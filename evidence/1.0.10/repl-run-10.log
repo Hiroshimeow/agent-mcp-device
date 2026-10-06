@@ -1,0 +1,60 @@
+Testing enhanced REPL functionality...
+Using python command: py -3
+Starting Python REPL...
+(node:33752) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Result from start_process: {
+  content: [
+    {
+      type: 'text',
+      text: 'Process started with PID 19348 (shell: powershell.exe)\n' +
+        'Initial output:\n' +
+        'Python 3.13.13 (tags/v3.13.13:01104ce, Apr  7 2026, 19:25:48) [MSC v.1944 64 bit (AMD64)] on win32\n' +
+        'Type "help", "copyright", "credits" or "license" for more information.\n' +
+        '>>> \n' +
+        '🔄 Process 19348 is waiting for input (detected: ">>>")'
+    }
+  ]
+}
+Started Python session with PID: 19348
+Testing read_process_output with timeout...
+Initial Python prompt: [Reading 1 new lines (total: 3 lines)]
+
+(No output in requested range)
+Testing interact_with_process with wait_for_prompt...
+Python output with wait_for_prompt: ✅ Input executed in process 19348:
+
+📤 Output:
+Hello from Python with wait!
+
+
+🔄 Process 19348 is waiting for input (detected: ">>>")
+Testing interact_with_process without wait_for_prompt...
+Python output without wait_for_prompt: [Reading 3 new lines (total: 5 lines)]
+
+Hello from Python with wait!
+>>> Hello from Python without wait!
+>>> 
+🔄 Process 19348 is waiting for input (detected: ">>>")
+Testing multi-line code with wait_for_prompt...
+Python multi-line output with wait_for_prompt: ✅ Input executed in process 19348.
+📭 (No output produced)
+🔄 Process 19348 is waiting for input (detected: "...")✅ Input executed in process 19348:
+
+📤 Output:
+>>> ... ...
+
+
+🔄 Process 19348 is waiting for input (detected: ">>>")[Reading 1 new lines (total: 5 lines)]
+
+... ... >>> ... ... 
+🔄 Process 19348 is waiting for input (detected: ">>>")[Reading 4 new lines (total: 8 lines)]
+
+Hello, Guest 1!
+Hello, Guest 2!
+Hello, Guest 3!
+>>> 
+🔄 Process 19348 is waiting for input (detected: ">>>")
+Terminating session...
+Python session terminated
+Enhanced REPL test PASSED

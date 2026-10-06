@@ -1,0 +1,15 @@
+P0 Baseline Test Execution
+Baseline Commit SHA: a97d7ab8af8065ff4327bc35b341e58928e837c5
+Date: 2026-10-04
+
+Directly confirmed failures on baseline:
+1. test/test-gateway-device-channel.js:
+   - Reason: testExecutionEngineChildDeathInvalidatesReadiness fails because GatewayToolAdapter now dispatches directly via tool-dispatcher.ts, whereas test asserts readiness rejection tied to child engine failure.
+2. test/test-linux-device-service.js:
+   - Reason: Assertion on regex /WorkingDirectory=C:\Users\.../ fails due to Windows path quoting in generated systemd unit file on win32 runner.
+3. test/test-mcp-device-branding.js:
+   - Reason: Regex assertion expects "npm install -g @hcu-lab.me/mcp-device@1.0.7", but README.md was updated to 1.0.10.
+4. test/test-enhanced-repl.js:
+   - Reason: Flaky/timing issue with Python REPL prompt detection on Windows.
+
+All failures are documented and must be resolved or reconciled in Phase 5.

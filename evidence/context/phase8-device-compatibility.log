@@ -1,0 +1,5 @@
+(node:44968) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:44968) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+error catch Error: ENOENT: no such file or directory, stat 'C:\Users\admin\AppData\Local\Temp\mcp-device-direct-ViwgsP\missing'
+Gateway identity, direct dispatch, enrollment, tool routing, and reconnect tests passed

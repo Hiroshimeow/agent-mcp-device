@@ -1,0 +1,6 @@
+Linux DESKTOP-B5E4IUE 6.6.87.2-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Thu Jun  5 18:30:46 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
+/usr/bin/node
+v22.21.0
+11.6.3
+f58b95ae1c1be735f3f9601d8a8695e445a8b101
+{"platform":"linux","arch":"x64","sqlite":"3.50.4"}

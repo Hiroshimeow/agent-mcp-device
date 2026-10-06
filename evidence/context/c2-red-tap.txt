@@ -1,0 +1,199 @@
+TAP version 13
+# (node:27048) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: C2-3 reap revokes epoch and late worker cannot commit even before another admission
+not ok 1 - C2-3 reap revokes epoch and late worker cannot commit even before another admission
+  ---
+  duration_ms: 164.3191
+  type: 'test'
+  location: 'E:\\git-project\\wt-mcp-device-111-context\\test\\context\\c2-closure.test.js:25:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    1 !== 2
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 2
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/test/context/c2-closure.test.js:30:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: C2-3 allocation automatically reclaims dead quota leases before QUOTA_EXCEEDED
+ok 2 - C2-3 allocation automatically reclaims dead quota leases before QUOTA_EXCEEDED
+  ---
+  duration_ms: 228.3559
+  type: 'test'
+  ...
+# Subtest: C2-2 admission refuses a second living writer lease for the same repository
+not ok 3 - C2-2 admission refuses a second living writer lease for the same repository
+  ---
+  duration_ms: 189.8351
+  type: 'test'
+  location: 'E:\\git-project\\wt-mcp-device-111-context\\test\\context\\c2-closure.test.js:57:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/test/context/c2-closure.test.js:60:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: C2-2 two out-of-order reservations cannot overwrite the newer committed watermark
+ok 4 - C2-2 two out-of-order reservations cannot overwrite the newer committed watermark
+  ---
+  duration_ms: 145.6623
+  type: 'test'
+  ...
+# Subtest: C2-2 commit gate rejects watermark update outside a repository transaction
+not ok 5 - C2-2 commit gate rejects watermark update outside a repository transaction
+  ---
+  duration_ms: 144.002
+  type: 'test'
+  location: 'E:\\git-project\\wt-mcp-device-111-context\\test\\context\\c2-closure.test.js:83:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /RESERVATION_FENCED_OFF/. Input:
+    
+    'Error: cannot commit - no transaction is active'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+  error: 'cannot commit - no transaction is active'
+  stack: |-
+    ContextStore.commitRepository (file:///E:/git-project/wt-mcp-device-111-context/dist/context/store.js:53:12)
+    file:///E:/git-project/wt-mcp-device-111-context/test/context/c2-closure.test.js:87:37
+    getActual (node:assert:609:5)
+    Function.throws (node:assert:757:24)
+    TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/test/context/c2-closure.test.js:87:16)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/test/context/c2-closure.test.js:87:16)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: C2-5/6 FEATURE_LIVE_CAPTURE defaults off and refuses initialization/execution without signed SOC approval
+not ok 6 - C2-5/6 FEATURE_LIVE_CAPTURE defaults off and refuses initialization/execution without signed SOC approval
+  ---
+  duration_ms: 137.7154
+  type: 'test'
+  location: 'E:\\git-project\\wt-mcp-device-111-context\\test\\context\\c2-closure.test.js:93:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/test/context/c2-closure.test.js:95:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: C2-5/6 FEATURE_LIVE_CAPTURE validates pinned signature, expiry, feature scope and rechecks execution
+not ok 7 - C2-5/6 FEATURE_LIVE_CAPTURE validates pinned signature, expiry, feature scope and rechecks execution
+  ---
+  duration_ms: 147.1054
+  type: 'test'
+  location: 'E:\\git-project\\wt-mcp-device-111-context\\test\\context\\c2-closure.test.js:103:3'
+  failureType: 'testCodeFailure'
+  error: 'instance.executeFeature is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/test/context/c2-closure.test.js:112:27)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: C2-5/6 FEATURE_PUBLIC_GATEWAY defaults off and refuses initialization/execution without signed SOC approval
+not ok 8 - C2-5/6 FEATURE_PUBLIC_GATEWAY defaults off and refuses initialization/execution without signed SOC approval
+  ---
+  duration_ms: 136.9735
+  type: 'test'
+  location: 'E:\\git-project\\wt-mcp-device-111-context\\test\\context\\c2-closure.test.js:93:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/test/context/c2-closure.test.js:95:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: C2-5/6 FEATURE_PUBLIC_GATEWAY validates pinned signature, expiry, feature scope and rechecks execution
+not ok 9 - C2-5/6 FEATURE_PUBLIC_GATEWAY validates pinned signature, expiry, feature scope and rechecks execution
+  ---
+  duration_ms: 139.3142
+  type: 'test'
+  location: 'E:\\git-project\\wt-mcp-device-111-context\\test\\context\\c2-closure.test.js:103:3'
+  failureType: 'testCodeFailure'
+  error: 'instance.executeFeature is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/test/context/c2-closure.test.js:112:27)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 2
+# fail 7
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1563.8281

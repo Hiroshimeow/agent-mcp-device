@@ -7,6 +7,7 @@ import { getPrompts } from './tools/prompts.js';
 import { trackToolCall } from './utils/trackTools.js';
 import { usageTracker } from './utils/usageTracker.js';
 import { toolHistory } from './utils/toolHistory.js';
+import { observePublicInvocation, isCapturingInvocation } from './context/capture.js';
 import { capture } from './utils/capture.js';
 import {
     currentCallIsRemote,
@@ -26,6 +27,10 @@ export async function dispatchToolCall(
     args: any,
     options: DispatchToolOptions = {}
 ): Promise<ServerResult> {
+    return observePublicInvocation({ tool: name, args }, () => executeToolCall(name, args, options));
+}
+
+async function executeToolCall(name: string, args: any, options: DispatchToolOptions): Promise<ServerResult> {
     const startTime = Date.now();
     let telemetryData: any = { tool_name: name };
     let result: ServerResult;
@@ -225,7 +230,7 @@ export async function dispatchToolCall(
         isError = !!result.isError;
         const EXCLUDED_TOOLS = ['get_recent_tool_calls', 'track_ui_event'];
 
-        if (!currentCallIsRemote && process.env.MCP_DEVICE_REMOTE !== 'true' && !EXCLUDED_TOOLS.includes(name)) {
+        if (!isCapturingInvocation() && !currentCallIsRemote && process.env.MCP_DEVICE_REMOTE !== 'true' && !EXCLUDED_TOOLS.includes(name)) {
             toolHistory.addCall(name, args, result, duration);
         }
 

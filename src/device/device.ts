@@ -145,14 +145,14 @@ export class MCPDevice {
                 proxyAgent: proxy.agent,
                 securityProtocolFloor: gatewayConfig.securityProtocolFloor,
                 appCaPem: gatewayConfig.appCaPem || undefined,
-                adapter: new GatewayToolAdapter(undefined, { allowedRoots: gatewayConfig.allowedRoots }),
+                adapter: new GatewayToolAdapter(undefined, { allowedRoots: gatewayConfig.allowedRoots, context: { deviceId: identityRecord.deviceId } }),
                 // In remote direct-dispatch mode, the daemon is ready once the gateway channel & dispatch are established.
                 runtimeState: () => ({
                     runtime_ready: true,
                     runtime_reason: null,
                     execution_runtime_generation: `direct-in-process:${this.bootNonce}`
                 }),
-                agentVersion: VERSION || process.env.npm_package_version || '1.0.10',
+                agentVersion: VERSION || process.env.npm_package_version || '1.0.11',
                 onUpdateRequest: async (targetVersion, { requestId }) => {
                     const record = await identity.loadOrCreate();
                     const prepared = await prepareDevicePackageUpdate({

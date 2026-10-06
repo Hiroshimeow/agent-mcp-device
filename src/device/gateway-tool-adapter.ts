@@ -9,6 +9,11 @@ import { configManager } from '../config-manager.js';
 import { validatePath } from '../tools/filesystem.js';
 import { inspectProjectOnDevice } from './project-inspection.js';
 import { dispatchToolCall } from '../tool-dispatcher.js';
+import { observePublicInvocation, type CanonicalObserver } from '../context/capture.js';
+import { executePublicGateway } from '../context/gateway.js';
+import { isFeatureAuthorized } from '../context/authorization.js';
+import { CONTEXT_TOOL_NAMES } from '../context/tool-contract.js';
+import { callDeviceContext, type DeviceContextOptions } from '../context/device-adapter.js';
 
 const execAsync = promisify(exec);
 const execFileAsync = promisify(execFile);
@@ -34,7 +39,14 @@ export const GATEWAY_CAPABILITIES = [
     'project_inspect'
 ] as const;
 
+export function gatewayCapabilities(): string[] {
+    return [...GATEWAY_CAPABILITIES, ...(isFeatureAuthorized('FEATURE_PUBLIC_GATEWAY') ? CONTEXT_TOOL_NAMES : [])];
+}
+
 export interface GatewayToolAdapterOptions {
+    context?: DeviceContextOptions;
+    /** Trusted runtime supplies an owner/repository-bound observer, never tool arguments. */
+    observer?: CanonicalObserver;
     allowedRoots?: string[];
     pathValidator?: (requestedPath: string) => Promise<string>;
 }
@@ -131,8 +143,12 @@ export class GatewayToolAdapter {
     private allowedRoots: string[];
     private pathValidator: (requestedPath: string) => Promise<string>;
     private canonicalRoots?: Promise<string[]>;
+    private readonly observer?: CanonicalObserver;
+    private readonly context?: DeviceContextOptions;
 
     constructor(_unusedEngine?: any, options: GatewayToolAdapterOptions = {}) {
+        this.observer = options.observer;
+        this.context = options.context;
         this.allowedRoots = options.allowedRoots ?? configuredGatewayRoots();
         this.pathValidator = options.pathValidator ?? validatePath;
     }
@@ -157,7 +173,7 @@ export class GatewayToolAdapter {
         this.canonicalRoots ??= Promise.all(this.allowedRoots.map(root => this.pathValidator(root)));
         const roots = await this.canonicalRoots;
         if (!roots.some(root => isWithinRoot(candidate, root))) {
-            throw new Error('Remote device path is outside MCP_GATEWAY_ALLOWED_ROOTS');
+            throw Object.assign(new Error('Remote device path is outside MCP_GATEWAY_ALLOWED_ROOTS'), { code: 'ACCESS_DENIED' });
         }
         return candidate;
     }
@@ -233,6 +249,16 @@ export class GatewayToolAdapter {
     }
 
     async call(tool: string, args: any = {}): Promise<any> {
+        if (tool.startsWith('local_')) {
+            return executePublicGateway(() => this.context
+                ? callDeviceContext(tool, args, this.context, requested => this.guardPath(requested))
+                : Promise.resolve({ ok: false, error: { code: 'DEVICE_UNSUPPORTED' } }));
+        }
+        // Outermost public boundary: nested file/edit dispatches do not record again.
+        return observePublicInvocation({ tool, args }, () => this.executeCall(tool, args), this.observer);
+    }
+
+    private async executeCall(tool: string, args: any): Promise<any> {
         const dispatch = async (name: string, toolArgs: any) => {
             const res = await dispatchToolCall(name, toolArgs, { isRemote: true });
             return assertSuccess(res, name);

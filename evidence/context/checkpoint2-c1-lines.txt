@@ -1,0 +1,15 @@
+src/context/authorization.ts:46:    if (!Array.isArray(revoked)) return 'FEATURE_GATE_LOCKED: revocation list malformed';
+src/context/authorization.ts:47:    if (!revoked.every((value: unknown) => typeof value === 'string' && /^[0-9a-f]{64}$/.test(value))) return 'FEATURE_GATE_LOCKED: revocation list malformed';
+src/context/authorization.ts:48:    if (revoked.includes(digest)) return 'FEATURE_GATE_LOCKED: artifact revoked';
+src/context/authorization.ts:49:    return undefined;
+src/context/authorization.ts:50:  } catch { return GATE_ERROR; }
+src/context/authorization.ts:51:}
+src/context/authorization.ts:52:
+src/context/authorization.ts:53:export function isFeatureAuthorized(scope: GatedFeature, configDirectory?: string): boolean {
+src/context/authorization.ts:54:  return approvalFailure(scope, configDirectory) === undefined;
+src/context/authorization.ts:55:}
+src/context/authorization.ts:56:
+src/context/authorization.ts:57:export function requireFeatureAuthorized(scope: GatedFeature, configDirectory?: string): void {
+src/context/authorization.ts:58:  const failure = approvalFailure(scope, configDirectory);
+src/context/authorization.ts:59:  if (failure) throw new Error(failure);
+src/context/authorization.ts:60:}

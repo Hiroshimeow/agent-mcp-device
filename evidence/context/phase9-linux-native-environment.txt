@@ -1,0 +1,12 @@
+Tue Oct  6 00:11:44 UTC 2026
+/home/ayumi/test-mcp-context-build
+Filesystem     Type  1K-blocks     Used Available Use% Mounted on
+/dev/sdd       ext4 1055762868 65975740 936083656   7% /
+Linux DESKTOP-B5E4IUE 6.6.87.2-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Thu Jun  5 18:30:46 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
+/usr/bin/node
+v22.21.0
+/usr/bin/npm
+11.6.3
+0c0a806406e432181915425a4ccaba85dfc17dff
+?? phase9-linux-native-environment.txt
+{"platform":"linux","arch":"x64","execPath":"/usr/bin/node"}

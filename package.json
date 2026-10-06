@@ -1,6 +1,6 @@
 {
   "name": "@hcu-lab.me/mcp-device",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "MCP Device runtime.",
   "license": "MIT",
   "author": "Hirohimeow",
@@ -12,14 +12,16 @@
   "bugs": "https://github.com/Hiroshimeow/agent-mcp-device/issues",
   "type": "module",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.13.0"
   },
   "bin": {
     "mcp-device": "dist/mcp-device.js",
     "md": "dist/mcp-device.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "config/revoked-approvals.json",
+    "skills/mcp-device-context"
   ],
   "scripts": {
     "device:install": "cd src/device && npm install",

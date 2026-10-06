@@ -1,0 +1,164 @@
+TAP version 13
+# (node:45100) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: R2 reconciliation preserves living leases and removes dead or expired leases
+ok 1 - R2 reconciliation preserves living leases and removes dead or expired leases
+  ---
+  duration_ms: 238.0686
+  type: 'test'
+  ...
+# Subtest: R2 living commit-to-registry worker retains lease until PID death
+ok 2 - R2 living commit-to-registry worker retains lease until PID death
+  ---
+  duration_ms: 443.7126
+  type: 'test'
+  ...
+# Subtest: B1 secure_delete is enabled on writable, read, registry, unscoped and CLI-style connections
+ok 3 - B1 secure_delete is enabled on writable, read, registry, unscoped and CLI-style connections
+  ---
+  duration_ms: 209.2838
+  type: 'test'
+  ...
+# (node:23892) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: B1 maintenance uses incremental reclamation and explicit WAL truncate
+ok 4 - B1 maintenance uses incremental reclamation and explicit WAL truncate
+  ---
+  duration_ms: 291.1731
+  type: 'test'
+  ...
+# Subtest: B1 concurrent purge waits for an active writer and preserves every event
+ok 5 - B1 concurrent purge waits for an active writer and preserves every event
+  ---
+  duration_ms: 1031.0612
+  type: 'test'
+  ...
+# Subtest: B1 capture writer waits for purge lock release with zero lost events
+ok 6 - B1 capture writer waits for purge lock release with zero lost events
+  ---
+  duration_ms: 1443.5333
+  type: 'test'
+  ...
+# Subtest: B2 admin purge rejects agent environments even with TTY input and output
+ok 7 - B2 admin purge rejects agent environments even with TTY input and output
+  ---
+  duration_ms: 478.8684
+  type: 'test'
+  ...
+# Subtest: B3 killed cross-database writer reconciles exact committed evidence bytes on restart
+ok 8 - B3 killed cross-database writer reconciles exact committed evidence bytes on restart
+  ---
+  duration_ms: 518.4843
+  type: 'test'
+  ...
+# Subtest: B3 reconciliation waits for a separate-process admission and retains sealed evidence totals
+ok 9 - B3 reconciliation waits for a separate-process admission and retains sealed evidence totals
+  ---
+  duration_ms: 2204.5164
+  type: 'test'
+  ...
+# Subtest: B1 migrated auto-vacuum NONE purge clears indexed payload bytes and logical quota without rebuilding
+ok 10 - B1 migrated auto-vacuum NONE purge clears indexed payload bytes and logical quota without rebuilding
+  ---
+  duration_ms: 301.2015
+  type: 'test'
+  ...
+# Subtest: B2 stripped agent markers in TTY-capable child rejects generic PURGE
+ok 11 - B2 stripped agent markers in TTY-capable child rejects generic PURGE
+  ---
+  duration_ms: 221.0745
+  type: 'test'
+  ...
+# Subtest: B2 stripped agent markers in TTY-capable child rejects repository challenge with extra whitespace
+ok 12 - B2 stripped agent markers in TTY-capable child rejects repository challenge with extra whitespace
+  ---
+  duration_ms: 233.5931
+  type: 'test'
+  ...
+# Subtest: B2 stripped agent markers in TTY-capable child accepts exact repository challenge with one-time admin token
+ok 13 - B2 stripped agent markers in TTY-capable child accepts exact repository challenge with one-time admin token
+  ---
+  duration_ms: 348.9494
+  type: 'test'
+  ...
+# Subtest: B2 stripped agent markers in TTY-capable child rejects PTY agent without admin token despite exact challenge
+ok 14 - B2 stripped agent markers in TTY-capable child rejects PTY agent without admin token despite exact challenge
+  ---
+  duration_ms: 225.9573
+  type: 'test'
+  ...
+# Subtest: P2 admin token replay is rejected with TOKEN_ALREADY_USED
+ok 15 - P2 admin token replay is rejected with TOKEN_ALREADY_USED
+  ---
+  duration_ms: 114.3016
+  type: 'test'
+  ...
+# Subtest: P2 expired token is rejected with TOKEN_EXPIRED
+ok 16 - P2 expired token is rejected with TOKEN_EXPIRED
+  ---
+  duration_ms: 112.7805
+  type: 'test'
+  ...
+# Subtest: P2 token comparison uses constant-time crypto primitive and never argv
+ok 17 - P2 token comparison uses constant-time crypto primitive and never argv
+  ---
+  duration_ms: 1.3762
+  type: 'test'
+  ...
+# Subtest: P3 every production SQLite connection uses the hardened factory
+ok 18 - P3 every production SQLite connection uses the hardened factory
+  ---
+  duration_ms: 106.6136
+  type: 'test'
+  ...
+# Subtest: P3 blocked truncate checkpoint fails closed with PURGE_CHECKPOINT_BUSY
+ok 19 - P3 blocked truncate checkpoint fails closed with PURGE_CHECKPOINT_BUSY
+  ---
+  duration_ms: 282.0437
+  type: 'test'
+  ...
+# Subtest: P4 expired reservation fences repository commit and rolls back evidence
+ok 20 - P4 expired reservation fences repository commit and rolls back evidence
+  ---
+  duration_ms: 192.7661
+  type: 'test'
+  ...
+# Subtest: P4 real append commit outliving lease is rejected before COMMIT
+ok 21 - P4 real append commit outliving lease is rejected before COMMIT
+  ---
+  duration_ms: 187.1252
+  type: 'test'
+  ...
+# Subtest: P4 EPERM preserves same-host lease and foreign host does not probe PID
+ok 22 - P4 EPERM preserves same-host lease and foreign host does not probe PID
+  ---
+  duration_ms: 114.5558
+  type: 'test'
+  ...
+# Subtest: quota rejection bursts create one deduplicated gap per minute
+ok 23 - quota rejection bursts create one deduplicated gap per minute
+  ---
+  duration_ms: 492.5598
+  type: 'test'
+  ...
+# Subtest: graph neighbor SQL fetch is bounded by remaining examined-edge budget plus one
+ok 24 - graph neighbor SQL fetch is bounded by remaining examined-edge budget plus one
+  ---
+  duration_ms: 0.5719
+  type: 'test'
+  ...
+# Subtest: graph path cannot traverse a purged intermediate node
+ok 25 - graph path cannot traverse a purged intermediate node
+  ---
+  duration_ms: 312.1588
+  type: 'test'
+  ...
+1..25
+# tests 25
+# suites 0
+# pass 25
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 9427.1912

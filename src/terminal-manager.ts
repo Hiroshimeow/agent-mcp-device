@@ -1,4 +1,5 @@
 import { spawn } from 'child_process';
+import { randomUUID } from 'node:crypto';
 import path from 'path';
 import { TerminalSession, CommandExecutionResult, ActiveSession, TimingInfo, OutputEvent } from './types.js';
 import { DEFAULT_COMMAND_TIMEOUT } from './config.js';
@@ -36,6 +37,7 @@ function getRepairedPathExt(): string {
 }
 
 interface CompletedSession {
+  executionId: string;
   pid: number;
   outputLines: string[];       // Line-based buffer (consistent with active sessions)
   exitCode: number | null;
@@ -150,6 +152,12 @@ function getShellSpawnArgs(shellPath: string, command: string): ShellSpawnConfig
 export class TerminalManager {
   private sessions: Map<number, TerminalSession> = new Map();
   private completedSessions: Map<number, CompletedSession> = new Map();
+  private readonly runtimeGeneration = randomUUID();
+
+  processIdentity(pid: number) {
+    const session = this.sessions.get(pid) ?? this.completedSessions.get(pid);
+    return session ? { execution_id: session.executionId, runtime_generation: this.runtimeGeneration, pid } : undefined;
+  }
   
   /**
    * Send input to a running process
@@ -242,6 +250,9 @@ export class TerminalManager {
       };
     }
 
+    // Inherited by nested shells/PTYs: a process-tool terminal is not owner-admin consent.
+    spawnOptions.env.MCP_DEVICE_SESSION = 'process-tool';
+
     // Repair PATHEXT on Windows before spawning. On some Windows DXT launches
     // the server process inherits a corrupted PATHEXT (e.g. ".CPL"), which we
     // would otherwise propagate via { ...process.env } and break command
@@ -308,6 +319,7 @@ export class TerminalManager {
     }
 
     const session: TerminalSession = {
+      executionId: randomUUID(),
       pid: childProcess.pid,
       process: childProcess,
       outputLines: [],           // Line-based buffer
@@ -502,6 +514,7 @@ export class TerminalManager {
       childProcess.on('close', (code: any) => {
         if (!childProcess.pid) return;
         this.completedSessions.set(childProcess.pid, {
+          executionId: session.executionId,
           pid: childProcess.pid,
           outputLines: [...session.outputLines],
           exitCode: processExitCode ?? code,

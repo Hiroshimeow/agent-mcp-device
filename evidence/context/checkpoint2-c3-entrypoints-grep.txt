@@ -1,0 +1,2 @@
+src/context/capture.ts:5:export function executeLiveCapture<T>(action: () => T): T {
+src/context/gateway.ts:5:export function executePublicGateway<T>(action: () => T): T {

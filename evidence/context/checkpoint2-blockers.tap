@@ -1,0 +1,604 @@
+TAP version 13
+# (node:30172) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: frozen ground truth: exact top-3 100%, history Recall@8 >=90%, unauthorized hits zero
+ok 1 - frozen ground truth: exact top-3 100%, history Recall@8 >=90%, unauthorized hits zero
+  ---
+  duration_ms: 1209.3085
+  type: 'test'
+  ...
+# (node:25088) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: re-pair seals old namespace; refs and cursors never authorize another scope
+ok 2 - re-pair seals old namespace; refs and cursors never authorize another scope
+  ---
+  duration_ms: 651.9215
+  type: 'test'
+  ...
+# Subtest: read cursor binds repository scope and sealed state
+ok 3 - read cursor binds repository scope and sealed state
+  ---
+  duration_ms: 945.9887
+  type: 'test'
+  ...
+# Subtest: durable cursor signature protects generation, query, expiry and position
+ok 4 - durable cursor signature protects generation, query, expiry and position
+  ---
+  duration_ms: 1184.9862
+  type: 'test'
+  ...
+# Subtest: sandbox denial is propagated once, without Git or alternate-path fallback
+ok 5 - sandbox denial is propagated once, without Git or alternate-path fallback
+  ---
+  duration_ms: 3.4748
+  type: 'test'
+  ...
+# (node:43264) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: explicit sync constructs directed evidence-backed relations without causal inference
+ok 6 - explicit sync constructs directed evidence-backed relations without causal inference
+  ---
+  duration_ms: 908.7919
+  type: 'test'
+  ...
+# Subtest: graph shares opaque entity identities but never persists metadata secrets
+ok 7 - graph shares opaque entity identities but never persists metadata secrets
+  ---
+  duration_ms: 1211.3727
+  type: 'test'
+  ...
+# (node:22780) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: checkpoint separates observed Git metadata from reported summary and refs
+ok 8 - checkpoint separates observed Git metadata from reported summary and refs
+  ---
+  duration_ms: 6407.9647
+  type: 'test'
+  ...
+# Subtest: checkpoint claims remain reported after indexing and search
+ok 9 - checkpoint claims remain reported after indexing and search
+  ---
+  duration_ms: 1171.0018
+  type: 'test'
+  ...
+# Subtest: checkpoint redacts reported secrets without breaking structured evidence
+ok 10 - checkpoint redacts reported secrets without breaking structured evidence
+  ---
+  duration_ms: 1176.146
+  type: 'test'
+  ...
+# Subtest: checkpoint rejects unknown evidence refs without fabricating checkpoint evidence
+ok 11 - checkpoint rejects unknown evidence refs without fabricating checkpoint evidence
+  ---
+  duration_ms: 575.9136
+  type: 'test'
+  ...
+# (node:40340) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: CLI search/read/status preserve ContextService JSON semantics with gateway offline
+ok 12 - CLI search/read/status preserve ContextService JSON semantics with gateway offline
+  ---
+  duration_ms: 5679.1448
+  type: 'test'
+  ...
+# Subtest: CLI keeps inaccessible local state typed and redacted without remote bypass
+ok 13 - CLI keeps inaccessible local state typed and redacted without remote bypass
+  ---
+  duration_ms: 811.9338
+  type: 'test'
+  ...
+# Subtest: CLI ACCESS_DENIED remains local and uses the stable access exit code
+ok 14 - CLI ACCESS_DENIED remains local and uses the stable access exit code
+  ---
+  duration_ms: 1005.2164
+  type: 'test'
+  ...
+# Subtest: CLI executable emits JSON, human output, and safe usage errors
+ok 15 - CLI executable emits JSON, human output, and safe usage errors
+  ---
+  duration_ms: 1997.1859
+  type: 'test'
+  ...
+# Subtest: CLI paginates search and read and explicitly syncs/rebuilds without source mutation
+ok 16 - CLI paginates search and read and explicitly syncs/rebuilds without source mutation
+  ---
+  duration_ms: 4924.4104
+  type: 'test'
+  ...
+# Subtest: read-only CLI leaves persisted databases unchanged and reports safe accounting
+ok 17 - read-only CLI leaves persisted databases unchanged and reports safe accounting
+  ---
+  duration_ms: 589.2397
+  type: 'test'
+  ...
+# Subtest: CLI scope failure and sealed namespace cannot fall back
+ok 18 - CLI scope failure and sealed namespace cannot fall back
+  ---
+  duration_ms: 2222.4505
+  type: 'test'
+  ...
+# Subtest: CLI rejects caller-controlled device/account/store selectors and exposes only contracted commands
+ok 19 - CLI rejects caller-controlled device/account/store selectors and exposes only contracted commands
+  ---
+  duration_ms: 1.27
+  type: 'test'
+  ...
+# (node:25864) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: device quota serializes all repos and includes sealed namespaces, without evicting evidence
+ok 20 - device quota serializes all repos and includes sealed namespaces, without evicting evidence
+  ---
+  duration_ms: 1363.4963
+  type: 'test'
+  ...
+# Subtest: repo quota pauses sync and import without publishing partial generations
+ok 21 - repo quota pauses sync and import without publishing partial generations
+  ---
+  duration_ms: 1390.2231
+  type: 'test'
+  ...
+# Subtest: transaction failure rolls back evidence and event together
+ok 22 - transaction failure rolls back evidence and event together
+  ---
+  duration_ms: 1429.6664
+  type: 'test'
+  ...
+# Subtest: restart abandons shadow generations and marks unresolved intents unknown without sync
+ok 23 - restart abandons shadow generations and marks unresolved intents unknown without sync
+  ---
+  duration_ms: 2538.3024
+  type: 'test'
+  ...
+# Subtest: process kill rolls back uncommitted WAL writes and preserves last-good generation
+ok 24 - process kill rolls back uncommitted WAL writes and preserves last-good generation
+  ---
+  duration_ms: 812.7999
+  type: 'test'
+  ...
+# Subtest: cleanup invalidates stateless search cursors and supports explicit sealed namespace selection
+ok 25 - cleanup invalidates stateless search cursors and supports explicit sealed namespace selection
+  ---
+  duration_ms: 828.0742
+  type: 'test'
+  ...
+# Subtest: admin clean CLI refuses non-TTY input and cannot accept agent confirmation flags
+ok 26 - admin clean CLI refuses non-TTY input and cannot accept agent confirmation flags
+  ---
+  duration_ms: 140.9014
+  type: 'test'
+  ...
+# Subtest: explicit local admin payload purge reclaims quota and leaves metadata and content-free audit
+ok 27 - explicit local admin payload purge reclaims quota and leaves metadata and content-free audit
+  ---
+  duration_ms: 553.7879
+  type: 'test'
+  ...
+# (node:30500) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: fresh status creates no repo database; unknown intent and wrong job scope are visible
+ok 28 - fresh status creates no repo database; unknown intent and wrong job scope are visible
+  ---
+  duration_ms: 1858.972
+  type: 'test'
+  ...
+# Subtest: migration rejects a newer schema without replacing it and publication rejects invalid watermarks
+ok 29 - migration rejects a newer schema without replacing it and publication rejects invalid watermarks
+  ---
+  duration_ms: 2413.1238
+  type: 'test'
+  ...
+# Subtest: symlink sandbox escape is denied on its canonical target
+ok 30 - symlink sandbox escape is denied on its canonical target
+  ---
+  duration_ms: 2209.3043
+  type: 'test'
+  ...
+# (node:24848) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: graph CLI is read-only domain parity and search optionally returns bounded related refs
+ok 31 - graph CLI is read-only domain parity and search optionally returns bounded related refs
+  ---
+  duration_ms: 6315.0777
+  type: 'test'
+  ...
+# (node:45284) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: high-degree traversal enforces examined, visited, node, depth and aggregate byte caps
+ok 32 - high-degree traversal enforces examined, visited, node, depth and aggregate byte caps
+  ---
+  duration_ms: 2234.1623
+  type: 'test'
+  ...
+# Subtest: cycles terminate and path, direction, relation filtering and timeline are deterministic
+ok 33 - cycles terminate and path, direction, relation filtering and timeline are deterministic
+  ---
+  duration_ms: 1728.5125
+  type: 'test'
+  ...
+# Subtest: generation, retention, repository and sealed-owner boundaries are enforced before graph lookup
+ok 34 - generation, retention, repository and sealed-owner boundaries are enforced before graph lookup
+  ---
+  duration_ms: 2930.0744
+  type: 'test'
+  ...
+# (node:44084) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: JSONL import is source-preserving, redacted, idempotent and quarantines unresolved scope
+ok 35 - JSONL import is source-preserving, redacted, idempotent and quarantines unresolved scope
+  ---
+  duration_ms: 1287.1397
+  type: 'test'
+  ...
+# Subtest: legacy id wins over changed content, and excluded paths never persist payloads
+ok 36 - legacy id wins over changed content, and excluded paths never persist payloads
+  ---
+  duration_ms: 1390.9039
+  type: 'test'
+  ...
+# (node:30708) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: scoped foreground jobs reject overlap, cancel safely and keep sync idempotent
+ok 37 - scoped foreground jobs reject overlap, cancel safely and keep sync idempotent
+  ---
+  duration_ms: 1287.8165
+  type: 'test'
+  ...
+# Subtest: startup, read, search, graph, status and idle never materialize pending evidence
+ok 38 - startup, read, search, graph, status and idle never materialize pending evidence
+  ---
+  duration_ms: 1437.8452
+  type: 'test'
+  ...
+# (node:2244) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: sync indexes only pending retained events and advances watermark without copying old rows
+ok 39 - sync indexes only pending retained events and advances watermark without copying old rows
+  ---
+  duration_ms: 1305.1365
+  type: 'test'
+  ...
+# PASS: frozen policy bounds, six-tool contract, baseline byte accounting and proposed local catalog budget
+# Subtest: test\\context\\policy-contract.test.js
+ok 13 - test\\context\\policy-contract.test.js
+  ---
+  duration_ms: 4210.23
+  type: 'test'
+  ...
+# (node:37344) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: Vietnamese and emoji byte-budget pages preserve code points and byte offsets
+ok 41 - Vietnamese and emoji byte-budget pages preserve code points and byte offsets
+  ---
+  duration_ms: 1929.1356
+  type: 'test'
+  ...
+# Subtest: evidence read preserves order, retention/redaction and aggregate UTF-8 byte budgets without writes
+ok 42 - evidence read preserves order, retention/redaction and aggregate UTF-8 byte budgets without writes
+  ---
+  duration_ms: 1790.6737
+  type: 'test'
+  ...
+# (node:40848) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: secrets are replaced before SQLite, WAL and FTS persistence; hash is retained bytes
+ok 43 - secrets are replaced before SQLite, WAL and FTS persistence; hash is retained bytes
+  ---
+  duration_ms: 1321.0717
+  type: 'test'
+  ...
+# Subtest: import deduplicates redacted content and indexes only redacted text
+ok 44 - import deduplicates redacted content and indexes only redacted text
+  ---
+  duration_ms: 1505.7908
+  type: 'test'
+  ...
+# Subtest: secret markers use keyed tags, never offline-guessable plain hashes
+ok 45 - secret markers use keyed tags, never offline-guessable plain hashes
+  ---
+  duration_ms: 1.1537
+  type: 'test'
+  ...
+# Subtest: UTF-8 budgets handle zero, four-byte emoji boundaries and surrogate pairs
+ok 46 - UTF-8 budgets handle zero, four-byte emoji boundaries and surrogate pairs
+  ---
+  duration_ms: 1.27
+  type: 'test'
+  ...
+# Subtest: excluded paths, binary/base64, UTF-8 byte caps and boundary secrets
+ok 47 - excluded paths, binary/base64, UTF-8 byte caps and boundary secrets
+  ---
+  duration_ms: 83.9738
+  type: 'test'
+  ...
+# Subtest: Git roots, worktrees, separate clones and nested repositories
+ok 48 - Git roots, worktrees, separate clones and nested repositories
+  ---
+  duration_ms: 5072.2182
+  type: 'test'
+  ...
+# Subtest: non-Git, missing/ambiguous cwd, traversal and symlink escape are not weakly resolved
+ok 49 - non-Git, missing/ambiguous cwd, traversal and symlink escape are not weakly resolved
+  ---
+  duration_ms: 56.0393
+  type: 'test'
+  ...
+# (node:38976) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: v1 repo migration preserves evidence and installs incremental retrieval schema
+ok 50 - v1 repo migration preserves evidence and installs incremental retrieval schema
+  ---
+  duration_ms: 10.8444
+  type: 'test'
+  ...
+# Subtest: v2 migration adds snapshot tombstones and folds existing redacted FTS content
+ok 51 - v2 migration adds snapshot tombstones and folds existing redacted FTS content
+  ---
+  duration_ms: 3.6795
+  type: 'test'
+  ...
+# Subtest: FTS filters first generation, retention, source and time without returning cross-scope evidence
+ok 52 - FTS filters first generation, retention, source and time without returning cross-scope evidence
+  ---
+  duration_ms: 1559.8077
+  type: 'test'
+  ...
+# (node:34568) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: pinned pagination retains page-two reindexed rows and excludes new generations
+ok 53 - pinned pagination retains page-two reindexed rows and excludes new generations
+  ---
+  duration_ms: 1667.0699
+  type: 'test'
+  ...
+# Subtest: pinned generation excludes a clock-skewed G+1 event older than the cursor
+ok 54 - pinned generation excludes a clock-skewed G+1 event older than the cursor
+  ---
+  duration_ms: 2505.5752
+  type: 'test'
+  ...
+# Subtest: read continuation cannot be replayed against different refs in the same repo
+ok 55 - read continuation cannot be replayed against different refs in the same repo
+  ---
+  duration_ms: 695.7015
+  type: 'test'
+  ...
+# Subtest: pinned keyset pagination uses deterministic bucket and timestamp ordering across generation advances
+ok 56 - pinned keyset pagination uses deterministic bucket and timestamp ordering across generation advances
+  ---
+  duration_ms: 1854.4451
+  type: 'test'
+  ...
+# Subtest: stable exact-match bucket precedes newer FTS-only matches across keyset pages
+ok 57 - stable exact-match bucket precedes newer FTS-only matches across keyset pages
+  ---
+  duration_ms: 312.006
+  type: 'test'
+  ...
+# Subtest: documents matching both exact and FTS preserve match_reason 0 and never repeat across keyset page boundaries with limit 1
+ok 58 - documents matching both exact and FTS preserve match_reason 0 and never repeat across keyset page boundaries with limit 1
+  ---
+  duration_ms: 3810.4553
+  type: 'test'
+  ...
+# Subtest: expired authenticated search and read cursors are stale at the domain boundary
+ok 59 - expired authenticated search and read cursors are stale at the domain boundary
+  ---
+  duration_ms: 238.7848
+  type: 'test'
+  ...
+# Subtest: read cursor issued at G is stale after publication of G+1
+ok 60 - read cursor issued at G is stale after publication of G+1
+  ---
+  duration_ms: 263.7189
+  type: 'test'
+  ...
+# Subtest: one-byte payload tampering with the original MAC is invalid
+ok 61 - one-byte payload tampering with the original MAC is invalid
+  ---
+  duration_ms: 314.5858
+  type: 'test'
+  ...
+# Subtest: query mismatch and search/read/durable kind confusion are invalid
+ok 62 - query mismatch and search/read/durable kind confusion are invalid
+  ---
+  duration_ms: 294.107
+  type: 'test'
+  ...
+# Subtest: current retention availability overrides pinned generation for purged evidence
+ok 63 - current retention availability overrides pinned generation for purged evidence
+  ---
+  duration_ms: 377.4886
+  type: 'test'
+  ...
+# Subtest: Vietnamese stroked d folds on index and query sides
+ok 64 - Vietnamese stroked d folds on index and query sides
+  ---
+  duration_ms: 281.6674
+  type: 'test'
+  ...
+# Subtest: v2 upgrade rebuilds folded FTS and initializes generation tombstones to NULL
+ok 65 - v2 upgrade rebuilds folded FTS and initializes generation tombstones to NULL
+  ---
+  duration_ms: 1870.8624
+  type: 'test'
+  ...
+# (node:34568) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: concurrent migration opener waits and rechecks v3, then commits without DDL
+ok 66 - concurrent migration opener waits and rechecks v3, then commits without DDL
+  ---
+  duration_ms: 321.0019
+  type: 'test'
+  ...
+# Subtest: concurrent migration opener rejects post-lock v4 and rolls back without a dangling transaction
+ok 67 - concurrent migration opener rejects post-lock v4 and rolls back without a dangling transaction
+  ---
+  duration_ms: 307.9197
+  type: 'test'
+  ...
+# Subtest: v3 migration rolls back pre-commit failure and process crash, then reruns cleanly
+ok 68 - v3 migration rolls back pre-commit failure and process crash, then reruns cleanly
+  ---
+  duration_ms: 282.4101
+  type: 'test'
+  ...
+# Subtest: parseVersion rejects unreadable and invalid versions directly
+ok 69 - parseVersion rejects unreadable and invalid versions directly
+  ---
+  duration_ms: 1.0565
+  type: 'test'
+  ...
+# Subtest: migration rejects unreadable and invalid versions before and after BEGIN IMMEDIATE
+ok 70 - migration rejects unreadable and invalid versions before and after BEGIN IMMEDIATE
+  ---
+  duration_ms: 3.1069
+  type: 'test'
+  ...
+# Subtest: migration preserves the original error when COMMIT already released the transaction
+ok 71 - migration preserves the original error when COMMIT already released the transaction
+  ---
+  duration_ms: 58.6838
+  type: 'test'
+  ...
+# Subtest: substring and FTS matches collapse to one row with exact score zero
+ok 72 - substring and FTS matches collapse to one row with exact score zero
+  ---
+  duration_ms: 190.186
+  type: 'test'
+  ...
+# Subtest: FTS search binds every SQL placeholder and uses all-null first-page keyset sentinels
+ok 73 - FTS search binds every SQL placeholder and uses all-null first-page keyset sentinels
+  ---
+  duration_ms: 244.9544
+  type: 'test'
+  ...
+# Subtest: FTS syntax characters are quoted as tokens and never interpreted as operators
+ok 74 - FTS syntax characters are quoted as tokens and never interpreted as operators
+  ---
+  duration_ms: 233.2663
+  type: 'test'
+  ...
+# Subtest: empty-token queries skip FTS and return only substring matches
+ok 75 - empty-token queries skip FTS and return only substring matches
+  ---
+  duration_ms: 199.3515
+  type: 'test'
+  ...
+# Subtest: search/status are read-only, Unicode-aware, bounded and never sync implicitly
+ok 76 - search/status are read-only, Unicode-aware, bounded and never sync implicitly
+  ---
+  duration_ms: 351.2373
+  type: 'test'
+  ...
+# (node:14904) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: B1 maintenance uses incremental reclamation, never full VACUUM or WAL truncate
+ok 77 - B1 maintenance uses incremental reclamation, never full VACUUM or WAL truncate
+  ---
+  duration_ms: 1195.0616
+  type: 'test'
+  ...
+# Subtest: B1 concurrent purge waits for an active writer and preserves every event
+ok 78 - B1 concurrent purge waits for an active writer and preserves every event
+  ---
+  duration_ms: 3002.9173
+  type: 'test'
+  ...
+# Subtest: B1 capture writer waits for purge lock release with zero lost events
+ok 79 - B1 capture writer waits for purge lock release with zero lost events
+  ---
+  duration_ms: 1969.9098
+  type: 'test'
+  ...
+# Subtest: B2 admin purge rejects agent environments even with TTY input and output
+ok 80 - B2 admin purge rejects agent environments even with TTY input and output
+  ---
+  duration_ms: 476.0157
+  type: 'test'
+  ...
+# Subtest: B3 killed cross-database writer reconciles exact committed evidence bytes on restart
+ok 81 - B3 killed cross-database writer reconciles exact committed evidence bytes on restart
+  ---
+  duration_ms: 3798.6923
+  type: 'test'
+  ...
+# Subtest: quota rejection bursts create one deduplicated gap per minute
+ok 82 - quota rejection bursts create one deduplicated gap per minute
+  ---
+  duration_ms: 443.1726
+  type: 'test'
+  ...
+# Subtest: graph neighbor SQL fetch is bounded by remaining examined-edge budget plus one
+ok 83 - graph neighbor SQL fetch is bounded by remaining examined-edge budget plus one
+  ---
+  duration_ms: 1.8578
+  type: 'test'
+  ...
+# Subtest: graph path cannot traverse a purged intermediate node
+ok 84 - graph path cannot traverse a purged intermediate node
+  ---
+  duration_ms: 344.0303
+  type: 'test'
+  ...
+# (node:41916) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: portable skill freezes search-first and selective-maintenance behavior
+ok 85 - portable skill freezes search-first and selective-maintenance behavior
+  ---
+  duration_ms: 3.6801
+  type: 'test'
+  ...
+# Subtest: portable skill forbids sandbox bypass and sealed namespace auto-selection
+ok 86 - portable skill forbids sandbox bypass and sealed namespace auto-selection
+  ---
+  duration_ms: 1.608
+  type: 'test'
+  ...
+# Subtest: portable skill mentions only commands and flags covered by the CLI contract
+ok 87 - portable skill mentions only commands and flags covered by the CLI contract
+  ---
+  duration_ms: 1.9279
+  type: 'test'
+  ...
+# {"ok":true,"platform":"win32","arch":"x64","node":"22.22.2","sqlite":"3.51.2","constructor":"PASS","busy_timeout_ms":5,"fts5":"PASS","warnings":["ExperimentalWarning"],"json_stdout":"PASS","warning_stderr":"(node:44984) ExperimentalWarning: SQLite is an experimental feature and might change at any time\\n(Use `node --trace-warnings ...` to show where the warning was created)"}
+# Subtest: test\\context\\sqlite-platform.test.js
+ok 21 - test\\context\\sqlite-platform.test.js
+  ---
+  duration_ms: 1225.1016
+  type: 'test'
+  ...
+# (node:39164) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: WAL, timeout, foreign keys, migrations, opaque refs, generations and durable cursors
+ok 89 - WAL, timeout, foreign keys, migrations, opaque refs, generations and durable cursors
+  ---
+  duration_ms: 1868.171
+  type: 'test'
+  ...
+# Subtest: cursor v1 MAC binds kind and scope and rejects wrong-length signatures before payload parsing
+ok 90 - cursor v1 MAC binds kind and scope and rejects wrong-length signatures before payload parsing
+  ---
+  duration_ms: 268.8604
+  type: 'test'
+  ...
+# Subtest: JSON MAC encoding rejects colon-delimiter scope collisions across owners
+ok 91 - JSON MAC encoding rejects colon-delimiter scope collisions across owners
+  ---
+  duration_ms: 266.7278
+  type: 'test'
+  ...
+# Subtest: status is read-only, capture gaps are visible and jobs/stores have ownership bounds
+ok 92 - status is read-only, capture gaps are visible and jobs/stores have ownership bounds
+  ---
+  duration_ms: 299.8531
+  type: 'test'
+  ...
+1..92
+# tests 92
+# suites 0
+# pass 92
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 19578.504

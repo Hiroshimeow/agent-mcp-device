@@ -1,0 +1,12 @@
+# Preserve forensic test output and its embedded review copy byte-for-byte.
+/raw-tap.txt -text
+/evidence/context/b-*.txt -text -whitespace
+/evidence/context/b1-b5-review-packet.md -text
+/evidence/context/b1-b5-*.tap -text
+/evidence/context/b1-b5-build.txt -text
+/evidence/context/blockers-review-packet.md -text
+/evidence/context/blockers-*.txt -text
+# Phase 9 raw platform evidence and hash manifest must remain byte-identical.
+/evidence/context/phase9-* -text -whitespace
+# Checkpoint 3 raw output and hash manifest remain byte-identical.
+/evidence/context/checkpoint3-* -text -whitespace

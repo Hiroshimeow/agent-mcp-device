@@ -1,0 +1,66 @@
+{
+  "canonical_observer_adapter": {
+    "status": "BLOCKED_MISSING_HOOK",
+    "source": "src/device/gateway-tool-adapter.ts",
+    "actual": "GatewayToolAdapter.call dispatches mapped filesystem/process calls via dispatchToolCall; shell_execute/image_preview/project_inspect have direct implementations. No unified pre-intent/post-outcome observer or public invocation UUID exists.",
+    "required": "Exactly-once observer after authorization/scope and before side-effect dispatch, outcome callback before transport handling. Owner acceptance still required."
+  },
+  "dispatcher_dispatchToolCall": {
+    "source": "src/tool-dispatcher.ts",
+    "signature": "dispatchToolCall(name: string, args: any, options: DispatchToolOptions = {}): Promise<ServerResult>",
+    "options": ["isRemote", "clientInfo", "origin", "metadata"],
+    "actual": "Gateway adapter calls with isRemote=true. server.ts separately implements stdio dispatch. No pre-intent callback; legacy history records outcomes for eligible local calls."
+  },
+  "process_correlation_keys": {
+    "status": "BLOCKED_INCOMPLETE",
+    "sources": ["src/device/gateway-tool-adapter.ts", "src/device/device.ts", "src/device/execution-engine.ts"],
+    "actual": "Gateway adapter session_id is decimal PID; offsets/length pass into legacy line API. Direct runtime generation is direct-in-process:<bootNonce>. Legacy optional child engine has random runtime UUID. No durable per-execution UUID/range-completeness correlation contract.",
+    "required": ["execution UUID", "runtime generation", "ranges", "truncation", "completeness", "terminal state"]
+  },
+  "shared_resource_accounting_status": {
+    "status": "DEFERRED_TO_1.0.11",
+    "live_wiring": "BLOCKED_PENDING_BOUNDED_SHARED_POLICY",
+    "source": "evidence/1.0.10/p6-final-verification.md",
+    "actual": "Final 1.0.10 production and packaged files exclude the proposed resource-accounting module. Do not claim shared context job/DB accounting is integrated."
+  },
+  "observer_exclusion_hook": {
+    "status": "BLOCKED_MISSING_HOOK",
+    "source": "src/tool-dispatcher.ts",
+    "actual": "Legacy EXCLUDED_TOOLS contains get_recent_tool_calls and track_ui_event only; no canonical exclusion seam.",
+    "required_exclusions": ["local_status", "local_search", "local_read", "local_graph", "local_index", "local_wiki", "context maintenance audit"]
+  },
+  "readiness_and_shutdown": {
+    "sources": ["src/device/device.ts", "src/device/runtime-owner.ts", "src/device/execution-engine.ts"],
+    "actual": "Device bootstrap acquires runtime ownership. Gateway uses direct adapter and advertises runtime_ready=true with boot nonce; no eager child initialize. Update shuts down before helper. Shutdown closes gateway/legacy engine and releases RuntimeOwner. Optional legacy engine assertReady returns DEVICE_NOT_READY; child close/transport close have 3000 ms timeout each.",
+    "context_flush_contract": "NOT_IMPLEMENTED"
+  },
+  "gateway_device_channel_direct": {
+    "status": "PRESENT",
+    "source": "src/device/gateway-channel.ts",
+    "actual": "Authenticated handleToolCall calls options.adapter.call directly, then sends result/error only if socket/device/connection_epoch still match. Delivery failure does not request another execution. request_id is transport correlation, not a durable execution UUID."
+  },
+  "test_baseline_pass": {
+    "total": 66,
+    "passed": 66,
+    "failed": 0,
+    "provenance": "Inherited final-release evidence, not rerun by Phase 1",
+    "evidence": ["evidence/1.0.10/p6-final-verification.md", "evidence/1.0.10/p6-final-suite.txt"]
+  },
+  "runtime_node_version": {
+    "feature_002_minimum": "22.13.0",
+    "observed_windows": "22.22.2",
+    "release_110_package_engine": ">=18.0.0",
+    "evidence": "evidence/context/sqlite-platform.md",
+    "note": "Feature floor is not an assertion that 1.0.10 required >=22.13.0."
+  },
+  "release_commit": {
+    "commit": "6490faa055efc99f20701280e8394ccc5034f3dd",
+    "version": "1.0.10",
+    "source_worktree": "E:/git-project/wt-mcp-device-111-context",
+    "head_matches_release": true,
+    "initial_dirty_state": "Only staged new specs/002-device-local-context files; src unchanged relative to release commit.",
+    "owner_semantic_handoff_acceptance": "NOT_RECORDED",
+    "live_wiring_gate": "BLOCKED",
+    "invalidation_rule": "Material observer/dispatcher/process/resource/lifecycle/schema changes require refreshed handoff and dependent tests."
+  }
+}

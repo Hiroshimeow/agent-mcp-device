@@ -1,0 +1,86 @@
+TAP version 13
+# (node:44544) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:44544) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# Subtest: public context route registration and dispatch retain explicit gate boundaries
+ok 1 - public context route registration and dispatch retain explicit gate boundaries
+  ---
+  duration_ms: 2.3124
+  type: 'test'
+  ...
+# Subtest: device public MCP preserves exact CLI content/scope/errors/coverage and gate
+not ok 2 - device public MCP preserves exact CLI content/scope/errors/coverage and gate
+  ---
+  duration_ms: 3941.0646
+  type: 'test'
+  location: 'E:\\git-project\\wt-mcp-device-111-context\\test\\context\\adapter-parity.test.js:24:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/test/context/adapter-parity.test.js:66:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# (node:35412) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: capture beginIntent revalidates revocation and detaches the active observer
+ok 3 - capture beginIntent revalidates revocation and detaches the active observer
+  ---
+  duration_ms: 314.1716
+  type: 'test'
+  ...
+# Subtest: capture completeOutcome revalidates revocation and detaches the active observer
+ok 4 - capture completeOutcome revalidates revocation and detaches the active observer
+  ---
+  duration_ms: 284.1946
+  type: 'test'
+  ...
+# Subtest: capture excluded revalidates revocation and detaches the active observer
+ok 5 - capture excluded revalidates revocation and detaches the active observer
+  ---
+  duration_ms: 302.1445
+  type: 'test'
+  ...
+# Subtest: capture duplicate revalidates revocation and detaches the active observer
+ok 6 - capture duplicate revalidates revocation and detaches the active observer
+  ---
+  duration_ms: 356.6746
+  type: 'test'
+  ...
+# Subtest: capture invalid-token revalidates revocation and detaches the active observer
+ok 7 - capture invalid-token revalidates revocation and detaches the active observer
+  ---
+  duration_ms: 279.1971
+  type: 'test'
+  ...
+# Subtest: T047 completed durable intent remains idempotent across observer recreation
+ok 8 - T047 completed durable intent remains idempotent across observer recreation
+  ---
+  duration_ms: 357.8011
+  type: 'test'
+  ...
+# Subtest: captured evidence uses 48-hex refs accepted by store read and activity graph
+ok 9 - captured evidence uses 48-hex refs accepted by store read and activity graph
+  ---
+  duration_ms: 388.6334
+  type: 'test'
+  ...
+# Subtest: T047 captured payload is bounded, redacted and original thrown error is preserved
+ok 10 - T047 captured payload is bounded, redacted and original thrown error is preserved
+  ---
+  duration_ms: 418.3433
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 9
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 7627.7945

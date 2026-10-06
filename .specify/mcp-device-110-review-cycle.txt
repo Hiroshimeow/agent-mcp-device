@@ -1,0 +1,43 @@
+MCP Device 1.0.10 Spec Kit review cycle.
+
+Run ONLY these stages in order and STOP before implementation:
+1) constitution
+2) specify
+3) plan
+4) tasks
+
+Use the authoritative Pi prompt templates in .pi/prompts/speckit.constitution.md, speckit.specify.md, speckit.plan.md, speckit.tasks.md. Follow each template fully.
+
+Project goals:
+- Baseline v1.0.9 commit ee87d0f3057e01e8087db99615d14bd1b4c626d4.
+- No silent semantic degradation; preserve existing user-facing MCP behavior unless an intentional drift is explicitly evidenced.
+- Evidence before optimization; benchmark baseline vs candidate with repeatable raw evidence and median/p95 where meaningful.
+- Bounded resource use: process output, memory, spill files, concurrency, transport payloads.
+- Windows + Linux are first-class acceptance targets.
+- Deterministic observable semantics for process output consumption/cursors, timeouts, search/edit behavior, errors, truncation/spill.
+- Preserve legacy APIs when needed; add compact hot paths without blindly deleting existing workflows.
+- Independent compatibility, adversarial review, and stress acceptance before release.
+- No npm publish/tag/release during this cycle.
+
+Feature scope:
+A) Process runtime: consume/drain hot path; bounded observer/history; separate call wait from process lifetime timeout; background spawn confirmation; bounded stdout/stderr with spill; preserve stdin order, completeness, exit code, kill/tree, fast-exit, concurrency.
+B) File/Search/Edit: bounded read_file/read_multiple_files; shared output budget/lazy spill where justified; one-shot grep/glob/native search hot path while preserving legacy/stateful workflows; deterministic exact edit; batched edits/apply-patch if evidence supports; per-resource serialization; benchmark fuzzy edit rather than removing by assumption; cover maxResults/context quota so context cannot hide actual matches.
+C) Benchmark: warmup/repeats, median/p95, latency, bytes, CPU/RSS where measurable, small/large files, search/edit, repeated process reads, large stdout/stderr, long-running/background, concurrency, Windows/Linux, raw machine-readable evidence, classify KEEP/REVERT/INCONCLUSIVE.
+D) Compatibility: baseline-vs-candidate regression for process/file/search/path restrictions/transport/truncation/spill/concurrency/Unicode/newline/errors plus randomized stress, leak and memory-growth checks.
+E) Integration: incremental gated integration, adversarial review, final Windows+Linux stress; investigate prior high failure-rate evidence rather than trusting short tests.
+
+Inspect sibling worktrees read-only for evidence:
+E:\git-project\wt-mcp-device-110-process
+E:\git-project\wt-mcp-device-110-file
+E:\git-project\wt-mcp-device-110-bench
+E:\git-project\wt-mcp-device-110-compat
+E:\git-project\wt-mcp-device-110-review
+E:\git-project\wt-mcp-device-110-stress
+
+After tasks generation:
+- print STOPPED BEFORE IMPLEMENTATION
+- list created/modified Spec Kit artifacts
+- summarize decisions + unresolved questions
+- run git status --short and git diff --stat
+- recommend first review targets
+Then exit. Do not implement, commit, push, publish, tag, deploy, or merge.

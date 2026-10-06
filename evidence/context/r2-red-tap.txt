@@ -1,0 +1,132 @@
+TAP version 13
+# (node:30540) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: R2 missing revocation file fails closed with FEATURE_GATE_LOCKED
+not ok 1 - R2 missing revocation file fails closed with FEATURE_GATE_LOCKED
+  ---
+  duration_ms: 137.4624
+  type: 'test'
+  location: 'E:\\git-project\\wt-mcp-device-111-context\\test\\context\\review-blockers.test.js:463:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    true !== false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/test/context/review-blockers.test.js:469:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: R2 different working directory still resolves the module config directory securely
+not ok 2 - R2 different working directory still resolves the module config directory securely
+  ---
+  duration_ms: 123.0581
+  type: 'test'
+  location: 'E:\\git-project\\wt-mcp-device-111-context\\test\\context\\review-blockers.test.js:473:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    cwd approval cannot authorize the installed module
+    
+    true !== false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/test/context/review-blockers.test.js:481:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: R2 public capture entry ignores caller-supplied config directory
+not ok 3 - R2 public capture entry ignores caller-supplied config directory
+  ---
+  duration_ms: 120.2453
+  type: 'test'
+  location: 'E:\\git-project\\wt-mcp-device-111-context\\test\\context\\review-blockers.test.js:490:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /FEATURE_GATE_LOCKED/. Input:
+    
+    'AssertionError [ERR_ASSERTION]: caller configuration authorized action'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+  error: 'caller configuration authorized action'
+  stack: |-
+    file:///E:/git-project/wt-mcp-device-111-context/test/context/review-blockers.test.js:494:49
+    Module.executeLiveCapture (file:///E:/git-project/wt-mcp-device-111-context/dist/context/capture.js:6:12)
+    file:///E:/git-project/wt-mcp-device-111-context/test/context/review-blockers.test.js:494:35
+    getActual (node:assert:609:5)
+    Function.throws (node:assert:757:24)
+    TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/test/context/review-blockers.test.js:494:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/test/context/review-blockers.test.js:494:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: R2 public gateway entry ignores caller-supplied config directory
+not ok 4 - R2 public gateway entry ignores caller-supplied config directory
+  ---
+  duration_ms: 120.2325
+  type: 'test'
+  location: 'E:\\git-project\\wt-mcp-device-111-context\\test\\context\\review-blockers.test.js:490:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /FEATURE_GATE_LOCKED/. Input:
+    
+    'AssertionError [ERR_ASSERTION]: caller configuration authorized action'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+  error: 'caller configuration authorized action'
+  stack: |-
+    file:///E:/git-project/wt-mcp-device-111-context/test/context/review-blockers.test.js:494:49
+    Module.executePublicGateway (file:///E:/git-project/wt-mcp-device-111-context/dist/context/gateway.js:6:12)
+    file:///E:/git-project/wt-mcp-device-111-context/test/context/review-blockers.test.js:494:35
+    getActual (node:assert:609:5)
+    Function.throws (node:assert:757:24)
+    TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/test/context/review-blockers.test.js:494:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/test/context/review-blockers.test.js:494:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: R3 initialized service with enabled flags rejects execution after signed approval is removed
+ok 5 - R3 initialized service with enabled flags rejects execution after signed approval is removed
+  ---
+  duration_ms: 123.3313
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 1
+# fail 4
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 789.2148

@@ -1,0 +1,415 @@
+TAP version 13
+# (node:21968) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: C2-3 reap revokes epoch and late worker cannot commit even before another admission
+ok 1 - C2-3 reap revokes epoch and late worker cannot commit even before another admission
+  ---
+  duration_ms: 309.4024
+  type: 'test'
+  ...
+# Subtest: C2-3 allocation automatically reclaims dead quota leases before QUOTA_EXCEEDED
+ok 2 - C2-3 allocation automatically reclaims dead quota leases before QUOTA_EXCEEDED
+  ---
+  duration_ms: 307.9613
+  type: 'test'
+  ...
+# Subtest: C2-2 admission refuses a second living writer lease for the same repository
+ok 3 - C2-2 admission refuses a second living writer lease for the same repository
+  ---
+  duration_ms: 218.7416
+  type: 'test'
+  ...
+# Subtest: C2-2 two out-of-order reservations cannot overwrite the newer committed watermark
+ok 4 - C2-2 two out-of-order reservations cannot overwrite the newer committed watermark
+  ---
+  duration_ms: 185.8722
+  type: 'test'
+  ...
+# Subtest: C2-2 commit gate rejects watermark update outside a repository transaction
+ok 5 - C2-2 commit gate rejects watermark update outside a repository transaction
+  ---
+  duration_ms: 166.8614
+  type: 'test'
+  ...
+# Subtest: C2-5/6 FEATURE_LIVE_CAPTURE defaults off and refuses initialization/execution without signed SOC approval
+ok 6 - C2-5/6 FEATURE_LIVE_CAPTURE defaults off and refuses initialization/execution without signed SOC approval
+  ---
+  duration_ms: 168.1066
+  type: 'test'
+  ...
+# Subtest: C2-5/6 FEATURE_LIVE_CAPTURE validates pinned signature, expiry, feature scope and rechecks execution
+ok 7 - C2-5/6 FEATURE_LIVE_CAPTURE validates pinned signature, expiry, feature scope and rechecks execution
+  ---
+  duration_ms: 190.8715
+  type: 'test'
+  ...
+# Subtest: C2-5/6 FEATURE_PUBLIC_GATEWAY defaults off and refuses initialization/execution without signed SOC approval
+ok 8 - C2-5/6 FEATURE_PUBLIC_GATEWAY defaults off and refuses initialization/execution without signed SOC approval
+  ---
+  duration_ms: 164.7686
+  type: 'test'
+  ...
+# Subtest: C2-5/6 FEATURE_PUBLIC_GATEWAY validates pinned signature, expiry, feature scope and rechecks execution
+ok 9 - C2-5/6 FEATURE_PUBLIC_GATEWAY validates pinned signature, expiry, feature scope and rechecks execution
+  ---
+  duration_ms: 181.9419
+  type: 'test'
+  ...
+# Subtest: G2 valid Ed25519 signed artifact verifies with explicit test-only key without crypto substitution
+ok 10 - G2 valid Ed25519 signed artifact verifies with explicit test-only key without crypto substitution
+  ---
+  duration_ms: 18.2941
+  type: 'test'
+  ...
+# Subtest: R2 Negative Test \#5 attacker env public key plus valid self-signed artifact is SOC_KEY_UNTRUSTED
+ok 11 - R2 Negative Test \#5 attacker env public key plus valid self-signed artifact is SOC_KEY_UNTRUSTED
+  ---
+  duration_ms: 15.8037
+  type: 'test'
+  ...
+# Subtest: R3 direct capture function call without service initialization is locked
+ok 12 - R3 direct capture function call without service initialization is locked
+  ---
+  duration_ms: 1.8973
+  type: 'test'
+  ...
+# Subtest: R3 capture every call revalidates expiry and removal after valid setup
+ok 13 - R3 capture every call revalidates expiry and removal after valid setup
+  ---
+  duration_ms: 15.2243
+  type: 'test'
+  ...
+# Subtest: R3 direct gateway function call without service initialization is locked
+ok 14 - R3 direct gateway function call without service initialization is locked
+  ---
+  duration_ms: 3.2834
+  type: 'test'
+  ...
+# Subtest: R3 gateway every call revalidates expiry and removal after valid setup
+ok 15 - R3 gateway every call revalidates expiry and removal after valid setup
+  ---
+  duration_ms: 12.3579
+  type: 'test'
+  ...
+# Subtest: G4 capture revoked artifact digest locks subsequent invocation before side effects
+ok 16 - G4 capture revoked artifact digest locks subsequent invocation before side effects
+  ---
+  duration_ms: 18.2003
+  type: 'test'
+  ...
+# Subtest: G4 gateway revoked artifact digest locks subsequent invocation before side effects
+ok 17 - G4 gateway revoked artifact digest locks subsequent invocation before side effects
+  ---
+  duration_ms: 18.8124
+  type: 'test'
+  ...
+# Subtest: G4 malformed revocation source fails closed
+ok 18 - G4 malformed revocation source fails closed
+  ---
+  duration_ms: 22.7824
+  type: 'test'
+  ...
+# Subtest: G4 unrelated revoked digest leaves a valid approval authorized
+ok 19 - G4 unrelated revoked digest leaves a valid approval authorized
+  ---
+  duration_ms: 9.3997
+  type: 'test'
+  ...
+# Subtest: JCS RFC 8785 signature uses sorted payload keys regardless of artifact insertion order
+ok 20 - JCS RFC 8785 signature uses sorted payload keys regardless of artifact insertion order
+  ---
+  duration_ms: 6.8737
+  type: 'test'
+  ...
+# (node:11824) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: B1 maintenance uses incremental reclamation and explicit WAL truncate
+ok 21 - B1 maintenance uses incremental reclamation and explicit WAL truncate
+  ---
+  duration_ms: 205.2521
+  type: 'test'
+  ...
+# Subtest: B1 concurrent purge waits for an active writer and preserves every event
+ok 22 - B1 concurrent purge waits for an active writer and preserves every event
+  ---
+  duration_ms: 1052.0773
+  type: 'test'
+  ...
+# Subtest: B1 capture writer waits for purge lock release with zero lost events
+ok 23 - B1 capture writer waits for purge lock release with zero lost events
+  ---
+  duration_ms: 1463.4386
+  type: 'test'
+  ...
+# Subtest: B2 admin purge rejects agent environments even with TTY input and output
+ok 24 - B2 admin purge rejects agent environments even with TTY input and output
+  ---
+  duration_ms: 421.4415
+  type: 'test'
+  ...
+# Subtest: B3 killed cross-database writer reconciles exact committed evidence bytes on restart
+ok 25 - B3 killed cross-database writer reconciles exact committed evidence bytes on restart
+  ---
+  duration_ms: 434.4266
+  type: 'test'
+  ...
+# Subtest: B3 reconciliation waits for a separate-process admission and retains sealed evidence totals
+ok 26 - B3 reconciliation waits for a separate-process admission and retains sealed evidence totals
+  ---
+  duration_ms: 1640.9685
+  type: 'test'
+  ...
+# Subtest: B1 migrated auto-vacuum NONE purge clears indexed payload bytes and logical quota without rebuilding
+ok 27 - B1 migrated auto-vacuum NONE purge clears indexed payload bytes and logical quota without rebuilding
+  ---
+  duration_ms: 320.7693
+  type: 'test'
+  ...
+# C2-1 scanned fragment byte lengths: canarytokenprefix:17, alphaunique:11, betaunique:10, canarytoken:11, tokenprefix:11, alphauniq:9, betauniq:8, canarytokenprefixalphaunique:28, canarytokenprefixbetaunique:27
+# Subtest: B2 stripped agent markers in TTY-capable child rejects generic PURGE
+ok 28 - B2 stripped agent markers in TTY-capable child rejects generic PURGE
+  ---
+  duration_ms: 194.3981
+  type: 'test'
+  ...
+# Subtest: B2 stripped agent markers in TTY-capable child rejects repository challenge with extra whitespace
+ok 29 - B2 stripped agent markers in TTY-capable child rejects repository challenge with extra whitespace
+  ---
+  duration_ms: 199.9296
+  type: 'test'
+  ...
+# Subtest: B2 stripped agent markers in TTY-capable child accepts exact repository challenge with one-time admin token
+ok 30 - B2 stripped agent markers in TTY-capable child accepts exact repository challenge with one-time admin token
+  ---
+  duration_ms: 325.6917
+  type: 'test'
+  ...
+# Subtest: B2 stripped agent markers in TTY-capable child rejects PTY agent without admin token despite exact challenge
+ok 31 - B2 stripped agent markers in TTY-capable child rejects PTY agent without admin token despite exact challenge
+  ---
+  duration_ms: 192.2675
+  type: 'test'
+  ...
+# Subtest: P2 argv admin token is rejected even with a local TTY
+ok 32 - P2 argv admin token is rejected even with a local TTY
+  ---
+  duration_ms: 91.2473
+  type: 'test'
+  ...
+# Subtest: P2 admin token replay is rejected with TOKEN_ALREADY_USED
+ok 33 - P2 admin token replay is rejected with TOKEN_ALREADY_USED
+  ---
+  duration_ms: 105.8204
+  type: 'test'
+  ...
+# Subtest: P2 expired token is rejected with TOKEN_EXPIRED
+ok 34 - P2 expired token is rejected with TOKEN_EXPIRED
+  ---
+  duration_ms: 98.5116
+  type: 'test'
+  ...
+# Subtest: P2 token comparison uses constant-time crypto primitive and never argv
+ok 35 - P2 token comparison uses constant-time crypto primitive and never argv
+  ---
+  duration_ms: 0.4098
+  type: 'test'
+  ...
+# Subtest: P3 every production SQLite connection uses the hardened factory
+ok 36 - P3 every production SQLite connection uses the hardened factory
+  ---
+  duration_ms: 143.4536
+  type: 'test'
+  ...
+# Subtest: P3 blocked truncate checkpoint fails closed with PURGE_CHECKPOINT_BUSY
+ok 37 - P3 blocked truncate checkpoint fails closed with PURGE_CHECKPOINT_BUSY
+  ---
+  duration_ms: 296.9939
+  type: 'test'
+  ...
+# Subtest: P4 expired reservation fences repository commit and rolls back evidence
+ok 38 - P4 expired reservation fences repository commit and rolls back evidence
+  ---
+  duration_ms: 184.7273
+  type: 'test'
+  ...
+# Subtest: P4 real append commit outliving lease is rejected before COMMIT
+ok 39 - P4 real append commit outliving lease is rejected before COMMIT
+  ---
+  duration_ms: 188.4478
+  type: 'test'
+  ...
+# Subtest: P4 EPERM preserves same-host lease and foreign host does not probe PID
+ok 40 - P4 EPERM preserves same-host lease and foreign host does not probe PID
+  ---
+  duration_ms: 108.7917
+  type: 'test'
+  ...
+# Subtest: C2-2 stale monotonic epoch rejects a still-live reservation before repo commit
+ok 41 - C2-2 stale monotonic epoch rejects a still-live reservation before repo commit
+  ---
+  duration_ms: 227.8086
+  type: 'test'
+  ...
+# Subtest: C2-2 repo fence rejects an epoch older than its committed watermark
+ok 42 - C2-2 repo fence rejects an epoch older than its committed watermark
+  ---
+  duration_ms: 207.3596
+  type: 'test'
+  ...
+# Subtest: C2-3 continuing process explicitly recovers committed bytes and reaps abandoned leases
+ok 43 - C2-3 continuing process explicitly recovers committed bytes and reaps abandoned leases
+  ---
+  duration_ms: 394.203
+  type: 'test'
+  ...
+# (node:33524) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: B2 repo.sqlite async reap overlaps an in-flight worker
+ok 44 - B2 repo.sqlite async reap overlaps an in-flight worker
+  ---
+  duration_ms: 543.5635
+  type: 'test'
+  ...
+# (node:7316) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: B2 repo.sqlite async replace-token overlaps an in-flight worker
+ok 45 - B2 repo.sqlite async replace-token overlaps an in-flight worker
+  ---
+  duration_ms: 1661.6175
+  type: 'test'
+  ...
+# Subtest: B2 equal epoch with wrong reservation id is fenced off
+ok 46 - B2 equal epoch with wrong reservation id is fenced off
+  ---
+  duration_ms: 174.616
+  type: 'test'
+  ...
+# Subtest: B2 registry epoch cache cannot define repository authority
+ok 47 - B2 registry epoch cache cannot define repository authority
+  ---
+  duration_ms: 184.5445
+  type: 'test'
+  ...
+# Subtest: C1 valid JSON non-array revocation source fails closed: {"revoked":true}
+ok 48 - C1 valid JSON non-array revocation source fails closed: {"revoked":true}
+  ---
+  duration_ms: 101.5548
+  type: 'test'
+  ...
+# Subtest: C1 valid JSON non-array revocation source fails closed: "invalid"
+ok 49 - C1 valid JSON non-array revocation source fails closed: "invalid"
+  ---
+  duration_ms: 100.5927
+  type: 'test'
+  ...
+# Subtest: C1 valid JSON non-array revocation source fails closed: {"schema_version":1,"revoked_digests":[]}
+ok 50 - C1 valid JSON non-array revocation source fails closed: {"schema_version":1,"revoked_digests":[]}
+  ---
+  duration_ms: 104.8762
+  type: 'test'
+  ...
+# Subtest: C2 ContextService ignores caller-supplied configDirectory for FEATURE_LIVE_CAPTURE
+ok 51 - C2 ContextService ignores caller-supplied configDirectory for FEATURE_LIVE_CAPTURE
+  ---
+  duration_ms: 106.6398
+  type: 'test'
+  ...
+# Subtest: C2 ContextService ignores caller-supplied configDirectory for FEATURE_PUBLIC_GATEWAY
+ok 52 - C2 ContextService ignores caller-supplied configDirectory for FEATURE_PUBLIC_GATEWAY
+  ---
+  duration_ms: 101.4378
+  type: 'test'
+  ...
+# Subtest: R2 missing revocation file fails closed with FEATURE_GATE_LOCKED
+ok 53 - R2 missing revocation file fails closed with FEATURE_GATE_LOCKED
+  ---
+  duration_ms: 101.4329
+  type: 'test'
+  ...
+# Subtest: R2 different working directory still resolves the module config directory securely
+ok 54 - R2 different working directory still resolves the module config directory securely
+  ---
+  duration_ms: 99.3396
+  type: 'test'
+  ...
+# Subtest: R2 public capture entry ignores caller-supplied config directory
+ok 55 - R2 public capture entry ignores caller-supplied config directory
+  ---
+  duration_ms: 101.8689
+  type: 'test'
+  ...
+# Subtest: R2 public gateway entry ignores caller-supplied config directory
+ok 56 - R2 public gateway entry ignores caller-supplied config directory
+  ---
+  duration_ms: 101.1511
+  type: 'test'
+  ...
+# Subtest: R3 initialized service with enabled flags rejects execution after signed approval is removed
+ok 57 - R3 initialized service with enabled flags rejects execution after signed approval is removed
+  ---
+  duration_ms: 110.583
+  type: 'test'
+  ...
+# Subtest: B3 tampered SOC signature is rejected
+ok 58 - B3 tampered SOC signature is rejected
+  ---
+  duration_ms: 109.9138
+  type: 'test'
+  ...
+# Subtest: B3 expired signed SOC artifact is rejected
+ok 59 - B3 expired signed SOC artifact is rejected
+  ---
+  duration_ms: 107.537
+  type: 'test'
+  ...
+# Subtest: B3 Phase 7 approval cannot authorize Phase 8 gateway
+ok 60 - B3 Phase 7 approval cannot authorize Phase 8 gateway
+  ---
+  duration_ms: 101.5148
+  type: 'test'
+  ...
+# Subtest: B3 forced env/config flag and caller key cannot bypass invalid approval
+ok 61 - B3 forced env/config flag and caller key cannot bypass invalid approval
+  ---
+  duration_ms: 104.0681
+  type: 'test'
+  ...
+# Subtest: B3 direct capture import is initialization-gated
+ok 62 - B3 direct capture import is initialization-gated
+  ---
+  duration_ms: 0.4784
+  type: 'test'
+  ...
+# Subtest: B3 direct gateway import is initialization-gated
+ok 63 - B3 direct gateway import is initialization-gated
+  ---
+  duration_ms: 0.2096
+  type: 'test'
+  ...
+# Subtest: quota rejection bursts create one deduplicated gap per minute
+ok 64 - quota rejection bursts create one deduplicated gap per minute
+  ---
+  duration_ms: 450.487
+  type: 'test'
+  ...
+# Subtest: graph neighbor SQL fetch is bounded by remaining examined-edge budget plus one
+ok 65 - graph neighbor SQL fetch is bounded by remaining examined-edge budget plus one
+  ---
+  duration_ms: 0.5276
+  type: 'test'
+  ...
+# Subtest: graph path cannot traverse a purged intermediate node
+ok 66 - graph path cannot traverse a purged intermediate node
+  ---
+  duration_ms: 291.4913
+  type: 'test'
+  ...
+1..66
+# tests 66
+# suites 0
+# pass 66
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 13479.206

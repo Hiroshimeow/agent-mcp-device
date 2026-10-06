@@ -1,0 +1,45 @@
+checkpoint3-context.tap
+# Subtest: JSON MAC encoding rejects colon-delimiter scope collisions across owners
+ok 197 - JSON MAC encoding rejects colon-delimiter scope collisions across owners
+  ---
+  duration_ms: 665.8293
+  type: 'test'
+  ...
+# Subtest: status is read-only, capture gaps are visible and jobs/stores have ownership bounds
+ok 198 - status is read-only, capture gaps are visible and jobs/stores have ownership bounds
+  ---
+  duration_ms: 655.108
+  type: 'test'
+  ...
+1..198
+# tests 198
+# suites 0
+# pass 198
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 31030.8324
+
+checkpoint3-regression.tap
+✓ Test passed: ./test_search_truncation.js (2148ms)
+
+===== TEST SUMMARY =====
+
+Overall Results:
+  Total tests:     66
+  ✓ Passed:        66
+  ✗ Failed:        0
+  Total duration:  164347ms (164.3s)
+
+Performance Summary:
+  Average test duration: 2490ms
+  Fastest test: ./test-error-sanitization.js (66ms)
+  Slowest test: ./test-self-update.js (32659ms)
+
+🎉 ALL TESTS PASSED! 🎉
+All 66 tests completed successfully.
+
+===== Test run completed =====
+
+Total execution time: 174313ms (174.3s)

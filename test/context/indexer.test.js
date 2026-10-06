@@ -1,0 +1,30 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { ContextStore } from '../../dist/context/store.js';
+import { sync } from '../../dist/context/indexer.js';
+import { temporary } from './helpers.js';
+
+test('sync indexes only pending retained events and advances watermark without copying old rows', t => {
+  let store; t.after(() => store?.close()); const root = temporary(t); store = new ContextStore(root);
+  const owner = store.activateOwner('a'), repo = store.repository(owner, root);
+  writeFileSync(join(root, 'unobserved.txt'), 'HIDDEN_SOURCE_CANARY');
+  const first = store.append(owner, repo, 'Tiếng Việt kiểm tra api_key=INDEX_SECRET_CANARY');
+  assert.equal(store.manifest(owner, repo).pending_events, 1);
+  const one = sync(store, owner, repo);
+  assert.equal(one.indexed, 1); assert.equal(one.indexed_through_event, 1);
+  const db = store.repoDatabase(owner, repo);
+  const original = db.prepare('SELECT rowid,* FROM evidence_fts').get();
+  assert.ok(!original.text.includes('INDEX_SECRET_CANARY'));
+  assert.equal(db.prepare("SELECT count(*) AS n FROM evidence_fts WHERE evidence_fts MATCH 'HIDDEN_SOURCE_CANARY'").get().n, 0);
+  assert.equal(sync(store, owner, repo).generation, one.generation);
+  store.append(owner, repo, 'second pending'); store.append(owner, repo, 'third pending');
+  const two = sync(store, owner, repo, { max_events: 1 });
+  assert.equal(two.indexed, 1); assert.equal(two.pending_events, 1); assert.ok(two.generation > one.generation);
+  assert.deepEqual(db.prepare('SELECT rowid,* FROM evidence_fts WHERE ref=?').get(first), original);
+  assert.equal(db.prepare('SELECT first_indexed_generation,last_indexed_generation FROM search_documents WHERE ref=?').get(first).last_indexed_generation, one.generation);
+  assert.equal(sync(store, owner, repo).pending_events, 0);
+  assert.equal(db.prepare('SELECT count(*) AS n FROM evidence_fts').get().n, 3);
+  assert.throws(() => sync(store, owner, repo, { max_events: 0 }), /BUDGET_EXCEEDED/);
+});

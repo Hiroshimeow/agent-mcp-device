@@ -1,0 +1,96 @@
+TAP version 13
+# (node:35140) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: device quota serializes all repos and includes sealed namespaces, without evicting evidence
+ok 1 - device quota serializes all repos and includes sealed namespaces, without evicting evidence
+  ---
+  duration_ms: 293.3962
+  type: 'test'
+  ...
+# Subtest: repo quota pauses sync and import without publishing partial generations
+ok 2 - repo quota pauses sync and import without publishing partial generations
+  ---
+  duration_ms: 169.0186
+  type: 'test'
+  ...
+# Subtest: transaction failure rolls back evidence and event together
+ok 3 - transaction failure rolls back evidence and event together
+  ---
+  duration_ms: 138.7902
+  type: 'test'
+  ...
+# Subtest: restart abandons shadow generations and marks unresolved intents unknown without sync
+ok 4 - restart abandons shadow generations and marks unresolved intents unknown without sync
+  ---
+  duration_ms: 219.583
+  type: 'test'
+  ...
+# Subtest: process kill rolls back uncommitted WAL writes and preserves last-good generation
+ok 5 - process kill rolls back uncommitted WAL writes and preserves last-good generation
+  ---
+  duration_ms: 358.7365
+  type: 'test'
+  ...
+# Subtest: cleanup invalidates stateless search cursors and supports explicit sealed namespace selection
+not ok 6 - cleanup invalidates stateless search cursors and supports explicit sealed namespace selection
+  ---
+  duration_ms: 210.123
+  type: 'test'
+  location: 'E:\\git-project\\wt-mcp-device-111-context\\test\\context\\durability-quota.test.js:84:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/test/context/durability-quota.test.js:90:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: admin clean CLI refuses non-TTY input and cannot accept agent confirmation flags
+not ok 7 - admin clean CLI refuses non-TTY input and cannot accept agent confirmation flags
+  ---
+  duration_ms: 85.5474
+  type: 'test'
+  location: 'E:\\git-project\\wt-mcp-device-111-context\\test\\context\\durability-quota.test.js:95:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'ACTION_UNSUPPORTED'
+    - 'ACCESS_DENIED'
+         ^
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'ACCESS_DENIED'
+  actual: 'ACTION_UNSUPPORTED'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///E:/git-project/wt-mcp-device-111-context/test/context/durability-quota.test.js:98:10)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: explicit local admin payload purge reclaims quota and leaves metadata and content-free audit
+ok 8 - explicit local admin payload purge reclaims quota and leaves metadata and content-free audit
+  ---
+  duration_ms: 194.1165
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 6
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1799.8932

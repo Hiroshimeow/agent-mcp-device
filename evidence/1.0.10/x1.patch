@@ -1,0 +1,710 @@
+diff --git a/.gitignore b/.gitignore
+index a8296dc..1657ca0 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -51,6 +51,7 @@ test/samples/*_images/
+ 
+ # MCPB related files
+ *.mcpb
++*.tgz
+ mcpb-bundle/
+ .mcpregistry_github_token
+ .mcpregistry_registry_token
+diff --git a/test/test-enhanced-repl.js b/test/test-enhanced-repl.js
+index 40b07ec..0f944d6 100644
+--- a/test/test-enhanced-repl.js
++++ b/test/test-enhanced-repl.js
+@@ -51,7 +51,7 @@ async function testEnhancedREPL() {
+   }
+   
+   console.log(`Started Python session with PID: ${pid}`);
+-  
++  try {
+   // Test read_process_output with timeout
+   console.log('Testing read_process_output with timeout...');
+   const initialOutput = await readProcessOutput({ 
+@@ -102,7 +102,7 @@ for i in range(3):
+     print(greet(f"Guest {i+1}"))`;
+   
+   // Send the multi-line code
+-  await interactWithProcess({
++  const blockResult = await interactWithProcess({
+     pid,
+     input: multilineCode,
+     wait_for_prompt: true,
+@@ -116,22 +116,32 @@ for i in range(3):
+     wait_for_prompt: true,
+     timeout_ms: 5000
+   });
+-  console.log('Python multi-line output with wait_for_prompt:', multilineResult.content[0].text);
++  // Windows may report a continuation prompt before the final output arrives.
++  // Preserve output from both calls and poll for the actual block result, not
++  // the presence of a prompt (which can be stale).
++  let multilineOutput = blockResult.content[0].text + multilineResult.content[0].text;
++  const deadline = Date.now() + 10000;
++  while (!multilineOutput.includes('Hello, Guest 3!') && Date.now() < deadline) {
++    const next = await readProcessOutput({ pid, timeout_ms: 500 });
++    multilineOutput += next.content[0].text;
++    if (!multilineOutput.includes('Hello, Guest 3!')) await new Promise(resolve => setTimeout(resolve, 100));
++  }
++  console.log('Python multi-line output with wait_for_prompt:', multilineOutput);
+   
+   // Check that the output contains all three greetings
+-  assert(multilineResult.content[0].text.includes('Hello, Guest 1!'), 
++  assert(multilineOutput.includes('Hello, Guest 1!'),
+     'Output should contain greeting for Guest 1');
+-  assert(multilineResult.content[0].text.includes('Hello, Guest 2!'), 
++  assert(multilineOutput.includes('Hello, Guest 2!'),
+     'Output should contain greeting for Guest 2');
+-  assert(multilineResult.content[0].text.includes('Hello, Guest 3!'), 
++  assert(multilineOutput.includes('Hello, Guest 3!'),
+     'Output should contain greeting for Guest 3');
+   
+-  // Terminate the session
+-  console.log("Terminating session...");
+-  await forceTerminate({ pid });
+-  console.log('Python session terminated');
+-  
+   return true;
++  } finally {
++    console.log('Terminating session...');
++    await forceTerminate({ pid });
++    console.log('Python session terminated');
++  }
+ }
+ 
+ // Run the test
+diff --git a/test/test-gateway-device-channel.js b/test/test-gateway-device-channel.js
+index e906d32..45133cb 100644
+--- a/test/test-gateway-device-channel.js
++++ b/test/test-gateway-device-channel.js
+@@ -10,7 +10,7 @@ import sharp from 'sharp';
+ import tls from 'tls';
+ import { WebSocketServer } from 'ws';
+ 
+-import { LocalExecutionEngine } from '../dist/device/execution-engine.js';
++import { randomUUID } from 'crypto';
+ import { GatewayDeviceChannel } from '../dist/device/gateway-channel.js';
+ import { GatewayDeviceIdentity } from '../dist/device/gateway-identity.js';
+ import { pairGatewayDevice } from '../dist/device/gateway-pairing.js';
+@@ -126,106 +126,66 @@ async function testDefaultWindowsIdentityPathIsProfileBound() {
+   }
+ }
+ 
+-async function testExecutionEngineFailureKeepsRuntimeObservableButNotReady() {
+-  const engine = new LocalExecutionEngine();
+-  engine.resolveMcpConfig = async () => null;
+-  await engine.initialize();
+-  assert.deepEqual(engine.getRuntimeState(), {
+-    runtime_ready: false,
+-    runtime_reason: 'LOCAL_EXECUTION_ENGINE_UNAVAILABLE',
+-    execution_runtime_generation: null
+-  });
+-  assert.throws(
+-    () => engine.assertReady(),
+-    error => error?.code === 'DEVICE_NOT_READY'
+-  );
+-}
+-
+-async function testExecutionEngineChildDeathInvalidatesReadiness() {
+-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-engine-close-'));
+-  const engine = new LocalExecutionEngine();
+-  engine.resolveMcpConfig = async () => ({
+-    command: process.execPath,
+-    args: [path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../dist/index.js')],
+-    cwd: root,
+-    env: {
+-      HOME: root,
+-      USERPROFILE: root
+-    }
++async function testDirectInProcessChannelDispatch() {
++  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-direct-'));
++  const filePath = path.join(root, 'remote.txt');
++  await fs.writeFile(filePath, 'direct-dispatch:ok');
++  const identity = new GatewayDeviceIdentity(path.join(root, 'identity.json'));
++  // An obsolete engine argument must never be consulted by direct dispatch.
++  const unusedEngine = { assertReady() { throw new Error('child readiness must not gate direct dispatch'); } };
++  const adapter = new GatewayToolAdapter(unusedEngine, { allowedRoots: [], pathValidator: async value => value });
++  const runtime = {
++    runtime_ready: true,
++    runtime_reason: null,
++    execution_runtime_generation: `direct-in-process:${randomUUID()}`
++  };
++  const wss = new WebSocketServer({ port: 0 });
++  await new Promise(resolve => wss.once('listening', resolve));
++  let advertised;
++  let result;
++  wss.on('connection', ws => ws.on('message', raw => {
++    const message = JSON.parse(raw.toString());
++    if (message.type === 'enroll_hello') {
++      advertised = Object.fromEntries(Object.keys(runtime).map(key => [key, message.payload[key]]));
++      ws.send(JSON.stringify({ protocol_version: 1, type: 'auth_challenge', device_id: message.device_id, payload: { nonce: 'direct' } }));
++    } else if (message.type === 'auth_response') {
++      ws.send(JSON.stringify({ protocol_version: 1, type: 'auth_ok', device_id: message.device_id, connection_epoch: 1, payload: { accepted: true } }));
++      ws.send(JSON.stringify({ protocol_version: 1, type: 'tool_call', request_id: 'direct-1', device_id: message.device_id, connection_epoch: 1, payload: { tool: 'read_text_file', arguments: { path: filePath } } }));
++    } else if (message.type === 'tool_result') result = message.payload;
++  }));
++  const channel = new GatewayDeviceChannel({
++    gatewayUrl: `ws://127.0.0.1:${wss.address().port}/device`,
++    enrollmentToken: 'test', identity, adapter, runtimeState: () => runtime
+   });
+-
+   try {
+-    await engine.initialize();
+-    const before = engine.getRuntimeState();
+-    assert.equal(before.runtime_ready, true);
+-    assert.equal(typeof before.execution_runtime_generation, 'string');
+-    assert(before.execution_runtime_generation.length > 0);
+-
+-    const childPid = engine.getChildPid();
+-    assert(Number.isInteger(childPid) && childPid > 0, 'local execution engine must expose a live child PID');
+-    process.kill(childPid, 'SIGTERM');
+-
+-    await waitFor(() => engine.getRuntimeState().runtime_ready === false);
+-    const after = engine.getRuntimeState();
+-    assert.deepEqual(after, {
+-      runtime_ready: false,
+-      runtime_reason: 'LOCAL_EXECUTION_ENGINE_UNAVAILABLE',
+-      execution_runtime_generation: null
+-    });
+-    assert.notEqual(after.execution_runtime_generation, before.execution_runtime_generation);
+-    assert.throws(
+-      () => engine.assertReady(),
+-      error => error?.code === 'DEVICE_NOT_READY'
+-    );
+-
+-    const adapter = new GatewayToolAdapter(engine, { pathValidator: async value => value });
+-    await assert.rejects(
+-      () => adapter.call('read_text_file', { path: path.join(root, 'missing.txt') }),
+-      error => error?.code === 'DEVICE_NOT_READY'
+-    );
+-
+-    const channel = new GatewayDeviceChannel({
+-      gatewayUrl: 'ws://127.0.0.1:1/device',
+-      enrollmentToken: 'unused',
+-      adapter,
+-      runtimeState: () => engine.getRuntimeState()
+-    });
+-    assert.deepEqual(channel.runtimePayload(), after);
++    await channel.start();
++    await waitFor(() => Boolean(result));
++    assert.deepEqual(advertised, runtime);
++    assert.deepEqual(channel.runtimePayload(), runtime);
++    assert.match(result.content[0].text, /direct-dispatch:ok/);
++    await adapter.call('write_file', { path: filePath, content: 'updated' });
++    assert.equal(await fs.readFile(filePath, 'utf8'), 'updated');
++    await adapter.call('edit_file', { path: filePath, old_text: 'updated', new_text: 'edited', expected_replacements: 1 });
++    assert.equal(await fs.readFile(filePath, 'utf8'), 'edited');
++    const dryRun = await adapter.call('edit_file', { path: filePath, old_text: 'edited', new_text: '', expected_replacements: 1, dry_run: true });
++    assert.match(dryRun.content[0].text, /Dry run successful/);
++    assert.equal(await fs.readFile(filePath, 'utf8'), 'edited', 'dry run must not mutate the file');
++    await adapter.call('edit_file', { path: filePath, old_text: 'edited', new_text: '', expected_replacements: 1 });
++    assert.equal(await fs.readFile(filePath, 'utf8'), '');
++    await adapter.call('write_file', { path: filePath, content: '' });
++    assert.equal(await fs.readFile(filePath, 'utf8'), '');
++    await assert.rejects(adapter.call('start_process', { command: 'node -v' }), /path\/working_directory is required/);
++    await assert.rejects(adapter.call('read_text_file', { path: path.join(root, 'missing') }), error => error?.code === 'TOOL_EXECUTION_FAILED');
++    assert.deepEqual(channel.runtimePayload(), runtime, 'individual tool errors do not invalidate direct runtime readiness');
++    const restricted = new GatewayToolAdapter(undefined, { allowedRoots: [path.join(root, 'other')], pathValidator: async value => value });
++    await assert.rejects(restricted.call('read_text_file', { path: filePath }), /outside MCP_GATEWAY_ALLOWED_ROOTS/);
+   } finally {
+-    await engine.shutdown();
++    await channel.stop();
++    await new Promise(resolve => wss.close(resolve));
+     await fs.rm(root, { recursive: true, force: true });
+   }
+ }
+ 
+-async function testAdapterRejectsWhenRuntimeIsNotReady() {
+-  const desktop = new FakeDesktop();
+-  desktop.assertReady = () => {
+-    const error = new Error('execution runtime is not ready');
+-    error.code = 'DEVICE_NOT_READY';
+-    throw error;
+-  };
+-  const adapter = new GatewayToolAdapter(desktop, { pathValidator: async value => value });
+-  await assert.rejects(
+-    () => adapter.call('read_text_file', { path: '/work/file.txt' }),
+-    error => error?.code === 'DEVICE_NOT_READY'
+-  );
+-  assert.equal(desktop.calls.length, 0);
+-}
+-
+-async function testAdapterDefaultsToWideAccess() {
+-  const desktop = new FakeDesktop();
+-  const previous = process.env.MCP_GATEWAY_ALLOWED_ROOTS;
+-  delete process.env.MCP_GATEWAY_ALLOWED_ROOTS;
+-  try {
+-    const adapter = new GatewayToolAdapter(desktop, { pathValidator: async value => value });
+-    await adapter.call('read_text_file', { path: '/shared/anywhere.txt' });
+-    assert.deepEqual(desktop.calls.at(-1), { name: 'read_file', args: { path: '/shared/anywhere.txt' } });
+-  } finally {
+-    if (previous === undefined) delete process.env.MCP_GATEWAY_ALLOWED_ROOTS;
+-    else process.env.MCP_GATEWAY_ALLOWED_ROOTS = previous;
+-  }
+-}
+-
+ async function testRemoteImagePreviewIsBounded() {
+   assert.equal(GATEWAY_CAPABILITIES.includes('image_preview'), true);
+   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-image-'));
+@@ -241,7 +201,7 @@ async function testRemoteImagePreviewIsBounded() {
+     const result = await adapter.call('image_preview', { path: imagePath, includeImage: true });
+     const image = result.content.find(item => item.type === 'image');
+     assert(image, 'remote image_preview should return MCP image content');
+-    assert.equal(image.mimeType, 'image/webp');
++    assert(['image/jpeg', 'image/webp'].includes(image.mimeType));
+     assert(Buffer.from(image.data, 'base64').length <= 32 * 1024, 'remote preview must stay within the bounded WSS payload budget');
+   } finally {
+     await fs.rm(root, { recursive: true, force: true });
+@@ -302,49 +262,6 @@ async function testRemoteProjectInspectionRunsOnDevice() {
+   }
+ }
+ 
+-async function testAdapter() {
+-  const desktop = new FakeDesktop();
+-  const adapter = new GatewayToolAdapter(desktop, { allowedRoots: ['/work'], pathValidator: async value => value });
+-  await adapter.call('read_text_file', { path: '/work/x.txt', head: 3 });
+-  assert.deepEqual(desktop.calls.at(-1), { name: 'read_file', args: { path: '/work/x.txt', offset: 0, length: 3 } });
+-  await assert.rejects(adapter.call('read_text_file', { path: '/other/x.txt' }), /outside MCP_GATEWAY_ALLOWED_ROOTS/);
+-  await adapter.call('write_file', { path: '/work/x.txt', content: 'new' });
+-  assert.equal(desktop.calls.at(-1).name, 'write_file');
+-  await adapter.call('write_file', { path: '/work/x.txt', content: '' });
+-  assert.deepEqual(desktop.calls.at(-1), { name: 'write_file', args: { path: '/work/x.txt', content: '', mode: 'rewrite' } });
+-
+-  await adapter.call('edit_file', { path: '/work/x.txt', old_text: 'old', new_text: 'new', expected_replacements: 1 });
+-  assert.deepEqual(desktop.calls.at(-1), { name: 'edit_block', args: { file_path: '/work/x.txt', old_string: 'old', new_string: 'new', expected_replacements: 1 } });
+-  await adapter.call('edit_file', { path: '/work/x.txt', old_text: 'old', new_text: '', expected_replacements: 1 });
+-  assert.deepEqual(desktop.calls.at(-1), { name: 'edit_block', args: { file_path: '/work/x.txt', old_string: 'old', new_string: '', expected_replacements: 1 } });
+-  desktop.readFileText = 'old old';
+-  const dryRun = await adapter.call('edit_file', {
+-    path: '/work/x.txt', old_text: 'old', new_text: 'new', expected_replacements: 2, dry_run: true
+-  });
+-  desktop.readFileText = 'read_file:ok';
+-  assert.deepEqual(JSON.parse(dryRun.content[0].text), {
+-    ok: true, dry_run: true, expected_replacements: 2, actual_count: 2
+-  });
+-  await assert.rejects(
+-    adapter.call('edit_file', { path: '/work/x.txt', edits: [{ oldText: 'old', newText: 'legacy' }], dryRun: false }),
+-    /old_text is required/
+-  );
+-  const started = await adapter.call('start_process', { command: 'node -v', working_directory: '/work' });
+-  assert.equal(started.session_id, '123');
+-  assert.deepEqual(desktop.calls.at(-1), { name: 'start_process', args: { command: 'node -v', timeout_ms: 10000, working_directory: '/work' } });
+-  await assert.rejects(adapter.call('start_process', { command: 'node -v' }), /path\/working_directory is required/);
+-  await adapter.call('read_process_output', { session_id: '123', offset: 2, length: 5 });
+-  assert.equal(desktop.calls.at(-1).name, 'read_process_output');
+-  assert.equal(desktop.calls.at(-1).args.pid, 123);
+-  await adapter.call('interact_with_process', { session_id: '123', input: '' });
+-  assert.deepEqual(desktop.calls.at(-1), {
+-    name: 'interact_with_process',
+-    args: { pid: 123, input: '', timeout_ms: 8000 }
+-  });
+-  await adapter.call('terminate_process', { session_id: '123' });
+-  assert.equal(desktop.calls.at(-1).name, 'force_terminate');
+-}
+-
+ async function testRejectsUnsafeNonLoopbackPlaintextGatewayUrls() {
+   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-gateway-unsafe-url-'));
+   const identity = new GatewayDeviceIdentity(path.join(root, 'identity.json'));
+@@ -621,9 +538,10 @@ async function testNotReadyRuntimeIsAdvertisedOnHello() {
+ 
+ async function testChannelEnrollmentToolAndReconnect() {
+   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dc-gateway-channel-'));
++  const filePath = path.join(root, 'remote.txt');
++  await fs.writeFile(filePath, 'read_file:ok');
+   const identity = new GatewayDeviceIdentity(path.join(root, 'identity.json'));
+-  const desktop = new FakeDesktop();
+-  const adapter = new GatewayToolAdapter(desktop, { allowedRoots: ['/work'], pathValidator: async value => value });
++  const adapter = new GatewayToolAdapter(undefined, { allowedRoots: [root], pathValidator: async value => value });
+   const wss = new WebSocketServer({ port: 0 });
+   await new Promise(resolve => wss.once('listening', resolve));
+   const address = wss.address();
+@@ -664,7 +582,7 @@ async function testChannelEnrollmentToolAndReconnect() {
+         }
+         ws.send(JSON.stringify({ protocol_version: 1, type: 'auth_ok', device_id: message.device_id, connection_epoch: current, payload: { accepted: true } }));
+         if (current === 1) {
+-          setTimeout(() => ws.send(JSON.stringify({ protocol_version: 1, type: 'tool_call', request_id: 'req-1', device_id: message.device_id, connection_epoch: current, payload: { tool: 'read_text_file', arguments: { path: '/work/remote.txt' } } })), 20);
++          setTimeout(() => ws.send(JSON.stringify({ protocol_version: 1, type: 'tool_call', request_id: 'req-1', device_id: message.device_id, connection_epoch: current, payload: { tool: 'read_text_file', arguments: { path: filePath } } })), 20);
+         }
+         return;
+       }
+@@ -678,7 +596,7 @@ async function testChannelEnrollmentToolAndReconnect() {
+   const channel = new GatewayDeviceChannel({ gatewayUrl: `ws://127.0.0.1:${port}/device`, enrollmentToken: 'enroll-once', identity, adapter });
+   await channel.start();
+   await waitFor(() => Boolean(firstToolResult));
+-  assert.equal(firstToolResult.content[0].text, 'read_file:ok');
++  assert.match(firstToolResult.content[0].text, /read_file:ok/);
+   await waitFor(() => reconnectSeen && connections >= 2, 5000);
+   await channel.stop();
+   await new Promise(resolve => wss.close(resolve));
+@@ -956,13 +874,9 @@ async function testOversizedToolResultReturnsBoundedError() {
+ testPm2EntrypointDetection();
+ await testIdentity();
+ await testDefaultWindowsIdentityPathIsProfileBound();
+-await testExecutionEngineFailureKeepsRuntimeObservableButNotReady();
+-await testExecutionEngineChildDeathInvalidatesReadiness();
+-await testAdapterRejectsWhenRuntimeIsNotReady();
+-await testAdapterDefaultsToWideAccess();
++await testDirectInProcessChannelDispatch();
+ await testRemoteImagePreviewIsBounded();
+ await testRemoteProjectInspectionRunsOnDevice();
+-await testAdapter();
+ await testRejectsUnsafeNonLoopbackPlaintextGatewayUrls();
+ await testV2ReconnectUsesInnerTlsExporterProofWithoutOuterCredential();
+ await testFloorTwoNeverFallsBackWhenV2SubprotocolIsNotSelected();
+@@ -976,4 +890,4 @@ await testForgottenDeviceInitialAuthIsClassified();
+ await testForgottenDeviceCloseStopsReconnectLoop();
+ await testAuthenticatedDashboardUpdateControl();
+ await testOversizedToolResultReturnsBoundedError();
+-console.log('Ã¢Å“â€¦ Gateway identity, adapter, enrollment, tool routing, and reconnect tests passed');
++console.log('Gateway identity, direct dispatch, enrollment, tool routing, and reconnect tests passed');
+diff --git a/test/test-linux-device-service.js b/test/test-linux-device-service.js
+index f7b4b3d..e9eabc2 100644
+--- a/test/test-linux-device-service.js
++++ b/test/test-linux-device-service.js
+@@ -20,6 +20,20 @@ async function testManagerChoicePromptsEveryInstall() {
+   assert.equal(asks, 2);
+ }
+ 
++function testQuoteSystemdArgLiteralExpectations() {
++  // quoteSystemdArg is private; exercise it through pure unit serialization.
++  // Expected strings are literals, not values calculated by a quoting helper.
++  for (const [runtimeDir, expected] of [
++    ['/usr/bin/node', 'WorkingDirectory=/usr/bin/node'],
++    ['/opt/my app/bin', 'WorkingDirectory="/opt/my app/bin"'],
++    ['C:\\a"b', 'WorkingDirectory="C:\\\\a\\"b"']
++  ]) {
++    const service = new SystemdUserDeviceService({ platform: 'linux', runtimeDir });
++    const unit = service.unitText();
++    assert.equal(unit.split(/\r?\n/).find(line => line.startsWith('WorkingDirectory=')), expected);
++  }
++}
++
+ async function testSystemdUserLifecycleUsesOwnedUnitWithoutSecrets() {
+   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-device-systemd-'));
+   const unitPath = path.join(root, 'mcp-device.service');
+@@ -50,7 +64,13 @@ async function testSystemdUserLifecycleUsesOwnedUnitWithoutSecrets() {
+     const unit = await fs.readFile(unitPath, 'utf8');
+     assert.match(unit, /ExecStart=\/usr\/bin\/node \/opt\/mcp-device\/dist\/mcp-device\.js --service --manager=systemd/);
+     assert.match(unit, /Environment="PATH=\/usr\/local\/bin:\/usr\/bin:\/bin"/);
+-    assert.match(unit, new RegExp(`WorkingDirectory=${path.join(root, 'runtime').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
++    const escapeRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
++    function quoteSystemdArg(value) {
++      if (/^[A-Za-z0-9_@%+=:,./-]+$/.test(value)) return value;
++      return `"${value.replace(/([\\"])/g, '\\$1')}"`;
++    }
++    const expected = quoteSystemdArg(path.join(root, 'runtime'));
++    assert.match(unit, new RegExp(`^WorkingDirectory=${escapeRe(expected)}\\r?$`, 'm'));
+     assert.doesNotMatch(unit, /proxy|bearer|token|private.?key/i);
+     assert(calls.some(call => call.args.join(' ').includes('--user daemon-reload')));
+     assert(calls.some(call => call.args.join(' ').includes('--user enable --now mcp-device.service')));
+@@ -201,6 +221,7 @@ async function testPm2LifecycleRequiresMatchingStartupEvidenceAndSavesState() {
+ }
+ 
+ await testManagerChoicePromptsEveryInstall();
++await testQuoteSystemdArgLiteralExpectations();
+ await testSystemdUserLifecycleUsesOwnedUnitWithoutSecrets();
+ await testSystemdLeavesLookalikeUnitUntouched();
+ await testPm2PreflightFailsBeforeMutationWhenUnavailableOrStartupUnproven();
+diff --git a/test/test-mcp-device-branding.js b/test/test-mcp-device-branding.js
+index bc97643..92caf78 100644
+--- a/test/test-mcp-device-branding.js
++++ b/test/test-mcp-device-branding.js
+@@ -45,7 +45,7 @@ assert.equal(fs.existsSync(new URL('../PUBLISH.md', import.meta.url)), false);
+ const readme = fs.readFileSync(new URL('../README.md', import.meta.url), 'utf8');
+ assert.match(readme, /^# MCP Device/m);
+ assert.match(readme, /The gateway owns accounts, OAuth, device ownership, MCP tool contracts, routing, and usage aggregation\. MCP Device owns local device identity, pairing, reconnect lifecycle, bounded execution, background registration, and local status\./);
+-assert.match(readme, /npm install -g @hcu-lab\.me\/mcp-device@1\.0\.7/);
++assert.match(readme, /npm install -g @hcu-lab\.me\/mcp-device@1\.0\.10/);
+ for (const command of ['login', 'logout', 'status', 'install', 'stop', 'uninstall']) {
+   assert.match(readme, new RegExp(`mcp-device ${command}\\b`));
+ }
+diff --git a/test/test-pid-collision-guard.js b/test/test-pid-collision-guard.js
+index f4302dd..b0f8a00 100644
+--- a/test/test-pid-collision-guard.js
++++ b/test/test-pid-collision-guard.js
+@@ -1,27 +1,89 @@
+-import assert from 'assert';
+-import { terminalManager } from '../dist/terminal-manager.js';
++import assert from 'node:assert/strict';
++import childProcess from 'node:child_process';
++import { EventEmitter } from 'node:events';
++import { syncBuiltinESMExports } from 'node:module';
++import { readFile } from 'node:fs/promises';
++import { TerminalManager } from '../dist/terminal-manager.js';
+ 
+-async function testPidCollisionEviction() {
+-    console.log('Testing PID reuse eviction and collision guards in terminal-manager...');
+-    
+-    // Test 1: Run a short command that finishes
+-    const proc1 = await terminalManager.executeCommand('echo test-pid-collision-1', 2000);
+-    assert(proc1.pid > 0, 'proc1 should have a positive pid');
+-    
+-    // Simulate process completion and verify sessions map
+-    const session1 = terminalManager.sessions.get(proc1.pid);
+-    if (session1) {
+-        console.log(`Found active session for PID ${proc1.pid}`);
++async function testPidCollisionGuard() {
++    console.log('Testing PID collision cleanup and numeric/string session IDs...');
++    const originalSpawn = childProcess.spawn;
++    const originalError = console.error;
++    const manager = new TerminalManager();
++    const pid = 43210;
++    const existingSession = { pid, process: { kill() { throw new Error('Must not kill existing session'); } } };
++    manager.sessions.set(pid, existingSession);
++    const errors = [];
++    console.error = (...args) => errors.push(args);
++    try {
++        for (const killThrows of [false, true]) {
++            const child = new EventEmitter();
++            child.pid = pid;
++            child.stdout = new EventEmitter();
++            child.stderr = new EventEmitter();
++            let killCount = 0;
++            child.kill = () => {
++                killCount++;
++                if (killThrows) throw new Error('simulated kill failure');
++                return true;
++            };
++            childProcess.spawn = () => child;
++            syncBuiltinESMExports();
++            await assert.rejects(manager.executeCommand('collision-test', 10, true), {
++                message: `PID collision detected: process ${pid} is already running under an active session.`
++            });
++            assert.equal(child.stdout.listenerCount('data'), 0, 'Collision check must precede stdout listeners');
++            assert.equal(child.stderr.listenerCount('data'), 0, 'Collision check must precede stderr listeners');
++            assert.equal(child.listenerCount('exit'), 0, 'Collision check must precede exit listeners');
++            assert.equal(child.listenerCount('close'), 0, 'Rejected child must not finalize a session');
++            assert.equal(killCount, 1, 'New conflicting child must be killed before rejecting');
++            assert.equal(manager.sessions.get(pid), existingSession, 'Existing session must remain untouched');
++        }
++        assert.equal(errors.length, 1);
++        assert.equal(errors[0][0], `Failed to kill conflicting child process ${pid}:`);
++        assert.equal(errors[0][1].message, 'simulated kill failure');
++    } finally {
++        childProcess.spawn = originalSpawn;
++        syncBuiltinESMExports();
++        console.error = originalError;
+     }
+-    
+-    // Emulate collision check
+-    console.log(`Simulating recycled PID ${proc1.pid}...`);
+-    terminalManager.sessions.delete(proc1.pid);
+-    
+-    console.log('✅ PID Collision stopgap tests passed!');
++    console.log('PASS: colliding child killed; kill failure logged without replacing collision error');
++
++    // Run the compiled adapter class with only its dispatch boundary replaced,
++    // allowing exact assertions on the PID forwarded to each local tool.
++    const source = await readFile(new URL('../dist/device/gateway-tool-adapter.js', import.meta.url), 'utf8');
++    const classSource = source.slice(source.indexOf('export class GatewayToolAdapter'))
++        .replace('export class GatewayToolAdapter', 'class GatewayToolAdapter');
++    const calls = [];
++    const Adapter = new Function('configuredGatewayRoots', 'validatePath', 'dispatchToolCall', 'assertSuccess',
++        `${classSource}\nreturn GatewayToolAdapter;`)(
++        () => [], async value => value,
++        async (tool, args) => { calls.push({ tool, args }); return { content: [] }; },
++        value => value
++    );
++    const adapter = new Adapter();
++    for (const [tool, dispatchedTool] of [
++        ['read_process_output', 'read_process_output'],
++        ['interact_with_process', 'interact_with_process'],
++        ['terminate_process', 'force_terminate']
++    ]) {
++        for (const session_id of [pid, String(pid), Number.MAX_SAFE_INTEGER, String(Number.MAX_SAFE_INTEGER)]) {
++            await adapter.call(tool, { session_id, input: 'test' });
++            assert.equal(calls.at(-1).tool, dispatchedTool);
++            assert.equal(calls.at(-1).args.pid, Number(session_id));
++        }
++        for (const session_id of [undefined, null, '', ' ', ' 12 ', '1e3', '0x10', '-1', '12.5', '0', '012', '12\n', 0, -1, 1.5, 'no-pid', NaN, Infinity, Number.MAX_SAFE_INTEGER + 1, String(Number.MAX_SAFE_INTEGER + 1), true, [pid], { toString: () => String(pid) }]) {
++            const count = calls.length;
++            await assert.rejects(adapter.call(tool, { session_id }), {
++                message: `Invalid session_id provided for ${tool}: must be a positive integer`
++            });
++            assert.equal(calls.length, count, 'Invalid session IDs must never dispatch');
++        }
++    }
++    console.log('PASS: all session tools accept numeric/string IDs and reject invalid IDs before dispatch');
+ }
+ 
+-testPidCollisionEviction().catch(err => {
+-    console.error('❌ Test failed:', err);
+-    process.exit(1);
++testPidCollisionGuard().catch(error => {
++    console.error('FAIL:', error);
++    process.exitCode = 1;
+ });
+diff --git a/test/test-remote-startup-no-child.js b/test/test-remote-startup-no-child.js
+index b5677ca..8961484 100644
+--- a/test/test-remote-startup-no-child.js
++++ b/test/test-remote-startup-no-child.js
+@@ -1,28 +1,97 @@
+-import { spawn } from 'child_process';
+-import assert from 'assert';
+-import path from 'path';
+-import { fileURLToPath } from 'url';
+-
+-const __filename = fileURLToPath(import.meta.url);
+-const __dirname = path.dirname(__filename);
++import assert from 'node:assert/strict';
++import { readFile } from 'node:fs/promises';
++import { randomUUID } from 'node:crypto';
++import childProcess from 'node:child_process';
++import { syncBuiltinESMExports } from 'node:module';
++import { LocalExecutionEngine } from '../dist/device/execution-engine.js';
+ 
+ async function testRemoteStartupHasZeroChildren() {
+-    console.log('Testing remote startup spawns 0 child dist/index.js processes...');
+-    const serverScript = path.resolve(__dirname, '../dist/device/device.js');
+-    
+-    // We inspect through child process query
+-    // Command to check children of a PID on Windows:
+-    // wmic or PowerShell Get-CimInstance
+-    const { execSync } = await import('child_process');
+-    
+-    // Assert that in dist/device/device.js, initialize is not called
+-    const fs = await import('fs/promises');
+-    const deviceJs = await fs.readFile(serverScript, 'utf8');
+-    assert(!deviceJs.includes('this.executionEngine.initialize()'), 'device.js must not call executionEngine.initialize()');
+-    console.log('✅ Verified: device.js does not eagerly initialize LocalExecutionEngine');
++    console.log('Testing remote startup generations, zero child spawns, and uninitialized shutdown...');
++    const engine = new LocalExecutionEngine();
++    const initialState = engine.getRuntimeState();
++    const originalSpawn = childProcess.spawn;
++    let spawnCount = 0;
++    childProcess.spawn = () => {
++        spawnCount++;
++        throw new Error('Remote startup must not spawn a child');
++    };
++    syncBuiltinESMExports();
++    try {
++        await engine.shutdown();
++        await engine.shutdown();
++        assert.equal(engine.getChildPid(), null);
++        assert.deepEqual(engine.getRuntimeState(), initialState);
++        assert.equal(engine.mcpClient, null);
++        assert.equal(engine.mcpTransport, null);
++
++        // Execute the compiled device class with gateway/persistence boundaries
++        // stubbed so startup requires neither credentials nor a running gateway.
++        const source = await readFile(new URL('../dist/device/device.js', import.meta.url), 'utf8');
++        const classSource = source.split('// Start only when this module')[0]
++            .replace(/^#!.*\n/, '')
++            .replace(/^import[\s\S]*?;\s*$/gm, '')
++            .replace('export class MCPDevice', 'class MCPDevice');
++        const generations = [];
++        class Store {
++            async load() { return { gatewayUrl: 'https://gateway.test', connection: {}, allowedRoots: [] }; }
++            async markOffline() {}
++        }
++        class Owner {
++            async bootstrap() {}
++            setDeviceId() {}
++            async release() {}
++        }
++        class Channel {
++            constructor(options) { this.options = options; }
++            async start() { generations.push(this.options.runtimeState().execution_runtime_generation); }
++            async stop() {}
++        }
++        const dependencies = {
++            randomUUID, LocalExecutionEngine, GatewayDeviceChannel: Channel,
++            GatewayDeviceConfigStore: Store, GatewayDeviceStatusStore: Store,
++            GatewayDeviceIdentity: class { async loadOrCreate() { return { deviceId: 'test', enrolled: true }; } },
++            GatewayToolAdapter: class {}, RuntimeOwner: Owner,
++            acquireRuntimeOwner: async () => {}, bootstrapOfficialGatewayTrust: async () => {},
++            assertDeviceStartupAllowedDuringUpdate: async () => {},
++            createGatewayProxyAgent: () => ({}),
++            reconcileDeviceUpdateAfterStart: async () => ({ action: 'none' }),
++            captureRemote: async () => {}, VERSION: '1.0.10'
++        };
++        const MCPDevice = new Function(...Object.keys(dependencies), `${classSource}\nreturn MCPDevice;`)(...Object.values(dependencies));
++        const originalRemote = process.env.MCP_DEVICE_REMOTE;
++        const signals = ['SIGINT', 'SIGTERM'];
++        const originalListeners = signals.map(signal => process.listeners(signal));
++        try {
++            const first = new MCPDevice();
++            await first.start();
++            await first.start();
++            const second = new MCPDevice();
++            await second.start();
++            await first.shutdown();
++            await second.shutdown();
++        } finally {
++            if (originalRemote === undefined) delete process.env.MCP_DEVICE_REMOTE;
++            else process.env.MCP_DEVICE_REMOTE = originalRemote;
++            signals.forEach((signal, index) => {
++                for (const listener of process.listeners(signal)) {
++                    if (!originalListeners[index].includes(listener)) process.removeListener(signal, listener);
++                }
++            });
++        }
++        assert.equal(generations.length, 3);
++        for (const generation of generations) {
++            assert.match(generation, /^direct-in-process:[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
++        }
++        assert.equal(new Set(generations).size, generations.length, 'Each start must advertise a distinct boot UUID');
++        assert.equal(spawnCount, 0, 'Remote startup and shutdown must spawn zero children');
++        console.log('PASS: distinct per-start UUIDs, zero child spawns, and repeated uninitialized shutdown');
++    } finally {
++        childProcess.spawn = originalSpawn;
++        syncBuiltinESMExports();
++    }
+ }
+ 
+-testRemoteStartupHasZeroChildren().catch(err => {
+-    console.error('❌ Test failed:', err);
+-    process.exit(1);
++testRemoteStartupHasZeroChildren().catch(error => {
++    console.error('FAIL:', error);
++    process.exitCode = 1;
+ });
+diff --git a/test/test-self-update.js b/test/test-self-update.js
+index 5202512..015c0af 100644
+--- a/test/test-self-update.js
++++ b/test/test-self-update.js
+@@ -260,7 +260,9 @@ async function runHelperCase({ failInstall, stripPath = false }) {
+     errorCode: null,
+     message: null,
+     deviceId: 'device-helper',
+-    managerKind: 'pm2',
++    // Windows execFile cannot execute a .cmd fixture; exercise the native
++    // detached PowerShell runner there, and the PM2 fixture on Unix.
++    managerKind: process.platform === 'win32' ? 'windows-foreground' : 'pm2',
+     pm2Path: fakeManager,
+     pm2Name: 'mcp-device-test',
+     parentPid: 99999999,
+@@ -310,7 +312,7 @@ async function runHelperCase({ failInstall, stripPath = false }) {
+     assert.equal(finalState.state, 'failed');
+     assert.equal(finalPackage.version, '1.0.5', 'failed install must restore old package offline');
+   } else {
+-    assert.equal(exitCode, 0);
++    assert.equal(exitCode, 0, JSON.stringify(finalState));
+     assert.equal(finalState.state, 'installed_waiting_reconnect');
+     assert.equal(finalPackage.version, '1.0.6');
+     assert.equal(
+diff --git a/test/test-version-consistency.js b/test/test-version-consistency.js
+new file mode 100644
+index 0000000..9b1074c
+--- /dev/null
++++ b/test/test-version-consistency.js
+@@ -0,0 +1,18 @@
++import assert from 'node:assert/strict';
++import { readFile } from 'node:fs/promises';
++
++const expectedVersion = '1.0.10';
++const read = relativePath => readFile(new URL(relativePath, import.meta.url), 'utf8');
++
++const packageJson = JSON.parse(await read('../package.json'));
++const lockfile = JSON.parse(await read('../package-lock.json'));
++const versionSource = await read('../src/version.ts');
++const deviceSource = await read('../src/device/device.ts');
++
++assert.equal(packageJson.version, expectedVersion, 'package.json version');
++assert.equal(lockfile.version, expectedVersion, 'package-lock.json root version');
++assert.equal(lockfile.packages[''].version, expectedVersion, 'package-lock.json root package version');
++assert.equal(versionSource.match(/export const VERSION\s*=\s*['"]([^'"]+)['"]/)?.[1], expectedVersion, 'src/version.ts VERSION');
++assert.equal(deviceSource.match(/agentVersion:\s*VERSION\s*\|\|\s*process\.env\.npm_package_version\s*\|\|\s*['"]([^'"]+)['"]/)?.[1], expectedVersion, 'src/device/device.ts fallback version');
++
++console.log(`PASS: package.json, package-lock.json (root and root package), version.ts, and device.ts match ${expectedVersion}`);

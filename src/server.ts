@@ -63,6 +63,7 @@ import { trackToolCall } from './utils/trackTools.js';
 import { usageTracker } from './utils/usageTracker.js';
 import { processDockerPrompt } from './utils/dockerPrompt.js';
 import { toolHistory } from './utils/toolHistory.js';
+import { observePublicInvocation, isCapturingInvocation } from './context/capture.js';
 import { handleWelcomePageOnboarding, skipWelcomePageOnboarding } from './utils/welcome-onboarding.js';
 
 import { VERSION } from './version.js';
@@ -1186,6 +1187,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request: CallToolRequest)
 });
 
 async function handleCallToolRequest(request: CallToolRequest): Promise<ServerResult> {
+    return observePublicInvocation({ tool: request.params.name, args: request.params.arguments }, () => executeCallToolRequest(request));
+}
+
+async function executeCallToolRequest(request: CallToolRequest): Promise<ServerResult> {
     const { name, arguments: args } = request.params;
     const startTime = Date.now();
     // Hoisted above the try so the finally block can read them when emitting the
@@ -1455,7 +1460,7 @@ async function handleCallToolRequest(request: CallToolRequest): Promise<ServerRe
             'track_ui_event'
         ];
 
-        if (!currentCallIsRemote && process.env.MCP_DEVICE_REMOTE !== 'true' && !EXCLUDED_TOOLS.includes(name)) {
+        if (!isCapturingInvocation() && !currentCallIsRemote && process.env.MCP_DEVICE_REMOTE !== 'true' && !EXCLUDED_TOOLS.includes(name)) {
             toolHistory.addCall(name, args, result, duration);
         }
 

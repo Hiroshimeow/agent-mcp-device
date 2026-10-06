@@ -11,7 +11,7 @@ import {
     encodeJsonFrame,
     exportDeviceAuthKeyingMaterial
 } from './gateway-secure-transport.js';
-import { GATEWAY_CAPABILITIES, GatewayToolAdapter } from './gateway-tool-adapter.js';
+import { gatewayCapabilities, GatewayToolAdapter } from './gateway-tool-adapter.js';
 import { gatewaySocketUrl } from './gateway-url-policy.js';
 import { VERSION } from '../version.js';
 
@@ -200,7 +200,8 @@ export class GatewayDeviceChannel {
                 platform: process.platform,
                 arch: process.arch,
                 path_style: process.platform === 'win32' ? 'windows' : 'posix',
-                capabilities: [...GATEWAY_CAPABILITIES],
+                capabilities: gatewayCapabilities(),
+                context_version: gatewayCapabilities().includes('local_status') ? 1 : undefined,
                 ...this.runtimePayload(),
                 ...(enrolling || pairing ? { public_key_pem: record.publicKeyPem } : {})
             }
@@ -225,7 +226,8 @@ export class GatewayDeviceChannel {
                 platform: process.platform,
                 arch: process.arch,
                 path_style: process.platform === 'win32' ? 'windows' : 'posix',
-                capabilities: [...GATEWAY_CAPABILITIES],
+                capabilities: gatewayCapabilities(),
+                context_version: gatewayCapabilities().includes('local_status') ? 1 : undefined,
                 ...this.runtimePayload(),
                 ...(pairing || enrolling ? { public_key_pem: record.publicKeyPem, enrollment_grant: grant } : {})
             }

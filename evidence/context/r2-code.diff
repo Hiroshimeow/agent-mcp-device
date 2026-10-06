@@ -1,0 +1,269 @@
+diff --git a/config/revoked-approvals.json b/config/revoked-approvals.json
+new file mode 100644
+index 0000000..fe51488
+--- /dev/null
++++ b/config/revoked-approvals.json
+@@ -0,0 +1 @@
++[]
+diff --git a/package.json b/package.json
+index 41fb14b..25c558d 100644
+--- a/package.json
++++ b/package.json
+@@ -20,6 +20,7 @@
+   },
+   "files": [
+     "dist",
++    "config/revoked-approvals.json",
+     "skills/mcp-device-context"
+   ],
+   "scripts": {
+diff --git a/src/context/authorization.ts b/src/context/authorization.ts
+index 0b9b4ca..71b9381 100644
+--- a/src/context/authorization.ts
++++ b/src/context/authorization.ts
+@@ -1,13 +1,17 @@
+ import { createHash } from 'node:crypto';
+ import { readFileSync, statSync } from 'node:fs';
+ import { join } from 'node:path';
++import { fileURLToPath } from 'node:url';
+ import { verifyOfficialApproval } from '../device/official-trust.js';
+ export { SOC_PUBLIC_KEY } from '../device/official-trust.js';
+ 
+ export type GatedFeature = 'FEATURE_LIVE_CAPTURE' | 'FEATURE_PUBLIC_GATEWAY';
+ export const GATE_ERROR = 'FEATURE_GATE_LOCKED: Phase 7/8 requires valid SOC security approval artifact';
+ 
+-function approvalFailure(scope: GatedFeature, configDirectory = join(process.cwd(), 'config')): string | undefined {
++// Anchor trust configuration to the installed module, never the caller's cwd.
++const CONFIG_DIRECTORY = fileURLToPath(new URL('../../config/', import.meta.url));
++
++function approvalFailure(scope: GatedFeature, configDirectory = CONFIG_DIRECTORY): string | undefined {
+   try {
+     if (!['FEATURE_LIVE_CAPTURE', 'FEATURE_PUBLIC_GATEWAY'].includes(scope)) return GATE_ERROR;
+     const path = join(configDirectory, 'soc-approval.json');
+@@ -33,16 +37,16 @@ function approvalFailure(scope: GatedFeature, configDirectory = join(process.cwd
+     try {
+       if (statSync(revokedPath).size > 1048576) return GATE_ERROR;
+       revokedText = readFileSync(revokedPath, 'utf8');
+-    } catch (error) {
+-      if ((error as NodeJS.ErrnoException).code === 'ENOENT') return undefined;
+-      return GATE_ERROR;
++    } catch {
++      return 'FEATURE_GATE_LOCKED: revocation list missing or unreadable';
+     }
+     let revoked;
+     try { revoked = JSON.parse(revokedText); }
+     catch { return 'FEATURE_GATE_LOCKED: revocation list malformed'; }
+-    if (!revoked || revoked.schema_version !== 1 || !Array.isArray(revoked.revoked_digests) ||
+-        !revoked.revoked_digests.every((value: unknown) => typeof value === 'string' && /^[0-9a-f]{64}$/.test(value))) return 'FEATURE_GATE_LOCKED: revocation list malformed';
+-    return revoked.revoked_digests.includes(digest) ? 'FEATURE_GATE_LOCKED: artifact revoked' : undefined;
++    // Plain digest arrays are the shipped format; retain versioned-list compatibility.
++    const digests = Array.isArray(revoked) ? revoked : revoked?.schema_version === 1 ? revoked.revoked_digests : undefined;
++    if (!Array.isArray(digests) || !digests.every((value: unknown) => typeof value === 'string' && /^[0-9a-f]{64}$/.test(value))) return 'FEATURE_GATE_LOCKED: revocation list malformed';
++    return digests.includes(digest) ? 'FEATURE_GATE_LOCKED: artifact revoked' : undefined;
+   } catch { return GATE_ERROR; }
+ }
+ 
+diff --git a/src/context/capture.ts b/src/context/capture.ts
+index 2d71c19..69e7795 100644
+--- a/src/context/capture.ts
++++ b/src/context/capture.ts
+@@ -2,7 +2,7 @@ import { requireFeatureAuthorized } from './authorization.js';
+ 
+ /** Trusted Phase 7 entry boundary; revalidate before every privileged action.
+  * No live hooks are registered or enabled by importing this module. */
+-export function executeLiveCapture<T>(action: () => T, configDirectory?: string): T {
+-  requireFeatureAuthorized('FEATURE_LIVE_CAPTURE', configDirectory);
++export function executeLiveCapture<T>(action: () => T): T {
++  requireFeatureAuthorized('FEATURE_LIVE_CAPTURE');
+   return action();
+ }
+diff --git a/src/context/gateway.ts b/src/context/gateway.ts
+index 45f666e..1e41103 100644
+--- a/src/context/gateway.ts
++++ b/src/context/gateway.ts
+@@ -2,7 +2,7 @@ import { requireFeatureAuthorized } from './authorization.js';
+ 
+ /** Trusted Phase 8 entry boundary; revalidate before every privileged action.
+  * No public routes or tools are registered by importing this module. */
+-export function executePublicGateway<T>(action: () => T, configDirectory?: string): T {
+-  requireFeatureAuthorized('FEATURE_PUBLIC_GATEWAY', configDirectory);
++export function executePublicGateway<T>(action: () => T): T {
++  requireFeatureAuthorized('FEATURE_PUBLIC_GATEWAY');
+   return action();
+ }
+diff --git a/test/context/c2-closure.test.js b/test/context/c2-closure.test.js
+index b9e7437..aa49782 100644
+--- a/test/context/c2-closure.test.js
++++ b/test/context/c2-closure.test.js
+@@ -119,6 +119,7 @@ for (const feature of ['FEATURE_LIVE_CAPTURE', 'FEATURE_PUBLIC_GATEWAY']) {
+     const artifact = { ...payload, signature: sign(null, Buffer.from(JSON.stringify(payload)), privateKey).toString('base64') };
+     const path = join(configDirectory, 'soc-approval.json');
+     writeFileSync(path, JSON.stringify(artifact));
++    writeFileSync(join(configDirectory, 'revoked-approvals.json'), '[]');
+     const instance = new service.ContextService(f.store, options);
+     assert.equal(instance.executeFeature(feature, () => 'approved'), 'approved');
+     const other = feature === 'FEATURE_LIVE_CAPTURE' ? 'FEATURE_PUBLIC_GATEWAY' : 'FEATURE_LIVE_CAPTURE';
+diff --git a/test/context/pinned-gates.test.js b/test/context/pinned-gates.test.js
+index c6bda35..3405fd0 100644
+--- a/test/context/pinned-gates.test.js
++++ b/test/context/pinned-gates.test.js
+@@ -5,6 +5,8 @@ import { syncBuiltinESMExports } from 'node:module';
+ import { mkdirSync, readFileSync, writeFileSync, unlinkSync } from 'node:fs';
+ import { join } from 'node:path';
+ import { temporary } from './helpers.js';
++import fs from 'node:fs';
++import { fileURLToPath } from 'node:url';
+ import * as authorization from '../../dist/context/authorization.js';
+ 
+ const scopes = ['FEATURE_LIVE_CAPTURE', 'FEATURE_PUBLIC_GATEWAY'];
+@@ -24,6 +26,7 @@ function approval(t, features = scopes) {
+   const path = join(config, 'soc-approval.json');
+   const write = () => writeFileSync(path, JSON.stringify({ ...payload, signature: sign(null, Buffer.from(JSON.stringify(payload)), keys.privateKey).toString('base64') }));
+   write();
++  writeFileSync(join(config, 'revoked-approvals.json'), '[]');
+   return { config, path, payload, keys, write };
+ }
+ // Positive controls replace only crypto key construction in this isolated test
+@@ -34,14 +37,28 @@ function testTrust(t, keys) {
+   t.after(() => { crypto.createPublicKey = original; syncBuiltinESMExports(); });
+ }
+ 
++// Redirect installed-config reads only within this isolated test process.
++// Public production entry points expose no configuration injection parameter.
++function moduleConfig(t, f) {
++  const installed = fileURLToPath(new URL('../../config/', import.meta.url));
++  const originals = { statSync: fs.statSync, readFileSync: fs.readFileSync };
++  for (const name of Object.keys(originals)) fs[name] = (path, ...args) => {
++    const mapped = typeof path === 'string' && path.startsWith(installed) ? join(f.config, path.slice(installed.length)) : path;
++    return originals[name](mapped, ...args);
++  };
++  syncBuiltinESMExports();
++  t.after(() => { Object.assign(fs, originals); syncBuiltinESMExports(); });
++}
++
+ test('R2 Negative Test #5 attacker env public key plus valid self-signed artifact is SOC_KEY_UNTRUSTED', async t => {
+   const f = approval(t);
+   const previous = process.env.MCP_DEVICE_SOC_PUBLIC_KEY;
+   process.env.MCP_DEVICE_SOC_PUBLIC_KEY = f.keys.publicKey.export({ type: 'spki', format: 'pem' });
+   t.after(() => { if (previous === undefined) delete process.env.MCP_DEVICE_SOC_PUBLIC_KEY; else process.env.MCP_DEVICE_SOC_PUBLIC_KEY = previous; });
+   assert.equal(authorization.isFeatureAuthorized(scopes[0], f.config), false);
++  moduleConfig(t, f);
+   const { executeLiveCapture } = await import('../../dist/context/capture.js');
+-  assert.throws(() => executeLiveCapture(() => assert.fail('attacker ran'), f.config), /SOC_KEY_UNTRUSTED/);
++  assert.throws(() => executeLiveCapture(() => assert.fail('attacker ran')), /SOC_KEY_UNTRUSTED/);
+ });
+ 
+ for (const [module, entry, scope] of [['capture', 'executeLiveCapture', scopes[0]], ['gateway', 'executePublicGateway', scopes[1]]]) {
+@@ -51,33 +68,33 @@ for (const [module, entry, scope] of [['capture', 'executeLiveCapture', scopes[0
+     assert.throws(() => api[entry](() => assert.fail('ran without approval'), root), /FEATURE_GATE_LOCKED/);
+   });
+   test(`R3 ${module} every call revalidates expiry and removal after valid setup`, async t => {
+-    const f = approval(t, [scope]); testTrust(t, f.keys);
++    const f = approval(t, [scope]); testTrust(t, f.keys); moduleConfig(t, f);
+     const api = await import(`../../dist/context/${module}.js`);
+-    assert.equal(api[entry](() => 'approved', f.config), 'approved');
++    assert.equal(api[entry](() => 'approved'), 'approved');
+     // Advance the clock beyond the signed expiry without changing the artifact.
+     const now = Date.now; Date.now = () => f.payload.expires_at + 1;
+-    try { assert.throws(() => api[entry](() => assert.fail('expired ran'), f.config), /FEATURE_GATE_LOCKED/); }
++    try { assert.throws(() => api[entry](() => assert.fail('expired ran')), /FEATURE_GATE_LOCKED/); }
+     finally { Date.now = now; }
+-    assert.equal(api[entry](() => 'approved again', f.config), 'approved again');
++    assert.equal(api[entry](() => 'approved again'), 'approved again');
+     unlinkSync(f.path);
+-    assert.throws(() => api[entry](() => assert.fail('revoked ran'), f.config), /FEATURE_GATE_LOCKED/);
++    assert.throws(() => api[entry](() => assert.fail('revoked ran')), /FEATURE_GATE_LOCKED/);
+   });
+ }
+ 
+ for (const [module, entry, scope] of [['capture', 'executeLiveCapture', scopes[0]], ['gateway', 'executePublicGateway', scopes[1]]]) {
+   test(`G4 ${module} revoked artifact digest locks subsequent invocation before side effects`, async t => {
+-    const f = approval(t, [scope]); testTrust(t, f.keys);
++    const f = approval(t, [scope]); testTrust(t, f.keys); moduleConfig(t, f);
+     const api = await import(`../../dist/context/${module}.js`);
+     let invocations = 0;
+-    assert.equal(api[entry](() => ++invocations, f.config), 1);
++    assert.equal(api[entry](() => ++invocations), 1);
+     const digest = crypto.createHash('sha256').update(readFileSync(f.path)).digest('hex');
+     writeFileSync(join(f.config, 'revoked-approvals.json'), JSON.stringify({ schema_version: 1, revoked_digests: [digest] }));
+     assert.equal(authorization.isFeatureAuthorized(scope, f.config), false);
+-    assert.throws(() => api[entry](() => ++invocations, f.config), /^Error: FEATURE_GATE_LOCKED: artifact revoked$/);
++    assert.throws(() => api[entry](() => ++invocations), /^Error: FEATURE_GATE_LOCKED: artifact revoked$/);
+     assert.equal(invocations, 1);
+     const artifact = JSON.parse(readFileSync(f.path, 'utf8'));
+     writeFileSync(f.path, JSON.stringify({ signature: artifact.signature, schema_version: artifact.schema_version, features: artifact.features, expires_at: artifact.expires_at }, null, 2));
+-    assert.throws(() => api[entry](() => ++invocations, f.config), /FEATURE_GATE_LOCKED: artifact revoked/);
++    assert.throws(() => api[entry](() => ++invocations), /FEATURE_GATE_LOCKED: artifact revoked/);
+     assert.equal(invocations, 1);
+   });
+ }
+diff --git a/test/context/review-blockers.test.js b/test/context/review-blockers.test.js
+index a6b7375..f6197ea 100644
+--- a/test/context/review-blockers.test.js
++++ b/test/context/review-blockers.test.js
+@@ -16,6 +16,8 @@ import { ContextService } from '../../dist/context/service.js';
+ import * as authorization from '../../dist/context/service.js';
+ const isFeatureAuthorized = (...args) => authorization.isFeatureAuthorized(...args);
+ import { temporary } from './helpers.js';
++import { fileURLToPath } from 'node:url';
++import { requireFeatureAuthorized } from '../../dist/context/authorization.js';
+ 
+ function fixture(t) {
+   let store;
+@@ -454,9 +456,56 @@ function approvalFixture(t, patch = {}) {
+   const artifact = { ...payload, signature: sign(null, Buffer.from(JSON.stringify(payload)), privateKey).toString('base64') };
+   const path = join(configDirectory, 'soc-approval.json');
+   writeFileSync(path, JSON.stringify(artifact));
++  writeFileSync(join(configDirectory, 'revoked-approvals.json'), '[]');
+   return { ...f, configDirectory, artifact, path };
+ }
+ 
++test('R2 missing revocation file fails closed with FEATURE_GATE_LOCKED', t => {
++  const f = approvalFixture(t);
++  // Use the existing versioned format for a control valid before and after R2.
++  writeFileSync(join(f.configDirectory, 'revoked-approvals.json'), JSON.stringify({ schema_version: 1, revoked_digests: [] }));
++  assert.equal(isFeatureAuthorized('FEATURE_LIVE_CAPTURE', f.configDirectory), true);
++  fs.unlinkSync(join(f.configDirectory, 'revoked-approvals.json'));
++  assert.equal(isFeatureAuthorized('FEATURE_LIVE_CAPTURE', f.configDirectory), false);
++  assert.throws(() => requireFeatureAuthorized('FEATURE_LIVE_CAPTURE', f.configDirectory), /^Error: FEATURE_GATE_LOCKED: revocation list missing or unreadable$/);
++});
++
++test('R2 different working directory still resolves the module config directory securely', t => {
++  const f = approvalFixture(t);
++  writeFileSync(join(f.configDirectory, 'revoked-approvals.json'), JSON.stringify({ schema_version: 1, revoked_digests: [] }));
++  const cwd = process.cwd(), originalStat = fs.statSync, observed = [];
++  fs.statSync = (...args) => { observed.push(args[0]); return originalStat(...args); };
++  syncBuiltinESMExports();
++  try {
++    process.chdir(f.root);
++    assert.equal(isFeatureAuthorized('FEATURE_LIVE_CAPTURE'), false, 'cwd approval cannot authorize the installed module');
++    assert.equal(observed[0], fileURLToPath(new URL('../../config/soc-approval.json', import.meta.url)));
++  } finally {
++    process.chdir(cwd);
++    fs.statSync = originalStat; syncBuiltinESMExports();
++  }
++});
++
++for (const [module, entry] of [['capture', 'executeLiveCapture'], ['gateway', 'executePublicGateway']]) {
++  test(`R2 public ${module} entry ignores caller-supplied config directory`, async t => {
++    const f = approvalFixture(t, { features: ['FEATURE_LIVE_CAPTURE', 'FEATURE_PUBLIC_GATEWAY'] });
++    writeFileSync(join(f.configDirectory, 'revoked-approvals.json'), JSON.stringify({ schema_version: 1, revoked_digests: [] }));
++    const api = await import(`../../dist/context/${module}.js`);
++    assert.throws(() => api[entry](() => assert.fail('caller configuration authorized action'), f.configDirectory), /FEATURE_GATE_LOCKED/);
++  });
++}
++
++test('R3 initialized service with enabled flags rejects execution after signed approval is removed', t => {
++  const f = approvalFixture(t, { features: ['FEATURE_LIVE_CAPTURE', 'FEATURE_PUBLIC_GATEWAY'] });
++  writeFileSync(join(f.configDirectory, 'revoked-approvals.json'), JSON.stringify({ schema_version: 1, revoked_digests: [] }));
++  const service = new ContextService(f.store, { configDirectory: f.configDirectory, FEATURE_LIVE_CAPTURE: true, FEATURE_PUBLIC_GATEWAY: true });
++  for (const feature of ['FEATURE_LIVE_CAPTURE', 'FEATURE_PUBLIC_GATEWAY']) assert.equal(service.executeFeature(feature, () => 'approved'), 'approved');
++  fs.unlinkSync(f.path);
++  for (const feature of ['FEATURE_LIVE_CAPTURE', 'FEATURE_PUBLIC_GATEWAY']) {
++    assert.throws(() => service.executeFeature(feature, () => assert.fail('initialized but unauthorized action ran')), /FEATURE_GATE_LOCKED/);
++  }
++});
++
+ test('B3 tampered SOC signature is rejected', t => {
+   const f = approvalFixture(t);
+   assert.equal(isFeatureAuthorized('FEATURE_LIVE_CAPTURE', f.configDirectory), true, 'valid control');

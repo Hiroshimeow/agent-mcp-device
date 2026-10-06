@@ -1,0 +1,166 @@
+src/bootstrap.ts:20:if (!process.env.UV_THREADPOOL_SIZE) {
+src/bootstrap.ts:21:  process.env.UV_THREADPOOL_SIZE = String(DEFAULT_THREADPOOL_SIZE);
+src/config-manager.ts:82:        configData = await fs.readFile(this.configPath, 'utf8');
+src/config-manager.ts:117:          if (process.env.MCP_DEVICE_REMOTE !== 'true') {
+src/config-manager.ts:195:        // On macOS, default to zsh (default since Catalina) since process.env.SHELL
+src/config-manager.ts:198:        const userShell = process.env.SHELL || fallbackShell;
+src/config.ts:7:  process.env.MCP_DEVICE_CONFIG_DIR || path.join(USER_HOME, '.mcp-device')
+src/context/authorization.ts:2:import { readFileSync, statSync } from 'node:fs';
+src/context/authorization.ts:15:    const artifact = JSON.parse(readFileSync(path, 'utf8'));
+src/context/authorization.ts:35:      revokedText = readFileSync(revokedPath, 'utf8');
+src/context/cli.ts:4:import { openSync, readFileSync, fstatSync, closeSync, unlinkSync, appendFileSync, fsyncSync, constants } from 'node:fs';
+src/context/cli.ts:121:      const used = readFileSync(path + '.used', 'utf8');
+src/context/cli.ts:127:    const record = JSON.parse(readFileSync(fd, 'utf8'));
+src/context/cli.ts:155:      if (agentMarkers.some(marker => process.env[marker] !== undefined) || !process.stdin.isTTY || !process.stdout.isTTY) throw new Error('ACCESS_DENIED');
+src/context/cli.ts:159:          ['ADMIN_TOKEN', 'ADMIN_TOKEN_FILE', 'MCP_DEVICE_ADMIN_TOKEN', 'MCP_DEVICE_ADMIN_TOKEN_FILE'].some(key => process.env[key] !== undefined)) throw new Error('ACCESS_DENIED');
+src/context/importer.ts:1:import { readFileSync, statSync } from 'node:fs';
+src/context/importer.ts:13:  for (const line of readFileSync(sourceFile, 'utf8').split(/\r?\n/)) {
+src/context/repositories.ts:23:    env: { ...process.env, GIT_DIR: undefined, GIT_WORK_TREE: undefined, GIT_COMMON_DIR: undefined },
+src/context/service.ts:82:      env: { ...process.env, GIT_DIR: undefined, GIT_WORK_TREE: undefined, GIT_COMMON_DIR: undefined },
+src/context/store.ts:2:import { mkdirSync, readFileSync, writeFileSync, readdirSync, statSync, chmodSync, existsSync, renameSync } from 'node:fs';
+src/context/store.ts:71:        this.key = readFileSync(join(stateRoot, 'context-hmac.key'));
+src/context/store.ts:94:    this.key = readFileSync(keyPath);
+src/device/device-status.ts:136:            return sanitizedStatus(JSON.parse(await fs.readFile(this.statusPath, 'utf8')));
+src/device/device.ts:86:            if (process.env.DEBUG_MODE === 'true') console.log('  - 🐞 DEBUG_MODE');
+src/device/device.ts:92:            const managerArg = process.argv.find(value => value.startsWith('--manager='));
+src/device/device.ts:94:            const mode = process.argv.includes('--service')
+src/device/device.ts:115:            process.env.MCP_DEVICE_REMOTE = 'true';
+src/device/device.ts:122:                process.env.MCP_GATEWAY_ENROLLMENT_TOKEN || process.env.MCP_DEVICE_ENROLLMENT_TOKEN || ''
+src/device/device.ts:155:                agentVersion: VERSION || process.env.npm_package_version || '1.0.10',
+src/device/device.ts:243:            if (error.stack && process.env.DEBUG_MODE === 'true') console.error('Stack trace:', error.stack);
+src/device/device.ts:291:const isMainModule = isModuleEntrypoint(import.meta.url, process.argv[1], process.env.pm_exec_path);
+src/device/gateway-config.ts:89:            parsed = JSON.parse(await fs.readFile(this.configPath, 'utf8'));
+src/device/gateway-config.ts:160:    const explicit = PROXY_ENV_NAMES.some(name => process.env[name] !== undefined);
+src/device/gateway-config.ts:179:    const gatewayUrl = String(process.env.MCP_GATEWAY_URL || current.gatewayUrl || options.fallbackGatewayUrl || '').trim();
+src/device/gateway-config.ts:182:    if (process.env.MCP_GATEWAY_ALLOWED_ROOTS !== undefined) {
+src/device/gateway-config.ts:183:        patch.allowedRoots = parseAllowedRootsEnvironment(String(process.env.MCP_GATEWAY_ALLOWED_ROOTS || ''));
+src/device/gateway-config.ts:191:    const appCaPath = String(process.env.MCP_GATEWAY_APP_CA_PATH || '').trim();
+src/device/gateway-config.ts:192:    if (appCaPath) patch.appCaPem = await fs.readFile(path.resolve(appCaPath), 'utf8');
+src/device/gateway-identity.ts:22:    const configured = String(process.env.MCP_GATEWAY_DEVICE_IDENTITY_PATH || '').trim();
+src/device/gateway-identity.ts:66:            const parsed = JSON.parse(await fs.readFile(this.identityPath, 'utf8'));
+src/device/gateway-identity.ts:79:            deviceId: String(process.env.MCP_DEVICE_ID || '').trim() || newDeviceId(),
+src/device/gateway-tool-adapter.ts:43:    const raw = process.env.MCP_GATEWAY_ALLOWED_ROOTS || '';
+src/device/gateway-tool-adapter.ts:88:    const shell = process.env.SHELL || (process.platform === 'win32' ? process.env.COMSPEC || 'cmd.exe' : '/bin/sh');
+src/device/linux-service.ts:30:    const configHome = String(process.env.XDG_CONFIG_HOME || '').trim() || path.join(os.homedir(), '.config');
+src/device/linux-service.ts:77:        this.entrypoint = options.platform === 'linux' && options.entrypoint ? String(options.entrypoint) : path.resolve(options.entrypoint || process.argv[1]);
+src/device/linux-service.ts:78:        this.pathValue = String(options.pathValue ?? process.env.PATH ?? '/usr/local/bin:/usr/bin:/bin');
+src/device/linux-service.ts:93:        const text = await fs.readFile(this.unitPath, 'utf8');
+src/device/linux-service.ts:183:        this.entrypoint = options.platform === 'linux' && options.entrypoint ? String(options.entrypoint) : path.resolve(options.entrypoint || process.argv[1]);
+src/device/linux-service.ts:184:        this.user = String(options.user || process.env.USER || process.env.LOGNAME || os.userInfo().username);
+src/device/linux-service.ts:185:        this.pm2Home = options.platform === 'linux' && options.pm2Home ? String(options.pm2Home) : path.resolve(options.pm2Home || process.env.PM2_HOME || path.join(os.homedir(), '.pm2'));
+src/device/official-trust.ts:61:        process.env.MCP_GATEWAY_URL || options.gatewayUrl || current.gatewayUrl || OFFICIAL_GATEWAY_URL
+src/device/official-trust.ts:78:        appCaPem = await fs.readFile(caPath, 'utf8');
+src/device/project-inspection.ts:155:                return { fileName, text: await fs.readFile(filePath, 'utf8') };
+src/device/project-inspection.ts:170:        return { data: JSON.parse(await fs.readFile(packagePath, 'utf8')) };
+src/device/project-inspection.ts:177:    const buffer = await fs.readFile(filePath);
+src/device/runtime-owner.ts:88:            entrypoint: path.resolve(process.argv[1] || process.execPath),
+src/device/runtime-owner.ts:154:    try { control = JSON.parse(await fs.readFile(runtimeOwnerControlFileFor(paths), 'utf8')); } catch (error: any) {
+src/device/self-update.ts:187:        const parsed = JSON.parse(await fs.readFile(filePath, 'utf8')) as DeviceUpdateState;
+src/device/self-update.ts:323:        platform === process.platform ? process.env.npm_execpath : undefined,
+src/device/self-update.ts:368:export async function findCurrentPackageRoot(entrypoint = process.argv[1]): Promise<string> {
+src/device/self-update.ts:376:                const parsed = JSON.parse(await fs.readFile(manifest, 'utf8'));
+src/device/self-update.ts:433:        const systemRoot = String(process.env.SystemRoot || 'C:\\Windows');
+src/device/self-update.ts:558:        const manifest = JSON.parse(await fs.readFile(path.join(packageRoot, 'package.json'), 'utf8'));
+src/device/self-update.ts:611:    const packageRoot = path.resolve(options.packageRoot || await findCurrentPackageRoot(options.entrypoint || process.argv[1]));
+src/device/self-update.ts:663:        argv: options.argv || process.argv,
+src/device/update-helper.cjs:10:const statePath = process.argv[2];
+src/device/update-helper.cjs:36:  return JSON.parse(await fsp.readFile(statePath, 'utf8'));
+src/device/update-helper.cjs:142:    const manifest = JSON.parse(await fsp.readFile(path.join(packageRoot, 'package.json'), 'utf8'));
+src/device/update-helper.cjs:158:    control = JSON.parse(await fsp.readFile(controlPath, 'utf8'));
+src/device/windows-service.ts:82:        this.entrypoint = path.resolve(options.entrypoint || process.argv[1]);
+src/handlers/filesystem-handlers.ts:87:        if (process.env.MCP_DEVICE_REMOTE === 'true' && parsed.isUrl) {
+src/handlers/filesystem-handlers.ts:118:        const fileResult = await readFile(parsed.path, options);
+src/index.ts:25:    if (process.argv[2] === 'remote') {
+src/index.ts:31:    const DISABLE_ONBOARDING = process.argv.includes('--no-onboarding');
+src/index.ts:54:      if (process.env.MCP_DEVICE_REMOTE !== 'true') {
+src/mcp-device.ts:5:if (process.argv[2] === 'context') {
+src/mcp-device.ts:7:  const result = await runContextCli(process.argv.slice(3));
+src/mcp-device.ts:12:  if (process.argv[2] !== 'remote') process.argv.splice(2, 0, 'remote');
+src/npm-scripts/remote.ts:17:    const value = String(process.argv[3] || '').trim().toLowerCase();
+src/npm-scripts/remote.ts:178:                    agentVersion: process.env.npm_package_version
+src/npm-scripts/remote.ts:211:            agentVersion: process.env.npm_package_version,
+src/npm-scripts/remote.ts:247:        agentVersion: process.env.npm_package_version,
+src/npm-scripts/remote.ts:335:    const disableNoSleep = process.argv.includes('--disable-no-sleep');
+src/npm-scripts/remote.ts:336:    const verbose = process.argv.includes('--debug');
+src/npm-scripts/remote.ts:342:    if (command === 'status') return await showStatus(process.argv.includes('--json'));
+src/npm-scripts/remote.ts:363:    await device.start({ confirmTakeover: process.argv.includes('--service') ? undefined : confirmRuntimeTakeover });
+src/search-manager.ts:525:        await workbook.xlsx.readFile(filePath);
+src/search-manager.ts:695:        const buf = await fs.readFile(filePath);
+src/server.ts:176:    return process.env.MCP_DEVICE_REMOTE === 'true';
+src/server.ts:1458:        if (!currentCallIsRemote && process.env.MCP_DEVICE_REMOTE !== 'true' && !EXCLUDED_TOOLS.includes(name)) {
+src/terminal-manager.ts:15: * { ...process.env }, that broken value would propagate into every spawned
+src/terminal-manager.ts:29:  const current = process.env.PATHEXT;
+src/terminal-manager.ts:216:          ...process.env,
+src/terminal-manager.ts:237:          ...process.env,
+src/terminal-manager.ts:250:    // would otherwise propagate via { ...process.env } and break command
+src/tool-dispatcher.ts:228:        if (!currentCallIsRemote && process.env.MCP_DEVICE_REMOTE !== 'true' && !EXCLUDED_TOOLS.includes(name)) {
+src/tools/config.ts:36:    add(process.env.ComSpec ?? '');
+src/tools/config.ts:37:    const systemRoot = process.env.SystemRoot ?? 'C:\\Windows';
+src/tools/config.ts:61:  add(process.env.SHELL ?? '');
+src/tools/config.ts:66:      const content = await readFile(shellFile, 'utf8');
+src/tools/filesystem.ts:296:        const remoteGatewayContext = process.env.MCP_DEVICE_REMOTE === 'true';
+src/tools/filesystem.ts:579:export async function readFile(
+src/tools/filesystem.ts:622:        (signal) => fs.readFile(validPath, { encoding: 'utf8', signal }),
+src/tools/filesystem.ts:683:                const fileResult = await readFile(validPath, options);
+src/tools/improved-process-tools.ts:55:        env: { ...process.env, MCP_DEVICE_SESSION: 'process-tool' },
+src/tools/improved-process-tools.ts:184:      if (isWindows && process.env.COMSPEC) {
+src/tools/improved-process-tools.ts:185:        shellUsed = process.env.COMSPEC;
+src/tools/improved-process-tools.ts:186:      } else if (!isWindows && process.env.SHELL) {
+src/tools/improved-process-tools.ts:187:        shellUsed = process.env.SHELL;
+src/tools/pdf/manipulations.ts:21:    const buffer = typeof filePathOrBuffer === 'string' ? await fs.readFile(filePathOrBuffer) : filePathOrBuffer;
+src/tools/pdf/markdown.ts:145:            `${process.env.LOCALAPPDATA}\\Google\\Chrome\\Application\\chrome.exe`,
+src/tools/pdf/markdown.ts:267:        return await fs.readFile(source);
+src/tools/prompts.ts:57:    const fileContent = await fs.readFile(dataPath, 'utf-8');
+src/ui/resources.ts:75:        fs.readFile(path.join(distDir, 'index.html'), 'utf8'),
+src/ui/resources.ts:76:        fs.readFile(path.join(distDir, 'styles.css'), 'utf8'),
+src/ui/resources.ts:77:        fs.readFile(path.join(distDir, runtimeFileName), 'utf8')
+src/utils/capture.ts:14:    const raw = process.env.MCP_DEVICE_DISABLE_TELEMETRY;
+src/utils/files/docx.ts:519:        const buf = await fs.readFile(path);
+src/utils/files/docx.ts:648:            const buf = await fs.readFile(path);
+src/utils/files/docx.ts:736:            const buf = await fs.readFile(path);
+src/utils/files/excel.ts:44:        await workbook.xlsx.readFile(path);
+src/utils/files/excel.ts:105:                await workbook.xlsx.readFile(path);
+src/utils/files/excel.ts:181:        await workbook.xlsx.readFile(path);
+src/utils/files/excel.ts:245:            await workbook.xlsx.readFile(path);
+src/utils/files/image.ts:40:        const buffer = await fs.readFile(path, { signal: options?.signal });
+src/utils/files/text.ts:100:                let content = await fs.readFile(path, encoding);
+src/utils/files/text.ts:144:                let content = await fs.readFile(filePath, { encoding, signal });
+src/utils/fuzzySearchLogger.ts:113:            const content = await fs.readFile(this.logPath, 'utf-8');
+src/utils/system-info.ts:73:    if (process.env.MCP_CLIENT_DOCKER === 'true') {
+src/utils/system-info.ts:78:    if (process.env.KUBERNETES_SERVICE_HOST || process.env.KUBERNETES_PORT) {
+src/utils/system-info.ts:83:    if (process.env.PODMAN_CONTAINER || process.env.CONTAINER_HOST?.includes('podman')) {
+src/utils/system-info.ts:95:            const cgroup = fs.readFileSync('/proc/1/cgroup', 'utf8');
+src/utils/system-info.ts:134:            const environ = fs.readFileSync('/proc/1/environ', 'utf8');
+src/utils/system-info.ts:172:    if (process.env.COMPOSE_PROJECT_NAME || process.env.COMPOSE_SERVICE) {
+src/utils/system-info.ts:177:    if (process.env.DOCKER_SWARM_MODE || process.env.DOCKER_NODE_ID) {
+src/utils/system-info.ts:197:            const mountsContent = fs.readFileSync('/proc/mounts', 'utf8');
+src/utils/system-info.ts:358:        if (process.env.DOCKER_IMAGE) {
+src/utils/system-info.ts:359:            env.dockerImage = process.env.DOCKER_IMAGE;
+src/utils/system-info.ts:360:        } else if (process.env.IMAGE_NAME) {
+src/utils/system-info.ts:361:            env.dockerImage = process.env.IMAGE_NAME;
+src/utils/system-info.ts:362:        } else if (process.env.CONTAINER_IMAGE) {
+src/utils/system-info.ts:363:            env.dockerImage = process.env.CONTAINER_IMAGE;
+src/utils/system-info.ts:369:                const cgroup = fs.readFileSync('/proc/self/cgroup', 'utf8');
+src/utils/system-info.ts:384:        if (process.env.KUBERNETES_NAMESPACE || process.env.POD_NAMESPACE) {
+src/utils/system-info.ts:385:            env.kubernetesNamespace = process.env.KUBERNETES_NAMESPACE || process.env.POD_NAMESPACE;
+src/utils/system-info.ts:388:        if (process.env.POD_NAME || process.env.HOSTNAME) {
+src/utils/system-info.ts:389:            env.kubernetesPod = process.env.POD_NAME || process.env.HOSTNAME;
+src/utils/system-info.ts:392:        if (process.env.NODE_NAME || process.env.KUBERNETES_NODE_NAME) {
+src/utils/system-info.ts:393:            env.kubernetesNode = process.env.NODE_NAME || process.env.KUBERNETES_NODE_NAME;
+src/utils/system-info.ts:397:        if (process.env.CONTAINER_IMAGE) {
+src/utils/system-info.ts:398:            env.dockerImage = process.env.CONTAINER_IMAGE;
+src/utils/system-info.ts:399:        } else if (process.env.IMAGE_NAME) {
+src/utils/system-info.ts:400:            env.dockerImage = process.env.IMAGE_NAME;
+src/utils/system-info.ts:406:                const namespace = fs.readFileSync('/var/run/secrets/kubernetes.io/serviceaccount/namespace', 'utf8').trim();
+src/utils/system-info.ts:419:        if (process.env.CONTAINER_IMAGE || process.env.PODMAN_IMAGE) {
+src/utils/system-info.ts:420:            env.dockerImage = process.env.CONTAINER_IMAGE || process.env.PODMAN_IMAGE;
+src/utils/system-info.ts:427:        if (process.env.LXC_NAME) {
+src/utils/system-info.ts:428:            env.containerName = process.env.LXC_NAME;
+src/utils/system-info.ts:433:    if (process.env.HOST_PLATFORM) {
+src/utils/system-info.ts:434:        env.hostPlatform = process.env.HOST_PLATFORM;
+src/utils/system-info.ts:452:        const npmVersion = process.env.npm_version;
+src/utils/system-info.ts:620:        isDXT: !!process.env.MCP_DXT,
+src/utils/toolHistory.ts:77:      const content = fs.readFileSync(this.historyFile, 'utf-8');
+src/utils/toolHistory.ts:127:      const content = fs.readFileSync(this.historyFile, 'utf-8');
+src/utils/trackTools.ts:21:    const remote = process.env.MCP_DEVICE_REMOTE === 'true';
+src/utils/usageTracker.ts:102:    if (process.env.MCP_DEVICE_REMOTE === 'true') return;

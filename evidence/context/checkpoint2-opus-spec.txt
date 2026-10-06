@@ -1,0 +1,149 @@
+(node:35604) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ frozen ground truth: exact top-3 100%, history Recall@8 >=90%, unauthorized hits zero (1067.7967ms)
+(node:42744) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ re-pair seals old namespace; refs and cursors never authorize another scope (576.1171ms)
+✔ read cursor binds repository scope and sealed state (582.5114ms)
+✔ durable cursor signature protects generation, query, expiry and position (289.4819ms)
+✔ sandbox denial is propagated once, without Git or alternate-path fallback (2.9235ms)
+(node:24988) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ explicit sync constructs directed evidence-backed relations without causal inference (1239.6934ms)
+✔ graph shares opaque entity identities but never persists metadata secrets (1061.0419ms)
+(node:4824) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ checkpoint separates observed Git metadata from reported summary and refs (3561.6612ms)
+✔ checkpoint claims remain reported after indexing and search (2765.0328ms)
+✔ checkpoint redacts reported secrets without breaking structured evidence (931.1748ms)
+✔ checkpoint rejects unknown evidence refs without fabricating checkpoint evidence (602.5577ms)
+(node:44704) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ CLI search/read/status preserve ContextService JSON semantics with gateway offline (3641.8105ms)
+✔ CLI keeps inaccessible local state typed and redacted without remote bypass (920.4825ms)
+✔ CLI ACCESS_DENIED remains local and uses the stable access exit code (1607.3452ms)
+✔ CLI executable emits JSON, human output, and safe usage errors (1980.0531ms)
+✔ CLI paginates search and read and explicitly syncs/rebuilds without source mutation (3112.501ms)
+✔ read-only CLI leaves persisted databases unchanged and reports safe accounting (686.7297ms)
+✔ CLI scope failure and sealed namespace cannot fall back (725.2031ms)
+✔ CLI rejects caller-controlled device/account/store selectors and exposes only contracted commands (1.2834ms)
+(node:24616) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ device quota serializes all repos and includes sealed namespaces, without evicting evidence (1328.983ms)
+✔ repo quota pauses sync and import without publishing partial generations (2039.6879ms)
+✔ transaction failure rolls back evidence and event together (353.6725ms)
+✔ restart abandons shadow generations and marks unresolved intents unknown without sync (1116.3334ms)
+✔ process kill rolls back uncommitted WAL writes and preserves last-good generation (1448.3721ms)
+✔ cleanup invalidates stateless search cursors and supports explicit sealed namespace selection (442.059ms)
+✔ admin clean CLI refuses non-TTY input and cannot accept agent confirmation flags (224.7826ms)
+✔ explicit local admin payload purge reclaims quota and leaves metadata and content-free audit (626.5991ms)
+(node:38172) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ fresh status creates no repo database; unknown intent and wrong job scope are visible (1826.7972ms)
+✔ migration rejects a newer schema without replacing it and publication rejects invalid watermarks (1814.2211ms)
+✔ symlink sandbox escape is denied on its canonical target (922.9663ms)
+(node:26684) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ graph CLI is read-only domain parity and search optionally returns bounded related refs (3389.8715ms)
+(node:40060) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ high-degree traversal enforces examined, visited, node, depth and aggregate byte caps (2272.2781ms)
+✔ cycles terminate and path, direction, relation filtering and timeline are deterministic (1629.5552ms)
+✔ generation, retention, repository and sealed-owner boundaries are enforced before graph lookup (1167.6428ms)
+(node:25780) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ JSONL import is source-preserving, redacted, idempotent and quarantines unresolved scope (1237.862ms)
+✔ legacy id wins over changed content, and excluded paths never persist payloads (1254.8003ms)
+(node:36672) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ scoped foreground jobs reject overlap, cancel safely and keep sync idempotent (1222.7362ms)
+✔ startup, read, search, graph, status and idle never materialize pending evidence (1560.7983ms)
+(node:34348) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ sync indexes only pending retained events and advances watermark without copying old rows (1269.7134ms)
+PASS: frozen policy bounds, six-tool contract, baseline byte accounting and proposed local catalog budget
+✔ test\context\policy-contract.test.js (1245.1889ms)
+(node:33636) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ Vietnamese and emoji byte-budget pages preserve code points and byte offsets (1479.9955ms)
+✔ evidence read preserves order, retention/redaction and aggregate UTF-8 byte budgets without writes (1835.3728ms)
+(node:45236) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ secrets are replaced before SQLite, WAL and FTS persistence; hash is retained bytes (460.352ms)
+✔ import deduplicates redacted content and indexes only redacted text (2029.8918ms)
+✔ secret markers use keyed tags, never offline-guessable plain hashes (1.5687ms)
+✔ UTF-8 budgets handle zero, four-byte emoji boundaries and surrogate pairs (1.7524ms)
+✔ excluded paths, binary/base64, UTF-8 byte caps and boundary secrets (87.5291ms)
+✔ Git roots, worktrees, separate clones and nested repositories (4888.7371ms)
+✔ non-Git, missing/ambiguous cwd, traversal and symlink escape are not weakly resolved (66.2889ms)
+(node:8864) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ v1 repo migration preserves evidence and installs incremental retrieval schema (14.1448ms)
+✔ v2 migration adds snapshot tombstones and folds existing redacted FTS content (3.313ms)
+✔ FTS filters first generation, retention, source and time without returning cross-scope evidence (2386.6056ms)
+(node:18544) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ pinned pagination retains page-two reindexed rows and excludes new generations (2233.1696ms)
+✔ pinned generation excludes a clock-skewed G+1 event older than the cursor (583.9574ms)
+✔ read continuation cannot be replayed against different refs in the same repo (951.6175ms)
+✔ pinned keyset pagination uses deterministic bucket and timestamp ordering across generation advances (1692.0753ms)
+✔ stable exact-match bucket precedes newer FTS-only matches across keyset pages (396.3815ms)
+✔ documents matching both exact and FTS preserve match_reason 0 and never repeat across keyset page boundaries with limit 1 (471.9679ms)
+✔ expired authenticated search and read cursors are stale at the domain boundary (349.8193ms)
+✔ read cursor issued at G is stale after publication of G+1 (328.649ms)
+✔ one-byte payload tampering with the original MAC is invalid (1794.9822ms)
+✔ query mismatch and search/read/durable kind confusion are invalid (261.1667ms)
+✔ current retention availability overrides pinned generation for purged evidence (336.9103ms)
+✔ Vietnamese stroked d folds on index and query sides (270.9888ms)
+✔ v2 upgrade rebuilds folded FTS and initializes generation tombstones to NULL (273.2215ms)
+(node:18544) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ concurrent migration opener waits and rechecks v3, then commits without DDL (334.4952ms)
+(node:18544) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ concurrent migration opener rejects post-lock v4 and rolls back without a dangling transaction (350.1798ms)
+✔ v3 migration rolls back pre-commit failure and process crash, then reruns cleanly (367.7671ms)
+✔ parseVersion rejects unreadable and invalid versions directly (0.7951ms)
+✔ migration rejects unreadable and invalid versions before and after BEGIN IMMEDIATE (2.3438ms)
+✔ migration preserves the original error when COMMIT already released the transaction (78.2878ms)
+✔ substring and FTS matches collapse to one row with exact score zero (221.0316ms)
+✔ FTS search binds every SQL placeholder and uses all-null first-page keyset sentinels (240.7929ms)
+✔ FTS syntax characters are quoted as tokens and never interpreted as operators (249.0458ms)
+✔ empty-token queries skip FTS and return only substring matches (239.5384ms)
+✔ search/status are read-only, Unicode-aware, bounded and never sync implicitly (355.109ms)
+(node:43868) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ B1 maintenance uses incremental reclamation, never full VACUUM or WAL truncate (1519.4676ms)
+✔ B1 concurrent purge waits for an active writer and preserves every event (1717.5874ms)
+✔ B1 capture writer waits for purge lock release with zero lost events (2381.417ms)
+✔ B2 admin purge rejects agent environments even with TTY input and output (585.5595ms)
+✔ B3 killed cross-database writer reconciles exact committed evidence bytes on restart (635.1563ms)
+✔ B3 reconciliation waits for a separate-process admission and retains sealed evidence totals (2246.074ms)
+✔ B1 migrated auto-vacuum NONE purge clears indexed payload bytes and logical quota without rebuilding (338.6884ms)
+✔ B2 stripped agent markers in TTY-capable child rejects generic PURGE (253.6816ms)
+✔ B2 stripped agent markers in TTY-capable child rejects repository challenge with extra whitespace (252.3648ms)
+✔ B2 stripped agent markers in TTY-capable child accepts exact repository challenge with documented residual risk (378.4006ms)
+✔ quota rejection bursts create one deduplicated gap per minute (450.0635ms)
+✔ graph neighbor SQL fetch is bounded by remaining examined-edge budget plus one (0.7417ms)
+✔ graph path cannot traverse a purged intermediate node (317.9536ms)
+(node:24188) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ portable skill freezes search-first and selective-maintenance behavior (4.9356ms)
+✔ portable skill forbids sandbox bypass and sealed namespace auto-selection (2.4441ms)
+✔ portable skill mentions only commands and flags covered by the CLI contract (2.9549ms)
+{"ok":true,"platform":"win32","arch":"x64","node":"22.22.2","sqlite":"3.51.2","constructor":"PASS","busy_timeout_ms":5,"fts5":"PASS","warnings":["ExperimentalWarning"],"json_stdout":"PASS","warning_stderr":"(node:44004) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)"}
+✔ test\context\sqlite-platform.test.js (955.2225ms)
+(node:30248) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ WAL, timeout, foreign keys, migrations, opaque refs, generations and durable cursors (2215.8764ms)
+✔ cursor v1 MAC binds kind and scope and rejects wrong-length signatures before payload parsing (353.6802ms)
+✔ JSON MAC encoding rejects colon-delimiter scope collisions across owners (763.8953ms)
+✔ status is read-only, capture gaps are visible and jobs/stores have ownership bounds (822.868ms)
+ℹ tests 97
+ℹ suites 0
+ℹ pass 97
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 13933.6683

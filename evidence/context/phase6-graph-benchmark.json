@@ -1,0 +1,210 @@
+{
+  "runtime": "v22.22.2",
+  "platform": "win32",
+  "fixture_events": 100,
+  "samples": [
+    {
+      "ms": 22.331300000000056,
+      "visited": 100,
+      "examined": 101,
+      "nodes": 100,
+      "edges": 99,
+      "truncated_by": [
+        "returned_nodes"
+      ]
+    },
+    {
+      "ms": 18.624399999999923,
+      "visited": 100,
+      "examined": 101,
+      "nodes": 100,
+      "edges": 99,
+      "truncated_by": [
+        "returned_nodes"
+      ]
+    },
+    {
+      "ms": 17.47160000000008,
+      "visited": 100,
+      "examined": 101,
+      "nodes": 100,
+      "edges": 99,
+      "truncated_by": [
+        "returned_nodes"
+      ]
+    },
+    {
+      "ms": 16.394199999999955,
+      "visited": 100,
+      "examined": 101,
+      "nodes": 100,
+      "edges": 99,
+      "truncated_by": [
+        "returned_nodes"
+      ]
+    },
+    {
+      "ms": 17.62169999999992,
+      "visited": 100,
+      "examined": 101,
+      "nodes": 100,
+      "edges": 99,
+      "truncated_by": [
+        "returned_nodes"
+      ]
+    },
+    {
+      "ms": 17.174199999999928,
+      "visited": 100,
+      "examined": 101,
+      "nodes": 100,
+      "edges": 99,
+      "truncated_by": [
+        "returned_nodes"
+      ]
+    },
+    {
+      "ms": 18.764900000000125,
+      "visited": 100,
+      "examined": 101,
+      "nodes": 100,
+      "edges": 99,
+      "truncated_by": [
+        "returned_nodes"
+      ]
+    },
+    {
+      "ms": 18.386099999999942,
+      "visited": 100,
+      "examined": 101,
+      "nodes": 100,
+      "edges": 99,
+      "truncated_by": [
+        "returned_nodes"
+      ]
+    },
+    {
+      "ms": 16.537099999999782,
+      "visited": 100,
+      "examined": 101,
+      "nodes": 100,
+      "edges": 99,
+      "truncated_by": [
+        "returned_nodes"
+      ]
+    },
+    {
+      "ms": 17.063700000000154,
+      "visited": 100,
+      "examined": 101,
+      "nodes": 100,
+      "edges": 99,
+      "truncated_by": [
+        "returned_nodes"
+      ]
+    },
+    {
+      "ms": 16.862300000000005,
+      "visited": 100,
+      "examined": 101,
+      "nodes": 100,
+      "edges": 99,
+      "truncated_by": [
+        "returned_nodes"
+      ]
+    },
+    {
+      "ms": 16.273300000000063,
+      "visited": 100,
+      "examined": 101,
+      "nodes": 100,
+      "edges": 99,
+      "truncated_by": [
+        "returned_nodes"
+      ]
+    },
+    {
+      "ms": 17.217299999999796,
+      "visited": 100,
+      "examined": 101,
+      "nodes": 100,
+      "edges": 99,
+      "truncated_by": [
+        "returned_nodes"
+      ]
+    },
+    {
+      "ms": 17.648500000000013,
+      "visited": 100,
+      "examined": 101,
+      "nodes": 100,
+      "edges": 99,
+      "truncated_by": [
+        "returned_nodes"
+      ]
+    },
+    {
+      "ms": 18.900699999999915,
+      "visited": 100,
+      "examined": 101,
+      "nodes": 100,
+      "edges": 99,
+      "truncated_by": [
+        "returned_nodes"
+      ]
+    },
+    {
+      "ms": 18.0483999999999,
+      "visited": 100,
+      "examined": 101,
+      "nodes": 100,
+      "edges": 99,
+      "truncated_by": [
+        "returned_nodes"
+      ]
+    },
+    {
+      "ms": 17.55899999999997,
+      "visited": 100,
+      "examined": 101,
+      "nodes": 100,
+      "edges": 99,
+      "truncated_by": [
+        "returned_nodes"
+      ]
+    },
+    {
+      "ms": 16.203899999999976,
+      "visited": 100,
+      "examined": 101,
+      "nodes": 100,
+      "edges": 99,
+      "truncated_by": [
+        "returned_nodes"
+      ]
+    },
+    {
+      "ms": 16.090199999999868,
+      "visited": 100,
+      "examined": 101,
+      "nodes": 100,
+      "edges": 99,
+      "truncated_by": [
+        "returned_nodes"
+      ]
+    },
+    {
+      "ms": 15.689200000000028,
+      "visited": 100,
+      "examined": 101,
+      "nodes": 100,
+      "edges": 99,
+      "truncated_by": [
+        "returned_nodes"
+      ]
+    }
+  ],
+  "median_ms": 17.47160000000008,
+  "p95_ms": 18.900699999999915,
+  "max_ms": 22.331300000000056
+}

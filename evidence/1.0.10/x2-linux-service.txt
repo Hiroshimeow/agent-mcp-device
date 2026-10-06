@@ -1,0 +1,2 @@
+WorkingDirectory="C:\\Users\\admin\\AppData\\Local\\Temp\\mcp-device-systemd-7wPhwf\\runtime"
+Linux MCP Device service tests passed

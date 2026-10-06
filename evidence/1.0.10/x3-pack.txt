@@ -1,0 +1,573 @@
+
+> @hcu-lab.me/mcp-device@1.0.10 prepack
+> node scripts/verify-production-trust.cjs
+
+MCP Device production application CA preflight passed.
+
+> @hcu-lab.me/mcp-device@1.0.10 prepare
+> npm run build
+
+
+> @hcu-lab.me/mcp-device@1.0.10 build
+> shx rm -rf dist && tsc && shx chmod +x dist/*.js && shx cp src/device/update-helper.cjs dist/device/update-helper.cjs && shx mkdir -p dist/data && shx cp src/data/onboarding-prompts.json dist/data/ && node scripts/copy-official-ca.cjs && node scripts/build-ui-runtime.cjs
+
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/bootstrap.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/bootstrap.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/version.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/version.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/config.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/config.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/capture.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/capture.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/config-manager.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/config-manager.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/command-manager.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/command-manager.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/config-field-definitions.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/config-field-definitions.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/custom-stdio.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/custom-stdio.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/shared/preview-file-types.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/shared/preview-file-types.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/types.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/types.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/error-handlers.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/error-handlers.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/system-info.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/system-info.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/schemas.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/schemas.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/unsupportedParams.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/unsupportedParams.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/feature-flags.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/feature-flags.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/config.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/config.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/usageTracker.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/usageTracker.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/usage.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/usage.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/prompts.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/prompts.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/trackTools.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/trackTools.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/dockerPrompt.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/dockerPrompt.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/toolHistory.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/toolHistory.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/ab-test.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/ab-test.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/logger.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/logger.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/open-browser.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/open-browser.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/welcome-onboarding.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/welcome-onboarding.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/contracts.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/contracts.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/resources.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/resources.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/mcp-ui-ab-test.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/mcp-ui-ab-test.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/withTimeout.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/withTimeout.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/files/base.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/files/base.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/files/text.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/files/text.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/files/image.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/files/image.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/files/binary.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/files/binary.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/files/excel.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/files/excel.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/pdf/utils.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/pdf/utils.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/pdf/extract-images.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/pdf/extract-images.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/pdf/lib/pdf2md.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/pdf/lib/pdf2md.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/pdf/markdown.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/pdf/markdown.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/pdf/manipulations.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/pdf/manipulations.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/pdf/index.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/pdf/index.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/files/pdf.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/files/pdf.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/files/docx.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/files/docx.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/files/factory.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/files/factory.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/files/index.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/files/index.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/mime-types.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/mime-types.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/ripgrep-resolver.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/ripgrep-resolver.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/search-manager.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/search-manager.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/filesystem.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/filesystem.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/output-budget.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/output-budget.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/handlers/filesystem-handlers.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/handlers/filesystem-handlers.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/process-detection.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/process-detection.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/terminal-manager.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/terminal-manager.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/improved-process-tools.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/improved-process-tools.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/handlers/terminal-handlers.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/handlers/terminal-handlers.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/process.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/process.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/handlers/process-handlers.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/handlers/process-handlers.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/fuzzySearchCore.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/fuzzySearchCore.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/fuzzySearch.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/fuzzySearch.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/lineEndingHandler.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/lineEndingHandler.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/fuzzySearchLogger.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/utils/fuzzySearchLogger.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/edit.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tools/edit.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/handlers/edit-search-handlers.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/handlers/edit-search-handlers.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/handlers/search-handlers.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/handlers/search-handlers.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/handlers/history-handlers.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/handlers/history-handlers.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/handlers/index.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/handlers/index.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/server.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/server.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/device-state.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/device-state.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/execution-engine.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/execution-engine.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/gateway-identity.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/gateway-identity.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/gateway-secure-transport.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/gateway-secure-transport.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/project-inspection.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/project-inspection.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tool-dispatcher.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/tool-dispatcher.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/gateway-tool-adapter.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/gateway-tool-adapter.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/gateway-url-policy.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/gateway-url-policy.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/gateway-channel.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/gateway-channel.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/gateway-config.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/gateway-config.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/gateway-pairing.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/gateway-pairing.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/official-trust.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/official-trust.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/device-status.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/device-status.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/runtime-owner.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/runtime-owner.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/linux-service.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/linux-service.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/windows-service.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/windows-service.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/self-update.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/self-update.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/device.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/device/device.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/npm-scripts/remote.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/npm-scripts/remote.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/index.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/index.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/mcp-device.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/mcp-device.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/shared/tool-bridge.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/shared/tool-bridge.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/shared/tool-shell.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/shared/tool-shell.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/shared/escape-html.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/shared/escape-html.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/shared/compact-row.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/shared/compact-row.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/shared/widget-state.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/shared/widget-state.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/shared/host-context.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/shared/host-context.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/shared/ui-event-tracker.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/shared/ui-event-tracker.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/config-editor/src/array-modal.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/config-editor/src/array-modal.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/config-editor/src/app.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/config-editor/src/app.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/config-editor/src/main.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/config-editor/src/main.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/components/highlighting.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/components/highlighting.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/document-outline.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/document-outline.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/markdown/slugify.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/markdown/slugify.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/path-utils.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/path-utils.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/markdown/linking.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/markdown/linking.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/markdown/editor.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/markdown/editor.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/model.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/model.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/document-workspace.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/document-workspace.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/payload-utils.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/payload-utils.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/directory-controller.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/directory-controller.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/document-layout.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/document-layout.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/components/code-viewer.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/components/code-viewer.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/types.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/types.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/components/html-renderer.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/components/html-renderer.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/image-preview.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/image-preview.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/markdown/conflict-dialog.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/markdown/conflict-dialog.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/markdown/utils.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/markdown/utils.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/markdown/parser.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/markdown/parser.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/markdown/outline.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/markdown/outline.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/components/markdown-renderer.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/components/markdown-renderer.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/markdown/preview.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/markdown/preview.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/markdown/controller.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/markdown/controller.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/file-type-handlers.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/file-type-handlers.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/host/external-actions.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/host/external-actions.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/host/selection-context.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/host/selection-context.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/panel-actions.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/panel-actions.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/app.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/app.d.ts
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/main.js
+TSFILE: E:/git-project/wt-mcp-device-110-integrate/dist/ui/file-preview/src/main.d.ts
+Files:                         724
+Lines of Library:            50310
+Lines of Definitions:       150505
+Lines of TypeScript:         29199
+Lines of JavaScript:             0
+Lines of JSON:                   0
+Lines of Other:                  0
+Identifiers:                229044
+Symbols:                    253587
+Types:                       65000
+Instantiations:             166396
+Memory used:               343482K
+Assignability cache size:    24117
+Identity cache size:          1924
+Subtype cache size:           1885
+Strict subtype cache size:     499
+I/O Read time:               0.74s
+Parse time:                  1.15s
+ResolveModule time:          0.37s
+ResolveLibrary time:         0.02s
+ResolveTypeReference time:   0.01s
+Program time:                2.48s
+Bind time:                   0.60s
+Check time:                  3.91s
+transformTime time:          0.35s
+commentTime time:            0.11s
+I/O Write time:              0.21s
+printTime time:              1.31s
+Emit time:                   1.31s
+Total time:                  8.30s
+npm notice
+npm notice package: @hcu-lab.me/mcp-device@1.0.10
+npm notice Tarball Contents
+npm notice 1.1kB LICENSE
+npm notice 974B README.md
+npm notice 11B dist/bootstrap.d.ts
+npm notice 1.1kB dist/bootstrap.js
+npm notice 311B dist/command-manager.d.ts
+npm notice 10.7kB dist/command-manager.js
+npm notice 2.4kB dist/config-field-definitions.d.ts
+npm notice 2.0kB dist/config-field-definitions.js
+npm notice 3.6kB dist/config-manager.d.ts
+npm notice 13.6kB dist/config-manager.js
+npm notice 275B dist/config.d.ts
+npm notice 574B dist/config.js
+npm notice 1.9kB dist/custom-stdio.d.ts
+npm notice 13.5kB dist/custom-stdio.js
+npm notice 644B dist/data/official-app-ca.pem
+npm notice 3.6kB dist/data/onboarding-prompts.json
+npm notice 294B dist/device/device-state.d.ts
+npm notice 585B dist/device/device-state.js
+npm notice 2.5kB dist/device/device-status.d.ts
+npm notice 8.0kB dist/device/device-status.js
+npm notice 616B dist/device/device.d.ts
+npm notice 14.2kB dist/device/device.js
+npm notice 5.4kB dist/device/execution-engine.d.ts
+npm notice 5.7kB dist/device/execution-engine.js
+npm notice 2.2kB dist/device/gateway-channel.d.ts
+npm notice 24.4kB dist/device/gateway-channel.js
+npm notice 1.1kB dist/device/gateway-config.d.ts
+npm notice 7.7kB dist/device/gateway-config.js
+npm notice 923B dist/device/gateway-identity.d.ts
+npm notice 6.5kB dist/device/gateway-identity.js
+npm notice 882B dist/device/gateway-pairing.d.ts
+npm notice 4.4kB dist/device/gateway-pairing.js
+npm notice 1.1kB dist/device/gateway-secure-transport.d.ts
+npm notice 4.6kB dist/device/gateway-secure-transport.js
+npm notice 729B dist/device/gateway-tool-adapter.d.ts
+npm notice 12.8kB dist/device/gateway-tool-adapter.js
+npm notice 189B dist/device/gateway-url-policy.d.ts
+npm notice 1.8kB dist/device/gateway-url-policy.js
+npm notice 2.2kB dist/device/linux-service.d.ts
+npm notice 12.4kB dist/device/linux-service.js
+npm notice 438B dist/device/official-trust.d.ts
+npm notice 2.2kB dist/device/official-trust.js
+npm notice 88B dist/device/project-inspection.d.ts
+npm notice 8.0kB dist/device/project-inspection.js
+npm notice 1.6kB dist/device/runtime-owner.d.ts
+npm notice 6.9kB dist/device/runtime-owner.js
+npm notice 4.2kB dist/device/self-update.d.ts
+npm notice 31.9kB dist/device/self-update.js
+npm notice 11.4kB dist/device/update-helper.cjs
+npm notice 1.7kB dist/device/windows-service.d.ts
+npm notice 9.1kB dist/device/windows-service.js
+npm notice 260B dist/error-handlers.d.ts
+npm notice 412B dist/error-handlers.js
+npm notice 205B dist/handlers/edit-search-handlers.d.ts
+npm notice 205B dist/handlers/edit-search-handlers.js
+npm notice 1.2kB dist/handlers/filesystem-handlers.d.ts
+npm notice 19.3kB dist/handlers/filesystem-handlers.js
+npm notice 559B dist/handlers/history-handlers.d.ts
+npm notice 2.2kB dist/handlers/history-handlers.js
+npm notice 241B dist/handlers/index.d.ts
+npm notice 292B dist/handlers/index.js
+npm notice 275B dist/handlers/process-handlers.d.ts
+npm notice 419B dist/handlers/process-handlers.js
+npm notice 611B dist/handlers/search-handlers.d.ts
+npm notice 11.4kB dist/handlers/search-handlers.js
+npm notice 743B dist/handlers/terminal-handlers.d.ts
+npm notice 1.1kB dist/handlers/terminal-handlers.js
+npm notice 45B dist/index.d.ts
+npm notice 6.7kB dist/index.js
+npm notice 45B dist/mcp-device.d.ts
+npm notice 273B dist/mcp-device.js
+npm notice 587B dist/npm-scripts/remote.d.ts
+npm notice 15.9kB dist/npm-scripts/remote.js
+npm notice 4.8kB dist/search-manager.d.ts
+npm notice 40.7kB dist/search-manager.js
+npm notice 1.8kB dist/server.d.ts
+npm notice 79.8kB dist/server.js
+npm notice 4.3kB dist/terminal-manager.d.ts
+npm notice 34.0kB dist/terminal-manager.js
+npm notice 345B dist/tool-dispatcher.d.ts
+npm notice 10.0kB dist/tool-dispatcher.js
+npm notice 2.8kB dist/tools/config.d.ts
+npm notice 10.7kB dist/tools/config.js
+npm notice 1.7kB dist/tools/edit.d.ts
+npm notice 25.3kB dist/tools/edit.js
+npm notice 3.9kB dist/tools/filesystem.d.ts
+npm notice 41.7kB dist/tools/filesystem.js
+npm notice 784B dist/tools/fuzzySearch.d.ts
+npm notice 3.4kB dist/tools/fuzzySearch.js
+npm notice 1.9kB dist/tools/fuzzySearchCore.d.ts
+npm notice 5.2kB dist/tools/fuzzySearchCore.js
+npm notice 880B dist/tools/improved-process-tools.d.ts
+npm notice 25.6kB dist/tools/improved-process-tools.js
+npm notice 189B dist/tools/mime-types.d.ts
+npm notice 887B dist/tools/mime-types.js
+npm notice 1.2kB dist/tools/pdf/extract-images.d.ts
+npm notice 5.8kB dist/tools/pdf/extract-images.js
+npm notice 406B dist/tools/pdf/index.d.ts
+npm notice 178B dist/tools/pdf/index.js
+npm notice 1.0kB dist/tools/pdf/lib/pdf2md.d.ts
+npm notice 3.1kB dist/tools/pdf/lib/pdf2md.js
+npm notice 704B dist/tools/pdf/manipulations.d.ts
+npm notice 4.5kB dist/tools/pdf/manipulations.js
+npm notice 1.1kB dist/tools/pdf/markdown.d.ts
+npm notice 10.3kB dist/tools/pdf/markdown.js
+npm notice 558B dist/tools/pdf/utils.d.ts
+npm notice 1.3kB dist/tools/pdf/utils.js
+npm notice 183B dist/tools/process.d.ts
+npm notice 1.9kB dist/tools/process.js
+npm notice 676B dist/tools/prompts.d.ts
+npm notice 10.0kB dist/tools/prompts.js
+npm notice 19.0kB dist/tools/schemas.d.ts
+npm notice 10.6kB dist/tools/schemas.js
+npm notice 167B dist/tools/usage.d.ts
+npm notice 649B dist/tools/usage.js
+npm notice 2.5kB dist/types.d.ts
+npm notice 11B dist/types.js
+npm notice 441.4kB dist/ui/config-editor/config-editor-runtime.js
+npm notice 337B dist/ui/config-editor/index.html
+npm notice 1.5kB dist/ui/config-editor/src/app.d.ts
+npm notice 31.9kB dist/ui/config-editor/src/app.js
+npm notice 702B dist/ui/config-editor/src/array-modal.d.ts
+npm notice 7.6kB dist/ui/config-editor/src/array-modal.js
+npm notice 11B dist/ui/config-editor/src/main.d.ts
+npm notice 81B dist/ui/config-editor/src/main.js
+npm notice 11.7kB dist/ui/config-editor/styles.css
+npm notice 702B dist/ui/contracts.d.ts
+npm notice 748B dist/ui/contracts.js
+npm notice 500B dist/ui/file-preview/index.html
+npm notice 1.2MB dist/ui/file-preview/preview-runtime.js
+npm notice 364B dist/ui/file-preview/shared/preview-file-types.d.ts
+npm notice 1.4kB dist/ui/file-preview/shared/preview-file-types.js
+npm notice 289B dist/ui/file-preview/src/app.d.ts
+npm notice 28.0kB dist/ui/file-preview/src/app.js
+npm notice 304B dist/ui/file-preview/src/components/code-viewer.d.ts
+npm notice 2.3kB dist/ui/file-preview/src/components/code-viewer.js
+npm notice 140B dist/ui/file-preview/src/components/highlighting.d.ts
+npm notice 2.3kB dist/ui/file-preview/src/components/highlighting.js
+npm notice 179B dist/ui/file-preview/src/components/html-renderer.d.ts
+npm notice 2.3kB dist/ui/file-preview/src/components/html-renderer.js
+npm notice 65B dist/ui/file-preview/src/components/markdown-renderer.d.ts
+npm notice 2.5kB dist/ui/file-preview/src/components/markdown-renderer.js
+npm notice 481B dist/ui/file-preview/src/directory-controller.d.ts
+npm notice 10.6kB dist/ui/file-preview/src/directory-controller.js
+npm notice 708B dist/ui/file-preview/src/document-layout.d.ts
+npm notice 8.1kB dist/ui/file-preview/src/document-layout.js
+npm notice 617B dist/ui/file-preview/src/document-outline.d.ts
+npm notice 4.6kB dist/ui/file-preview/src/document-outline.js
+npm notice 667B dist/ui/file-preview/src/document-workspace.d.ts
+npm notice 1.2kB dist/ui/file-preview/src/document-workspace.js
+npm notice 504B dist/ui/file-preview/src/file-type-handlers.d.ts
+npm notice 4.8kB dist/ui/file-preview/src/file-type-handlers.js
+npm notice 536B dist/ui/file-preview/src/host/external-actions.d.ts
+npm notice 2.5kB dist/ui/file-preview/src/host/external-actions.js
+npm notice 435B dist/ui/file-preview/src/host/selection-context.d.ts
+npm notice 4.1kB dist/ui/file-preview/src/host/selection-context.js
+npm notice 233B dist/ui/file-preview/src/image-preview.d.ts
+npm notice 706B dist/ui/file-preview/src/image-preview.js
+npm notice 11B dist/ui/file-preview/src/main.d.ts
+npm notice 213B dist/ui/file-preview/src/main.js
+npm notice 1.7kB dist/ui/file-preview/src/markdown/conflict-dialog.d.ts
+npm notice 7.2kB dist/ui/file-preview/src/markdown/conflict-dialog.js
+npm notice 2.6kB dist/ui/file-preview/src/markdown/controller.d.ts
+npm notice 46.0kB dist/ui/file-preview/src/markdown/controller.js
+npm notice 5.7kB dist/ui/file-preview/src/markdown/editor.d.ts
+npm notice 70.7kB dist/ui/file-preview/src/markdown/editor.js
+npm notice 691B dist/ui/file-preview/src/markdown/linking.d.ts
+npm notice 7.8kB dist/ui/file-preview/src/markdown/linking.js
+npm notice 154B dist/ui/file-preview/src/markdown/outline.d.ts
+npm notice 624B dist/ui/file-preview/src/markdown/outline.js
+npm notice 1.1kB dist/ui/file-preview/src/markdown/parser.d.ts
+npm notice 1.3kB dist/ui/file-preview/src/markdown/parser.js
+npm notice 78B dist/ui/file-preview/src/markdown/preview.d.ts
+npm notice 692B dist/ui/file-preview/src/markdown/preview.js
+npm notice 196B dist/ui/file-preview/src/markdown/slugify.d.ts
+npm notice 999B dist/ui/file-preview/src/markdown/slugify.js
+npm notice 95B dist/ui/file-preview/src/markdown/utils.d.ts
+npm notice 438B dist/ui/file-preview/src/markdown/utils.js
+npm notice 1.1kB dist/ui/file-preview/src/model.d.ts
+npm notice 11B dist/ui/file-preview/src/model.js
+npm notice 945B dist/ui/file-preview/src/panel-actions.d.ts
+npm notice 7.9kB dist/ui/file-preview/src/panel-actions.js
+npm notice 451B dist/ui/file-preview/src/path-utils.d.ts
+npm notice 2.3kB dist/ui/file-preview/src/path-utils.js
+npm notice 861B dist/ui/file-preview/src/payload-utils.d.ts
+npm notice 4.6kB dist/ui/file-preview/src/payload-utils.js
+npm notice 53B dist/ui/file-preview/src/types.d.ts
+npm notice 11B dist/ui/file-preview/src/types.js
+npm notice 34.8kB dist/ui/file-preview/styles.css
+npm notice 759B dist/ui/resources.d.ts
+npm notice 3.7kB dist/ui/resources.js
+npm notice 315B dist/ui/shared/compact-row.d.ts
+npm notice 999B dist/ui/shared/compact-row.js
+npm notice 127B dist/ui/shared/escape-html.d.ts
+npm notice 283B dist/ui/shared/escape-html.js
+npm notice 643B dist/ui/shared/host-context.d.ts
+npm notice 1.9kB dist/ui/shared/host-context.js
+npm notice 935B dist/ui/shared/tool-bridge.d.ts
+npm notice 4.8kB dist/ui/shared/tool-bridge.js
+npm notice 945B dist/ui/shared/tool-shell.d.ts
+npm notice 4.1kB dist/ui/shared/tool-shell.js
+npm notice 475B dist/ui/shared/ui-event-tracker.d.ts
+npm notice 850B dist/ui/shared/ui-event-tracker.js
+npm notice 1.5kB dist/ui/shared/widget-state.d.ts
+npm notice 5.5kB dist/ui/shared/widget-state.js
+npm notice 459B dist/utils/ab-test.d.ts
+npm notice 3.6kB dist/utils/ab-test.js
+npm notice 753B dist/utils/capture.d.ts
+npm notice 1.4kB dist/utils/capture.js
+npm notice 626B dist/utils/dockerPrompt.d.ts
+npm notice 3.1kB dist/utils/dockerPrompt.js
+npm notice 377B dist/utils/feature-flags.d.ts
+npm notice 515B dist/utils/feature-flags.js
+npm notice 5.2kB dist/utils/files/base.d.ts
+npm notice 130B dist/utils/files/base.js
+npm notice 793B dist/utils/files/binary.d.ts
+npm notice 2.2kB dist/utils/files/binary.js
+npm notice 2.1kB dist/utils/files/docx.d.ts
+npm notice 30.0kB dist/utils/files/docx.js
+npm notice 942B dist/utils/files/excel.d.ts
+npm notice 18.1kB dist/utils/files/excel.js
+npm notice 1.6kB dist/utils/files/factory.d.ts
+npm notice 4.3kB dist/utils/files/factory.js
+npm notice 722B dist/utils/files/image.d.ts
+npm notice 2.4kB dist/utils/files/image.js
+npm notice 376B dist/utils/files/index.d.ts
+npm notice 442B dist/utils/files/index.js
+npm notice 1.0kB dist/utils/files/pdf.d.ts
+npm notice 5.1kB dist/utils/files/pdf.js
+npm notice 2.3kB dist/utils/files/text.d.ts
+npm notice 16.8kB dist/utils/files/text.js
+npm notice 832B dist/utils/fuzzySearchLogger.d.ts
+npm notice 4.5kB dist/utils/fuzzySearchLogger.js
+npm notice 644B dist/utils/lineEndingHandler.d.ts
+npm notice 2.2kB dist/utils/lineEndingHandler.js
+npm notice 1.3kB dist/utils/logger.d.ts
+npm notice 2.6kB dist/utils/logger.js
+npm notice 733B dist/utils/mcp-ui-ab-test.d.ts
+npm notice 2.3kB dist/utils/mcp-ui-ab-test.js
+npm notice 314B dist/utils/open-browser.d.ts
+npm notice 1.5kB dist/utils/open-browser.js
+npm notice 181B dist/utils/output-budget.d.ts
+npm notice 550B dist/utils/output-budget.js
+npm notice 734B dist/utils/process-detection.d.ts
+npm notice 4.8kB dist/utils/process-detection.js
+npm notice 327B dist/utils/ripgrep-resolver.d.ts
+npm notice 2.9kB dist/utils/ripgrep-resolver.js
+npm notice 2.0kB dist/utils/system-info.d.ts
+npm notice 28.6kB dist/utils/system-info.js
+npm notice 2.6kB dist/utils/toolHistory.d.ts
+npm notice 9.1kB dist/utils/toolHistory.js
+npm notice 248B dist/utils/trackTools.d.ts
+npm notice 3.6kB dist/utils/trackTools.js
+npm notice 1.3kB dist/utils/unsupportedParams.d.ts
+npm notice 3.0kB dist/utils/unsupportedParams.js
+npm notice 3.9kB dist/utils/usageTracker.d.ts
+npm notice 19.2kB dist/utils/usageTracker.js
+npm notice 481B dist/utils/welcome-onboarding.d.ts
+npm notice 4.6kB dist/utils/welcome-onboarding.js
+npm notice 1.6kB dist/utils/withTimeout.d.ts
+npm notice 3.6kB dist/utils/withTimeout.js
+npm notice 41B dist/version.d.ts
+npm notice 33B dist/version.js
+npm notice 4.6kB package.json
+npm notice Tarball Details
+npm notice name: @hcu-lab.me/mcp-device
+npm notice version: 1.0.10
+npm notice filename: hcu-lab.me-mcp-device-1.0.10.tgz
+npm notice package size: 753.8 kB
+npm notice unpacked size: 2.9 MB
+npm notice shasum: 1274ff84cf1a17984070a60b545f7a5cb6aa022a
+npm notice integrity: sha512-BfFqXbCLImKF0[...]hTCKiQ7omzBkg==
+npm notice total files: 264
+npm notice
+hcu-lab.me-mcp-device-1.0.10.tgz

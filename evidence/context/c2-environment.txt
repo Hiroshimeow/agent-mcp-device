@@ -1,0 +1,15 @@
+git rev-parse HEAD
+77b4b566dd425b3358143caaf3f8bac9e21ad1b1
+node --version
+v22.22.2
+git status --porcelain (pre-delivery)
+ M raw-tap.txt
+M  src/context/service.ts
+M  src/context/sqlite.d.ts
+M  src/context/store.ts
+A  test/context/c2-closure.test.js
+M  test/context/review-blockers.test.js
+?? evidence/context/c2-build.txt
+?? evidence/context/c2-red-tap.txt
+?? evidence/context/c2-targeted-tap.txt
+?? evidence/context/create-c2-closure-packet.mjs

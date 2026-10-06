@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.11] - Unreleased
+
+### Added
+- Device-local retained evidence, explicit FTS5 sync, bounded activity relations, local CLI and portable context skill.
+- Six approval-gated public context schema/forwarding seams; wiki remains disabled.
+- Correctness-checked context workloads and raw Windows/Linux acceptance evidence.
+
+### Compatibility and privacy
+- Node floor is now >=22.13.0 for built-in `node:sqlite` and FTS5. Upgrade Node before adopting 1.0.11; no separate SQLite driver is installed.
+- Local SQLite schema migration occurs on authorized store opening. Back up the complete local state directory while the runtime is stopped. Legacy history import preserves the original JSONL source and does not silently adopt unknown owners.
+- Context stores retain bounded redacted evidence locally; redaction is best-effort, not a guarantee that arbitrary secrets are detected. Re-paired owner namespaces remain sealed.
+- No new third-party runtime dependencies or license changes. Existing 1.0.10 history is unchanged. This entry is not publication, tagging or rollout authorization.
+
 ## [1.0.10] - 2026-10-04
 
 ### Added

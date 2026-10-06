@@ -1,0 +1,14 @@
+import { readFileSync, writeFileSync } from 'node:fs';
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+const root = new URL('../../', import.meta.url);
+const raw = readFileSync(new URL('raw-tap.txt', root));
+const version = readFileSync(new URL('evidence/context/blockers-node-version.txt', root));
+const prefix = Buffer.from('# P1–P4 blocker revision review packet\n\nBuild: `npm run build` exited 0.\nTests: `node --test test/context/*.test.js > raw-tap.txt 2>&1` exited 0.\n\nImplementation: `src/context/cli.ts`, `src/context/store.ts`, `src/context/migrations/index.ts`.\nRegressions: `test/context/review-blockers.test.js`, `test/context/reservation-liveness.test.js`, `test/context/retrieval.test.js`, `test/context/fixtures/maintenance-worker.js`.\n\nR1 requires a matching owner-provisioned one-time nonce before the UUID-bound prompt. The stripped-marker TTY-capable regression without a token is rejected before any prompt. This is terminal-branch coverage, not native ConPTY integration. Formal owner acceptance of residual boundaries is PENDING in `decisions.md`; no owner signature is fabricated and no live enablement/release approval is implied.\nB1 sets secure_delete on every context connection; purge optimizes FTS and truncates WAL, rejecting a busy checkpoint. Byte scans cover main DB, WAL and FTS shadow tables.\nR2 durable leases are preserved for living, unexpired workers. A forked worker paused after repo commit survives reconciliation; killing its PID permits reaping without evidence loss.\n\nRaw SHA-256: `' + createHash('sha256').update(raw).digest('hex') + '`\n\n## Exact node -v output\n\n```text\n');
+const middle = Buffer.from('```\n\n## 100% unedited combined test-runner stdout/stderr\n\n```text\n');
+const suffix = Buffer.from('```\n');
+const packet = Buffer.concat([prefix, version, middle, raw, suffix]);
+writeFileSync(new URL('evidence/context/blockers-review-packet.md', root), packet);
+const offset = prefix.length + version.length + middle.length;
+assert.deepEqual(readFileSync(new URL('evidence/context/blockers-review-packet.md', root)).subarray(offset, offset + raw.length), raw);
+console.log('Packet raw output is byte-identical; SHA-256 ' + createHash('sha256').update(raw).digest('hex'));

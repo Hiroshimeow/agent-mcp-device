@@ -1,0 +1,122 @@
+src/server.ts:264–294
+server.setRequestHandler(ListToolsRequestSchema, async () => {
+    try {
+        // logToStderr('debug', 'Generating tools list...');
+        const showMcpUiPreviews = await shouldShowMcpUiPreviews();
+
+        // Build complete tools array
+        const allTools = [
+            // Configuration tools
+            {
+                name: "get_config",
+                description: `
+                        Get the complete server configuration as JSON. Config includes fields for:
+                        - blockedCommands (array of blocked shell commands)
+                        - defaultShell (shell to use for commands)
+                        - allowedDirectories (paths the server can access)
+                        - fileReadLineLimit (max lines for read_file, default 1000)
+                        - fileWriteLineLimit (max lines per write_file call, default 50)
+                        - telemetryEnabled (boolean for telemetry opt-in/out)
+                        - currentClient (information about the currently connected MCP client)
+                        - clientHistory (history of all clients that have connected)
+                        - version (version of MCP Device)
+                        - systemInfo (operating system and environment details)
+                        ${CMD_PREFIX_DESCRIPTION}`,
+                inputSchema: zodToJsonSchema(GetConfigArgsSchema),
+                _meta: buildUiToolMeta(CONFIG_EDITOR_RESOURCE_URI, true, showMcpUiPreviews),
+                annotations: {
+                    title: "Get Configuration",
+                    readOnlyHint: true,
+                },
+            },
+            {
+src/server.ts general tool registration names:
+        name: "mcp-device",
+                name: "mcp-device",
+                name: "get_config",
+                name: "set_config_value",
+                name: "read_file",
+                name: "read_multiple_files",
+                name: "write_file",
+                name: "write_pdf",
+                name: "create_directory",
+                name: "list_directory",
+                name: "move_file",
+                name: "start_search",
+                name: "get_more_search_results",
+                name: "stop_search",
+                name: "list_searches",
+                name: "get_file_info",
+                name: "edit_block",
+                name: "start_process",
+                name: "read_process_output",
+                name: "interact_with_process",
+                name: "force_terminate",
+                name: "list_sessions",
+                name: "list_processes",
+                name: "kill_process",
+                name: "get_usage_stats",
+                name: "get_recent_tool_calls",
+                name: "get_prompts",
+Privileged entry / flag matches in src/server.ts: 0
+src/context/capture.ts
+import { requireFeatureAuthorized } from './authorization.js';
+
+/** Trusted Phase 7 entry boundary; revalidate before every privileged action.
+ * No live hooks are registered or enabled by importing this module. */
+export function executeLiveCapture<T>(action: () => T): T {
+  requireFeatureAuthorized('FEATURE_LIVE_CAPTURE');
+  return action();
+}
+
+src/context/gateway.ts
+import { requireFeatureAuthorized } from './authorization.js';
+
+/** Trusted Phase 8 entry boundary; revalidate before every privileged action.
+ * No public routes or tools are registered by importing this module. */
+export function executePublicGateway<T>(action: () => T): T {
+  requireFeatureAuthorized('FEATURE_PUBLIC_GATEWAY');
+  return action();
+}
+
+src/context/service.ts:11–50
+export const FEATURE_LIVE_CAPTURE = false;
+export const FEATURE_PUBLIC_GATEWAY = false;
+export interface ContextServiceOptions {
+  FEATURE_LIVE_CAPTURE?: boolean;
+  FEATURE_PUBLIC_GATEWAY?: boolean;
+  /** Trusted runtime configuration only; never accepted from tool arguments. */
+  configDirectory?: string;
+}
+
+interface Job { job_ref: string; owner: string; repo: string; action: 'sync' | 'rebuild'; started_at: number }
+interface Gap { count: number; reasons: Set<string> }
+const GAP_REASONS = new Set(['storage_unavailable', 'busy', 'quota', 'outcome_failed']);
+
+/** Explicit foreground ownership only; no timers, scheduler, sync or source scans. */
+export class ContextService {
+  private readonly jobs = new Map<string, Job>();
+  private readonly gaps = new Map<string, Gap>();
+  constructor(private readonly store: ContextStore, private readonly options: ContextServiceOptions = {}) {
+    for (const feature of ['FEATURE_LIVE_CAPTURE', 'FEATURE_PUBLIC_GATEWAY'] as const) {
+      if (options[feature] === true) this.initializeFeature(feature);
+    }
+  }
+
+  /** All future Phase 7/8 tool initialization must pass this fail-closed boundary.
+   * No capture hooks, public routes or MCP tools are enabled by this change. */
+  initializeFeature(feature: GatedFeature): void {
+    this.requireFeatureAuthorized(feature);
+  }
+
+  requireFeatureAuthorized(feature: GatedFeature): void {
+    if (this.options[feature] !== true) throw new Error(GATE_ERROR);
+    requireFeatureAuthorized(feature, this.options.configDirectory);
+  }
+
+  /** Revalidate synchronously immediately before the side effect. Revocation
+   * takes effect on the next call; this is not cancellation of in-flight work. */
+  executeFeature<T>(feature: GatedFeature, action: () => T): T {
+    this.requireFeatureAuthorized(feature);
+    return action();
+  }

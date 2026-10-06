@@ -45,12 +45,14 @@ planning/
 .runtime/
 
 # Test output files
+/raw-tap.txt
 test/test_output/
 test/samples/*.md
 test/samples/*_images/
 
 # MCPB related files
 *.mcpb
+*.tgz
 mcpb-bundle/
 .mcpregistry_github_token
 .mcpregistry_registry_token

@@ -1,0 +1,29 @@
+src/context/service.ts:13:export interface ContextServiceOptions {
+src/context/service.ts:14:  FEATURE_LIVE_CAPTURE?: boolean;
+src/context/service.ts:15:  FEATURE_PUBLIC_GATEWAY?: boolean;
+src/context/service.ts:16:}
+src/context/service.ts:17:
+src/context/service.ts:18:interface Job { job_ref: string; owner: string; repo: string; action: 'sync' | 'rebuild'; started_at: number }
+src/context/service.ts:19:interface Gap { count: number; reasons: Set<string> }
+src/context/service.ts:20:const GAP_REASONS = new Set(['storage_unavailable', 'busy', 'quota', 'outcome_failed']);
+src/context/service.ts:21:
+src/context/service.ts:22:/** Explicit foreground ownership only; no timers, scheduler, sync or source scans. */
+src/context/service.ts:23:export class ContextService {
+src/context/service.ts:24:  private readonly jobs = new Map<string, Job>();
+src/context/service.ts:25:  private readonly gaps = new Map<string, Gap>();
+src/context/service.ts:26:  constructor(private readonly store: ContextStore, private readonly options: ContextServiceOptions = {}) {
+src/context/service.ts:27:    for (const feature of ['FEATURE_LIVE_CAPTURE', 'FEATURE_PUBLIC_GATEWAY'] as const) {
+src/context/service.ts:28:      if (options[feature] === true) this.initializeFeature(feature);
+src/context/service.ts:29:    }
+src/context/service.ts:30:  }
+src/context/service.ts:31:
+src/context/service.ts:32:  /** All future Phase 7/8 tool initialization must pass this fail-closed boundary.
+src/context/service.ts:33:   * No capture hooks, public routes or MCP tools are enabled by this change. */
+src/context/service.ts:34:  initializeFeature(feature: GatedFeature): void {
+src/context/service.ts:35:    this.requireFeatureAuthorized(feature);
+src/context/service.ts:36:  }
+src/context/service.ts:37:
+src/context/service.ts:38:  requireFeatureAuthorized(feature: GatedFeature): void {
+src/context/service.ts:39:    if (this.options[feature] !== true) throw new Error(GATE_ERROR);
+src/context/service.ts:40:    requireFeatureAuthorized(feature);
+src/context/service.ts:41:  }

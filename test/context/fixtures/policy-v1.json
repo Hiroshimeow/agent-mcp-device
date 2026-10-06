@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "sources": ["specs/002-device-local-context/contracts/context-policy.md", "evidence/context/decisions.md"],
+  "storage": {
+    "repo_stores_per_owner": 256,
+    "device_bytes": 8589934592,
+    "owner_bytes": 8589934592,
+    "repo_bytes": 2147483648,
+    "source_metadata_reserve_bytes": 134217728,
+    "event_payload_bytes": 4194304,
+    "blob_chunk_bytes": 1048576,
+    "modifying_jobs_per_repo": 1,
+    "jobs_per_owner": 4,
+    "metadata_ttl_ms": null,
+    "payload_ttl_ms": null,
+    "silent_eviction": false,
+    "device_quota_includes_sealed": true,
+    "cleanup_required_before_live_capture": true
+  },
+  "sqlite": {
+    "journal_mode": "WAL",
+    "synchronous": "NORMAL",
+    "power_loss_durability": false,
+    "intent_busy_ms": 5,
+    "outcome_busy_ms": 10,
+    "maintenance_acquire_ms": 100,
+    "write_batch_target_ms": 5,
+    "write_batch_max_ms": 50,
+    "yield": "setImmediate",
+    "online_heavy_db_work_on_gateway_event_loop": false
+  },
+  "bounds": {
+    "search": {"hits": [8, 50], "response_bytes": [32768, 131072]},
+    "read": {"refs": [8, 20], "response_bytes": [262144, 1048576]},
+    "cursor": {"lifetime_ms": [600000, 1800000]},
+    "graph": {"hops": [2, 4], "returned_nodes": [50, 200], "examined_edges": [500, 2000], "visited_nodes": [200, 1000], "response_bytes": [65536, 131072], "wall_ms": [25, 100]},
+    "maintenance": {"offline_ms": [2000, 10000]}
+  },
+  "bounds_format": "[default, hard_maximum]; byte values are UTF-8, time values milliseconds",
+  "retrieval": {"exact_top3": 1, "history_recall_at8_min": 0.9, "unauthorized_hits": 0},
+  "schema_token_max": 10000,
+  "schema_token_estimation": "utf8_bytes_div_4_estimate",
+  "capture": {"failure_policy": "fail_open", "gap_counter_fallback": "in_memory", "late_outcome_recording_status": "degraded", "side_effect_replay": false},
+  "cursor_visibility": ["first_indexed_generation <= G", "last_indexed_generation <= G"],
+  "import_redaction": "redact.ts_before_persistence",
+  "hmac": {"location": "device_state_root", "access": "os_user_only", "shared_cli_mcp": true, "rotate_on_repair": false},
+  "maintenance": {"sync_source": "retained_pending_events_current_repo", "rebuild_source": "retained_event_evidence", "auto_sync": false, "hidden_persistent_worker": false},
+  "admin_cleanup": {"local_tty_only": true, "mcp": false, "implemented": false, "gate": "before_T047"}
+}

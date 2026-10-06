@@ -52,6 +52,7 @@ async function executeNodeCode(code: string, timeout_ms: number = 30000): Promis
     const result = await new Promise<{ stdout: string; stderr: string; exitCode: number }>((resolve) => {
       const proc = spawn(process.execPath, [tempFile], {
         cwd: mcpRoot,
+        env: { ...process.env, MCP_DEVICE_SESSION: 'process-tool' },
         timeout: timeout_ms,
         windowsHide: true  // Prevent visible console windows on Windows
       });
@@ -234,6 +235,7 @@ export async function startProcess(args: unknown): Promise<ServerResult> {
       type: "text",
       text: `Process started with PID ${result.pid} (shell: ${shellUsed})\nInitial output:\n${result.output}${statusMessage}${timingMessage}`
     }],
+    _meta: { process: terminalManager.processIdentity(result.pid) },
   };
 }
 
@@ -370,6 +372,8 @@ export async function readProcessOutput(args: unknown): Promise<ServerResult> {
       type: "text",
       text: `${statusMessage}\n\n${responseText}${processStateMessage}${timingMessage}`
     }],
+    _meta: { process: { ...terminalManager.processIdentity(pid), read_from: result.readFrom,
+      read_count: result.readCount, evicted_lines: result.evictedLines, is_complete: result.isComplete } },
   };
 }
 

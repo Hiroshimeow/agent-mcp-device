@@ -1,0 +1,14 @@
+e512cccc36d12f7ab63aec7416462b1fd45107e614efd6f8c182f9de4c6cd95c *evidence/context/checkpoint2-raw-tap.txt
+179:ok 28 - G6 production constructors ignore attempted interleaving hook injection
+381:ok 59 - G2 valid Ed25519 signed artifact verifies with explicit test-only key without crypto substitution
+429:ok 67 - G4 malformed revocation source fails closed
+845:ok 133 - B2 repo.sqlite async reap overlaps an in-flight worker
+853:ok 134 - B2 repo.sqlite async replace-token overlaps an in-flight worker
+871:ok 137 - R2 missing revocation file fails closed with FEATURE_GATE_LOCKED
+877:ok 138 - R2 different working directory still resolves the module config directory securely
+883:ok 139 - R2 public capture entry ignores caller-supplied config directory
+889:ok 140 - R2 public gateway entry ignores caller-supplied config directory
+895:ok 141 - R3 initialized service with enabled flags rejects execution after signed approval is removed
+901:ok 142 - B3 tampered SOC signature is rejected
+907:ok 143 - B3 expired signed SOC artifact is rejected
+913:ok 144 - B3 Phase 7 approval cannot authorize Phase 8 gateway

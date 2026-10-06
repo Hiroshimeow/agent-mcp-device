@@ -1,0 +1,208 @@
+TAP version 13
+# (node:45084) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: B2 registry lock spans repository COMMIT through quota finalization even when lease expires after commit
+ok 1 - B2 registry lock spans repository COMMIT through quota finalization even when lease expires after commit
+  ---
+  duration_ms: 330.3981
+  type: 'test'
+  ...
+# Subtest: B3 crash between evidence commit and quota finalization heals quota at startup
+ok 2 - B3 crash between evidence commit and quota finalization heals quota at startup
+  ---
+  duration_ms: 474.8882
+  type: 'test'
+  ...
+# Subtest: P2 malformed token suffix cannot be truncated by hex buffer conversion
+ok 3 - P2 malformed token suffix cannot be truncated by hex buffer conversion
+  ---
+  duration_ms: 131.5325
+  type: 'test'
+  ...
+# Subtest: P2 clean rejects token transport --admin-token=value
+ok 4 - P2 clean rejects token transport --admin-token=value
+  ---
+  duration_ms: 118.858
+  type: 'test'
+  ...
+# Subtest: P2 clean rejects token transport environment variables
+ok 5 - P2 clean rejects token transport environment variables
+  ---
+  duration_ms: 109.6435
+  type: 'test'
+  ...
+# Subtest: P2 concurrent clean calls sharing one token consume exactly once under exclusive lock
+ok 6 - P2 concurrent clean calls sharing one token consume exactly once under exclusive lock
+  ---
+  duration_ms: 369.1789
+  type: 'test'
+  ...
+# (node:42788) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: R2 reconciliation preserves living leases and removes dead or expired leases
+ok 7 - R2 reconciliation preserves living leases and removes dead or expired leases
+  ---
+  duration_ms: 213.6886
+  type: 'test'
+  ...
+# Subtest: R2 commit-to-registry worker keeps registry lock until finalization or PID death
+ok 8 - R2 commit-to-registry worker keeps registry lock until finalization or PID death
+  ---
+  duration_ms: 455.3065
+  type: 'test'
+  ...
+# Subtest: B1 secure_delete is enabled on writable, read, registry, unscoped and CLI-style connections
+ok 9 - B1 secure_delete is enabled on writable, read, registry, unscoped and CLI-style connections
+  ---
+  duration_ms: 223.0788
+  type: 'test'
+  ...
+# (node:45092) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: B1 maintenance uses incremental reclamation and explicit WAL truncate
+ok 10 - B1 maintenance uses incremental reclamation and explicit WAL truncate
+  ---
+  duration_ms: 238.1016
+  type: 'test'
+  ...
+# Subtest: B1 concurrent purge waits for an active writer and preserves every event
+ok 11 - B1 concurrent purge waits for an active writer and preserves every event
+  ---
+  duration_ms: 994.2439
+  type: 'test'
+  ...
+# Subtest: B1 capture writer waits for purge lock release with zero lost events
+ok 12 - B1 capture writer waits for purge lock release with zero lost events
+  ---
+  duration_ms: 1314.293
+  type: 'test'
+  ...
+# Subtest: B2 admin purge rejects agent environments even with TTY input and output
+ok 13 - B2 admin purge rejects agent environments even with TTY input and output
+  ---
+  duration_ms: 385.7046
+  type: 'test'
+  ...
+# Subtest: B3 killed cross-database writer reconciles exact committed evidence bytes on restart
+ok 14 - B3 killed cross-database writer reconciles exact committed evidence bytes on restart
+  ---
+  duration_ms: 409.6936
+  type: 'test'
+  ...
+# Subtest: B3 reconciliation waits for a separate-process admission and retains sealed evidence totals
+ok 15 - B3 reconciliation waits for a separate-process admission and retains sealed evidence totals
+  ---
+  duration_ms: 1005.7962
+  type: 'test'
+  ...
+# Subtest: B1 migrated auto-vacuum NONE purge clears indexed payload bytes and logical quota without rebuilding
+ok 16 - B1 migrated auto-vacuum NONE purge clears indexed payload bytes and logical quota without rebuilding
+  ---
+  duration_ms: 270.6502
+  type: 'test'
+  ...
+# Subtest: B2 stripped agent markers in TTY-capable child rejects generic PURGE
+ok 17 - B2 stripped agent markers in TTY-capable child rejects generic PURGE
+  ---
+  duration_ms: 1564.715
+  type: 'test'
+  ...
+# Subtest: B2 stripped agent markers in TTY-capable child rejects repository challenge with extra whitespace
+ok 18 - B2 stripped agent markers in TTY-capable child rejects repository challenge with extra whitespace
+  ---
+  duration_ms: 189.5209
+  type: 'test'
+  ...
+# Subtest: B2 stripped agent markers in TTY-capable child accepts exact repository challenge with one-time admin token
+ok 19 - B2 stripped agent markers in TTY-capable child accepts exact repository challenge with one-time admin token
+  ---
+  duration_ms: 281.1389
+  type: 'test'
+  ...
+# Subtest: B2 stripped agent markers in TTY-capable child rejects PTY agent without admin token despite exact challenge
+ok 20 - B2 stripped agent markers in TTY-capable child rejects PTY agent without admin token despite exact challenge
+  ---
+  duration_ms: 184.3474
+  type: 'test'
+  ...
+# Subtest: P2 argv admin token is rejected even with a local TTY
+ok 21 - P2 argv admin token is rejected even with a local TTY
+  ---
+  duration_ms: 89.6215
+  type: 'test'
+  ...
+# Subtest: P2 admin token replay is rejected with TOKEN_ALREADY_USED
+ok 22 - P2 admin token replay is rejected with TOKEN_ALREADY_USED
+  ---
+  duration_ms: 103.8083
+  type: 'test'
+  ...
+# Subtest: P2 expired token is rejected with TOKEN_EXPIRED
+ok 23 - P2 expired token is rejected with TOKEN_EXPIRED
+  ---
+  duration_ms: 93.7348
+  type: 'test'
+  ...
+# Subtest: P2 token comparison uses constant-time crypto primitive and never argv
+ok 24 - P2 token comparison uses constant-time crypto primitive and never argv
+  ---
+  duration_ms: 0.8855
+  type: 'test'
+  ...
+# Subtest: P3 every production SQLite connection uses the hardened factory
+ok 25 - P3 every production SQLite connection uses the hardened factory
+  ---
+  duration_ms: 132.9871
+  type: 'test'
+  ...
+# Subtest: P3 blocked truncate checkpoint fails closed with PURGE_CHECKPOINT_BUSY
+ok 26 - P3 blocked truncate checkpoint fails closed with PURGE_CHECKPOINT_BUSY
+  ---
+  duration_ms: 278.5132
+  type: 'test'
+  ...
+# Subtest: P4 expired reservation fences repository commit and rolls back evidence
+ok 27 - P4 expired reservation fences repository commit and rolls back evidence
+  ---
+  duration_ms: 159.6705
+  type: 'test'
+  ...
+# Subtest: P4 real append commit outliving lease is rejected before COMMIT
+ok 28 - P4 real append commit outliving lease is rejected before COMMIT
+  ---
+  duration_ms: 166.8835
+  type: 'test'
+  ...
+# Subtest: P4 EPERM preserves same-host lease and foreign host does not probe PID
+ok 29 - P4 EPERM preserves same-host lease and foreign host does not probe PID
+  ---
+  duration_ms: 107.5085
+  type: 'test'
+  ...
+# Subtest: quota rejection bursts create one deduplicated gap per minute
+ok 30 - quota rejection bursts create one deduplicated gap per minute
+  ---
+  duration_ms: 416.8236
+  type: 'test'
+  ...
+# Subtest: graph neighbor SQL fetch is bounded by remaining examined-edge budget plus one
+ok 31 - graph neighbor SQL fetch is bounded by remaining examined-edge budget plus one
+  ---
+  duration_ms: 0.6203
+  type: 'test'
+  ...
+# Subtest: graph path cannot traverse a purged intermediate node
+ok 32 - graph path cannot traverse a purged intermediate node
+  ---
+  duration_ms: 256.4547
+  type: 'test'
+  ...
+1..32
+# tests 32
+# suites 0
+# pass 32
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8836.0262

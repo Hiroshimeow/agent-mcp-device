@@ -1,0 +1,10 @@
+src/server.ts:264:server.setRequestHandler(ListToolsRequestSchema, async () => {
+src/server.ts:265:    try {
+src/server.ts:266:        // logToStderr('debug', 'Generating tools list...');
+src/server.ts:267:        const showMcpUiPreviews = await shouldShowMcpUiPreviews();
+src/server.ts:268:
+src/server.ts:269:        // Build complete tools array
+src/server.ts:270:        const allTools = [
+src/server.ts:271:            // Configuration tools
+src/server.ts:272:            {
+src/server.ts:273:                name: "get_config",

@@ -1,0 +1,21 @@
+Session baseline HEAD: b8147f49d2fd5fd6f68608b0df55977a2b8f699c
+Session baseline git status --porcelain: (empty / clean)
+Session baseline node -v: v22.22.2
+
+Pre-commit git rev-parse HEAD:
+b8147f49d2fd5fd6f68608b0df55977a2b8f699c
+
+Pre-commit git status --porcelain:
+ M evidence/context/decisions.md
+ M raw-tap.txt
+ M src/context/cli.ts
+ M src/context/importer.ts
+ M src/context/indexer.ts
+ M src/context/store.ts
+ M test/context/review-blockers.test.js
+?? evidence/context/p1-p4-build.txt
+?? evidence/context/p1-p4-red.txt
+?? evidence/context/p1-p4-targeted.txt
+
+node -v:
+v22.22.2

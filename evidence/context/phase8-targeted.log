@@ -1,0 +1,64 @@
+TAP version 13
+# (node:30484) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:30484) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# Subtest: device public MCP preserves exact CLI content/scope/errors/coverage and gate
+ok 1 - device public MCP preserves exact CLI content/scope/errors/coverage and gate
+  ---
+  duration_ms: 2412.1064
+  type: 'test'
+  ...
+# (node:15224) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:15224) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# Subtest: SDK client refresh/re-registration sees six gated schemas without duplicates
+ok 2 - SDK client refresh/re-registration sees six gated schemas without duplicates
+  ---
+  duration_ms: 239.918
+  type: 'test'
+  ...
+# (node:36364) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: gateway success/error/truncation/debug/metrics never persist or log context canaries
+ok 3 - gateway success/error/truncation/debug/metrics never persist or log context canaries
+  ---
+  duration_ms: 234.6593
+  type: 'test'
+  ...
+# (node:34132) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: six full public schemas match contract annotations and fit the 10,000 token catalog budget
+ok 4 - six full public schemas match contract annotations and fit the 10,000 token catalog budget
+  ---
+  duration_ms: 209.4959
+  type: 'test'
+  ...
+# Subtest: public forwarding denies old/offline/unowned devices and lane mismatch before transport
+ok 5 - public forwarding denies old/offline/unowned devices and lane mismatch before transport
+  ---
+  duration_ms: 174.8209
+  type: 'test'
+  ...
+# Subtest: wiki is reserved disabled status with zero transport/provider calls
+ok 6 - wiki is reserved disabled status with zero transport/provider calls
+  ---
+  duration_ms: 139.1596
+  type: 'test'
+  ...
+# (node:30196) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: finalized per-ref byte ranges preserve order, Unicode, cursor binding and aggregate budget
+ok 7 - finalized per-ref byte ranges preserve order, Unicode, cursor binding and aggregate budget
+  ---
+  duration_ms: 442.918
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5865.956

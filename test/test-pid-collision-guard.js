@@ -4,6 +4,7 @@ import { EventEmitter } from 'node:events';
 import { syncBuiltinESMExports } from 'node:module';
 import { readFile } from 'node:fs/promises';
 import { TerminalManager } from '../dist/terminal-manager.js';
+import { observePublicInvocation } from '../dist/context/capture.js';
 
 async function testPidCollisionGuard() {
     console.log('Testing PID collision cleanup and numeric/string session IDs...');
@@ -55,11 +56,11 @@ async function testPidCollisionGuard() {
     const classSource = source.slice(source.indexOf('export class GatewayToolAdapter'))
         .replace('export class GatewayToolAdapter', 'class GatewayToolAdapter');
     const calls = [];
-    const Adapter = new Function('configuredGatewayRoots', 'validatePath', 'dispatchToolCall', 'assertSuccess',
+    const Adapter = new Function('configuredGatewayRoots', 'validatePath', 'dispatchToolCall', 'assertSuccess', 'observePublicInvocation',
         `${classSource}\nreturn GatewayToolAdapter;`)(
         () => [], async value => value,
         async (tool, args) => { calls.push({ tool, args }); return { content: [] }; },
-        value => value
+        value => value, observePublicInvocation
     );
     const adapter = new Adapter();
     for (const [tool, dispatchedTool] of [

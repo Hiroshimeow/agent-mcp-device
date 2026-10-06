@@ -1,0 +1,8 @@
+Requested staging command: git add -A
+Pre-existing untracked files were present before verification (archive, .pi, .specify, baseline evidence, and specs). The requested all-files staging includes these unchanged artifacts alongside new release evidence and the real tarball.
+Before this note: 1627 staged files; groups: .archive-worktrees-docs 1557, .pi 10, .specify 22, evidence 23, tarball 1, specs 14.
+No active src/, test/, package.json, package-lock.json, or build scripts were modified by this evidence task.
+Raw *.log artifacts were explicitly force-added because the repository ignores log files.
+git diff --cached --check reports existing archive whitespace and preserved Python prompt whitespace in raw logs. The updated claims-matrix.md passes its scoped whitespace check. Raw evidence was not normalized.
+Test suite: 66 passed modules, 0 failed modules, 0 skipped modules; one explicitly skipped internal pagination Python-interaction subtest. Self-update also has a silent Windows platform guard for its Unix symlink case.
+Additional standalone unpacked smoke failed without installed dependencies; compiled bin and unpacked bin using workspace dependencies both passed. No clean dependency-install certification is claimed.

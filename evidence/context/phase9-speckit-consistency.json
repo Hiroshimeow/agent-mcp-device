@@ -1,0 +1,9 @@
+{
+  "kind": "implementation-consistency-not-independent-review",
+  "requirements": 32,
+  "success_criteria": 8,
+  "tasks": 62,
+  "checked_tasks": 9,
+  "passed": true,
+  "errors": []
+}

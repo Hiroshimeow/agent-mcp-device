@@ -1,0 +1,55 @@
+﻿{
+    "observed_at_utc":  "2026-10-03T23:57:26.1955106Z",
+    "source_commit":  "ee87d0f3057e01e8087db99615d14bd1b4c626d4",
+    "source_git_status":  [
+                              "?? .pi/",
+                              "?? .specify/",
+                              "?? specs/"
+                          ],
+    "docs_only_worktree_commit":  "ee87d0f3057e01e8087db99615d14bd1b4c626d4",
+    "specify_version":  "1.0.6",
+    "files":  [
+                  {
+                      "source_worktree":  "wt-mcp-device-110-integrate",
+                      "source":  "specs/001-mcp-runtime-review/contracts/runtime-contract.md",
+                      "snapshot":  "references/runtime-110/runtime-contract.md",
+                      "sha256":  "84465191d318701d48e1fcd004ad2f4236a1a1bde31a05fb1d0756b2375bdad6",
+                      "last_write_utc":  "2026-10-03T23:50:00.9009814Z"
+                  },
+                  {
+                      "source_worktree":  "wt-mcp-device-110-integrate",
+                      "source":  "specs/001-mcp-runtime-review/plan.md",
+                      "snapshot":  "references/runtime-110/plan.md",
+                      "sha256":  "fe29fb3c6ab5ef5b9d12259d64b25eb828b25a3b444eaabe0098bc48f196b569",
+                      "last_write_utc":  "2026-10-03T23:53:47.5852988Z"
+                  },
+                  {
+                      "source_worktree":  "wt-mcp-device-110-integrate",
+                      "source":  "specs/001-mcp-runtime-review/tasks.md",
+                      "snapshot":  "references/runtime-110/tasks.md",
+                      "sha256":  "75be1ab42b443f8aed62fd616609567ec3c760d958678baad767600ccdf5065d",
+                      "last_write_utc":  "2026-10-03T23:29:51.1422533Z"
+                  },
+                  {
+                      "source_worktree":  "wt-mcp-device-110-integrate",
+                      "source":  "specs/001-mcp-runtime-review/data-model.md",
+                      "snapshot":  "references/runtime-110/data-model.md",
+                      "sha256":  "297212025b0d1d33913b1e30489cc8b1e4ec071d7f0393df37c9c60505710193",
+                      "last_write_utc":  "2026-10-03T23:52:26.1846085Z"
+                  },
+                  {
+                      "source_worktree":  "wt-mcp-device-110-integrate",
+                      "source":  "specs/001-mcp-runtime-review/spec.md",
+                      "snapshot":  "references/runtime-110/spec.md",
+                      "sha256":  "62d6ddf9cdcd5daaf0c6934c20bd306c932c2361deea7115ab6de767a4d49628",
+                      "last_write_utc":  "2026-10-03T23:46:56.4803524Z"
+                  },
+                  {
+                      "source_worktree":  "wt-mcp-device-110-integrate",
+                      "source":  ".specify/memory/constitution.md",
+                      "snapshot":  "references/runtime-110/constitution.md",
+                      "sha256":  "c94a46f8df36beb4b12e2de4eb49832c8d2d265379fdb0903f36c408f5acc1f5",
+                      "last_write_utc":  "2026-10-03T23:44:40.1280184Z"
+                  }
+              ]
+}
