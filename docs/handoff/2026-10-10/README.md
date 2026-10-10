@@ -1,6 +1,6 @@
 # MCP Device / MCP Gateway — handoff tập trung (10/10/2026)
 
-**Mục tiêu:** Đây là điểm bắt đầu duy nhất để hiểu hệ thống, tình trạng phát hành, mọi nhánh/spec/plan/task/evidence liên quan và cách thao tác tiếp mà không lệch nhánh hoặc mất dữ liệu. Các tài liệu gốc vẫn giữ ở đường dẫn tiêu chuẩn của Spec Kit; tệp `source-index.json` lập chỉ mục để không phải lục nhiều worktree.
+**Mục tiêu:** Đây là điểm bắt đầu duy nhất để hiểu hệ thống, tình trạng phát hành, mọi nhánh/spec/plan/task/evidence liên quan và cách thao tác tiếp mà không lệch nhánh hoặc mất dữ liệu. Các tài liệu Spec Kit đã commit giữ ở đường dẫn chuẩn; `source-index.json` đánh dấu rõ **359 file trong Git** và **115 file handoff `.plan` chỉ có trong kho lưu riêng**, với SHA-256 chuẩn hóa LF để tra cứu nhất quán Windows/Linux. Không tự hiểu đường dẫn chỉ mục là file chắc chắn đã nằm trong Git.
 
 **Thời điểm kiểm kê:** 10/10/2026 (Asia/Tokyo). Mọi số liệu runtime là ảnh chụp tại thời điểm kiểm tra, phải xác minh lại trước khi quyết định triển khai. Hai clone Device G6/G8 đã đồng bộ cùng commit tài liệu nội bộ **mới hơn GitHub `origin/main@9d96df9`**; không push tài liệu vận hành này ra công khai.
 

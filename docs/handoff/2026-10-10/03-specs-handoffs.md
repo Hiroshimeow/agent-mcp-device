@@ -35,7 +35,7 @@ Các cụm khác trong `.plan/` vẫn được giữ nguyên:
 - `mcp-device-release-publish-20260917/`.
 - `release-finalize-hcu-scope/`.
 
-`source-index.json` lưu đường dẫn và checksum của tài liệu thuộc `.plan`, `specs`, `docs` và `evidence/context`, để tìm lại từng bản gốc mà không phải tái tạo từ trí nhớ.
+`source-index.json` lưu đường dẫn, phân loại `git_commit`/`g6_local_archive`, Git blob và SHA-256 chuẩn hóa LF cho tài liệu `.plan`, `specs`, `docs` và `evidence/context`. **Lưu ý:** `.plan` bị Git ignore và 115 file trong chỉ mục không đi theo clone. Đã bảo toàn toàn bộ thư mục `.plan` (168 file, 3.264.173 byte) trong kho riêng trên **cả G6 và G8**, kiểm SHA-256 từng file; xem [kiểm kê worktree](05-worktrees.md).
 
 ## 3. Accepted evidence của Device v1.0.11 (lịch sử)
 

@@ -49,6 +49,7 @@ Ignored bị loại khỏi kho Git: dependency/build tái tạo `node_modules/**
 - `backup-g6-main-untracked/`, `backup-g6-main-manifest.json` — 20 file main untracked đã sao lưu trước fast-forward.
 - `g6-device-110-wt-preserved/complete-manifest.json` — phân loại, path, checksum của **1.534** file đã di chuyển; kèm `tracked-modifications.patch`.
 - `draft-ci-node18-incompatible.yml` — CI draft chưa được kích hoạt.
+- `g6-device-plan-evidence/`, `g6-device-plan-evidence-manifest.json`, `g6-device-plan-evidence.tgz` — **168 file trong `.plan`** (3.264.173 byte) đã snapshot và kiểm SHA-256; 115 file được liệt kê ở `source-index.json` là chỉ mục local-only. Đã sao chép archive này sang G8 và xác minh 168/168 hash; không đưa raw handoff/log bị Git ignore vào GitHub.
 
 **G8:** `/home/ayumi/Workspace/git_project/_mcp-consolidation-20261010/`
 - `inventory-g8-before.json`; hai gói `*-generated-files.tgz`; `g8-gateway-yellow-20261010.patch` và `g8-yellow-test.log`.

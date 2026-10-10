@@ -67,6 +67,7 @@ Khi kiểm tra UI bắt buộc bao phủ 24H/7D/30D, search/filter/sort devices,
 3. Kiểm tra tiến trình có dùng thư mục (PID cwd/command) và biến config nào còn trỏ vào nó. Không chỉ dựa `git status clean`.
 4. Bảo toàn file không tái tạo bằng archive và hash; commit checkpoint trên nhánh riêng cho code chưa được review. Không merge commit checkpoint vào main mặc định.
 5. Chỉ dùng `git worktree remove` thông thường sau khi nhánh đã được giữ và không còn tham chiếu. Nếu Windows báo khóa handle, không ép xóa.
+6. Các file `.plan` raw bị Git ignore **không có trong clone**, dùng `source-index.json` kiểm `availability`. Kho riêng: G6 `E:\git-project\_mcp-consolidation-20261010\g6-device-plan-evidence\`, G8 `/home/ayumi/Workspace/git_project/_mcp-consolidation-20261010/g6-device-plan-evidence/`. Mỗi file có SHA trong manifest; chỉ mở thông tin cần thiết, không push log riêng ra ngoài.
 6. Khi khôi phục state: dùng đúng source revision + receipt. Không lấy bản context ở release cũ ghi đè UI mới.
 
 ## Triển khai/reload (chỉ sau khi có task ủy quyền cụ thể)
