@@ -30,6 +30,10 @@ The six gated MCP schemas are `local_status`, `local_search`, `local_read`, `loc
 
 See [context commands, migration and limitations](docs/context.md) and [privacy](PRIVACY.md). Phase 9 evidence is under `evidence/context/`; this branch is not authorized for merge, publication or tagging.
 
+## Current-state handoff
+
+[Verified Device/Gateway status, Spec Kit, worktrees and next-agent handoff (2026-10-10)](docs/handoff/2026-10-10/README.md). The GitHub source version, npm publication state and live Gateway tool catalog are separate facts.
+
 ## Commands
 
 ```text
