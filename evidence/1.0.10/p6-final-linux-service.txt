@@ -1,1 +1,0 @@
-Linux MCP Device service tests passed

@@ -1,13 +1,10 @@
-# Spec Kit — trạng thái hiện hành
+# Current Spec Kit — start here
 
-| Spec | Trạng thái |
-| --- | --- |
-| **001 — runtime v1.0.10** | DONE/historical. Plan chi tiết đã retired khỏi HEAD; xem Git commit `baf7c5f` |
-| **002 — local Context v1.0.11** | DONE/ACCEPTED. **Giữ** vì script `scripts/check-context-acceptance.mjs` đọc spec/tasks/contracts làm regression checks; không phải active backlog |
-| **003 — NextGen** | P2 retrieval và P3 code graph là design inputs chưa implement; P4 wiki mặc định DEFER. P5 cũ đã superseded và retired |
-| **004 — v1.0.12** | R0 research; cần B0 A/B, quyết định contract và approval trước implement |
-| **005 — Experience Memory** | Research/spec only; chưa có code, final review và benchmark A/B |
+| Spec | State | Why visible |
+| --- | --- | --- |
+| **[006 Agent Memory Palace](006-agent-memory-palace/README.md)** | **ACTIVE / all 51 tasks OPEN** | Tool/session log search + graph, LLM Wiki long-term Palace, cross-repo no-guide recall, autonomous scheduled skills |
+| **[002 Device Local Context](002-device-local-context/spec.md)** | **DONE / FIXTURE ONLY** | Kept in place because accepted Device v1.0.11 tests/scripts read these exact paths; not a backlog |
 
-**Chỉ nên mở spec đúng với task**, không đọc toàn bộ hồ sơ cũ hay coi ô checkbox lịch sử là bằng chứng version hiện tại.
+Earlier `001`/`003`/`004`/`005` specs were completed or superseded and removed from active HEAD. Read only if auditing via [Git archive index](../docs/ARCHIVE.md). No implementation, merge or reload authorized by these documents.
 
-[Current status](../docs/STATUS.md) · [Archived source lookup](../docs/ARCHIVE.md)
+**Choose 006 `spec.md` → `plan.md` → `tasks.md`**, then only the necessary contract/evaluation section. Never load all legacy plan/checkpoint logs into the model at startup.

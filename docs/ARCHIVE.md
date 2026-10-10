@@ -1,27 +1,33 @@
-# DONE / OUTDATED — Git history và private backup
+# RETIRED / DONE — reference only
 
-Cleanup ngày **2026-10-10**, base Device `baf7c5f36ce5e632e3039f2b9247e900c09e99c6`, Gateway `develop@c5862aa`. File bị loại khỏi HEAD để agent chỉ thấy việc hiện tại; **không xóa Git history**.
+This is a small restoration index, **not an active task list**. Cleanup: 2026-10-11. Git history retains tracked content; selected local logs/plans have a private hashed archive outside both repos.
 
-| Phần retired | Lý do | Lệnh đọc lại |
+## Superseded Spec Kit (Device)
+
+**Last complete pre-006 tracked snapshot:** `8f3794a552627850a7e74876d376f8f6ec379ee9`.
+
+| Retired from active HEAD | Why | How to view the original |
 | --- | --- | --- |
-| `specs/001-mcp-runtime-review/` (16 file) | Plan/review v1.0.10 đã có code và evidence mới hơn; 8 ô chưa tích chủ yếu là deferred/not-selected historical | `git show baf7c5f:specs/001-mcp-runtime-review/tasks.md` |
-| `specs/003-context-nextgen/plan-p5-readiness.md`, `tasks-p5-readiness.md`, `contracts/readiness.md` | P5 kết luận blocker từ phiên code cũ `dea0b5b`, đã được R0 v1.0.12 sửa giả định; không được coi là kế hoạch hiện tại | `git show baf7c5f:specs/003-context-nextgen/plan-p5-readiness.md` |
-| `docs/handoff/2026-10-10/` (10 file) | Dated snapshot, chỉ mục 474 file và bảng 177 task; dư thừa trong active context | `git show baf7c5f:docs/handoff/2026-10-10/README.md` |
-| G6 Device ignored `.plan/` (168 file) | Báo cáo PLAN/REVIEW cũ, đã snapshot và kiểm hash ở cả G6/G8; không còn active backlog | Private backup bên dưới |
-| G8 Gateway `.plan/done/` (5 file) | Kế hoạch đánh dấu DONE về upstream MCP và legacy tool shell, không có runtime consumer | `git show c5862aa:.plan/done/external-mcp-handoff.md` |
+| `specs/003-context-nextgen/` (14 files) | Source-code AST graph and deferred Wiki contradict current tool/session-first Palace direction | `git show 8f3794a:specs/003-context-nextgen/spec.md` |
+| `specs/004-context-v112/` (2 files) | Old worktree baseline and source-graph roadmap are historical; accepted Device v1.0.11 facts incorporated in 006 | `git show 8f3794a:specs/004-context-v112/baseline.md` |
+| `specs/005-experience-memory/` (5 files) | Historical experience proposal **forbids** cross-repo recall and autonomous skill merging; replaced by 006 | `git show 8f3794a:specs/005-experience-memory/spec.md` |
+| `specs/001-mcp-runtime-review` | Already retired in earlier cleanup; v1.0.10 work is DONE | `git show baf7c5f:specs/001-mcp-runtime-review/tasks.md` |
+| `docs/handoff/2026-10-10` | Completed snapshot with 177 historical tasks and 474 source entries; too noisy as active context | `git show baf7c5f:docs/handoff/2026-10-10/README.md` |
 
-**Giữ để tránh regression:** `specs/002-device-local-context` là fixture của `scripts/check-context-acceptance.mjs`; `evidence/context` và `evidence/1.0.10` là bằng chứng chấp thuận; `.archive-worktrees-docs/.../core.mjs` được benchmark import. `specs/003` P2–P4 vẫn là nghiên cứu/tham khảo **chưa implement**, không xóa nhầm.
+**Exception — do NOT delete:** `specs/002-device-local-context` is the DONE v1.0.11 contract fixture read by `scripts/check-context-acceptance.mjs` and tests. Its checklist is not an open backlog.
 
-## Backup evidence ngoài repo
+## Original evidence vs new Palace
 
-- **G6:** `E:\git-project\_mcp-consolidation-20261010\g6-device-plan-evidence\`, `g6-device-plan-evidence-manifest.json`, `g6-device-plan-evidence.tgz`.
-- **G8:** `/home/ayumi/Workspace/git_project/_mcp-consolidation-20261010/g6-device-plan-evidence/` và manifest/tar. 168 file / 3.264.173 bytes, từng SHA đã được kiểm cả hai nơi trước cleanup.
-- Worktree cũ G6 có **1.534 file đã được bảo toàn** riêng tại `E:\git-project\_mcp-consolidation-20261010\g6-device-110-wt-preserved`. Không tự xóa backup này vì có spec, patch và evidence chưa phân loại đầy đủ.
-- **4 log root cũ** ngày 15–16/09 (219.507 byte) được sao lưu, đối chiếu SHA rồi xóa khỏi checkout; backup tại `E:\git-project\_mcp-consolidation-20261010\retired-local-logs\manifest.json`. Không động tới log đang tạo bởi test hiện tại.
-- Các backup này có thể chứa log nội bộ; **không push lên GitHub**.
+- v1.0.11 historical acceptance summaries remain in `evidence/context` and runtime usage in `docs/context.md`. The completed handoffs `docs/delivery-1.0.11-clean.md`, `docs/integration-1.0.11-github.md` and `docs/context/checkpoint2-trust-boundary.md` are retired from HEAD; read them with `git show 8f3794a:<path>` if auditing release history.
+- Old `003` P2 retrieval budgets can inform 006 but `003` P3 code graph / mandatory DEFER wiki **must not** automatically reappear.
+- Old `005` A/B correctness/provenance insights were incorporated into 006; its human approval restriction has intentionally been superseded.
+- Do not use Git `reset` to recover a historical doc; `git show <SHA>:<path>` reads it non-destructively.
 
-Để phục hồi một tệp tracked: `git show <SHA>:<file>` hoặc `git restore --source=<SHA> -- <file>` sau khi kiểm quyền. Không reset cả repo và không rollback production chỉ để đọc tài liệu.
+## Private sidecar/plan archives
 
-**Cleanup branch refs:** đã xóa **15 nhánh local hoàn toàn nằm trong lịch sử nhánh chuẩn**: Device G6 (3), Device G8 (8), Gateway G8 (4). SHA/nhãn gốc được ghi trong các file `retired-merged-refs-g6-device.txt`, `merged-refs-g8-device-before.txt`, `merged-refs-g8-gateway-before.txt` của kho backup. **Không xóa** các nhánh có commit độc lập/chưa merge. Hai nhánh Gateway có upstream khác (`feat/hot-reload-skills`, `fix/shell-adapt-linux`) được Git bảo vệ nên vẫn giữ nguyên; không sử dụng `branch -D`.
+Prior G6 backups at `E:\git-project\_mcp-consolidation-20261010\` include 168 raw Device `.plan` handoffs (sha manifest copied to G8) and 1,534 old worktree artifacts. They are intentionally outside active Git.
 
-**Giới hạn ngoài scope:** G8 có checkout Gateway gốc đang chạy 8101, checkout 8102 mang cấu hình NeuralMemory còn được sử dụng, và trên G6 còn thư mục worktree trống bị Windows khóa. Không xóa cưỡng bức.
+**2026-10-11 evidence cleanup:** copied/verified **all 227 accepted evidence files** (4,923,239 bytes) into `E:\git-project\_mcp-consolidation-20261011\device-evidence\files\` with `manifest.json` and per-file SHA-256. Retired **166 raw `.log`, `.tap`, `.txt`, `.jsonl`, `.sha256`, `.patch`, `.diff` and completed v1.0.10 evidence files** (4,285,080 bytes) from Git HEAD; **61 Context `.md`/fixture reports** (638,159 bytes) remain, including `evidence/context/decisions.md` required by tests. Original tracked content is also recoverable from Git SHA `8f3794a`. Do not publish private raw logs or delete the external evidence archive before retention review.
+This cleanup uses `E:\git-project\_mcp-consolidation-20261011\` for reviewed G6 Gateway old plan/log/config sidecars with SHA-256 receipts. Contains local data that must **not** be pushed to public GitHub.
+
+This document does not grant permission to delete auth/identity state, protected execution artifacts or production-linked config just because a filename is under `logs/`.
