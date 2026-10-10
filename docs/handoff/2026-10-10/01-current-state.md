@@ -13,8 +13,8 @@
 
 | Máy và đường dẫn | Git/ref được quan sát | Vai trò, giới hạn |
 | --- | --- | --- |
-| **G6** `E:\git-project\agent-mcp-device` | `main@9d96df9`, v1.0.11 | **Repo chính Device**; đã fast-forward từ `1492747`, không có merge commit mới |
-| **G8** `/home/ayumi/Workspace/git_project/agent-mcp-device` | `main@9d96df9`, v1.0.11 | Clone Device đồng bộ GitHub; service systemd lại dùng bản npm đã cài, không chạy từ checkout này |
+| **G6** `E:\git-project\agent-mcp-device` | `main` chứa base phát hành `9d96df9` + commit tài liệu sau kiểm kê | **Repo chính Device**; fast-forward từ `1492747`, không merge code tính năng; kiểm HEAD cụ thể bằng Git |
+| **G8** `/home/ayumi/Workspace/git_project/agent-mcp-device` | `main` cùng HEAD tài liệu với G6; base phát hành `9d96df9` | Đồng bộ commit nội bộ G6→G8; systemd vẫn dùng bản cài, không chạy trực tiếp từ checkout này |
 | **G8** `/home/ayumi/Workspace/git_project/agent-mcp-gateway-develop` | `develop@c5862aa` | **Base Gateway được chọn**: UI mới, không có mã Context Gateway |
 | **G8** `/home/ayumi/Workspace/git_project/agent-mcp-gateway` | `backup/develop-before-ui-return-20261010@91cefbc` | Checkout cũ, còn được Gateway legacy 8101 sử dụng; **không đổi/di chuyển** |
 | **G8** `/home/ayumi/Workspace/git_project/agent-mcp-gateway-8102` | detached `c5862aa`, có file sửa/untracked | Có cấu hình upstream NeuralMemory trong `.runtime/` đang được dịch vụ 8102 tham chiếu; **không xóa trước khi dời dependency và reload có kiểm soát** |
@@ -61,7 +61,7 @@ Quan sát qua `list_devices` hiện có 19 tool ở catalog Gateway. Device hỗ
 2. 04–05/10: Device `1492747` đóng gói v1.0.10, là nền cho v1.0.11.
 3. 06/10: accepted Device Context, kiểm thử riêng và giao bản v1.0.11 lên GitHub: `9d96df9`. Đây là **GitHub-only**, tài liệu không cho phép suy ra npm/tag/release production được chấp thuận.
 4. 07/10: Gateway Context xây từ `develop@89f7123` cũ được đóng gói; sản phẩm bị thiếu các cải tiến dashboard đã có ở `c2beabd`.
-5. 10/10: Gateway production quay về `develop@c5862aa` để giữ UI; Context Gateway **không merge**. Đồng bộ Device `main` G6/G8 tới `9d96df9`; cô lập và ghi nhận các worktree thừa.
+5. 10/10: Gateway production quay về `develop@c5862aa` để giữ UI; Context Gateway **không merge**. Đồng bộ Device `main` G6/G8 về cùng nền `9d96df9`, rồi thêm commit handoff/spec tài liệu (không thay mã sản phẩm) và đồng bộ qua Git nội bộ; cô lập và ghi nhận các worktree thừa.
 
 ## 5. Các giới hạn cần giữ
 

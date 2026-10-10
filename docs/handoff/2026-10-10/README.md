@@ -2,7 +2,7 @@
 
 **Mục tiêu:** Đây là điểm bắt đầu duy nhất để hiểu hệ thống, tình trạng phát hành, mọi nhánh/spec/plan/task/evidence liên quan và cách thao tác tiếp mà không lệch nhánh hoặc mất dữ liệu. Các tài liệu gốc vẫn giữ ở đường dẫn tiêu chuẩn của Spec Kit; tệp `source-index.json` lập chỉ mục để không phải lục nhiều worktree.
 
-**Thời điểm kiểm kê:** 10/10/2026 (Asia/Tokyo). Mọi số liệu runtime là ảnh chụp tại thời điểm kiểm tra, phải xác minh lại trước khi quyết định triển khai.
+**Thời điểm kiểm kê:** 10/10/2026 (Asia/Tokyo). Mọi số liệu runtime là ảnh chụp tại thời điểm kiểm tra, phải xác minh lại trước khi quyết định triển khai. Hai clone Device G6/G8 đã đồng bộ cùng commit tài liệu nội bộ **mới hơn GitHub `origin/main@9d96df9`**; không push tài liệu vận hành này ra công khai.
 
 ## Tóm tắt cần nhớ
 
@@ -10,7 +10,7 @@
 2. **Gateway production 8102 = `develop@c5862aa`, KHÔNG có Gateway Context.** Đây là lựa chọn đã xác nhận: ưu tiên UI mới (24H/7D/30D), chưa hợp nhất nhánh Context. Mã Context Gateway được giữ ở nhánh riêng `import/personal-context-20261010@c6cd6b1` và hai nhánh tích hợp thử nghiệm; không triển khai chúng.
 3. **Runtime Device ≠ mã nguồn Git checkout.** 8/8 thiết bị trực tuyến khi kiểm tra; 5 máy báo v1.0.11, 3 máy v1.0.10. Khả năng Context ở máy không đồng nghĩa sáu tool `local_*` đã được Gateway hiện tại công bố.
 4. **Spec Kit 003 / 004 / 005 vẫn là đặc tả/nghiên cứu.** 003 có tài liệu P2/P3/P4 được review, nhưng các kết luận P5 cũ dựa trên baseline sai; 004 R0 đã giải quyết phân biệt baseline. 005 Experience Memory chưa được triển khai hoặc chứng minh lợi ích.
-5. **Không dùng đường dẫn worktree cũ để xác định base.** G6 repo Device chính: `E:\git-project\agent-mcp-device`. G8 Gateway base phát triển chính: `/home/ayumi/Workspace/git_project/agent-mcp-gateway-develop`, nhánh `develop`. Xem lý do các checkout khác còn tồn tại trong `worktrees.md`.
+5. **Không dùng đường dẫn worktree cũ để xác định base.** G6 repo Device chính: `E:\git-project\agent-mcp-device`. G8 Gateway base phát triển chính: `/home/ayumi/Workspace/git_project/agent-mcp-gateway-develop`, nhánh `develop`. Xem lý do các checkout khác còn tồn tại trong [mục kiểm kê worktree](05-worktrees.md).
 
 ## Mục lục làm việc
 
@@ -19,6 +19,7 @@
 | [01 — Hiện trạng và nguồn chuẩn](01-current-state.md) | SHA, repo, môi trường, triển khai, thiết bị đang kết nối, lịch sử |
 | [02 — Kiến trúc và API](02-architecture.md) | Gateway/Device/CLI/MCP, quyền, Context, đường dẫn mã, giới hạn |
 | [03 — Spec Kit, handoff, task/evidence](03-specs-handoffs.md) | Toàn bộ cụm 001–005, tình trạng nhiệm vụ, các kết quả kiểm chứng |
+| [08 — Danh mục 177 task](08-task-register.md) | T001–T115 theo từng spec/phase, trạng thái checkbox gốc và đường dẫn nguồn |
 | [04 — Quyết định và việc cần làm](04-decisions-next.md) | Phần đã xong, chưa xong, tiêu chí để bắt đầu phần tiếp theo |
 | [05 — Dọn worktree và bảo toàn](05-worktrees.md) | Trước/sau, nhánh được giữ, checkpoint, file lạ, chỗ chưa thể xóa |
 | [06 — Quy trình vận hành](06-runbook.md) | Lệnh xác minh repo và runtime, an toàn nhánh, test, rollback |
