@@ -11,9 +11,9 @@ mcp-device install
 mcp-device status
 ```
 
-## 1.0.11 integration compatibility
+## 1.0.11 source compatibility
 
-The post-1.0.10 context integration targets **1.0.11 (unreleased)** and requires Node **>=22.13.0**, including built-in `node:sqlite` with FTS5. Upgrade Node before installing this unreleased version; no external SQLite npm driver is required. The published 1.0.10 installation example above remains historical and is not a 1.0.11 release announcement.
+Device source v1.0.11 is available on GitHub `main`, and requires Node **>=22.13.0**, including built-in `node:sqlite` with FTS5. Upgrade Node before using this source; no external SQLite npm driver is required. The 1.0.10 npm installation example above is historical: source delivery alone does **not** establish that 1.0.11 was published on npm or deployed.
 
 ## Device-local context
 
@@ -28,11 +28,11 @@ Search/read/status never run indexing automatically. Run sync selectively when f
 
 The six gated MCP schemas are `local_status`, `local_search`, `local_read`, `local_graph`, `local_index` and `local_wiki`; public registration/live capture require valid runtime approval. Wiki is disabled. Source schemas: [`src/context/tool-contract.ts`](src/context/tool-contract.ts). Portable skill: [`skills/mcp-device-context/SKILL.md`](skills/mcp-device-context/SKILL.md); explicit client loading is supported, universal automatic discovery is not claimed.
 
-See [context commands, migration and limitations](docs/context.md) and [privacy](PRIVACY.md). Phase 9 evidence is under `evidence/context/`; this branch is not authorized for merge, publication or tagging.
+See [context commands, migration and limitations](docs/context.md) and [privacy](PRIVACY.md). Phase 9 acceptance evidence is under `evidence/context/`. GitHub source delivery does **not** authorize npm publication, tagging, SOC approval or production Context enablement.
 
-## Current-state handoff
+## Current status
 
-[Verified Device/Gateway status, Spec Kit, worktrees and next-agent handoff (2026-10-10)](docs/handoff/2026-10-10/README.md). The GitHub source version, npm publication state and live Gateway tool catalog are separate facts.
+[**Device/Gateway status and active tasks**](docs/STATUS.md) · [Historical DONE/outdated material](docs/ARCHIVE.md). Source commit, published package and live Gateway tool catalog must be verified separately.
 
 ## Commands
 

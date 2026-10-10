@@ -1,9 +1,9 @@
-# AGENTS.md — MCP Device repository
+# Repository agent contract — MCP Device
 
-Before changing code or making release/branch/worktree decisions, read the canonical [current system handoff](docs/handoff/2026-10-10/README.md), especially [source identities](docs/handoff/2026-10-10/01-current-state.md), [Spec Kit status](docs/handoff/2026-10-10/03-specs-handoffs.md), [worktree exclusions](docs/handoff/2026-10-10/05-worktrees.md), and [runbook](docs/handoff/2026-10-10/06-runbook.md).
+**Read [docs/STATUS.md](docs/STATUS.md) before modifying source or choosing a branch.** It defines canonical Device/Gateway checkouts, release-vs-runtime distinctions, retained active work, and safety gates. [docs/ARCHIVE.md](docs/ARCHIVE.md) explains how to retrieve DONE/outdated work through Git history or private backups.
 
-- This handoff is a dated evidence snapshot, not permanent authority. Verify machine, repo root, Git HEAD, branch, untracked/ignored files, actual runtime and outstanding tasks before changing anything.
-- Device and Gateway are separate repositories. Device GitHub main v1.0.11 does **not** mean Gateway develop has merged the Gateway Context patch.
-- Gateway official development base at the recorded date: G8 `/home/ayumi/Workspace/git_project/agent-mcp-gateway-develop` (`develop@c5862aa`). Do not merge Context, alter service PM2 or load a stale clone merely because an older worktree has a similar name.
-- No silent reset, stash/clean, forced worktree deletion, force-push, production reload, token/identity change or auto-promotion of experimental specs/skills.
-- Keep docs, handoffs and test evidence traceable to exact source SHA, actual commands, and independent review; mark stale/untested material explicitly.
+- Verify `git rev-parse --show-toplevel HEAD`, branch, dirty/untracked/ignored state and process/CWD on the actual device. Do not treat worktree path or branch name alone as authority.
+- Device and Gateway are separate products. The Device source contains Context v1.0.11, but Gateway `develop` does **not** yet expose the Gateway Context patch. Never merge that patch without an explicit task.
+- Do not `reset --hard`, clean files, remove worktrees forcibly, force-push, reload production, mutate identity/SQLite or publish/tag as a side effect of documentation or spec work.
+- Keep `specs/002-device-local-context/` (used by regression verification), accepted evidence and executable benchmark core; do not mistake ignored caches for source.
+- Record expected/actual tests, exact SHA and authorization. Distinguish historical acceptance, fresh measurement, current source and proposals; no tool call or rollout claim without evidence.
