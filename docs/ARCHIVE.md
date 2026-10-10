@@ -22,4 +22,6 @@ Cleanup ngày **2026-10-10**, base Device `baf7c5f36ce5e632e3039f2b9247e900c09e9
 
 Để phục hồi một tệp tracked: `git show <SHA>:<file>` hoặc `git restore --source=<SHA> -- <file>` sau khi kiểm quyền. Không reset cả repo và không rollback production chỉ để đọc tài liệu.
 
+**Cleanup branch refs:** đã xóa **15 nhánh local hoàn toàn nằm trong lịch sử nhánh chuẩn**: Device G6 (3), Device G8 (8), Gateway G8 (4). SHA/nhãn gốc được ghi trong các file `retired-merged-refs-g6-device.txt`, `merged-refs-g8-device-before.txt`, `merged-refs-g8-gateway-before.txt` của kho backup. **Không xóa** các nhánh có commit độc lập/chưa merge. Hai nhánh Gateway có upstream khác (`feat/hot-reload-skills`, `fix/shell-adapt-linux`) được Git bảo vệ nên vẫn giữ nguyên; không sử dụng `branch -D`.
+
 **Giới hạn ngoài scope:** G8 có checkout Gateway gốc đang chạy 8101, checkout 8102 mang cấu hình NeuralMemory còn được sử dụng, và trên G6 còn thư mục worktree trống bị Windows khóa. Không xóa cưỡng bức.
