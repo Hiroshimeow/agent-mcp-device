@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "packet": "005-experience-memory",
+  "status": "research_spec_only",
+  "date_utc": "2026-10-06",
+  "implementation_authorized": false,
+  "deployment_authorized": false,
+  "review": {
+    "historical_verdict": "FINDINGS",
+    "historical_workflow_id": "wf_3e4f194e0431",
+    "historical_stage": "Strong Review",
+    "historical_result_index": 0,
+    "historical_result_key": "3a297c1218a3dae27087e6e7a35f9f73",
+    "historical_dispatched_model": "cliproxy-g8/gpt-6.1-sol",
+    "identity_basis": "surviving_dispatch_configuration_not_authenticated_responder_telemetry",
+    "full_historical_tool_transcript_available": false,
+    "substantive_evidence": "review.md: criteria, surviving verdict/findings, resolutions, evidence locators/hashes and limitations are embedded; no lost bundle is assumed",
+    "historical_findings": [
+      { "id": 1, "subject": "CodeGraph blanket memory exclusion", "disposition": "documentation_addressed_confirmed_by_fresh_substantive_review_pending_final_seal" },
+      { "id": 2, "subject": "cross_agent_acquisition_initial_state_lineage_and_costs", "disposition": "documentation_addressed_confirmed_by_fresh_substantive_review_pending_final_seal" }
+    ],
+    "watchdog_id": "b92b7b73-e1f9-4ed",
+    "watchdog_verdict": "FINDINGS_NOT_ACHIEVED",
+    "repair_dispatched_model": "cliproxy-g8/gpt-6.1-sol",
+    "repair_session_id": "01a1126b-d57d-77dc-a534-c8414e0dd09e",
+    "fresh_substantive_review": {
+      "run_id": "01a11274-4d2d-7196-8f3b-ef8fc5159a33",
+      "started_utc": "2026-10-06T18:22:54.254Z",
+      "dispatched_model": "cliproxy-g8/gpt-6.1-sol",
+      "reasoning": "high",
+      "verdict": "FINDINGS",
+      "source_receipts_reproduced": 13,
+      "original_findings": "substantively_addressed",
+      "new_finding": "M1_unsupported_Pi_integration_attribution_to_pinned_colbymchenry_README",
+      "disposition": "removed_firsthand_attribution_pending_final_independent_verification",
+      "substantive_evidence": "review.md: Fresh substantive review and remediation",
+      "input_raw_manifest_sha256": "ccb64456e9244e72b9a8f0568048216951fb160d4ec7edb689df0f3c7a3a6c00",
+      "input_normalized_manifest_sha256": "ac3b89a558f68c46fe949c32e5c225a385237d30fe63d8f02bd29fb64c42af41"
+    },
+    "final_metadata_review": "PENDING_EXTERNAL_SEAL_AS_OF_FREEZE",
+    "final_review_provider_constraint": "cliproxy-g8_only_non_Luna",
+    "final_review_protocol": "freeze all five files and metadata; fresh independent read-only review hashes exact final inputs; final result/raw manifest digest external; any subsequent packet edit invalidates seal and requires new freeze and review",
+    "approval_claimed_as_of_freeze": false
+  },
+  "checkout_context": [
+    { "repository": "Hiroshimeow/agent-mcp-device", "path": "E:/git-project/wt-mcp-device-110-integrate", "branch": "release/v1.0.10-clean", "commit": "1492747a53902ebdce7ad5b8eccd522fa8afdcc9", "package_version": "1.0.10", "basis": "firsthand_identity_read", "packet_tracked_at_commit": false },
+    { "repository": "Hiroshimeow/agent-mcp-device", "path": "E:/git-project/wt-mcp-device-111-clean-delivery", "branch": "delivery/mcp-device-1.0.11-clean", "commit": "9d96df95d0bd4d7c5b7e7cda994e232a6871b4c1", "package_version": "1.0.11", "git_status_porcelain": "", "basis": "firsthand_identity_and_git_blob_read_not_test_execution" }
+  ],
+  "source_receipts": {
+    "retrieved_date_utc": "2026-10-06",
+    "verification": "firsthand_read_not_behavior_test_or_effectiveness_measurement",
+    "substantive_excerpts_and_limitations": "research.md",
+    "readme_method": "HTTP GET immutable raw.githubusercontent.com URL; status 200; SHA-256 over Buffer of response body before text decoding/newline normalization",
+    "readme_revision_selection": "existing full revision pins; historical Atom-feed selection not reconstructed; no latest-branch resolution in this repair",
+    "readmes": [
+      { "repository": "codegraph-ai/CodeGraph", "commit": "590c2ca7dd7b37bd1d41caf45fac535b6522f969", "path": "README.md", "url": "https://raw.githubusercontent.com/codegraph-ai/CodeGraph/590c2ca7dd7b37bd1d41caf45fac535b6522f969/README.md", "bytes": 25463, "sha256": "75d802202621db082a0b35cf6a0c50e503cdcf7bd2b32281d26e39dfcab3782d" },
+      { "repository": "getzep/graphiti", "commit": "689de295c209631405c00e19e0af4f9735142f13", "path": "README.md", "url": "https://raw.githubusercontent.com/getzep/graphiti/689de295c209631405c00e19e0af4f9735142f13/README.md", "bytes": 31417, "sha256": "72c09aa0f12b7835f8c2919000788bca43306cf847269d4c3a7f35c957218689" },
+      { "repository": "NousResearch/hermes-agent", "commit": "e032fdbca14fc528df207cd806c24da9f2d768fc", "path": "README.md", "url": "https://raw.githubusercontent.com/NousResearch/hermes-agent/e032fdbca14fc528df207cd806c24da9f2d768fc/README.md", "bytes": 16924, "sha256": "c8c3009b1cf6e8d6e48e96a9b4c549d9ab0c86fdaffd91b19f3e9d9b37d93d9d" },
+      { "repository": "letta-ai/letta", "commit": "5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a", "path": "README.md", "url": "https://raw.githubusercontent.com/letta-ai/letta/5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a/README.md", "bytes": 1574, "sha256": "1d624e8fd383c1198c8d42da87b055d591a5760e19607692eb46bbbfe2a58f03" },
+      { "repository": "SWE-agent/SWE-agent", "commit": "3ea751c087f32b16e039a2233dd6eefecef325d5", "path": "README.md", "url": "https://raw.githubusercontent.com/SWE-agent/SWE-agent/3ea751c087f32b16e039a2233dd6eefecef325d5/README.md", "bytes": 8158, "sha256": "dcd880557720efbab0f5c0e68f2bc742309efecfce83244c9e670ec1f1adf76f" },
+      { "repository": "Lordymine/codegraph", "commit": "a82876289a1a5040a4f6c399b4635ac9d3efb390", "path": "README.md", "url": "https://raw.githubusercontent.com/Lordymine/codegraph/a82876289a1a5040a4f6c399b4635ac9d3efb390/README.md", "bytes": 10546, "sha256": "2653bb681084b04f215c789aafafcb5306b478084ca130b6ca2868b54bd29a0c" },
+      { "repository": "colbymchenry/codegraph", "commit": "d2fb323e5101046fe198d16ec3900854b2e9b1ce", "path": "README.md", "url": "https://raw.githubusercontent.com/colbymchenry/codegraph/d2fb323e5101046fe198d16ec3900854b2e9b1ce/README.md", "bytes": 70865, "sha256": "eb84996efef40925f8a1acea1978537d18a3d1560e960e76ef7b081e5c03a071" }
+    ],
+    "mcp_git_blob_method": "execFileSync git -C local_repository show full_commit:path, Buffer output; Git blob bytes, not working-tree line-ending bytes",
+    "mcp_repository": "Hiroshimeow/agent-mcp-device",
+    "mcp_local_repository": "E:/git-project/wt-mcp-device-111-clean-delivery",
+    "mcp_commit": "9d96df95d0bd4d7c5b7e7cda994e232a6871b4c1",
+    "mcp_remote_availability": "NOT_TESTED",
+    "mcp_git_blobs": [
+      { "path": "package.json", "bytes": 4674, "sha256": "cc335f0e1ff17e9c59324afe1e7fe61e4cfa4b86ca218f731a450c47129ea682" },
+      { "path": "src/context/graph.ts", "bytes": 11412, "sha256": "1e168b60fd9ecc805a61a24782976df7e22a696be60b3b0977a4008d44f69d7b" },
+      { "path": "test/context/activity-graph.test.js", "bytes": 3342, "sha256": "2ab02bc8525165facbfaa904b4aa0c800a0ddb98f5c155e2fd0f9821a3e4e759" },
+      { "path": "docs/context.md", "bytes": 7935, "sha256": "d027e1ecae653a55a4caec5da14572e6f9c9a7e1570cf93a6994d2709e08a647" },
+      { "path": "evidence/context/acceptance.md", "bytes": 8652, "sha256": "517b79ea2ea9294815952215670eca1e75092e812847f00bfd6b3d91eb252245" },
+      { "path": "evidence/context/phase6-graph-benchmark.json", "bytes": 3908, "sha256": "59563d9a04c82b05cba35661eabfb4bc62ceefafb6f7d06f2cc0341e505229d7" }
+    ],
+    "uncaptured_sources": "Zep arXiv 2501.13956v1 and mutable Hermes/Letta/SWE-agent docs: historical reported leads only; no bytes/hash/page receipts; historical retrieval method/date unknown",
+    "snapshots_embedded": false,
+    "availability_limit": "claim-specific excerpts and reproduction instructions are self-contained in research.md; full upstream files/local objects not archived in this five-file packet; future availability not guaranteed"
+  },
+  "protected_scope": {
+    "basis": "task_entry_aggregate_to_be_reproduced_after_final_review_not_earlier_task_history",
+    "convention": "ordinal/code-unit sorted slash relative paths; UTF-8 relative/path:exact-byte-sha256 plus LF for each record; SHA-256 of concatenation",
+    "tracked_file_count": 265,
+    "tracked_aggregate_sha256": "4ab008033913065d3bd670c8d0f719a1d804d5a0edf6c8a4a3828602ff9bed1c",
+    "004_file_count": 2,
+    "004_aggregate_sha256": "86040e375312d95198bf3d6348c3484ef3932f294ca12a599b73f8567690280c"
+  },
+  "hash_algorithm": "SHA-256",
+  "hash_convention": {
+    "markdown": "Exact file bytes including newline/encoding.",
+    "manifest": "Replace only files[path=manifest.json].sha256 value with 64 ASCII zeroes, preserving all other bytes including whitespace/final newline; SHA-256 resulting bytes. Normalized self-hash, NOT raw manifest digest.",
+    "raw_manifest_receipt": "External final reviewer output/session seal, not embedded in packet; embedding changes reviewed bytes and creates circularity. Any packet edit requires restart of final review."
+  },
+  "files": [
+    { "path": "baseline.md", "hash_basis": "exact_bytes", "sha256": "b87309e5712b3c0f05f70ba7ceb7524e4bcfd259d2b15ad4b27905207ed748f8" },
+    { "path": "research.md", "hash_basis": "exact_bytes", "sha256": "c406b170b0583b41a077bf6f83d9077849e91275c7c4921cc02827974f5b1fb8" },
+    { "path": "spec.md", "hash_basis": "exact_bytes", "sha256": "db804eeed8023c24f5263f337644257f5325e87689c74282ee7c3d444731b1c9" },
+    { "path": "review.md", "hash_basis": "exact_bytes", "sha256": "5bc831118cb6e05fd115dcdade80a41908239337137e3bb2a09a41bf2be15130" },
+    { "path": "manifest.json", "hash_basis": "normalized_self_hash", "sha256": "5937ef12caf965e043c795dce838ffe303df5f9ed966c54dd31f26b0dc7a73f9" }
+  ]
+}
