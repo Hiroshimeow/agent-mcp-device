@@ -18,9 +18,9 @@ All changes must name exact Git commit and test output. **[x] means code/tests d
 - [x] **T011** Add regression fixtures for the above behavior, including offline/negative cases.
 - [x] **T012** Isolated G6 real-log smoke: 3 sources, 6,270,444 bytes, 1,652 records, index 483 ms, one query 3.48 ms, repeat 0 new, original SHA unchanged. Receipt: _mcp-consolidation-20261011/palace-real-smoke-result.json.
 - [x] **T013** npm run build PASS, P1 11/11 PASS, legacy Context 10/10 PASS, Context acceptance checker PASS; full Device suite NOT RUN (receipts in HANDOFF.md).
-- [ ] **T014** Benchmark source discovery/index fairness and FTS5 query p50/p95 on larger local corpora; document measured limits.
-- [ ] **T015** Handle giant individual lines that exceed the scan budget, with explicit resumability/partial state; test Windows/Linux.
-- [ ] **T016** Review log aliasing, rotation across renamed paths, overlapping source registrations, and missing-file visibility.
+- [x] **T014** Benchmark source discovery/index fairness and FTS5 query p50/p95 on larger local corpora; document measured limits. Commit `cb706ef`; fresh 10,020-file run: 51 bounded calls, index-call p50 278 ms / p95 624 ms / max 818 ms, total indexing 16.08 s with fixture creation measured separately; real Pi/Codex/MCP p50/p95 and storage/RSS/response-byte metrics are in HANDOFF.
+- [x] **T015** Handle giant individual lines that exceed the scan budget, with explicit resumability/partial state; test Windows/Linux. Windows >64 MiB JSONL/partial/long-token fixtures PASS at `cb706ef`; WSL Linux Node 22.21.0 >64 MiB parity PASS with 4 durable partial advances and late-marker retrieval (~5.78 s), plus partial/rewrite/overlap parity. Independent TEST still must reproduce acceptance before PLAN closure.
+- [x] **T016** Review log aliasing, rotation across renamed paths, overlapping source registrations, and missing-file visibility. Commit `cb706ef`; regressions cover overlap, missing/stale refs, replacement/same-size rewrite, copytruncate/regrow, partial append and reused call/session IDs; Linux parity smoke also covers rewrite/overlap.
 - [x] **T017** P1 source commit d5d28f5, README/STATUS/spec/handoff documentation follow-up in main, checked source/test receipts. Verify final docs commit via git log.
 
 ## P2 — LLM Wiki Palace (not implemented)
