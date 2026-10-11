@@ -1,6 +1,6 @@
 # Research and ADR — 006 Agent Memory Palace
 
-**Status:** RESEARCH INPUT ONLY, 2026-10-11. Public repository capabilities are upstream claims, not tested deployment behavior. Pin exact upstream commit/tag and license before installation; no provider is selected or installed in this documentation task.
+**Status:** RESEARCH INPUT FOR LATER WIKI PHASES, 2026-10-11. **P1 uses existing Pi/Codex/MCP logs directly; no new observer, capture hook, redaction gate or event bus.** Public repository capabilities below are upstream claims, not tested deployment behavior. Pin exact upstream commit/tag and license before installation. No Wiki provider has been selected or installed.
 
 ## 1. Why earlier specifications were wrong for the current goal
 
@@ -20,7 +20,7 @@
 - `src/context/tool-contract.ts` exposes six legacy `local_*` schemas; `local_wiki` remains `WIKI_DISABLED`. Spec 006 does not change live behavior.
 - Raw Context is device/owner/repo scoped; separate clones do not automatically share a corpus. A shared knowledge layer must not weaken this scope.
 - G8 Gateway `develop` has skill discovery and loading, but this does not imply it can already automatically create, merge or publish skills.
-- G6 Gateway `develop@89f7123` is stale relative to G8 canonical develop and has a local Letta upstream config modification. It must **never be used as the merge base** for Gateway integration.
+- G6 Gateway was later synchronized to the then-current G8 `develop@7a5a30b`; its earlier Letta config/docs remain on an archive branch. **Do not use either snapshot as a substitute for verifying the latest canonical G8 Gateway develop** before any future integration.
 
 ## 3. Mature upstreams to reuse and verify
 

@@ -1,55 +1,48 @@
-# ACTIVE — MCP Device / Gateway
+# CURRENT STATUS — MCP Device / Memory Palace
 
-**Snapshot:** 2026-10-11 (JST). Read this document first; verify actual `git rev-parse HEAD`, branch, dirty files and runtime before acting. This is not a perpetual live-status promise.
+**Updated:** 2026-10-11 JST. Verify actual git HEAD/status and runtime on the target host. This file describes the development checkout, not the installed binary or production gateway.
 
 ## Source of truth
 
-| Location | Role |
-| --- | --- |
-| G6 `E:\git-project\agent-mcp-device`, `main` | **Authoritative local Device source/spec editing workspace.** Product baseline v1.0.11 from GitHub; later local commits may be docs-only. |
-| G8 `/home/ayumi/Workspace/git_project/agent-mcp-device` | Separate Device checkout/runtime. **Not modified** in the 2026-10-11 spec cleanup. Do not assume G8 automatically follows G6. |
-| G8 `/home/ayumi/Workspace/git_project/agent-mcp-gateway-develop`, `develop` | **Canonical Gateway base** with newer dashboard UI. Not modified/reloaded in this documentation task. |
-| G6 `E:\git-project\agent-mcp-gateway`, `develop` | Old Gateway checkout (`89f7123` before local cleanup), **not** the canonical Gateway integration source. |
+- **G6 Device source:** E:\git-project\agent-mcp-device on main. Baseline P0 report eaa5192; P1 log-first CLI under src/log-palace/ is a later source-only increment. No npm publish, no rollout.
+- **G8 Device:** separate checkout. No automatic synchronization or live Device upgrade is claimed by work on G6.
+- **Gateway integration:** G8 /home/ayumi/Workspace/git_project/agent-mcp-gateway-develop on develop is canonical. The G6 Gateway checkout was aligned with G8 develop during prior work but is not production itself.
+- Legacy Context v1.0.11 (six local_* tools, optional capture hooks) remains intact for compatibility. This new feature neither enables nor depends on that capture path.
 
-Source Git revision, installed Device package, public tool catalog and PM2 production runtime are **different facts**.
+## What actually works in G6 P1 source
 
-## ONLY active feature Spec Kit
+The local command family **mcp-device logs** now provides:
+1. Register/discover existing MCP tool history, Pi and Codex session logs or any user-selected log.
+2. Incrementally index actual complete log lines into SQLite FTS5; no observer/extra capture gate.
+3. Keyword search returning compact references, then bounded read of the exact original source bytes.
+4. On-demand graph of **recorded** call IDs, session/turn IDs, and file identity verified by logged cwd.
+5. Detect append, partial tail, replay, truncation/replacement, missing source and false same-file joins.
 
-**[006 — Agent Memory Palace](../specs/006-agent-memory-palace/README.md)** — **OPEN / NOT IMPLEMENTED**.
+Only the derived index is written. Original logs are unchanged. This is a local CLI only, not a new MCP catalog tool.
 
-Focus:
-1. Search + graph over actual **tool/session logs**, not AST/source-code graph.
-2. **LLM Wiki is the Mind Palace**: evidence-linked, shared within the authorized owner, automatically consolidated from sessions.
-3. Auto recall across different repos/clones G6/G8 without user-written guides; compact locate → selective read.
-4. Autonomous agent-owned skills, lazy-load, **scheduled skill merge without per-skill human approval**, with automated tests/versioning/rollback.
-5. Minimize **total** token usage including background Wiki/skill generation, subject to correctness/security.
+**Source locations:** src/log-palace/{formats,store,cli}.ts and the CLI branch in src/mcp-device.ts. Test: test/log-palace/log-palace.test.js. See [CLI guide](log-palace.md) and [the takeover handoff](../specs/006-agent-memory-palace/HANDOFF.md).
 
-Start with `006/tasks.md` **P0** and `006/plan.md`. **51 tasks currently unchecked**; creating spec documents completes no implementation task. No tool, service, Wiki backend, schedule or public MCP route has been changed.
+### Verification
 
-## Implemented baseline to PRESERVE, not redo
+- Initial TS compiler/type-check PASS; after later graph fairness fixes build and **11/11 targeted regression tests PASS**.
+- Isolated **real logs G6**: 3 sources (Pi, Codex, MCP history), 6,270,444 bytes, 1,652 indexed records, ~483 ms initial indexing, ~3.48 ms one FTS query, repeat index 0 new records. Exact call/result graph link and selected source read verified. Raw log hashes unchanged. This is one measured smoke, **not** search p95 or token economy proof.
+- Evidence/output outside Git: E:\git-project\_mcp-consolidation-20261011\palace-real-smoke-result.json, log-palace-tests.out.txt and log-palace-build.out.txt.
+- Existing P0 historic audit is [P0-BASELINE-AUDIT.md](../specs/006-agent-memory-palace/P0-BASELINE-AUDIT.md). Its legacy capture observer bugs are NOT prerequisites to log-first P1.
+- Full Device suite and Linux parity have not been rerun in this increment; do not call the product fully certified.
 
-- Device **v1.0.11:** local Context `src/context`, capture intent/outcome, FTS5 search, bounded activity graph, CLI, six `local_*` schemas. `local_wiki` is still `WIKI_DISABLED`. Full session/turn joining and Wiki auto-learning are **not currently implemented**.
-- **`specs/002-device-local-context` is DONE**, retained **only as regression fixture** because `scripts/check-context-acceptance.mjs` and context tests read it. It is not an active task plan; moving/removing it would require changing test code, which is OUT of scope.
-- Keep the **61 essential Context evidence reports/fixtures** in `evidence/context` (including `decisions.md` used by tests). The **166 raw logs/TAP/old v1.0.10 evidence files** were archived with individual SHA-256 outside Git and retired from active HEAD; see [ARCHIVE.md](ARCHIVE.md). Never load old logs into an agent's initial context.
-- Gateway latest `develop` UI/auth/pairing/remote sessions and existing skill catalog must remain intact. Old Gateway `feat/personal-context` is **reference only**, NOT a merge target.
+## What is still NOT implemented
 
-## Not-active / retired
+- LLM Wiki / ReMe/OpenViking backend, cross-device portable Palace and automatic no-guide new-repo recall.
+- Agent-owned skill learning, lazy publication, scheduled merge and rollback.
+- Handling a giant single log line that exceeds the per-file scan budget, exhaustive >10,000-file directory discovery, indexing p95 benchmarks.
+- Additional authorization/secret gates are **not** intended for already-authorized local reads. If Wiki is later exported to another account/service, that separate transfer requires only the existing applicable access controls.
 
-Former `specs/003-context-nextgen` (code graph priority), `004-context-v112` (stale old worktree baseline), `005-experience-memory` (prohibited cross-repo/auto skill), and old DONE plans **are retired from HEAD**. Exact originals remain recoverable from Git revision `8f3794a552627850a7e74876d376f8f6ec379ee9`. See [ARCHIVE.md](ARCHIVE.md).
+## Next agent
 
-## Rules for the next agent
+**Start at [Spec 006 HANDOFF.md](../specs/006-agent-memory-palace/HANDOFF.md)**, check Git and run the bounded tests. Do not reinstate observer/capture plan, resurrect code AST graph tasks, create a worktree or start Pi without being asked.
 
-- **Do not code** in this spec/cleanup task. Later DEV requires an explicit implementation task with exact Git base and tests.
-- Do not merge Context into Gateway, deploy/reload, rewrite v1.0.11 API, change secrets, or auto-start a scheduler just by reading spec 006.
-- Never optimize model tokens by leaking secrets, skipping task verification or hiding background LLM costs.
-- User intentionally does **not** require approval dialogs for agent-owned skill creation/merge; automated safety checks and normal access controls still apply.
-- Preserve every unknown file until classified; no `reset --hard`, `clean -fdx` or force deletion. G6 Gateway external configs and auth state are not disposable logs.
+## Historical maintenance
 
-Go directly to [006 spec](../specs/006-agent-memory-palace/spec.md) and [active tasks](../specs/006-agent-memory-palace/tasks.md). Historical lookup only via [ARCHIVE](ARCHIVE.md).
-
-## Verification snapshot (2026-10-11)
-
-- `scripts/check-context-acceptance.mjs` **PASS** (32 requirements, 8 success criteria, 62 accepted-task inventory).
-- Targeted Context `access + graph-query + mcp-contract` tests **10/10 PASS**. Active spec link/ID check: 12 documents, 23 links, 39 FR, 51 unchecked tasks PASS.
-- `npm test` performed the build successfully; its long-running 66-module runner was **stopped before full completion**, so **FULL REGRESSION = NOT_MEASURED**. No product source was changed.
-- Stale Gateway G6 independently has missing npm dependencies; its full suite is not green (see Gateway `docs/STATUS.md`). Do not conflate Git cleanliness with release acceptance.
+- Spec 002 Device Local Context is DONE but retained as required regression fixture; old 001/003/004/005 retired and reachable in Git history. See [ARCHIVE.md](ARCHIVE.md).
+- G8 production Gateway release and runtime are not changed by this work. No automatic release/merge from G6 to Gateway.
+- User explicitly prefers reducing agent token cost and eliminating repeated guidance; do not preload logs/Wiki/skill bodies into prompt when a two-step locator suffices.

@@ -1,28 +1,26 @@
-# 006 — Agent Memory Palace
+# 006 — Agent Memory Palace (log-first)
 
-**ACTIVE SPEC KIT · chưa implement · 2026-10-11**
+**ACTIVE.** P0 audit done; **P1 local log search/index/graph CLI implemented in source and under test**. LLM Wiki, cross-device Palace, skills and automatic learning are not implemented yet.
 
-**Mục tiêu:** Agent dùng được kinh nghiệm từ **tool/session logs** và lịch sử của các repo trước ngay khi bước vào repo mới, không cần người dùng hướng dẫn lại, và chỉ tốn token cho đúng thông tin cần đọc.
+Goal: agent reads earlier Pi/Codex/MCP sessions and tool logs with minimal context, then later reuses long-term experience in new repos without new user guides.
 
-- **Log Search:** FTS5/BM25, định vị chứng cứ nhanh → đọc đúng ref; không đổ toàn bộ log vào prompt.
-- **Activity Graph:** session/turn/tool/error/file/test/outcome — không làm code AST graph mặc định.
-- **LLM Wiki = Mind Palace:** một backend wiki có sẵn (PoC ReMe/OpenViking), tự tổng hợp, liên kết bài học, cập nhật theo bằng chứng.
-- **Auto Skills:** tự học, lazy load, tự merge/dedupe theo lịch và rollback **không cần duyệt từng skill**.
-- **Shared Recall:** cùng owner có thể mang kiến thức từ G6/G8 sang một repo mới; source evidence vẫn kiểm quyền riêng.
+### Read only what you need
 
-## Chỉ đọc tài liệu cần thiết
-
-| File | Khi nào cần |
+| File | Purpose |
 | --- | --- |
-| [spec.md](spec.md) | Ý định, yêu cầu, giới hạn, tiêu chí chấp nhận |
-| [plan.md](plan.md) | Phase P0–P6, merge base đúng, dependency/điểm dừng |
-| [tasks.md](tasks.md) | **51 task OPEN**; chưa có task DEV nào DONE |
-| [contracts.md](contracts.md) | Event/session schema, search, graph, wiki, skill, auth |
-| [evaluation.md](evaluation.md) | A/B, E2E cross-repo, tổng token kể cả background |
-| [research.md](research.md) | Reuse upstream, quyết định, những giả định cũ đã supersede |
+| [HANDOFF.md](HANDOFF.md) | **Start here after takeover**: verified Git/tests, actual implementation, open bugs, next task |
+| [spec.md](spec.md) | Binding user intent and exclusions: NO capture/observer/new gate |
+| [plan.md](plan.md) | P0-P5 roadmap, smallest useful increments |
+| [tasks.md](tasks.md) | DONE vs OPEN tasks with clear stop line |
+| [contracts.md](contracts.md) | Real Pi/Codex/MCP parser and CLI/search/graph guarantees |
+| [evaluation.md](evaluation.md) | Evidence and end-to-end measurement criteria |
+| [research.md](research.md) | Open-source Wiki candidates (ReMe, OpenViking, Hermes) |
+| [P0-BASELINE-AUDIT.md](P0-BASELINE-AUDIT.md) | Historic audit of legacy Context; not the new ingest architecture |
 
-**Nguồn mã:** Device G6 `E:\git-project\agent-mcp-device` `main`. Nếu sau này cần Gateway, chỉ dùng **G8 canonical `develop`**, không merge nhánh Context Gateway cũ nguyên vẹn. G6 Gateway checkout là bản cũ.
+**Source:** G6 E:\git-project\agent-mcp-device on main. Repo's old Context v1.0.11 remains intact solely for backwards compatibility. Do not merge historical Gateway Context or create capture observers.
 
-**Ngoại lệ bắt buộc:** `specs/002-device-local-context/` là contract v1.0.11 đã DONE nhưng cần cho `scripts/check-context-acceptance.mjs`; không phải backlog. Các spec 003, 004, 005 sai/lỗi thời được truy hồi qua lịch sử Git trước đợt cleanup.
+**One-call summary of P1:** Explicitly add/discover source paths, index existing files, search compact locators, then read selected source or graph the observed IDs/paths. No LLM required during any of these operations.
 
-**Trong lượt này:** chỉ sửa spec/plan/docs và dọn repo; **không viết mã, không tạo cron thật, không đổi server hoặc release**.
+**Future:** One LLM Wiki backend for Mind Palace, then cross-repo recall and lazy automatically merged agent-owned skills without manual per-skill approvals.
+
+If handing to another agent, begin with [HANDOFF.md](HANDOFF.md); do not read all old worktrees/logs/agent sessions into model context.

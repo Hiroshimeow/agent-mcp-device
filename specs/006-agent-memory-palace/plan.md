@@ -1,115 +1,61 @@
-# Implementation plan — 006 Agent Memory Palace
+# 006 — Implementation plan, log-first
 
-**State:** OPEN / unimplemented. **Docs only in this change.**
-**Build/merge starting point:** Device `main`, which already owns `src/context/` and MCP execution/capture; **NOT** Gateway `feat/personal-context`. Gateway integration, if needed, is an **optional last lane** from G8 canonical `develop`.
-**Principle:** The memory system is built around **tool/session evidence**, not AST source-code graph. LLM Wiki is the sole long-term Palace. Skills are automatically learned, lazy-loaded and merged on schedule **without human approval**.
+**Source baseline:** G6 Device main at eaa5192 (P0 audit). **Scope currently active:** P1 existing-log CLI/index. Later phases stay pending. No PI, no worktrees or code on production G8 in this task.
 
-## Verified source boundaries (do not rediscover blindly)
+## Flow
 
-- Device v1.0.11: `src/context/{capture,store,search,graph,indexer,service,cli}.ts`, `src/tool-dispatcher.ts`; six public `local_*` schemas; protected `002-device-local-context` and `scripts/check-context-acceptance.mjs` remain regression fixtures.
-- Existing observer has invocation ID, tool args/result and outcome, but does **not** provide authoritative full chat/session/turn lineage. Need adapters; never infer IDs from accidental timestamp proximity.
-- Gateway G8 `develop` already has `skill_catalog`/`load_skill`, usage/session metadata, and separate WSS broker/auth. It has **not** integrated the old six-tool Gateway Context patch.
-- Existing Git common-dir identity links worktrees, **not distinct clones**. Cross-repo/global memory needs a **separate scoped knowledge identity**, not a hidden change to local Context permissions.
+1. **Register** existing Pi/Codex/MCP log file/directory (or user path). Never turn on a live observer.
+2. **Index** appended complete lines with a byte cursor. Recognize format locally. Keep raw file intact.
+3. **Search** local SQLite FTS5; return compact source refs.
+4. **Read** exact selected source record, optionally expand graph neighbors from explicitly logged call/session/turn/file evidence.
+5. **Later** use the evidence to build one LLM Wiki Palace and portable, lazy-loading skills.
 
-## Decision architecture
+## P0 — DONE: current-state audit
 
-```text
-Agent / Pi / ChatGPT / Codex
-  | existing tool execution + optional session hook
-  v
-Event adapters (Device tool evidence + client session/turn evidence)
-  | secure owner/device/repo IDs, redacted refs, bounded batches
-  v
-Immutable evidence log + SQLite FTS5 + activity graph
-  | LOCATE: compact cards/refs       READ: chosen spans only
-  +-----> CLI for graph/timeline/node exploration (lazy skill)
-  |
-  v  end-of-task / bounded idle queue
-Selected LLM Wiki backend (ReMe OR OpenViking, not both writable)
-  | linked pages, contradictions, provenance, stale states
-  +-----> tiny startup locator across authorized repos/devices
-  |
-  v
-Agent-owned skill generator -> sandbox checks -> atomic skill registry
-  | scheduled bounded dedupe/merge/archive + rollback snapshots
-  v
-Future agents lazy-load selected skill body; never whole library
-```
+- Evidence: [P0-BASELINE-AUDIT.md](P0-BASELINE-AUDIT.md), commit eaa5192.
+- Legacy capture and graph bugs apply to the **optional old Context pipeline**. They are **not P1 blockers** because P1 reads existing external logs.
 
-All references to `graph` below mean **activity/provenance graph of tool/session logs**. Any source-code AST/impact-graph design is deferred outside scope.
+## P1 — CLI vertical slice, current implementation
 
-## Workstreams, dependency order
+**Changes:** new src/log-palace/{formats,store,cli}.ts; only one dispatch branch in src/mcp-device.ts; regression tests test/log-palace/log-palace.test.js. Source API remains unchanged.
 
-### Phase P0 — Instrument baseline and freeze evaluation (mandatory)
-- Verify G6 Device Git SHA, build/test baseline; separately record G8 Gateway actual `develop` SHA/runtime **read-only** when authorized.
-- Inventory concrete event source schemas, redaction/permissions, coverage gaps and session APIs for selected clients. Record measurable missing IDs, output retention and access to original evidence.
-- Freeze fixture corpus: solved and failed sessions, G6→G8 new-repo transfer, repeated issue across distinct repos, exact/no-memory case, stale/counterexample, unauthorized owner, offline/reconnect.
-- Freeze costs: model prompt/response, extraction/wiki consolidation, skill merges, storage, calls and p50/p95 end-to-end time. Control uses **same native tools/client/model** with Palace off.
-- **Gate P0:** data source and ground-truth outcomes pinned; no “3x cheaper” claim before A/B.
+- Local SQLite under CONFIG_DIR/log-palace (can override via MCP_DEVICE_LOG_PALACE_DIR), uses FTS5 contentless index and metadata/record offsets. Does not retain whole raw lines as another corpus.
+- Sources are explicitly added or discovered by CLI. Directory scan bounded; no auto indexing on daemon startup.
+- Handles Pi JSONL, Codex JSONL, MCP legacy history and arbitrary plaintext/unknown JSONL.
+- Incremental append, pending final line, source replacement/truncate, dedupe and source hash verification.
+- Graph uses exact call ID plus session/file scope and absolute file identity resolved against logged cwd. No file-name-only cross-repo join or inferred causality.
+- CLI search body-free locator; read/graph bounded with explicit limits.
 
-### Phase P1 — Capture and normalize tool/session logs
-- Extend via a **versioned adapter**; retain 1.0.11 observer semantics. Event IDs, session/turn/task IDs and parent-child links are explicit or marked missing.
-- Add tool-call/result join, failure/attempt and next task outcome where supported. Record successful test only with actual test result refs/revision.
-- Ingest via local durable bounded queue (cursor + idempotent ACK), selective redaction and retention; no hidden replay of executable actions.
-- **Gate P1:** exactly-once *logical indexing* of duplicate input, explicit capture gaps, authenticated refs, restart/reconnect tests, no prod overhead regression.
+**P1 test gate:** Node 22.13+, TypeScript build, 11 targeted regression tests, legacy Context targeted tests, and isolated real-log smoke. Record actual successes/limits in [HANDOFF.md](HANDOFF.md).
 
-### Phase P2 — Log search and activity graph
-- Reuse FTS5 and bounded graph; add only fields/edges from actual event schemas.
-- Search result **locator** schema: `ref, title, kind, scope, freshness, time, 1-line preview, evidence refs`. Read selected refs only; timeline/path/neighbor CLI optional.
-- Provide a two-step locate→read path. Graph node details via CLI/skill to keep MCP schema small; no AST code-graph dependency.
-- **Gate P2:** hard correctness/security; error-signature, tool, file, task and session fixture retrieval. No phantom graph edges. p95 latency/token budgets from spec.
+### P1 hardening still open
 
-### Phase P3 — Wiki Palace backend PoC, one backend chosen
-- Evaluate **ReMe** (Markdown, BM25/wikilinks, daily digest/auto-dream) and **OpenViking** (URI/abstract/overview/detail, session files) using the **same sanitized corpus**.
-- Audit OSS license, exact pinned commit, Windows+Linux deploy, auth/deletion, CLI/API adapter, offline recovery, incremental update, LLM token cost and idempotency.
-- Include an adversarial contradiction and code-change stale challenge. Never send unsanitized raw payloads to a provider.
-- Select ONE backend by end-to-end correctness and amortized tokens; documented fallback if both fail. **Do not build our own wiki engine or run two writers concurrently.**
-- Agent writes Wiki in bounded task-end or idle batches; failed update preserves previous generation and marks stale.
-- **Gate P3:** knowledge pages grounded in exact refs, no unsupported verified “success” claim, correct owner scoping, demonstrably better repeated-task efficiency.
+- Robust handling for individual lines larger than per-file indexing budget. Current index reports stalled, does **not** silently mark a partial JSON record complete.
+- Directory/file rotation with overlapping registered sources and long-lived Windows file handles; validate Windows/Linux.
+- Real-log throughput, disk/FTS growth, search p95 and compact response sizes on repeat runs. No conjectured token-savings percentage.
+- Large-directory discovery (>10,000 matching files) and fair resumable paging; must not silently claim full coverage.
+- Source format auto-detection from rotated/new files, stale/missing source read, exact session/call relations and negative cases.
+- Optional output pagination/filtering for very large lists; add only when baseline shows need.
+- Documentation and test gap review with independent M365 if available, only through prescribed Worker; no raw private log attachments.
 
-### Phase P4 — Cross-repo / cross-device recall and bootstrap
-- Introduce stable owner-scoped shared knowledge keys (person/tenant, source repo lineage, topic); keep raw evidence separately authorized and repo-specific.
-- New agent environment receives a **tiny Palace locator** (target <=250 estimated tokens). If task is related, call search; else native work proceeds with zero Palace fetch.
-- When moving from G6 to a distinct repo/clone on G8: locate relevant skill/wiki/error history and verify current toolchain/revision before applying.
-- **Gate P4:** cold agent needs no user handoff; both directions G6↔G8, missing/denied state, stale revision and unrelated project negative controls pass.
+Do **not** expand P1 by adding an observer, broker, capture lifecycle, LLM summarization queue or permissions wrapper already handled by OS/MCP.
 
-### Phase P5 — Autonomous skills and bounded scheduled merging
-- Candidate extractor summarizes repeatable solution from verified sessions/wiki. Each agent-owned skill includes applicability, evidence refs, tests, negative examples and version.
-- Keep short catalog metadata cheap; lazy load body/resources only when selected. Use existing Gateway skill catalog contract when applicable.
-- Schedule curator **at most the frozen cadence** (candidate daily/idle if dirty), batch only changes, dedupe/merge agent-owned skills, snapshot before changes, atomic publish and auto rollback on failing tests.
-- **Zero human approval prompts for agent-owned skills**, but all ordinary filesystem/process/security permissions remain mandatory; no auto edits to bundled/user-pinned skills.
-- **Gate P5:** skill candidate acquired→reused, merged without duplicate skill exposure, known bad procedure invalidated, time/token ceiling and rollback proven.
+## P2 — Wiki Palace (NOT STARTED)
 
-### Phase P6 — Minimal transport integration and independent E2E
-- Only if P2–P5 demonstrate a gap not solvable by CLI/current tools: expose one small scoped MCP search facade; graph/wiki/curator remain CLI via lazy skill.
-- Gateway work must start from **G8 `develop`** and be conflict-reconciled file-by-file; old `feat/personal-context` is historical evidence, **not a merge target**.
-- Preserve full Device v1.0.11 catalog for old clients and the Gateway UI/auth/pairing/remote session flows.
-- Independently validate token budget including background costs, correctness, owner isolation, model hallucination/error propagation, restart/restore, load and cross-platform compatibility.
-- **Gate P6:** no safety/correctness regression; maintainability and fewer model tokens are **measured**, not assumed; no deploy until separately authorized.
+Use real P1 retrieval fixtures to evaluate ReMe vs OpenViking with *one* selected backend. Wiki is organized long-term memory; raw logs remain authoritative. Measure LLM digest cost, stale-claim handling, evidence refs, offline usability and source-provenance retention. Do not write our own wiki engine.
 
-## Interfaces and storage decision guards
+## P3 — Repo-new recall (NOT STARTED)
 
-- Device event store is **authoritative only for its owner/repo raw history**; do not implicitly put all user transcript contents inside it.
-- Wiki is authoritative for **organized long-term experience**, but individual page claims remain subordinate to current code/test and original evidence.
-- Shared wiki workspace is **per owner** with explicit repo/project provenance and allowlisted sharing; do not create a global anonymous index.
-- Skills live in versioned agent-owned space; registry may be read through Gateway. Curator cannot directly merge product Git branches.
-- CLI and minimal MCP facade must use the same authorization/ref lookup rules, not shell bypass for denied scopes.
-- Drop or defer each optional component unless it adds measurable value; keep independent adapters so a failed upstream PoC can be replaced without losing raw evidence.
+Introduce owner-scoped portable knowledge (not blanket sharing raw session log files). Fresh agent on different repo/G6/G8 should search the same Palace and load only a relevant locator/page, without being guided manually. Use existing authenticated transport; no new Gate.
 
-## Delivery artifacts by phase
+## P4 — Autonomous skills (NOT STARTED)
 
-| Phase | Required output / review evidence |
-| --- | --- |
-| P0 | Frozen corpus manifest, source-truth map, gap report, baseline token/latency |
-| P1 | Event schema and adapter fixtures, crash/dedup/auth tests |
-| P2 | Locator/read/graph contract, deterministic traversal and query/latency tests |
-| P3 | Side-by-side ReMe/OpenViking PoC report; backend choice and evidence-linked wiki |
-| P4 | Cold-start cross-repo G6/G8 fixture and denied/negative controls |
-| P5 | Skill acquisition/promotion/merge/rollback receipts and scheduled cost ledger |
-| P6 | Minimum integration diff, compatibility suite, regression + A/B report |
+Create agent-owned versions from repeated evidence; lazy-load compact catalog. Automatically merge/dedupe/archive on a **bounded changed-input schedule**, with automatic validation and rollback; no human per-skill approvals. No automatic merging into product Git branches.
 
-## Stop / rollback criteria
+## P5 — Gateway integration / release (NOT STARTED)
 
-Stop a phase on: leaked cross-owner knowledge, synthesized/phantom evidence, task-success misclassification, unauthorized skill execution, unbounded background spending, or measurable correctness regression. Partial success is **INCOMPLETE**; document the fix rather than broadening architecture.
+Use canonical G8 Gateway develop, not stale older Context branch. Existing shell access can execute CLI; only add a tiny MCP facade if cold-agent testing proves CLI insufficient. Protect current UI/account pairing and Device v1.0.11 public tool contracts. Release/reload requires separate authorization.
 
-**Implementation not authorized by this doc cleanup.** Do not create a task scheduler or write to Gateway production until an explicit implementation task is assigned.
+## Stop rules
+
+If a stage reads the wrong bytes, links two unrelated sessions/files, loses newly appended records, consumes unbounded model tokens or changes production outside its scope: mark INCOMPLETE, test and fix the exact issue. Commit coherent increments and keep [HANDOFF.md](HANDOFF.md) truthful so an unrelated successor agent can resume without conversation context.
