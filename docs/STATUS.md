@@ -24,13 +24,13 @@ Only the derived index is written. Original logs are unchanged. This is a local 
 
 ### Verification
 
-- Final P1 correctness source SHA `2526811340dc9984e767f3ad043ddcc250bdf946`; docs may be later. Build PASS.
-- Log Palace regression suite **29/29 PASS**; independent acceptance script **7/7 PASS on Windows and 7/7 PASS on WSL Linux** after fixing maxFiles=1 cross-root starvation, same-size interior mutation, and cross-source reused-session graph edges.
+- Final P1 correctness source SHA `716f011464286a3610a64f19becafb27850feae7`; docs may be later. Build PASS.
+- Log Palace regression suite **30/30 PASS**; independent acceptance script **7/7 PASS on Windows and 7/7 PASS on WSL Linux**. Final REVIEW-R1 fix also preserves discovery visibility when byte budget is exhausted before every discovered file is indexed.
 - Existing Context compatibility tests **10/10 PASS** and Context consistency checker PASS.
 - Clean full Device suite **66/66 PASS**; no source/build race during the final run.
-- Latest isolated real-log benchmark: 3 authorized sources, 6,690,674 input bytes, 1,759 records; index p50/p95 ~900/1107 ms, search p50/p95 ~1.89/3.19 ms, raw hashes unchanged. See Spec 006 HANDOFF for RSS/storage/response-byte receipts and 10,020-file benchmark.
+- Latest isolated real-log benchmark: 3 authorized sources, 6,690,674 input bytes, 1,759 records; index p50/p95 ~902/1054 ms, search p50/p95 ~1.52/2.22 ms, raw hashes unchanged. See Spec 006 HANDOFF for RSS/storage/response-byte receipts and 10,020-file benchmark.
 - Existing P0 historic audit is [P0-BASELINE-AUDIT.md](../specs/006-agent-memory-palace/P0-BASELINE-AUDIT.md). Its legacy capture observer bugs are NOT prerequisites to log-first P1.
-- P1 still requires a fresh independent TEST pass on committed `2526811` plus REVIEW/PLAN closure; do not call the product released or deployed.
+- P1 still requires fresh independent TEST/REVIEW acceptance on committed `716f011` plus PLAN closure; do not call the product released or deployed.
 
 ## What is still NOT implemented
 
