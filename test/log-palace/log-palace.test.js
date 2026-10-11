@@ -294,3 +294,33 @@ test('P1: search never silently drops query terms beyond the safe FTS budget',t=
   const {root,db}=setup(t),p=join(root,'query-budget.log');writeFileSync(p,'one two three\n');db.add(p,'text');db.index();
   assert.throws(()=>db.search(Array.from({length:25},(_,i)=>'term'+i).join(' ')),/BUDGET_EXCEEDED/);
 });
+
+test('P1 independent: maxFiles=1 rotates fairly across registered roots',t=>{
+  const {root,db}=setup(t),hot=join(root,'hot-one'),cold=join(root,'cold-one');mkdirSync(hot);mkdirSync(cold);
+  for(let i=0;i<40;i++)writeFileSync(join(hot,'h'+String(i).padStart(2,'0')+'.log'),'HOT_ONE_'+i+'\n');
+  writeFileSync(join(cold,'cold.log'),'COLD_ONE_SENTINEL\n');db.add(hot,'text');db.add(cold,'text');
+  for(let i=0;i<5&&!db.search('COLD_ONE_SENTINEL').count;i++)db.index({maxFiles:1,maxBytes:1024});
+  assert.equal(db.search('COLD_ONE_SENTINEL').count,1);
+});
+
+test('P1 independent: same-size interior rewrite invalidates stale FTS',t=>{
+  const {root,db}=setup(t),p=join(root,'interior.log');
+  const before='HEAD '+('a '.repeat(10000))+'INTERIOR_OLD_MARK '+('b '.repeat(10000))+'TAIL\n';
+  const after ='HEAD '+('a '.repeat(10000))+'INTERIOR_NEW_MARK '+('b '.repeat(10000))+'TAIL\n';
+  assert.equal(Buffer.byteLength(before),Buffer.byteLength(after));writeFileSync(p,before);db.add(p,'text');db.index();
+  assert.equal(db.search('INTERIOR_OLD_MARK').count,1);writeFileSync(p,after);const step=db.index();
+  assert.equal(step.reset,1);assert.equal(db.search('INTERIOR_OLD_MARK').count,0);assert.equal(db.search('INTERIOR_NEW_MARK').count,1);
+});
+
+test('P1 independent: reused session identity across separately registered logs has no session edge',t=>{
+  const {root,db}=setup(t),a=join(root,'repo-a.jsonl'),b=join(root,'repo-b.jsonl');
+  const make=(cwd,id,term)=>[
+    j({type:'session',id:'SESSION_REUSED',cwd,timestamp:'2026-10-11T00:00:00Z'}),
+    j({type:'message',message:{role:'assistant',content:[{type:'toolCall',id,name:'read_file',arguments:{path:'README.md',note:term}}]},timestamp:'2026-10-11T00:00:01Z'}),
+    j({type:'message',message:{role:'toolResult',toolName:'read_file',toolCallId:id,content:[{type:'text',text:'RESULT_'+term}]},timestamp:'2026-10-11T00:00:02Z'})
+  ].join('');
+  writeFileSync(a,make('E:/repo-a','ID_REUSED','SESSION_A_ONLY'));writeFileSync(b,make('E:/repo-b','ID_REUSED','SESSION_B_ONLY'));
+  db.add(a,'pi');db.add(b,'pi');db.index();const hit=db.search('SESSION_A_ONLY').items.find(x=>x.kind==='tool_call');assert.ok(hit);
+  const edges=db.graph(hit.ref).neighbors.filter(x=>x.relation==='same_session'||x.relation==='same_turn');
+  assert.equal(edges.some(x=>String(x.preview).includes('SESSION_B_ONLY')),false);
+});

@@ -53,6 +53,7 @@ export class LogPalace {
       "CREATE TABLE IF NOT EXISTS sources (id INTEGER PRIMARY KEY,path TEXT NOT NULL UNIQUE,format TEXT NOT NULL,dir INTEGER NOT NULL);" +
       "CREATE TABLE IF NOT EXISTS source_scan (source_id INTEGER PRIMARY KEY,queue TEXT NOT NULL,complete INTEGER NOT NULL DEFAULT 0,epoch INTEGER NOT NULL DEFAULT 0," +
       "FOREIGN KEY(source_id) REFERENCES sources(id));" +
+      "CREATE TABLE IF NOT EXISTS palace_state (key TEXT PRIMARY KEY,value TEXT NOT NULL);" +
       "CREATE TABLE IF NOT EXISTS files (id INTEGER PRIMARY KEY,source_id INTEGER NOT NULL,path TEXT NOT NULL UNIQUE,format TEXT NOT NULL," +
       "position INTEGER NOT NULL DEFAULT 0,session TEXT,turn TEXT,cwd TEXT,dev TEXT,ino TEXT,head_hash TEXT,tail_hash TEXT,missing INTEGER NOT NULL DEFAULT 0," +
       "FOREIGN KEY(source_id) REFERENCES sources(id));" +
@@ -72,6 +73,9 @@ export class LogPalace {
     const fileColumns=this.db.prepare("PRAGMA table_info(files)").all() as Row[];
     if(!fileColumns.some(column=>value(column.name)==='seen_epoch'))this.db.exec('ALTER TABLE files ADD COLUMN seen_epoch INTEGER NOT NULL DEFAULT 0');
     if(!fileColumns.some(column=>value(column.name)==='scan_position'))this.db.exec('ALTER TABLE files ADD COLUMN scan_position INTEGER NOT NULL DEFAULT 0');
+    if(!fileColumns.some(column=>value(column.name)==='mtime_ms'))this.db.exec('ALTER TABLE files ADD COLUMN mtime_ms REAL');
+    if(!fileColumns.some(column=>value(column.name)==='ctime_ms'))this.db.exec('ALTER TABLE files ADD COLUMN ctime_ms REAL');
+    if(!fileColumns.some(column=>value(column.name)==='content_hash'))this.db.exec('ALTER TABLE files ADD COLUMN content_hash TEXT');
   }
   close():void {this.db.close()}
   private atomic<T>(label:string,fn:()=>T):T {
@@ -155,6 +159,12 @@ export class LogPalace {
     const read=readSync(fd,buf,0,size,start);
     return digest(buf.subarray(0,read));
   }
+  private contentHash(fd:number,count:number):string {
+    const hash=createHash('sha256'),buf=Buffer.alloc(1024*1024);
+    let at=0;
+    while(at<count){const wanted=Math.min(buf.length,count-at),n=readSync(fd,buf,0,wanted,at);if(n<1)throw new Error('SOURCE_CHANGED');hash.update(buf.subarray(0,n));at+=n}
+    return hash.digest('hex');
+  }
   private indexSearchText(recordId:number,text:string) {
     if(Buffer.byteLength(text,'utf8')<=1024*1024){
       this.db.prepare('INSERT INTO records_fts(rowid,body) VALUES(?,?)').run(recordId,ftsSafe(text));
@@ -197,7 +207,7 @@ export class LogPalace {
       removeChunkMap.run(row.id as number);
     }
     this.db.prepare('DELETE FROM records WHERE file_id=?').run(id);
-    this.db.prepare('UPDATE files SET position=0,scan_position=0,session=NULL,turn=NULL,cwd=NULL,head_hash=NULL,tail_hash=NULL WHERE id=?').run(id);
+    this.db.prepare('UPDATE files SET position=0,scan_position=0,session=NULL,turn=NULL,cwd=NULL,head_hash=NULL,tail_hash=NULL,mtime_ms=NULL,ctime_ms=NULL,content_hash=NULL WHERE id=?').run(id);
   }
   private formatFor(p:string,preferred:Format):ResolvedFormat {
     if(preferred!=='auto')return preferred;
@@ -223,7 +233,11 @@ export class LogPalace {
       const identity=String(stats.dev)+'|'+String(stats.ino);
       const oldIdentity=value(file.dev)+'|'+value(file.ino);
       const verifiedAt=Math.max(offset,scan);
-      if((file.dev!==null&&oldIdentity!==identity)||stats.size<verifiedAt||
+      const sameSizeMetadataChanged=stats.size===verifiedAt&&file.mtime_ms!==null&&
+        (Number(file.mtime_ms)!==stats.mtimeMs||Number(file.ctime_ms)!==stats.ctimeMs);
+      const sameSizeContentChanged=stats.size===verifiedAt&&file.content_hash!==null&&
+        value(file.content_hash)!==this.contentHash(fd,verifiedAt);
+      if((file.dev!==null&&oldIdentity!==identity)||stats.size<verifiedAt||sameSizeMetadataChanged||sameSizeContentChanged||
           (verifiedAt>0&&(file.head_hash!==this.fingerprint(fd,0,verifiedAt)||
             file.tail_hash!==this.fingerprint(fd,Math.max(0,verifiedAt-4096),Math.min(4096,verifiedAt))))) {
         this.atomic('reset_file',()=>this.reset(Number(file.id)));
@@ -234,7 +248,8 @@ export class LogPalace {
         }
       }
       if(stats.size===offset){
-        this.db.prepare('UPDATE files SET scan_position=?,dev=?,ino=?,missing=0 WHERE id=?').run(offset,String(stats.dev),String(stats.ino),file.id as number);
+        this.db.prepare('UPDATE files SET scan_position=?,dev=?,ino=?,mtime_ms=?,ctime_ms=?,content_hash=?,missing=0 WHERE id=?')
+          .run(offset,String(stats.dev),String(stats.ino),stats.mtimeMs,stats.ctimeMs,this.contentHash(fd,offset),file.id as number);
         return {lines:0,records:0,bytes:0,reset,stalled:false,partial:false};
       }
       const toRead=Math.min(stats.size-scan,allocation,MAX_PER_FILE);
@@ -244,9 +259,9 @@ export class LogPalace {
       if(firstEnd<0){
         const at=scan+n;
         if(at-offset>MAX_RECORD_BYTES)throw new Error('RECORD_TOO_LARGE');
-        this.db.prepare('UPDATE files SET scan_position=?,dev=?,ino=?,head_hash=?,tail_hash=?,missing=0 WHERE id=?')
+        this.db.prepare('UPDATE files SET scan_position=?,dev=?,ino=?,head_hash=?,tail_hash=?,mtime_ms=?,ctime_ms=?,missing=0 WHERE id=?')
           .run(at,String(stats.dev),String(stats.ino),this.fingerprint(fd,0,at),
-            this.fingerprint(fd,Math.max(0,at-4096),Math.min(4096,at)),file.id as number);
+            this.fingerprint(fd,Math.max(0,at-4096),Math.min(4096,at)),stats.mtimeMs,stats.ctimeMs,file.id as number);
         return {lines:0,records:0,bytes:n,reset,stalled:false,partial:true};
       }
       let processed=0,count=0,position=0;
@@ -280,9 +295,10 @@ export class LogPalace {
           }
           at=offset+position;consumed=position;
         }
-        this.db.prepare('UPDATE files SET position=?,scan_position=?,session=?,turn=?,cwd=?,dev=?,ino=?,head_hash=?,tail_hash=?,missing=0 WHERE id=?')
+        this.db.prepare('UPDATE files SET position=?,scan_position=?,session=?,turn=?,cwd=?,dev=?,ino=?,head_hash=?,tail_hash=?,mtime_ms=?,ctime_ms=?,content_hash=?,missing=0 WHERE id=?')
           .run(at,at,context.session,context.turn,context.cwd,String(stats.dev),String(stats.ino),
-            this.fingerprint(fd,0,at),this.fingerprint(fd,Math.max(0,at-4096),Math.min(4096,at)),file.id as number);
+            this.fingerprint(fd,0,at),this.fingerprint(fd,Math.max(0,at-4096),Math.min(4096,at)),stats.mtimeMs,stats.ctimeMs,
+            at===stats.size?this.contentHash(fd,at):null,file.id as number);
         return {lines:processed,records:count,bytes:consumed,reset,stalled:false,partial:false};
       });
     }finally{closeSync(fd)}
@@ -293,20 +309,22 @@ export class LogPalace {
     const candidates:{source:Row,path:string,mtime:number,size:number,epoch:number}[]=[];
     const saved=new Map((this.db.prepare('SELECT path,position,scan_position FROM files').all() as Row[])
       .map(f=>[value(f.path),Math.max(Number(f.position),Number(f.scan_position??0))]));
-    const seen=new Set<string>();
-    let discoveryIncomplete=false;
-    const pages=new Map<number,{source:Row,items:{source:Row,path:string,mtime:number,size:number,epoch:number}[],complete:boolean,epoch:number}>();
-    const perSourceFiles=Math.max(1,Math.ceil(maxFiles/Math.max(1,registered.length)));
-    const perSourceEntries=Math.max(256,perSourceFiles*8);
-    for(const source of registered){
+    let discoveryIncomplete=maxFiles<registered.length;
+    const pages=new Map<number,{source:Row,complete:boolean,epoch:number}>();
+    const rrRow=this.db.prepare("SELECT value FROM palace_state WHERE key='source_rr_start'").get() as Row|undefined;
+    const rrStart=registered.length?Math.max(0,Number(rrRow?.value??0))%registered.length:0;
+    const ordered=registered.length?[...registered.slice(rrStart),...registered.slice(0,rrStart)]:[];
+    const base=registered.length?Math.floor(maxFiles/registered.length):0;
+    const remainder=registered.length?maxFiles%registered.length:0;
+    for(let index=0;index<ordered.length;index++){
+      const source=ordered[index],quota=base+(index<remainder?1:0);
+      if(quota<1)continue;
       const root=value(source.path);
       if(!existsSync(root)){this.db.prepare('UPDATE files SET missing=1 WHERE source_id=?').run(source.id as number);continue}
-      const page=this.scanPage(source,perSourceEntries,perSourceFiles);
+      const page=this.scanPage(source,Math.max(256,quota*8),quota);
       discoveryIncomplete ||= !page.complete;
       const items:{source:Row,path:string,mtime:number,size:number,epoch:number}[]=[];
       for(const p of page.paths){
-        if(seen.has(p))continue;
-        seen.add(p);
         try{const s=statSync(p);items.push({source,path:p,mtime:s.mtimeMs,size:s.size,epoch:page.epoch})}catch{}
       }
       items.sort((a,b)=>{
@@ -314,17 +332,13 @@ export class LogPalace {
         const bp=b.size>(saved.get(b.path)??-1)?0:1;
         return ap-bp || b.mtime-a.mtime || a.path.localeCompare(b.path);
       });
-      pages.set(Number(source.id),{source,items,complete:page.complete,epoch:page.epoch});
+      candidates.push(...items);
+      pages.set(Number(source.id),{source,complete:page.complete,epoch:page.epoch});
     }
-    // Round-robin candidates across registered sources so a hot root cannot starve a cold root.
-    let emitted=true;
-    while(candidates.length<maxFiles&&emitted){
-      emitted=false;
-      for(const source of registered){
-        const page=pages.get(Number(source.id));
-        const next=page?.items.shift();
-        if(next){candidates.push(next);emitted=true;if(candidates.length>=maxFiles)break}
-      }
+    if(registered.length){
+      const advance=Math.min(maxFiles,registered.length);
+      this.db.prepare("INSERT INTO palace_state(key,value) VALUES('source_rr_start',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value")
+        .run(String((rrStart+advance)%registered.length));
     }
     let indexed=0,files=0,bytes=0,reset=0,stalled=0,partial=0,lines=0;
     const failures:string[]=[];
@@ -350,7 +364,7 @@ export class LogPalace {
   }
   private record(ref:string):Row {
     if(!/^[a-f0-9]{48}$/.test(ref))throw new Error('INVALID_REF');
-    const row=this.db.prepare("SELECT r.*,f.path,f.missing FROM records r JOIN files f ON f.id=r.file_id WHERE r.ref=?").get(ref) as Row|undefined;
+    const row=this.db.prepare("SELECT r.*,f.path,f.missing,f.source_id FROM records r JOIN files f ON f.id=r.file_id WHERE r.ref=?").get(ref) as Row|undefined;
     if(!row)throw new Error('REF_NOT_FOUND');
     if(Number(row.missing)||!existsSync(value(row.path)))throw new Error('SOURCE_MISSING');
     return row;
@@ -419,10 +433,12 @@ export class LogPalace {
     }
     if(focus.file_key)push('same_file','explicit argument path resolved against logged cwd',base+" AND r.file_key=? LIMIT ?",
       [ref,value(focus.file_key),limit]);
-    if(focus.turn&&focus.session)push('same_turn','explicit session and turn',base+" AND r.session=? AND r.turn=? LIMIT ?",
-      [ref,value(focus.session),value(focus.turn),limit]);
-    if(focus.session)push('same_session','explicit session identity',base+" AND r.session=? LIMIT ?",
-      [ref,value(focus.session),limit]);
+    if(focus.turn&&focus.session)push('same_turn','explicit session and turn within registered source lineage',
+      base+" AND r.session=? AND r.turn=? AND f.source_id=? LIMIT ?",
+      [ref,value(focus.session),value(focus.turn),Number(focus.source_id),limit]);
+    if(focus.session)push('same_session','explicit session identity within registered source lineage',
+      base+" AND r.session=? AND f.source_id=? LIMIT ?",
+      [ref,value(focus.session),Number(focus.source_id),limit]);
     const seen=new Set<string>(),neighbors=[];
     for(const relation of rels){
       const key=value(relation.row.ref);
