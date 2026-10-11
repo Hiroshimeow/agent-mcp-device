@@ -15,6 +15,21 @@ mcp-device status
 
 Device source v1.0.11 is available on GitHub `main`, and requires Node **>=22.13.0**, including built-in `node:sqlite` with FTS5. Upgrade Node before using this source; no external SQLite npm driver is required. The 1.0.10 npm installation example above is historical: source delivery alone does **not** establish that 1.0.11 was published on npm or deployed.
 
+## Log-first memory search (source/P1)
+
+The new opt-in local CLI searches **existing Pi/Codex/MCP sessions and logs**, without enabling Context live capture/observer. See [log search commands and limitations](docs/log-palace.md).
+
+```text
+mcp-device logs discover
+mcp-device logs add <file-or-dir> --format auto
+mcp-device logs index
+mcp-device logs search --query "timeout reconnect" --limit 5
+mcp-device logs read --ref <ref>
+mcp-device logs graph --ref <ref>
+```
+
+These commands are available after building this source; they do **not** imply npm publication, production deployment, Wiki Palace or automatic skill learning.
+
 ## Device-local context
 
 ```text

@@ -8,6 +8,13 @@ if (process.argv[2] === 'context') {
   process.stdout.write(result.stdout);
   process.stderr.write(result.stderr);
   process.exitCode = result.exitCode;
+} else if (process.argv[2] === 'logs') {
+  // On-demand, local log search. Independent of Context capture/observer and remote startup.
+  const { runLogPalaceCli } = await import('./log-palace/cli.js');
+  const result = runLogPalaceCli(process.argv.slice(3));
+  process.stdout.write(result.stdout);
+  process.stderr.write(result.stderr);
+  process.exitCode = result.exitCode;
 } else {
   if (process.argv[2] !== 'remote') process.argv.splice(2, 0, 'remote');
   const { runRemote } = await import('./npm-scripts/remote.js');
