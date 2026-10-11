@@ -33,8 +33,8 @@ export function parse(format:ResolvedFormat,line:string,before:Context):{items:I
   const items:Item[]=[];
   const add=(part:number,kind:string,body:string,o:Partial<Item>={})=>{
     if(!body.trim())return;
-    const searchText=body.slice(0,250000);
-    items.push({part,kind,searchText,preview:searchText.replace(/\s+/g,' ').trim().slice(0,135),
+    const searchText=body;
+    items.push({part,kind,searchText,preview:body.slice(0,4096).replace(/\s+/g,' ').trim().slice(0,135),
       timestamp:o.timestamp??str(x?.timestamp),session:o.session??session,turn:o.turn??turn,
       callId:o.callId??null,tool:o.tool??null,filePath:o.filePath??null,outcome:o.outcome??null});
   };

@@ -145,10 +145,152 @@ test('Read fails on changed source bytes even before the next index; no stale bo
   writeFileSync(p,'SAME_SIZE_CONTENT_TWO\n');
   assert.throws(()=>db.read(ref),/SOURCE_CHANGED/);
 });
-test('Incomplete giant record reports stalled rather than indexing invented result',t=>{
+test('Incomplete giant record advances a durable partial cursor without inventing a result',t=>{
   const {root,db}=setup(t),p=join(root,'partial.jsonl');
   writeFileSync(p,'{"type":"message","message":{"role":"user","content":"'+ 'x'.repeat(15000));
-  db.add(p,'pi');const state=db.index({maxFiles:1,maxBytes:8192});
-  assert.equal(state.stalled,1);assert.equal(state.total_records,0);
-  assert.equal(db.search('missing').count,0);
+  db.add(p,'pi');let state=db.index({maxFiles:1,maxBytes:8192});
+  state=db.index({maxFiles:1,maxBytes:8192});
+  assert.equal(state.stalled,0);assert.equal(state.partial,1);assert.equal(state.more_files,false);assert.equal(state.total_records,0);
+  appendFileSync(p,'"}}\n');state=db.index({maxFiles:1,maxBytes:8192});
+  assert.equal(state.records,1);assert.equal(db.search('missing').count,0);
+});
+
+test('P1: giant complete JSONL line indexes unique marker beyond eight MiB and supports verified read',t=>{
+  const {root,db}=setup(t),p=join(root,'giant.jsonl');
+  const marker='GIANT_RECORD_LAST_7A19B';
+  writeFileSync(p,j({type:'message',message:{role:'assistant',content:[{type:'text',text:'x '.repeat(5*1024*1024)+marker}]}}));
+  db.add(p,'pi');
+  for(let attempt=0;attempt<8;attempt++){
+    const step=db.index({maxBytes:16*1024*1024});
+    if(db.search(marker).count)break;
+    assert.equal(step.stalled,0,'a complete oversized line must make bounded progress');
+  }
+  const items=db.search(marker).items;
+  assert.equal(items.length,1,'late content must be searchable');
+  assert.equal(db.read(items[0].ref,8192).truncated,true,'bounded read should indicate omitted tail');
+});
+
+test('P1: source scan reaches a cold file beyond 10000 entries with bounded calls',t=>{
+  const {root,db}=setup(t),dir=join(root,'bulk');mkdirSync(dir);
+  for(let i=0;i<10020;i++)writeFileSync(join(dir,'f'+String(i).padStart(5,'0')+'.log'),'BULK_ENTRY_'+i+'\n');
+  db.add(dir,'text');
+  let completed=false;
+  for(let i=0;i<120;i++){
+    const result=db.index({maxFiles:200,maxBytes:1024*1024});
+    if(db.search('BULK_ENTRY_10019').count){completed=true;break;}
+    assert.equal(result.more_files,true,'scan must disclose incomplete discovery');
+  }
+  assert.equal(completed,true,'the scan must eventually reach entries beyond the legacy 10000-file cap');
+});
+
+test('P1: reused session and call IDs from independent source files cannot create a false call edge',t=>{
+ const {root,db}=setup(t),a=join(root,'independent-a.jsonl'),b=join(root,'independent-b.jsonl');
+ writeFileSync(a,pi('same-session','same-call','SOURCE_A_ONLY'));
+ writeFileSync(b,pi('same-session','same-call','SOURCE_B_ONLY'));
+ db.add(a,'pi');db.add(b,'pi');db.index();
+ const hit=db.search('SOURCE_A_ONLY').items.find(x=>x.kind==='tool_call');
+ assert.ok(hit);
+ const connected=db.graph(hit.ref).neighbors.filter(x=>x.relation==='same_tool_call');
+ assert.ok(connected.some(x=>String(x.preview).includes('RESULT_SOURCE_A_ONLY')));
+ assert.equal(connected.some(x=>String(x.preview).includes('SOURCE_B_ONLY')),false);
+});
+
+test('P1: FTS preserves a logical token longer than SQLite token limit',t=>{
+  const {root,db}=setup(t),p=join(root,'long-token.log');
+  const token='a'.repeat(40000)+'TAIL9Z';
+  writeFileSync(p,token+'\n');db.add(p,'text');db.index({maxBytes:128*1024});
+  assert.equal(db.search(token).count,1);
+});
+
+test('P1: discovery cursor survives database restart',t=>{
+  const root=mkdtempSync(join(tmpdir(),'mcp-palace-restart-')),logs=join(root,'logs'),state=join(root,'db');mkdirSync(logs);
+  t.after(()=>rmSync(root,{recursive:true,force:true}));
+  for(let i=0;i<600;i++)writeFileSync(join(logs,'r'+String(i).padStart(4,'0')+'.log'),'RESTART_SCAN_'+i+'\n');
+  let db=new LogPalace(state);db.add(logs,'text');db.index({maxFiles:25,maxBytes:1024*1024});db.close();
+  db=new LogPalace(state);
+  let found=false;for(let i=0;i<30;i++){db.index({maxFiles:25,maxBytes:1024*1024});if(db.search('RESTART_SCAN_599').count){found=true;break;}}
+  db.close();assert.equal(found,true);
+});
+
+test('P1: bounded indexing is fair across multiple registered roots',t=>{
+  const {root,db}=setup(t),hot=join(root,'hot'),cold=join(root,'cold');mkdirSync(hot);mkdirSync(cold);
+  for(let i=0;i<100;i++)writeFileSync(join(hot,'h'+i+'.log'),'HOT_'+i+'\n');
+  writeFileSync(join(cold,'cold.log'),'COLD_FAIR_SENTINEL\n');
+  db.add(hot,'text');db.add(cold,'text');
+  db.index({maxFiles:2,maxBytes:4096});
+  assert.equal(db.search('COLD_FAIR_SENTINEL').count,1);
+});
+
+test('P1: completed discovery epoch invalidates a deleted directory member without scanning every known file each call',t=>{
+  const {root,db}=setup(t),dir=join(root,'stale-dir');mkdirSync(dir);
+  const a=join(dir,'a.log'),b=join(dir,'b.log');writeFileSync(a,'STALE_DIR_A\n');writeFileSync(b,'STALE_DIR_B\n');
+  db.add(dir,'text');let guard=0;while(db.index({maxFiles:1,maxBytes:4096}).more_files&&guard++<10){}
+  const ref=db.search('STALE_DIR_B').items[0].ref;unlinkSync(b);
+  guard=0;while(db.index({maxFiles:1,maxBytes:4096}).more_files&&guard++<10){}
+  assert.equal(db.search('STALE_DIR_B').count,0);assert.throws(()=>db.read(ref),/SOURCE_MISSING/);
+});
+
+test('P1: overlapping registered roots do not duplicate a physical log locator',t=>{
+  const {root,db}=setup(t),parent=join(root,'parent'),child=join(parent,'child');mkdirSync(parent);mkdirSync(child);
+  const p=join(child,'one.log');writeFileSync(p,'OVERLAP_ONE_SENTINEL\n');
+  db.add(parent,'text');db.add(child,'text');
+  for(let i=0;i<6;i++)db.index({maxFiles:2,maxBytes:4096});
+  const hits=db.search('OVERLAP_ONE_SENTINEL',20).items;
+  assert.equal(hits.length,1);assert.equal(new Set(hits.map(x=>x.ref)).size,1);
+});
+
+test('P1: JSONL record larger than 64 MiB resumes across calls and keeps late search coverage',t=>{
+  const {root,db}=setup(t),p=join(root,'over64.jsonl'),marker='OVER_64MIB_LATE_MARKER_71ZX';
+  const text='x '.repeat(34*1024*1024)+marker;
+  writeFileSync(p,j({type:'message',message:{role:'assistant',content:[{type:'text',text}]}}));
+  db.add(p,'pi');let found=false,sawPartial=false;
+  for(let i=0;i<8;i++){
+    const step=db.index({maxFiles:1,maxBytes:16*1024*1024});sawPartial ||= step.partial>0;
+    if(db.search(marker).count){found=true;break;}
+  }
+  assert.equal(sawPartial,true);assert.equal(found,true);
+  const hit=db.search(marker).items[0];assert.equal(db.read(hit.ref,1024).truncated,true);
+});
+
+test('P1: same-size rewrite is fingerprint-detected and stale FTS rows are replaced',t=>{
+  const {root,db}=setup(t),p=join(root,'same-size.log');
+  writeFileSync(p,'SAME_SIZE_OLD_12345\n');db.add(p,'text');db.index();
+  const old=db.search('SAME_SIZE_OLD_12345').items[0].ref;
+  writeFileSync(p,'SAME_SIZE_NEW_12345\n');const step=db.index();
+  assert.equal(step.reset,1);assert.equal(db.search('SAME_SIZE_OLD_12345').count,0);assert.equal(db.search('SAME_SIZE_NEW_12345').count,1);
+  assert.throws(()=>db.read(old),/REF_NOT_FOUND/);
+});
+
+test('P1: copytruncate and regrow do not preserve stale records',t=>{
+  const {root,db}=setup(t),p=join(root,'copytruncate.log');
+  writeFileSync(p,'COPYTRUNCATE_OLD_A\nCOPYTRUNCATE_OLD_B\n');db.add(p,'text');db.index();
+  writeFileSync(p,'COPYTRUNCATE_NEW\n');let step=db.index();assert.equal(step.reset,1);
+  assert.equal(db.search('COPYTRUNCATE_OLD_A').count,0);assert.equal(db.search('COPYTRUNCATE_NEW').count,1);
+  appendFileSync(p,'COPYTRUNCATE_REGROW\n');step=db.index();assert.equal(step.records,1);assert.equal(db.search('COPYTRUNCATE_REGROW').count,1);
+});
+
+test('P1: append after partial scan resumes once without duplicate locator',t=>{
+  const {root,db}=setup(t),p=join(root,'partial-append.log');
+  writeFileSync(p,'PARTIAL_APPEND_SENTINEL');db.add(p,'text');let step=db.index({maxBytes:4096});
+  assert.equal(step.partial,1);assert.equal(step.more_files,false);
+  appendFileSync(p,'\n');step=db.index({maxBytes:4096});assert.equal(step.records,1);
+  assert.equal(db.search('PARTIAL_APPEND_SENTINEL',20).items.length,1);assert.equal(db.index({maxBytes:4096}).records,0);
+});
+
+test('P1: chunked FTS matches query terms that live in distant windows of one large record',t=>{
+  const {root,db}=setup(t),p=join(root,'chunked.log');
+  writeFileSync(p,'DISTANT_ALPHA '+('m '.repeat(700000))+' DISTANT_OMEGA\n');db.add(p,'text');db.index({maxBytes:4*1024*1024});
+  const hits=db.search('DISTANT_ALPHA DISTANT_OMEGA',20).items;assert.equal(hits.length,1);
+});
+
+test('P1: chunked FTS preserves a greater-than-32768-byte logical token in a large record',t=>{
+  const {root,db}=setup(t),p=join(root,'chunk-long-token.log');
+  const token='z'.repeat(70000)+'TAIL_CHUNK_TOKEN';
+  writeFileSync(p,('pad '.repeat(300000))+token+'\n');db.add(p,'text');db.index({maxBytes:4*1024*1024});
+  assert.equal(db.search(token).count,1);
+});
+
+test('P1: search never silently drops query terms beyond the safe FTS budget',t=>{
+  const {root,db}=setup(t),p=join(root,'query-budget.log');writeFileSync(p,'one two three\n');db.add(p,'text');db.index();
+  assert.throws(()=>db.search(Array.from({length:25},(_,i)=>'term'+i).join(' ')),/BUDGET_EXCEEDED/);
 });
