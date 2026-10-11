@@ -324,8 +324,13 @@ export class LogPalace {
       const page=this.scanPage(source,Math.max(256,quota*8),quota);
       discoveryIncomplete ||= !page.complete;
       const items:{source:Row,path:string,mtime:number,size:number,epoch:number}[]=[];
+      const markSeen=this.db.prepare('UPDATE files SET seen_epoch=?,missing=0 WHERE path=? AND source_id=?');
       for(const p of page.paths){
-        try{const s=statSync(p);items.push({source,path:p,mtime:s.mtimeMs,size:s.size,epoch:page.epoch})}catch{}
+        try{
+          const s=statSync(p);
+          markSeen.run(page.epoch,p,source.id as number);
+          items.push({source,path:p,mtime:s.mtimeMs,size:s.size,epoch:page.epoch});
+        }catch{}
       }
       items.sort((a,b)=>{
         const ap=a.size>(saved.get(a.path)??-1)?0:1;

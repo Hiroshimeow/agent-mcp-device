@@ -324,3 +324,19 @@ test('P1 independent: reused session identity across separately registered logs 
   const edges=db.graph(hit.ref).neighbors.filter(x=>x.relation==='same_session'||x.relation==='same_turn');
   assert.equal(edges.some(x=>String(x.preview).includes('SESSION_B_ONLY')),false);
 });
+
+test('P1 review R1: discovery visibility survives byte-budget exhaustion and restart',t=>{
+  const root=mkdtempSync(join(tmpdir(),'mcp-palace-r1-')),dir=join(root,'logs'),state=join(root,'db');mkdirSync(dir);
+  const a=join(dir,'a.log'),b=join(dir,'b.log');writeFileSync(a,'R1_A_BASE\n');writeFileSync(b,'R1_B_STABLE\n');
+  let db=new LogPalace(state);db.add(dir,'text');
+  for(let i=0;i<6&&(!db.search('R1_A_BASE').count||!db.search('R1_B_STABLE').count);i++)db.index({maxFiles:2,maxBytes:4096});
+  const stable=db.search('R1_B_STABLE').items[0];assert.ok(stable);assert.match(db.read(stable.ref).text,/R1_B_STABLE/);
+  appendFileSync(a,'R1_A_GROW '+('x'.repeat(1400))+'\n');
+  const step=db.index({maxFiles:2,maxBytes:1024});
+  assert.ok(step.bytes>=1024||step.more_files);
+  assert.equal(db.search('R1_B_STABLE').count,1,'discovered unchanged file must not be marked missing when byte budget is spent elsewhere');
+  assert.match(db.read(stable.ref).text,/R1_B_STABLE/);
+  db.close();db=new LogPalace(state);
+  assert.equal(db.search('R1_B_STABLE').count,1,'visibility must survive DB restart');
+  assert.match(db.read(stable.ref).text,/R1_B_STABLE/);db.close();rmSync(root,{recursive:true,force:true});
+});
