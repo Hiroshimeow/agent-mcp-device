@@ -44,4 +44,4 @@ No shared Wiki, learned-skill scheduler, cross-device replication, semantic/vect
 
 ## Known limitations to evaluate next
 
-Real logs may have incomplete session coverage, files too large for one slice, giant lines, non-UTF8 encodings, source rotations while scanning and >10,000 matching directory files. No confidence claim is made without concrete test evidence. max-files/max-bytes cap one indexing call and calls can be repeated; stalled and more_files indicate partial progress.
+Real logs may have incomplete session coverage, files too large for one slice, giant lines, non-UTF8 encodings, source rotations while scanning and >10,000 matching directory files. No confidence claim is made without concrete test evidence. max-files/max-bytes cap one indexing call and calls can be repeated; partial and more_files expose bounded progress without claiming complete coverage.

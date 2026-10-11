@@ -24,17 +24,19 @@ Only the derived index is written. Original logs are unchanged. This is a local 
 
 ### Verification
 
-- Initial TS compiler/type-check PASS; after later graph fairness fixes build and **11/11 targeted regression tests PASS**.
-- Isolated **real logs G6**: 3 sources (Pi, Codex, MCP history), 6,270,444 bytes, 1,652 indexed records, ~483 ms initial indexing, ~3.48 ms one FTS query, repeat index 0 new records. Exact call/result graph link and selected source read verified. Raw log hashes unchanged. This is one measured smoke, **not** search p95 or token economy proof.
-- Evidence/output outside Git: E:\git-project\_mcp-consolidation-20261011\palace-real-smoke-result.json, log-palace-tests.out.txt and log-palace-build.out.txt.
+- Final P1 correctness source SHA `2526811340dc9984e767f3ad043ddcc250bdf946`; docs may be later. Build PASS.
+- Log Palace regression suite **29/29 PASS**; independent acceptance script **7/7 PASS on Windows and 7/7 PASS on WSL Linux** after fixing maxFiles=1 cross-root starvation, same-size interior mutation, and cross-source reused-session graph edges.
+- Existing Context compatibility tests **10/10 PASS** and Context consistency checker PASS.
+- Clean full Device suite **66/66 PASS**; no source/build race during the final run.
+- Latest isolated real-log benchmark: 3 authorized sources, 6,690,674 input bytes, 1,759 records; index p50/p95 ~900/1107 ms, search p50/p95 ~1.89/3.19 ms, raw hashes unchanged. See Spec 006 HANDOFF for RSS/storage/response-byte receipts and 10,020-file benchmark.
 - Existing P0 historic audit is [P0-BASELINE-AUDIT.md](../specs/006-agent-memory-palace/P0-BASELINE-AUDIT.md). Its legacy capture observer bugs are NOT prerequisites to log-first P1.
-- Full Device suite and Linux parity have not been rerun in this increment; do not call the product fully certified.
+- P1 still requires a fresh independent TEST pass on committed `2526811` plus REVIEW/PLAN closure; do not call the product released or deployed.
 
 ## What is still NOT implemented
 
 - LLM Wiki / ReMe/OpenViking backend, cross-device portable Palace and automatic no-guide new-repo recall.
 - Agent-owned skill learning, lazy publication, scheduled merge and rollback.
-- Handling a giant single log line that exceeds the per-file scan budget, exhaustive >10,000-file directory discovery, indexing p95 benchmarks.
+- Unlimited single-record support is not implemented: complete records above 128 MiB fail explicitly with `RECORD_TOO_LARGE`. Compressed rotated logs are not indexed. Bounded >10,000-file discovery and p50/p95 benchmarks are implemented and measured.
 - Additional authorization/secret gates are **not** intended for already-authorized local reads. If Wiki is later exported to another account/service, that separate transfer requires only the existing applicable access controls.
 
 ## Next agent
