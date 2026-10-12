@@ -10,7 +10,7 @@ Commands:
 - mcp-device logs sources
 - mcp-device logs index [--max-files N] [--max-bytes N]
 - mcp-device logs search --query "terms" [--limit N]
-- mcp-device logs read --ref <48-hex-ref> [--max-bytes N]
+- mcp-device logs read --ref <48-hex-ref> [--max-bytes N] [--from-byte N]
 - mcp-device logs graph --ref <48-hex-ref> [--limit N]
 
 Returns compact one-line JSON with ok/result on success and ok/error on failure. The client provides no LLM call, no implicit watcher, no capture observer and no extra authorization/redaction prompts. The existing logged-on OS user's file access controls apply.

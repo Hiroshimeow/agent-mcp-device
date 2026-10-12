@@ -40,6 +40,10 @@
 
 Do **not** expand P1 by adding an observer, broker, capture lifecycle, LLM summarization queue or permissions wrapper already handled by OS/MCP.
 
+## P1 next acceptance (2026-10-12)
+
+The old source checkpoint 716f011 covers indexing/fairness but not the newly observed late-hit retrieval or UTF-8 boundary failures. Bounded source fix adds a raw-source byte anchor for an exact matching term and an optional `--from-byte` raw-source read, retaining the no-offset legacy selection path. Independent TEST and REVIEW on final SHA remain required; unanchored normalized/synthetic FTS matches are not fabricated as original byte offsets.
+
 ## P2 — Wiki Palace (NOT STARTED)
 
 Use real P1 retrieval fixtures to evaluate ReMe vs OpenViking with *one* selected backend. Wiki is organized long-term memory; raw logs remain authoritative. Measure LLM digest cost, stale-claim handling, evidence refs, offline usability and source-provenance retention. Do not write our own wiki engine.

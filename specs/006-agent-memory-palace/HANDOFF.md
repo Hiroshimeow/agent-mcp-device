@@ -114,6 +114,12 @@ Pinned/public references used for the finite P1 invariants:
 - TEST turn 1 originally found F1/F2/F3; DEV `2526811` closed them. REVIEW turn 1 then found R1 (discovered valid files could be falsely marked missing when byte budget stopped indexing mid-page); DEV `716f011` marks discovery visibility independently of indexing budget. The same independent acceptance script remains **7/7 PASS** on Windows and Linux; fresh independent TEST/REVIEW must verify `716f011` before PLAN closure.
 - Stop before Wiki/P2, skills or cross-device integration unless separately instructed.
 
-## 9. Operational guardrails
+## 9. 2026-10-12 bounded LOCATE→READ continuation (DEV in progress)
+
+Historical P1 SHA `716f011` and docs `b748df4` do not close two observed bugs: a 132,023-byte source line returned one FTS hit but could not READ the late match under 65,536 bytes, and a UTF-8 split at 128 bytes emitted replacement characters and exceeded the budget. Current DEV work on the same G6 checkout adds SEARCH `hit_offset` (`source_record_byte` units) with `anchor_status=raw_match` only when a real source term was mapped; otherwise `hit_offset=null` and an honest `anchor_status`. READ `--from-byte` selects raw source bytes with complete record-hash verification, a UTF-8-safe bounded window, source-relative `range_start/range_end`, `next_offset` and truncation. Existing no-offset Pi selected-part behavior is retained. The original indexed corpus/source file is not rewritten. Fresh independent Windows/WSL TEST, 1.0.11 compatibility and architecture REVIEW of the final commit remain mandatory, and do not infer them from this handoff.
+
+**P2 one-backend design boundary (not authorized to implement):** Compare pinned versions/license of ReMe and OpenViking on the same sanitized indexed Pi/Codex/MCP corpus. Evaluate exact source-evidence references, incremental page updates, stale/contradictory claims, offline operation, on-demand pages, total LLM tokens and expense. No-change idle must make zero LLM calls. Select ONE mature backend only after measured decision; do not start a scheduler, adapter, auto-sync, new control plane, self-built wiki or publication. Then separately validate cold-agent cross-repo recall, and only later lazy validated skill consolidation. P1 continues to be ONE small local tool rather than a security platform.
+
+## 10. Operational guardrails
 
 No worktree/branch creation, reset/clean/stash of unrelated work, force-push, release, deployment or production reload. Keep Spec 002 regressions and private benchmark/raw-log evidence outside Git. Use exact SHAs and reproducible receipts as the acceptance basis.

@@ -20,6 +20,8 @@ node dist/mcp-device.js logs index --max-files 200 --max-bytes 33554432
 # Find compact refs (no raw log body), then read only the relevant record
 node dist/mcp-device.js logs search --query "reconnect timeout" --limit 5
 node dist/mcp-device.js logs read --ref <48-hex-ref> --max-bytes 8192
+# When SEARCH returns anchor_status=raw_match, fetch the exact late hit in ONE read:
+node dist/mcp-device.js logs read --ref <48-hex-ref> --from-byte <hit_offset> --max-bytes 8192
 
 # Optional associations from IDs/file paths actually present in source logs
 node dist/mcp-device.js logs graph --ref <48-hex-ref> --limit 12

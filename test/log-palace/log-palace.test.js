@@ -340,3 +340,64 @@ test('P1 review R1: discovery visibility survives byte-budget exhaustion and res
   assert.equal(db.search('R1_B_STABLE').count,1,'visibility must survive DB restart');
   assert.match(db.read(stable.ref).text,/R1_B_STABLE/);db.close();rmSync(root,{recursive:true,force:true});
 });
+
+test('P1 locate-read: a 132023-byte late hit is addressable with one bounded selected read',t=>{
+  const {root,db}=setup(t),p=join(root,'late-large.log'),marker='UNIQUE_LATE_HIT_20261012';
+  const raw='x '.repeat(60000)+marker+' '+'z'.repeat(132023-120000-marker.length-2)+'\n';
+  assert.equal(Buffer.byteLength(raw),132023);
+  writeFileSync(p,raw);db.add(p,'text');db.index({maxBytes:256*1024});
+  const hit=db.search(marker).items[0];assert.ok(hit);
+  assert.ok(hit.hit_offset>=65536,'SEARCH must supply a raw-source-byte offset for a late match');
+  assert.equal(hit.anchor_status,'raw_match');
+  const read=db.read(hit.ref,65536,hit.hit_offset);
+  assert.ok(read.text.includes(marker),'single READ using SEARCH anchor must include the evidence');
+  assert.equal(read.view,'raw_source');
+  assert.equal(read.range_start,hit.hit_offset);
+  assert.ok(Buffer.byteLength(read.text,'utf8')<=65536);
+  assert.equal(read.truncated,true,'earlier content was intentionally omitted');
+  assert.equal(read.next_offset,null,'the selected late window reaches EOF');
+  assert.ok(Buffer.byteLength(JSON.stringify(hit),'utf8')<900,'SEARCH locator remains compact');
+  assert.equal(readFileSync(p,'utf8'),raw);
+});
+
+test('P1 locate-read: UTF-8 boundary, CRLF, cursor round-trip and invalid range',t=>{
+  const {root,db}=setup(t),p=join(root,'utf8.log');
+  const raw='a'.repeat(127)+'😀'+'END\r\n';writeFileSync(p,raw);db.add(p,'text');db.index();
+  const hit=db.search('END').items[0];assert.ok(hit);
+  const ref=hit.ref,head=db.read(ref,128);
+  assert.equal(Buffer.byteLength(head.text,'utf8'),127);
+  assert.equal(head.text,'a'.repeat(127));
+  assert.equal(head.next_offset,127);
+  assert.equal(head.range_end,127);
+  assert.equal(head.text.includes('�'),false);
+  const tail=db.read(ref,128,head.next_offset);
+  assert.equal(tail.text,'😀END');
+  assert.equal(tail.range_start,127);
+  assert.equal(tail.range_end,Buffer.byteLength(raw,'utf8')-2);
+  assert.equal(tail.next_offset,null);
+  assert.ok(Buffer.byteLength(tail.text,'utf8')<=128);
+  assert.equal(head.text+tail.text,'a'.repeat(127)+'😀END');
+  assert.equal(hit.hit_offset,Buffer.byteLength('a'.repeat(127)+'😀','utf8'));
+  assert.throws(()=>db.read(ref,128,128),/INVALID_OFFSET/);
+  assert.throws(()=>db.read(ref,128,-1),/INVALID_OFFSET|BUDGET_EXCEEDED/);
+  assert.throws(()=>db.read(ref,128,9000),/INVALID_OFFSET/);
+  writeFileSync(p,'b'.repeat(127)+'😀END\r\n');
+  assert.throws(()=>db.read(ref,128,hit.hit_offset),/SOURCE_CHANGED/);
+});
+
+test('P1 locate-read: anchored Pi part uses verified raw JSON; legacy Pi part remains selected',t=>{
+  const {root,db}=setup(t),p=join(root,'pi-late.jsonl'),marker='PI_ANCHORED_LATE_20261012';
+  writeFileSync(p,pi('pi-large','id1','x '.repeat(60000)+marker));
+  db.add(p,'pi');db.index({maxBytes:1024*1024});
+  const hit=db.search(marker).items.find(x=>x.kind==='tool_call');
+  assert.ok(hit);assert.ok(hit.hit_offset>65536);
+  const source=db.read(hit.ref,8192,hit.hit_offset);
+  assert.equal(source.view,'raw_source');assert.match(source.text,/PI_ANCHORED_LATE_20261012/);
+  const legacy=db.read(hit.ref,8192);
+  assert.equal(legacy.view,'selected_part');assert.match(legacy.text,/^\{"type":"toolCall","id":"id1"/);
+  const status=runLogPalaceCli(['read','--ref',hit.ref,'--max-bytes','8192','--from-byte',String(hit.hit_offset)],join(root,'db'));
+  assert.equal(status.exitCode,0);
+  assert.match(JSON.parse(status.stdout).result.text,/PI_ANCHORED_LATE_20261012/);
+  const invalid=runLogPalaceCli(['read','--ref',hit.ref,'--from-byte','-3'],join(root,'db'));
+  assert.equal(invalid.exitCode,1);
+});

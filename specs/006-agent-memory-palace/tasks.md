@@ -23,6 +23,8 @@ All changes must name exact Git commit and test output. **[x] means code/tests d
 - [x] **T016** Review log aliasing, rotation across renamed paths, overlapping source registrations, and missing-file visibility. Final correctness commit `716f011`; regressions include same-size interior mutation invalidation, source-lineage scoping for reused session IDs, overlap, missing/stale refs, copytruncate/regrow, partial append and Linux parity.
 - [x] **T017** P1 source commit d5d28f5, README/STATUS/spec/handoff documentation follow-up in main, checked source/test receipts. Verify final docs commit via git log.
 
+- [ ] **T032** New P1 correctness acceptance (2026-10-12): late 132,023-byte evidence hit must be returned by one selected 65,536-byte read, UTF-8 budgets/cursors must be exact; TEST and REVIEW must independently approve final SHA. Developer-only red/green evidence is not closure.
+
 ## P2 — LLM Wiki Palace (not implemented)
 - [ ] **T018** Pin and audit ReMe/OpenViking upstream versions/license/features on identical sanitized *indexed log* corpus.
 - [ ] **T019** Choose one Wiki backend with evidence refs, incremental digest and bounded total LLM cost.

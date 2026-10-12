@@ -7,7 +7,7 @@ const usage=[
   'mcp-device logs sources                          # show registered inputs and index size',
   'mcp-device logs index [--max-files N] [--max-bytes N]',
   'mcp-device logs search --query "words" [--limit N]',
-  'mcp-device logs read --ref <ref> [--max-bytes N]',
+  'mcp-device logs read --ref <ref> [--max-bytes N] [--from-byte N]',
   'mcp-device logs graph --ref <ref> [--limit N]',
 ].join('\n');
 function integer(value:string|undefined,def:number):number {
@@ -28,14 +28,14 @@ export function runLogPalaceCli(argv:string[],stateDir?:string):CliResult {
       const arg=args[i];
       if(arg==='--json')continue;
       if(arg.startsWith('--')){
-        if(!['--format','--max-files','--max-bytes','--query','--ref','--limit'].includes(arg)||opts.has(arg))throw new Error('ACTION_UNSUPPORTED');
+        if(!['--format','--max-files','--max-bytes','--query','--ref','--limit','--from-byte'].includes(arg)||opts.has(arg))throw new Error('ACTION_UNSUPPORTED');
         if(i+1>=args.length)throw new Error('ACTION_UNSUPPORTED');
         opts.set(arg,args[++i]);
       }else positionals.push(arg);
     }
     const allowed:Record<string,string[]>={
       discover:[],add:['--format'],sources:[],index:['--max-files','--max-bytes'],
-      search:['--query','--limit'],read:['--ref','--max-bytes'],graph:['--ref','--limit'],
+      search:['--query','--limit'],read:['--ref','--max-bytes','--from-byte'],graph:['--ref','--limit'],
     };
     if(!(command in allowed)||[...opts.keys()].some(f=>!allowed[command].includes(f)))throw new Error('ACTION_UNSUPPORTED');
     db=new LogPalace(stateDir);
@@ -55,7 +55,7 @@ export function runLogPalaceCli(argv:string[],stateDir?:string):CliResult {
     }else{
       const ref=opts.get('--ref')??positionals[0];
       if(positionals.length>1||!ref)throw new Error('INVALID_REF');
-      result=command==='read'?db.read(ref,integer(opts.get('--max-bytes'),8192)):db.graph(ref,integer(opts.get('--limit'),12));
+      result=command==='read'?db.read(ref,integer(opts.get('--max-bytes'),8192),opts.has('--from-byte')?integer(opts.get('--from-byte'),0):undefined):db.graph(ref,integer(opts.get('--limit'),12));
     }
     return {exitCode:0,stdout:JSON.stringify({ok:true,result})+'\n',stderr:''};
   }catch(error){

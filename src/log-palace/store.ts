@@ -374,6 +374,46 @@ export class LogPalace {
     if(Number(row.missing)||!existsSync(value(row.path)))throw new Error('SOURCE_MISSING');
     return row;
   }
+  /** Locate FTS terms in original UTF-8 source bytes, never in synthetic search text. */
+  private sourceHit(row:Row,terms:string[]):{hit_offset:number|null;hit_term:string|null;anchor_status:string} {
+    const usable=terms.filter(term=>term.length>0).map(term=>({
+      term,matcher:new RegExp(term.replace(/[|\\{}()[\]^$+*?.]/g,'\\$&'),'iu'),
+      bytes:Buffer.byteLength(term,'utf8'),
+    }));
+    if(!usable.length)return {hit_offset:null,hit_term:null,anchor_status:'unmapped'};
+    let fd:number;
+    try{fd=openSync(value(row.path),'r')}
+    catch{return {hit_offset:null,hit_term:null,anchor_status:'source_unavailable'}}
+    try{
+      const total=Math.max(0,Number(row.record_bytes)-1),start=Number(row.record_position);
+      const overlap=Math.min(65540,Math.max(...usable.map(term=>Math.min(term.bytes,65536)))+4);
+      const block=Buffer.alloc(65536);
+      let carry=Buffer.alloc(0),at=0;
+      while(at<total){
+        const n=readSync(fd,block,0,Math.min(block.length,total-at),start+at);
+        if(n<1)return {hit_offset:null,hit_term:null,anchor_status:'source_unavailable'};
+        const data=carry.length?Buffer.concat([carry,block.subarray(0,n)]):block.subarray(0,n);
+        const base=at-carry.length;
+        // A scan boundary can bisect UTF-8; align before mapping character indexes to bytes.
+        let aligned=0;
+        while(aligned<data.length&&(data[aligned]&0xC0)===0x80)aligned++;
+        const text=data.subarray(aligned).toString('utf8');
+        let first:{offset:number;term:string}|undefined;
+        for(const entry of usable){
+          const match=entry.matcher.exec(text);
+          if(!match)continue;
+          const offset=base+aligned+Buffer.byteLength(text.slice(0,match.index),'utf8');
+          if(!first||offset<first.offset)first={offset,term:entry.term};
+        }
+        if(first)return {hit_offset:first.offset,hit_term:first.term,anchor_status:'raw_match'};
+        const kept=Math.min(overlap,data.length);
+        carry=Buffer.from(data.subarray(data.length-kept));
+        at+=n;
+      }
+      return {hit_offset:null,hit_term:null,anchor_status:'unmapped'};
+    }catch{return {hit_offset:null,hit_term:null,anchor_status:'source_unavailable'}}
+    finally{closeSync(fd)}
+  }
   search(query:string,limit=5) {
     const tokens=query.normalize('NFKC').match(/[\p{L}\p{N}_]+/gu)??[];
     if(!tokens.length)throw new Error('QUERY_REQUIRED');
@@ -387,38 +427,75 @@ export class LogPalace {
     const sql="WITH chunk_hits(record_id) AS ("+chunkIntersection+"), hits(record_id,rank) AS ("+
       "SELECT rowid,bm25(records_fts) FROM records_fts WHERE records_fts MATCH ? UNION ALL "+
       "SELECT record_id,0.0 FROM chunk_hits) "+
-      "SELECT r.ref,r.kind,r.tool,r.session,r.turn,r.file_path,r.timestamp,r.preview,f.path,min(h.rank) rank "+
+      "SELECT r.ref,r.kind,r.tool,r.session,r.turn,r.file_path,r.timestamp,r.preview,f.path,"+
+      "r.position AS record_position,r.bytes AS record_bytes,min(h.rank) rank "+
       "FROM hits h JOIN records r ON r.id=h.record_id JOIN files f ON f.id=r.file_id WHERE f.missing=0 "+
       "GROUP BY r.id ORDER BY rank,r.id DESC LIMIT ?";
     const rows=this.db.prepare(sql).all(...quoted,match,limit) as Row[];
-    return {query,items:rows.map(row=>({...row,rank:undefined})),count:rows.length};
+    return {query,items:rows.map(row=>{
+      const {rank,record_position,record_bytes,...item}=row;
+      return {...item,...this.sourceHit(row,tokens),hit_unit:'source_record_byte'};
+    }),count:rows.length};
   }
-  read(ref:string,maxBytes=8192) {
+  read(ref:string,maxBytes=8192,fromByte?:number) {
     safeInt(maxBytes,128,65536);
     const row=this.record(ref),fd=openSync(value(row.path),'r');
-    let body:Buffer;
     try{
       const len=Number(row.bytes);
       if(len>MAX_RECORD_BYTES)throw new Error('LINE_TOO_LARGE');
-      body=Buffer.alloc(len);
-      const n=readSync(fd,body,0,len,Number(row.position));
-      if(n!==len)throw new Error('SOURCE_CHANGED');
-      const source=body.subarray(0,body.at(-1)===10?body.length-1:body.length);
-      const withoutCr=source.subarray(0,source.at(-1)===13?source.length-1:source.length);
-      if(digest(withoutCr)!==row.hash)throw new Error('SOURCE_CHANGED');
+      const physical=Math.max(0,len-1),hash=createHash('sha256');
+      const block=Buffer.alloc(65536),base=Number(row.position);
+      const stats=fstatSync(fd);
+      if(base+len>stats.size)throw new Error('SOURCE_CHANGED');
+      let suffix=Buffer.alloc(0);
+      const requested=fromByte??0;
+      if(!Number.isSafeInteger(requested)||requested<0||requested>physical)throw new Error('INVALID_OFFSET');
+      const prefix=Buffer.alloc(Math.min(maxBytes+4,Math.max(0,physical-requested)));
+      let copied=0;
+      for(let at=0;at<physical;){
+        const n=readSync(fd,block,0,Math.min(block.length,physical-at),base+at);
+        if(n<1)throw new Error('SOURCE_CHANGED');
+        const part=block.subarray(0,n);
+        const begin=Math.max(0,requested-at),end=Math.min(n,requested+prefix.length-at);
+        if(begin<end){part.copy(prefix,copied,begin,end);copied+=end-begin}
+        // Hash excludes trailing CR, but always includes all other original bytes.
+        const combined=suffix.length?Buffer.concat([suffix,part]):part;
+        if(combined.length>1){hash.update(combined.subarray(0,combined.length-1));suffix=Buffer.from(combined.subarray(combined.length-1))}
+        else suffix=combined;
+        at+=n;
+      }
+      if(suffix.length&&suffix[0]!==13)hash.update(suffix);
+      if(hash.digest('hex')!==row.hash)throw new Error('SOURCE_CHANGED');
+      const terminal=Buffer.alloc(1);
+      if(readSync(fd,terminal,0,1,base+physical)!==1||terminal[0]!==10)throw new Error('SOURCE_CHANGED');
+      const endByte=physical-(suffix.length&&suffix[0]===13?1:0);
+      if(requested>endByte)throw new Error('INVALID_OFFSET');
+      const take=Math.min(copied,maxBytes,endByte-requested);
+      let first=0;
+      if(take>0&&(prefix[0]&0xC0)===0x80)throw new Error('INVALID_OFFSET');
+      let end=take;
+      while(end>0&&(prefix[end]&0xC0)===0x80)end--;
+      const raw=prefix.subarray(first,end);
+      let text=raw.toString('utf8'),view=fromByte===undefined&&Number(row.part)>=0?'selected_part':'raw_source';
+      let total=endByte;
+      if(view==='selected_part'){
+        // Keep the old selected Pi content-part semantics for unanchored reads.
+        const whole=Buffer.alloc(physical);
+        if(readSync(fd,whole,0,physical,base)!==physical)throw new Error('SOURCE_CHANGED');
+        try{const parsed=JSON.parse(whole.toString('utf8'));const selected=parsed?.message?.content?.[Number(row.part)];
+          if(selected!==undefined){text=JSON.stringify(selected);total=Buffer.byteLength(text,'utf8')}
+        }catch{}
+        const encoded=Buffer.from(text);
+        let cut=Math.min(maxBytes,encoded.length);
+        while(cut>0&&(encoded[cut]&0xC0)===0x80)cut--;
+        text=encoded.subarray(0,cut).toString('utf8');
+        return {ref,source:row.path,kind:row.kind,tool:row.tool,session:row.session,turn:row.turn,call_id:row.call_id,
+          offset:row.position,bytes:row.bytes,text,view,range_start:0,range_end:cut,next_offset:cut<total?cut:null,truncated:cut<total};
+      }
+      return {ref,source:row.path,kind:row.kind,tool:row.tool,session:row.session,turn:row.turn,call_id:row.call_id,
+        offset:row.position,bytes:row.bytes,text,view,range_start:requested,range_end:requested+end,
+        next_offset:requested+end<endByte?requested+end:null,truncated:requested>0||requested+end<endByte};
     }finally{closeSync(fd)}
-    let text=body.toString('utf8').trimEnd();
-    if(Number(row.part)>=0){
-      try{
-        const p=JSON.parse(text);
-        const block=p?.message?.content?.[Number(row.part)];
-        if(block!==undefined)text=JSON.stringify(block);
-      }catch{}
-    }
-    const content=Buffer.from(text);
-    return {ref,source:row.path,kind:row.kind,tool:row.tool,session:row.session,turn:row.turn,call_id:row.call_id,
-      offset:row.position,bytes:row.bytes,text:content.subarray(0,maxBytes).toString('utf8'),
-      truncated:content.length>maxBytes};
   }
   graph(ref:string,limit=12) {
     safeInt(limit,1,30);
