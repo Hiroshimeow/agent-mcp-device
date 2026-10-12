@@ -1,6 +1,6 @@
 # 006 — Implementation plan, log-first
 
-**Source baseline:** G6 Device main at eaa5192 (P0 audit). **Scope currently active:** P1 existing-log CLI/index. Later phases stay pending. No PI, no worktrees or code on production G8 in this task.
+**Source baseline:** G6 Device main at eaa5192 (P0 audit). **P1 source milestone accepted:** G6 `main@e1f7471` on 2026-10-13; not released/deployed. **Next bounded decision:** P2 Wiki backend evaluation, not implementation. No PI, worktrees, or changes to production G8.
 
 ## Flow
 
@@ -26,11 +26,11 @@
 - Graph uses exact call ID plus session/file scope and absolute file identity resolved against logged cwd. No file-name-only cross-repo join or inferred causality.
 - CLI search body-free locator; read/graph bounded with explicit limits.
 
-**P1 test gate:** Node 22.13+, TypeScript build, 11 targeted regression tests, legacy Context targeted tests, and isolated real-log smoke. Record actual successes/limits in [HANDOFF.md](HANDOFF.md).
+**Final P1 gate (passed):** Node 22.x, independent G6 Windows Log Palace 39/39, full Device build/test 66/66, independent provenance 10/10 on Windows and WSL, clean source REVIEW on `e1f7471`. Prior benchmarks and unresolved stress regimes are labeled historical/NOT_MEASURED in [HANDOFF.md](HANDOFF.md).
 
-### P1 hardening still open
+### P1 hardening — historical checklist, accepted in source at e1f7471
 
-- Robust handling for individual lines larger than per-file indexing budget. Current index reports stalled, does **not** silently mark a partial JSON record complete.
+- Giant lines advance a durable partial index cursor under the per-call byte budget; incomplete final lines are never published as complete, and complete records above 128 MiB fail explicitly.
 - Directory/file rotation with overlapping registered sources and long-lived Windows file handles; validate Windows/Linux.
 - Real-log throughput, disk/FTS growth, search p95 and compact response sizes on repeat runs. No conjectured token-savings percentage.
 - Large-directory discovery (>10,000 matching files) and fair resumable paging; must not silently claim full coverage.
@@ -40,9 +40,9 @@
 
 Do **not** expand P1 by adding an observer, broker, capture lifecycle, LLM summarization queue or permissions wrapper already handled by OS/MCP.
 
-## P1 next acceptance (2026-10-12)
+## P1 LOCATE→READ acceptance (completed 2026-10-13)
 
-The old source checkpoint 716f011 covers indexing/fairness but not the newly observed late-hit retrieval or UTF-8 boundary failures. Bounded source fix adds a raw-source byte anchor for an exact matching term and an optional `--from-byte` raw-source read, retaining the no-offset legacy selection path. Independent TEST and REVIEW on final SHA remain required; unanchored normalized/synthetic FTS matches are not fabricated as original byte offsets.
+The old source checkpoint `716f011` covered indexing/fairness but not late-hit retrieval or UTF-8 boundaries. The accepted source `e1f7471` adds a proven source-byte anchor and optional `--from-byte` raw READ, preserves unanchored legacy reads, enforces UTF-8-safe text-byte budgets, and refuses ambiguous Pi part provenance. Independent TEST and REVIEW passed at that SHA (see HANDOFF section 10); unmappable synthetic/normalized matches never fabricate byte offsets.
 
 ## P2 — Wiki Palace (NOT STARTED)
 

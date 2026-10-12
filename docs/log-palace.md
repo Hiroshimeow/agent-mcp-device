@@ -44,7 +44,7 @@ The source record is referenced by file path, original byte offset, part index a
 ## Limits/important caveats
 
 - Directory source discovery is bounded; repeatedly invoke index if more_files is true.
-- An incomplete trailing JSONL record is deferred until a newline appears. A huge single line can report stalled; increase budget or handle it in follow-up P1 hardening.
+- Incomplete trailing JSONL records wait for a newline; giant lines advance resumably across bounded indexing calls. A complete record above 128 MiB fails explicitly with `RECORD_TOO_LARGE`.
 - Search is Unicode FTS5 keyword/BM25, **not semantic cross-repo retrieval yet**.
 - Raw files remain authoritative. File rotation/deletion may invalidate previous refs; a later index clears/rebuilds the derived entries.
 - Model-visible text is UTF-8. Invalid UTF-8 source bytes fail explicitly instead of being silently replaced. `selected_part` is a bounded compatibility view and does not emit a continuation cursor; use a SEARCH `hit_offset` / raw-source read for resumable byte ranges.
