@@ -47,6 +47,7 @@ The source record is referenced by file path, original byte offset, part index a
 - An incomplete trailing JSONL record is deferred until a newline appears. A huge single line can report stalled; increase budget or handle it in follow-up P1 hardening.
 - Search is Unicode FTS5 keyword/BM25, **not semantic cross-repo retrieval yet**.
 - Raw files remain authoritative. File rotation/deletion may invalidate previous refs; a later index clears/rebuilds the derived entries.
+- Model-visible text is UTF-8. Invalid UTF-8 source bytes fail explicitly instead of being silently replaced. `selected_part` is a bounded compatibility view and does not emit a continuation cursor; use a SEARCH `hit_offset` / raw-source read for resumable byte ranges.
 - No new background tasks, extra redaction/capture gate, Wiki extraction or automatic skill processing occur. Cross-device sharing and Wiki are later phases.
 - Source files and index DB contain potentially private information and remain on the owner's local machine. Do not attach private raw sessions to an external review service.
 

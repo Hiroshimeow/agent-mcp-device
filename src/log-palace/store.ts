@@ -2,6 +2,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { createHash } from 'node:crypto';
 import { closeSync, existsSync, fstatSync, mkdirSync, openSync, readSync, readdirSync, realpathSync, statSync } from 'node:fs';
 import { homedir } from 'node:os';
+import { TextDecoder } from 'node:util';
 import { basename, extname, join, resolve, win32, posix } from 'node:path';
 import { CONFIG_DIR } from '../config.js';
 import { detect, parse, type Context, type Format, type Item, type ResolvedFormat } from './formats.js';
@@ -374,6 +375,30 @@ export class LogPalace {
     if(Number(row.missing)||!existsSync(value(row.path)))throw new Error('SOURCE_MISSING');
     return row;
   }
+  private validUtf8(fd:number,start:number,total:number):boolean {
+    const decoder=new TextDecoder('utf-8',{fatal:true}),block=Buffer.alloc(65536);
+    try{
+      for(let at=0;at<total;){
+        const n=readSync(fd,block,0,Math.min(block.length,total-at),start+at);
+        if(n<1)return false;
+        decoder.decode(block.subarray(0,n),{stream:true});at+=n;
+      }
+      decoder.decode();return true;
+    }catch{return false}
+  }
+  private selectedPartSpan(fd:number,row:Row,total:number):{start:number;end:number}|null {
+    const part=Number(row.record_part??-1);
+    if(part<0)return {start:0,end:total};
+    const body=Buffer.alloc(total);
+    if(readSync(fd,body,0,total,Number(row.record_position))!==total)return null;
+    let parsed:unknown;
+    try{parsed=JSON.parse(body.toString('utf8'))}catch{return null}
+    const selected=(parsed as {message?:{content?:unknown[]}})?.message?.content?.[part];
+    if(selected===undefined)return null;
+    const needle=Buffer.from(JSON.stringify(selected),'utf8'),start=body.indexOf(needle);
+    if(start<0||body.indexOf(needle,start+1)>=0)return null;
+    return {start,end:start+needle.length};
+  }
   /** Locate FTS terms in original UTF-8 source bytes, never in synthetic search text. */
   private sourceHit(row:Row,terms:string[]):{hit_offset:number|null;hit_term:string|null;anchor_status:string} {
     const usable=terms.filter(term=>term.length>0).map(term=>({
@@ -385,12 +410,15 @@ export class LogPalace {
     try{fd=openSync(value(row.path),'r')}
     catch{return {hit_offset:null,hit_term:null,anchor_status:'source_unavailable'}}
     try{
-      const total=Math.max(0,Number(row.record_bytes)-1),start=Number(row.record_position);
+      const total=Math.max(0,Number(row.record_bytes)-1),recordStart=Number(row.record_position);
+      const span=this.selectedPartSpan(fd,row,total);
+      if(!span)return {hit_offset:null,hit_term:null,anchor_status:'unmapped'};
+      const spanLength=span.end-span.start,start=recordStart+span.start;
       const overlap=Math.min(65540,Math.max(...usable.map(term=>Math.min(term.bytes,65536)))+4);
       const block=Buffer.alloc(65536);
       let carry=Buffer.alloc(0),at=0;
-      while(at<total){
-        const n=readSync(fd,block,0,Math.min(block.length,total-at),start+at);
+      while(at<spanLength){
+        const n=readSync(fd,block,0,Math.min(block.length,spanLength-at),start+at);
         if(n<1)return {hit_offset:null,hit_term:null,anchor_status:'source_unavailable'};
         const data=carry.length?Buffer.concat([carry,block.subarray(0,n)]):block.subarray(0,n);
         const base=at-carry.length;
@@ -402,7 +430,7 @@ export class LogPalace {
         for(const entry of usable){
           const match=entry.matcher.exec(text);
           if(!match)continue;
-          const offset=base+aligned+Buffer.byteLength(text.slice(0,match.index),'utf8');
+          const offset=span.start+base+aligned+Buffer.byteLength(text.slice(0,match.index),'utf8');
           if(!first||offset<first.offset)first={offset,term:entry.term};
         }
         if(first)return {hit_offset:first.offset,hit_term:first.term,anchor_status:'raw_match'};
@@ -428,12 +456,12 @@ export class LogPalace {
       "SELECT rowid,bm25(records_fts) FROM records_fts WHERE records_fts MATCH ? UNION ALL "+
       "SELECT record_id,0.0 FROM chunk_hits) "+
       "SELECT r.ref,r.kind,r.tool,r.session,r.turn,r.file_path,r.timestamp,r.preview,f.path,"+
-      "r.position AS record_position,r.bytes AS record_bytes,min(h.rank) rank "+
+      "r.position AS record_position,r.bytes AS record_bytes,r.part AS record_part,min(h.rank) rank "+
       "FROM hits h JOIN records r ON r.id=h.record_id JOIN files f ON f.id=r.file_id WHERE f.missing=0 "+
       "GROUP BY r.id ORDER BY rank,r.id DESC LIMIT ?";
     const rows=this.db.prepare(sql).all(...quoted,match,limit) as Row[];
     return {query,items:rows.map(row=>{
-      const {rank,record_position,record_bytes,...item}=row;
+      const {rank,record_position,record_bytes,record_part,...item}=row;
       return {...item,...this.sourceHit(row,tokens),hit_unit:'source_record_byte'};
     }),count:rows.length};
   }
@@ -466,6 +494,7 @@ export class LogPalace {
       }
       if(suffix.length&&suffix[0]!==13)hash.update(suffix);
       if(hash.digest('hex')!==row.hash)throw new Error('SOURCE_CHANGED');
+      if(!this.validUtf8(fd,base,physical))throw new Error('SOURCE_ENCODING_UNSUPPORTED');
       const terminal=Buffer.alloc(1);
       if(readSync(fd,terminal,0,1,base+physical)!==1||terminal[0]!==10)throw new Error('SOURCE_CHANGED');
       const endByte=physical-(suffix.length&&suffix[0]===13?1:0);
@@ -490,7 +519,7 @@ export class LogPalace {
         while(cut>0&&(encoded[cut]&0xC0)===0x80)cut--;
         text=encoded.subarray(0,cut).toString('utf8');
         return {ref,source:row.path,kind:row.kind,tool:row.tool,session:row.session,turn:row.turn,call_id:row.call_id,
-          offset:row.position,bytes:row.bytes,text,view,range_start:0,range_end:cut,next_offset:cut<total?cut:null,truncated:cut<total};
+          offset:row.position,bytes:row.bytes,text,view,range_start:0,range_end:cut,next_offset:null,resumable:false,truncated:cut<total};
       }
       return {ref,source:row.path,kind:row.kind,tool:row.tool,session:row.session,turn:row.turn,call_id:row.call_id,
         offset:row.position,bytes:row.bytes,text,view,range_start:requested,range_end:requested+end,

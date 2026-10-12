@@ -32,9 +32,9 @@ Exact file relationship uses absolute path, or an explicit logged cwd + relative
 
 - Index cursor is the last complete newline, so an unfinished append is deferred. Index reuses byte offsets and FTS rows without re-ingesting the same records.
 - Device/inode, indexed-prefix and indexed-tail hashes detect replacement/truncate/in-place changes; detected replacement invalidates derived records/FTS before replay.
-- Read reopens original file at the indexed byte range, verifies source SHA-256 and fails if changed/missing.
+- Read reopens original file at the indexed byte range, verifies source SHA-256 and fails if changed/missing. Valid UTF-8 is required for model-visible text; invalid UTF-8 fails explicitly with `SOURCE_ENCODING_UNSUPPORTED` rather than emitting replacement characters or exceeding the requested text-byte budget.
 - A large single line without newline may be reported stalled; the index must NOT invent a complete record. Handling lines beyond scan budget is P1 hardening.
-- Search uses tokenized FTS5 and returns locator metadata; raw content is read via ref, default 8 KiB, max 64 KiB.
+- Search uses tokenized FTS5 and returns locator metadata; raw content is read via ref, default 8 KiB, max 64 KiB. A mapped `hit_offset` is source-record-relative and, for a Pi content part, is only emitted when the matching raw byte is proven inside that exact indexed part; otherwise the anchor is `unmapped`. Legacy `selected_part` reads are bounded but non-resumable (`next_offset=null`, `resumable=false`); resumable cursors belong to `raw_source` reads.
 - Graph is an on-demand bounded SQL relation query, not an extra graph database/daemon. Supported relations: same exact call, same logged session, same turn, same normalized absolute file. No timestamp-derived caused_by edges.
 - A raw log may change between search and read; return explicit changed/missing error, not an unrelated byte window.
 

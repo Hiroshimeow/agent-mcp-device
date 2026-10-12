@@ -30,7 +30,7 @@ Only the derived index is written. Original logs are unchanged. This is a local 
 - Clean full Device suite **66/66 PASS**; no source/build race during the final run.
 - Latest isolated real-log benchmark: 3 authorized sources, 6,690,674 input bytes, 1,759 records; index p50/p95 ~902/1054 ms, search p50/p95 ~1.52/2.22 ms, raw hashes unchanged. See Spec 006 HANDOFF for RSS/storage/response-byte receipts and 10,020-file benchmark.
 - Existing P0 historic audit is [P0-BASELINE-AUDIT.md](../specs/006-agent-memory-palace/P0-BASELINE-AUDIT.md). Its legacy capture observer bugs are NOT prerequisites to log-first P1.
-- Previous P1 checkpoint `716f011` required additional correctness fixes on 2026-10-12: 132,023-byte late SEARCH matches lacked a selected READ anchor, and 128-byte UTF-8 reads could split characters and exceed the byte cap. Current development adds source-verified byte anchors, optional raw-range reads and UTF-8-safe budgets; independent TEST/REVIEW of the new final SHA is still required. Do not call this released or deployed.
+- Previous P1 checkpoint `716f011` required additional correctness fixes on 2026-10-12: late SEARCH matches lacked a selected READ anchor; UTF-8 reads could split/expand; legacy selected-part cursors mixed coordinate systems; and Pi multi-part duplicate terms could map to the wrong part. Current development uses source-verified part-scoped byte anchors, optional raw-range reads, explicit invalid-UTF-8 rejection and non-resumable truncated selected-part compatibility views. Independent TEST/REVIEW of the new final SHA is still required. Do not call this released or deployed.
 
 ## What is still NOT implemented
 

@@ -401,3 +401,38 @@ test('P1 locate-read: anchored Pi part uses verified raw JSON; legacy Pi part re
   const invalid=runLogPalaceCli(['read','--ref',hit.ref,'--from-byte','-3'],join(root,'db'));
   assert.equal(invalid.exitCode,1);
 });
+
+test('P1 review F1: invalid UTF-8 never expands model-visible text beyond maxBytes',t=>{
+  const {root,db}=setup(t),p=join(root,'invalid-utf8.log');
+  writeFileSync(p,Buffer.concat([Buffer.from('BAD_UTF8_MARK '),Buffer.alloc(512,0xff),Buffer.from(' FIN\n')]));
+  db.add(p,'text');db.index();
+  const hit=db.search('BAD_UTF8_MARK').items[0];assert.ok(hit);
+  assert.throws(()=>db.read(hit.ref,128),/SOURCE_ENCODING_UNSUPPORTED/);
+  assert.throws(()=>db.read(hit.ref,128,hit.hit_offset),/SOURCE_ENCODING_UNSUPPORTED/);
+});
+
+test('P1 review F2: selected Pi part never exposes a cursor in raw-source coordinates',t=>{
+  const {root,db}=setup(t),p=join(root,'pi-selected-cursor.jsonl');
+  writeFileSync(p,pi('pi-cursor','cursor-id','PI_CURSOR_TERM_2026 '+('M'.repeat(800))));
+  db.add(p,'pi');db.index();
+  const hit=db.search('PI_CURSOR_TERM_2026').items.find(x=>x.kind==='tool_call');assert.ok(hit);
+  const first=db.read(hit.ref,128);
+  assert.equal(first.view,'selected_part');assert.equal(first.truncated,true);
+  assert.equal(first.next_offset,null);assert.equal(first.resumable,false);
+});
+
+test('P1 review F3: Pi multi-part anchor belongs to the indexed selected part',t=>{
+  const {root,db}=setup(t),p=join(root,'pi-multipart-anchor.jsonl'),marker='SECOND_PART_UNIQUE_20261012';
+  writeFileSync(p,j({type:'session',id:'multi',cwd:'E:/repo'})+
+    j({type:'message',message:{role:'assistant',content:[
+      {type:'toolCall',id:'first',name:'read_file',arguments:{note:marker}},
+      {type:'toolCall',id:'second',name:'read_file',arguments:{note:'x '.repeat(65000)+marker}}
+    ]}}));
+  db.add(p,'pi');db.index({maxBytes:512*1024});
+  const hits=db.search(marker,10).items.filter(x=>x.kind==='tool_call');assert.equal(hits.length,2);
+  const second=hits.find(x=>db.read(x.ref,512).text.includes('"id":"second"'));assert.ok(second);
+  assert.equal(second.anchor_status,'raw_match');
+  assert.ok(second.hit_offset>100000,'second part must not anchor to the first part marker');
+  const selected=db.read(second.ref,8192,second.hit_offset);
+  assert.match(selected.text,/SECOND_PART_UNIQUE_20261012/);
+});
