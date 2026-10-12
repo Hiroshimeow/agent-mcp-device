@@ -391,13 +391,60 @@ export class LogPalace {
     if(part<0)return {start:0,end:total};
     const body=Buffer.alloc(total);
     if(readSync(fd,body,0,total,Number(row.record_position))!==total)return null;
-    let parsed:unknown;
-    try{parsed=JSON.parse(body.toString('utf8'))}catch{return null}
-    const selected=(parsed as {message?:{content?:unknown[]}})?.message?.content?.[part];
-    if(selected===undefined)return null;
-    const needle=Buffer.from(JSON.stringify(selected),'utf8'),start=body.indexOf(needle);
-    if(start<0||body.indexOf(needle,start+1)>=0)return null;
-    return {start,end:start+needle.length};
+    const ws=(i:number)=>{while(i<body.length&&[9,10,13,32].includes(body[i]!))i++;return i};
+    const stringEnd=(start:number):number=>{
+      if(body[start]!==34)return -1;
+      for(let i=start+1;i<body.length;i++){
+        if(body[i]===92){i++;continue}
+        if(body[i]===34)return i+1;
+      }
+      return -1;
+    };
+    const valueEnd=(start:number):number=>{
+      start=ws(start);if(start>=body.length)return -1;
+      if(body[start]===34)return stringEnd(start);
+      if(body[start]===123||body[start]===91){
+        const stack:number[]=[body[start]===123?125:93];
+        for(let i=start+1;i<body.length;i++){
+          const byte=body[i]!;
+          if(byte===34){const end=stringEnd(i);if(end<0)return -1;i=end-1;continue}
+          if(byte===123)stack.push(125);
+          else if(byte===91)stack.push(93);
+          else if(byte===125||byte===93){
+            if(stack.pop()!==byte)return -1;
+            if(!stack.length)return i+1;
+          }
+        }
+        return -1;
+      }
+      let i=start;
+      while(i<body.length&&body[i]!==44&&body[i]!==93&&body[i]!==125)i++;
+      return ws(i)>start?i:-1;
+    };
+    const objectField=(objectStart:number,key:string):{start:number;end:number}|null=>{
+      let i=ws(objectStart);if(body[i]!==123)return null;i=ws(i+1);
+      while(i<body.length&&body[i]!==125){
+        const keyEnd=stringEnd(i);if(keyEnd<0)return null;
+        let parsedKey:string;try{parsedKey=JSON.parse(body.subarray(i,keyEnd).toString('utf8')) as string}catch{return null}
+        i=ws(keyEnd);if(body[i]!==58)return null;
+        const start=ws(i+1),end=valueEnd(start);if(end<0)return null;
+        if(parsedKey===key)return {start,end};
+        i=ws(end);if(body[i]===44)i=ws(i+1);else if(body[i]!==125)return null;
+      }
+      return null;
+    };
+    const arrayItem=(arrayStart:number,index:number):{start:number;end:number}|null=>{
+      let i=ws(arrayStart);if(body[i]!==91)return null;i=ws(i+1);
+      for(let current=0;i<body.length&&body[i]!==93;current++){
+        const start=i,end=valueEnd(start);if(end<0)return null;
+        if(current===index)return {start,end};
+        i=ws(end);if(body[i]===44)i=ws(i+1);else if(body[i]!==93)return null;
+      }
+      return null;
+    };
+    const message=objectField(0,'message');if(!message)return null;
+    const content=objectField(message.start,'content');if(!content)return null;
+    return arrayItem(content.start,part);
   }
   /** Locate FTS terms in original UTF-8 source bytes, never in synthetic search text. */
   private sourceHit(row:Row,terms:string[]):{hit_offset:number|null;hit_term:string|null;anchor_status:string} {

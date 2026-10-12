@@ -436,3 +436,19 @@ test('P1 review F3: Pi multi-part anchor belongs to the indexed selected part',t
   const selected=db.read(second.ref,8192,second.hit_offset);
   assert.match(selected.text,/SECOND_PART_UNIQUE_20261012/);
 });
+
+test('P1 review R2-F1: Pi anchor follows actual noncanonical content part, not mirrored metadata',t=>{
+  const {root,db}=setup(t),p=join(root,'pi-mirror-anchor.jsonl'),marker='MIRROR_ANCHOR_PROVENANCE_20261013';
+  const part={type:'toolCall',id:'id1',name:'read_file',arguments:{note:marker}};
+  const canonical=JSON.stringify(part),actual=canonical.replace(/:/g,': ');
+  const raw='{"type":"message","mirror":'+canonical+',"message":{"role":"assistant","content":['+actual+']}}\n';
+  writeFileSync(p,raw);db.add(p,'pi');db.index();
+  const hit=db.search(marker).items.find(x=>x.kind==='tool_call');assert.ok(hit);
+  const actualStart=Buffer.byteLength(raw.slice(0,raw.indexOf(actual)),'utf8');
+  const actualMarker=actualStart+Buffer.byteLength(actual.slice(0,actual.indexOf(marker)),'utf8');
+  assert.equal(hit.anchor_status,'raw_match');
+  assert.equal(hit.hit_offset,actualMarker);
+  const selected=db.read(hit.ref,128,hit.hit_offset);
+  assert.match(selected.text,/MIRROR_ANCHOR_PROVENANCE_20261013/);
+  assert.equal(readFileSync(p,'utf8'),raw);
+});
