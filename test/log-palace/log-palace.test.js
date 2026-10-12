@@ -452,3 +452,29 @@ test('P1 review R2-F1: Pi anchor follows actual noncanonical content part, not m
   assert.match(selected.text,/MIRROR_ANCHOR_PROVENANCE_20261013/);
   assert.equal(readFileSync(p,'utf8'),raw);
 });
+
+test('P1 review R3-F1: duplicate top-level message key fails Pi anchor closed',t=>{
+  const {root,db}=setup(t),p=join(root,'pi-duplicate-message.jsonl'),marker='DUPLICATE_MESSAGE_ANCHOR_20261013';
+  const obsolete={role:'assistant',content:[{type:'toolCall',id:'obsolete',name:'read_file',arguments:{note:marker}}]};
+  const actual={role:'assistant',content:[{type:'toolCall',id:'actual',name:'read_file',
+    arguments:{note:'x '.repeat(65000)+marker}}]};
+  const raw='{"type":"message","message":'+JSON.stringify(obsolete)+',"message":'+JSON.stringify(actual)+'}\n';
+  writeFileSync(p,raw);db.add(p,'pi');db.index({maxBytes:512*1024});
+  const hit=db.search(marker).items.find(x=>x.kind==='tool_call');assert.ok(hit);
+  assert.match(db.read(hit.ref,256).text,/"id":"actual"/);
+  assert.equal(hit.anchor_status,'unmapped');
+  assert.equal(hit.hit_offset,null);
+});
+
+test('P1 review R3-F1: duplicate nested content key fails Pi anchor closed',t=>{
+  const {root,db}=setup(t),p=join(root,'pi-duplicate-content.jsonl'),marker='DUPLICATE_CONTENT_ANCHOR_20261013';
+  const obsolete=[{type:'toolCall',id:'obsolete-content',name:'read_file',arguments:{note:marker}}];
+  const actual=[{type:'toolCall',id:'actual-content',name:'read_file',arguments:{note:'x '.repeat(65000)+marker}}];
+  const raw='{"type":"message","message":{"role":"assistant","content":'+JSON.stringify(obsolete)+
+    ',"content":'+JSON.stringify(actual)+'}}\n';
+  writeFileSync(p,raw);db.add(p,'pi');db.index({maxBytes:512*1024});
+  const hit=db.search(marker).items.find(x=>x.kind==='tool_call');assert.ok(hit);
+  assert.match(db.read(hit.ref,256).text,/"id":"actual-content"/);
+  assert.equal(hit.anchor_status,'unmapped');
+  assert.equal(hit.hit_offset,null);
+});

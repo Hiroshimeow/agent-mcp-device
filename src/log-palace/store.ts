@@ -423,15 +423,19 @@ export class LogPalace {
     };
     const objectField=(objectStart:number,key:string):{start:number;end:number}|null=>{
       let i=ws(objectStart);if(body[i]!==123)return null;i=ws(i+1);
+      let found:{start:number;end:number}|null=null;
       while(i<body.length&&body[i]!==125){
         const keyEnd=stringEnd(i);if(keyEnd<0)return null;
         let parsedKey:string;try{parsedKey=JSON.parse(body.subarray(i,keyEnd).toString('utf8')) as string}catch{return null}
         i=ws(keyEnd);if(body[i]!==58)return null;
         const start=ws(i+1),end=valueEnd(start);if(end<0)return null;
-        if(parsedKey===key)return {start,end};
+        if(parsedKey===key){
+          if(found)return null;
+          found={start,end};
+        }
         i=ws(end);if(body[i]===44)i=ws(i+1);else if(body[i]!==125)return null;
       }
-      return null;
+      return found;
     };
     const arrayItem=(arrayStart:number,index:number):{start:number;end:number}|null=>{
       let i=ws(arrayStart);if(body[i]!==91)return null;i=ws(i+1);
