@@ -120,6 +120,20 @@ Historical P1 SHA `716f011` and docs `b748df4` do not close two observed bugs: a
 
 **P2 one-backend design boundary (not authorized to implement):** Compare pinned versions/license of ReMe and OpenViking on the same sanitized indexed Pi/Codex/MCP corpus. Evaluate exact source-evidence references, incremental page updates, stale/contradictory claims, offline operation, on-demand pages, total LLM tokens and expense. No-change idle must make zero LLM calls. Select ONE mature backend only after measured decision; do not start a scheduler, adapter, auto-sync, new control plane, self-built wiki or publication. Then separately validate cold-agent cross-repo recall, and only later lazy validated skill consolidation. P1 continues to be ONE small local tool rather than a security platform.
 
-## 10. Operational guardrails
+## 10. P1 source acceptance — 2026-10-13 JST (PLAN closure)
+
+**Accepted G6 source SHA:** `e1f74715b60a008171d3e0a9c27c8f4f2964ce2c` (`main`), following `ca595e1` late-hit/UTF-8 repair, `b3e9655` source-anchor/cursor correction, `ab40106` raw Pi-part provenance binding, and `e1f7471` duplicate traversed-key fail-closed correction. This is **source acceptance only**: not published, deployed, loaded on G8 or exposed as a new public MCP tool.
+
+**Independent final-SHA TEST turn 4:** Windows full `npm test` 66/66 PASS (exit 0), Log Palace 39/39 PASS (exit 0), targeted P1 9/9 PASS, custom provenance suite Windows/WSL 10/10 PASS each, Context consistency `passed=true`. Windows Context compatibility 10/10 is recorded by DEV on final SHA. Final TEST evidence: `.plan/device-006-mind-palace-tool-20261012/device-006-mind-palace-tool-20261012-test_turn4_cdpa-idem-2eb7f15e5faf56b1159a6087.md` and task-local logs/exit markers.
+
+**Independent final-SHA REVIEW turn 4:** inspected final source delta and prior root causes, personally reran targeted 9/9 and Windows/WSL 10/10, no actionable in-scope correctness issue. Report: `.plan/device-006-mind-palace-tool-20261012/device-006-mind-palace-tool-20261012-review_turn4_cdpa-idem-2eb7f15e5faf56b1159a6087.md`. `T032` is closed by PLAN after these gates.
+
+**Contract boundary:** FTS5 SEARCH returns a compact locator; `anchor_status=raw_match` and `hit_offset` (source-record-relative bytes) only when actual original bytes prove the selected hit/part. Ambiguous Pi duplicate traversed keys yield `unmapped`, never a false pointer. `logs read --from-byte <hit_offset>` returns source-verified UTF-8-safe window; `--max-bytes` (128–65,536) caps `result.text` bytes, **not complete JSON envelope**. Legacy selected-part reads remain bounded but non-resumable. Original files unchanged, existing OS/MCP privileges retained, legacy Context 1.0.11 API intact.
+
+**Boundaries NOT_MEASURED on final SHA:** new 64 MiB / 10,020-file benchmark reruns, concurrent writer / TOCTOU race stress and constant RSS for legacy full-record Pi part. Earlier benchmark receipts in sections 4–5 are **historical `716f011` evidence only**, not measurements of final `e1f7471`. Single records >128 MiB and compressed rotations remain unsupported. No LLM token-cost savings demonstrated.
+
+**Next phase is P2 design, NOT implementation:** compare pinned ReMe/OpenViking license/version/functionality on the SAME sanitized indexed Pi/Codex/MCP fixtures; evaluate original-evidence backlinks, incremental update, stale claim correction, offline use, minimum page/locator cost and total LLM tokens. Idle with unchanged sources must make ZERO LLM calls. Select ONE mature backend only after comparison; subsequently design owner-scoped cross-repo cold recall and (later) bounded, automatic agent-owned skill consolidation. No Wiki adapter, scheduler, sync, custom engine, Gateway deployment or production changes authorized in this milestone.
+
+## 11. Operational guardrails
 
 No worktree/branch creation, reset/clean/stash of unrelated work, force-push, release, deployment or production reload. Keep Spec 002 regressions and private benchmark/raw-log evidence outside Git. Use exact SHAs and reproducible receipts as the acceptance basis.

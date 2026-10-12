@@ -6,7 +6,7 @@ All changes must name exact Git commit and test output. **[x] means code/tests d
 - [x] **T001** Audit Device legacy Context baseline with independent Explore/Review evidence, record limitations.
 - [x] **T002** Replace legacy capture-oriented P0.5 implementation goal with user's existing-log-first direction in this spec.
 
-## P1 — Existing log CLI, active
+## P1 — Existing log CLI, source milestone accepted on G6 (not deployed)
 - [x] **T003** Inspect actual Pi/Codex/MCP JSONL formats on G6 without dumping private log content.
 - [x] **T004** Provide opt-in log file/directory registration and standard source discovery.
 - [x] **T005** Add SQLite FTS5 local index and bounded locate-only search. No live observer, no duplicate full source log store.
@@ -19,11 +19,11 @@ All changes must name exact Git commit and test output. **[x] means code/tests d
 - [x] **T012** Isolated G6 real-log smoke: 3 sources, 6,270,444 bytes, 1,652 records, index 483 ms, one query 3.48 ms, repeat 0 new, original SHA unchanged. Receipt: _mcp-consolidation-20261011/palace-real-smoke-result.json.
 - [x] **T013** npm run build PASS, P1 11/11 PASS, legacy Context 10/10 PASS, Context acceptance checker PASS; full Device suite NOT RUN (receipts in HANDOFF.md).
 - [x] **T014** Benchmark source discovery/index fairness and FTS5 query p50/p95 on larger local corpora; document measured limits. Final correctness commit `716f011`; maxFiles=1 fairness plus REVIEW-R1 discovery-visibility regression are covered. Fresh 10,020-file run: 51 bounded calls, index-call p50 301 ms / p95 489 ms / max 621 ms, total indexing 16.52 s with fixture creation measured separately; real Pi/Codex/MCP p50/p95 and storage/RSS/response-byte metrics are in HANDOFF.
-- [x] **T015** Handle giant individual lines that exceed the scan budget, with explicit resumability/partial state; test Windows/Linux. Final correctness commit `716f011`; Windows and WSL Linux independent-script cases PASS for >8 MiB late-term, durable partial resume/restart and raw immutability; >64 MiB parity remains covered by DEV fixtures. Fresh independent TEST/REVIEW still must verify the committed checkpoint before PLAN closure.
+- [x] **T015** Handle giant individual lines that exceed the scan budget, with explicit resumability/partial state; test Windows/Linux. Historical correctness commit `716f011`; Windows/WSL checks covered >8 MiB, restart and immutable raw sources, with earlier >64 MiB parity evidence. Final source acceptance is tracked separately in T032, not inferred from earlier benchmarks.
 - [x] **T016** Review log aliasing, rotation across renamed paths, overlapping source registrations, and missing-file visibility. Final correctness commit `716f011`; regressions include same-size interior mutation invalidation, source-lineage scoping for reused session IDs, overlap, missing/stale refs, copytruncate/regrow, partial append and Linux parity.
 - [x] **T017** P1 source commit d5d28f5, README/STATUS/spec/handoff documentation follow-up in main, checked source/test receipts. Verify final docs commit via git log.
 
-- [ ] **T032** New P1 correctness acceptance (2026-10-12): late 132,023-byte evidence hit must be returned by one selected 65,536-byte read, UTF-8 budgets/cursors must be exact; TEST and REVIEW must independently approve final SHA. Developer-only red/green evidence is not closure.
+- [x] **T032** Accepted 2026-10-13 on G6 `main` source SHA `e1f74715b60a008171d3e0a9c27c8f4f2964ce2c`: a 132,023-byte late hit supports one bounded source READ; 128–65,536 text-byte limits, UTF-8 and cursors are correct; ambiguous Pi part/duplicate-key evidence fails closed. Independent TEST turn 4: Windows Log Palace 39/39, full Device 66/66, scoped 9/9, independent Windows and WSL 10/10. Independent REVIEW turn 4: clean architecture verdict, scoped 9/9 and Windows/WSL 10/10. See `.plan/device-006-mind-palace-tool-20261012/` reports. Historical 64 MiB / 10,020-file benchmarks were not rerun on this SHA; no release/deployment.
 
 ## P2 — LLM Wiki Palace (not implemented)
 - [ ] **T018** Pin and audit ReMe/OpenViking upstream versions/license/features on identical sanitized *indexed log* corpus.

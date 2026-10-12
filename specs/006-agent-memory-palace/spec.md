@@ -1,6 +1,6 @@
 # 006 — Agent Memory Palace (log-first)
 
-**Status:** ACTIVE. P0 source audit completed at Git commit eaa5192. P1 local log indexing CLI is being implemented on G6; do not confuse this with a published MCP Device release. All Wiki/automatic skill work remains unimplemented.
+**Status:** ACTIVE product roadmap. P0 source audit at `eaa5192`; P1 log-first CLI independently accepted in G6 source at `e1f7471` on 2026-10-13, **not published or deployed**. All Wiki/automatic skill work remains unimplemented.
 
 ## Product intent
 

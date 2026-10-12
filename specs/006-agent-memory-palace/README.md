@@ -1,6 +1,6 @@
 # 006 — Agent Memory Palace (log-first)
 
-**ACTIVE.** P0 audit done; **P1 local log search/index/graph CLI implemented in source and under test**. LLM Wiki, cross-device Palace, skills and automatic learning are not implemented yet.
+**ACTIVE roadmap; P1 source milestone ACCEPTED 2026-10-13 on G6 `main@e1f7471`.** Local log search/index/graph and bounded LOCATE→READ CLI passed independent TEST and REVIEW; NOT published or deployed. P2 Wiki, cross-device Palace, skills and automatic learning remain unimplemented.
 
 Goal: agent reads earlier Pi/Codex/MCP sessions and tool logs with minimal context, then later reuses long-term experience in new repos without new user guides.
 
