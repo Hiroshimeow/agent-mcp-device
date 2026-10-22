@@ -57,7 +57,7 @@ test('cold installed package runs CLI server, persists pairing/OAuth and restore
   const password = randomBytes(24).toString('hex'), email = 'cold-admin@example.test';
   let running;
   async function start(root) {
-    const child = fork(entry, ['server', '--runtime-dir', root, '--host', '127.0.0.1', '--port', '8104'], { execPath: process.execPath, execArgv: ['--import', pathToFileURL(preload).href], cwd: home, env: { ...env, MCP_DEVICE_CONFIG_DIR: root }, stdio: ['ignore', 'pipe', 'pipe', 'ipc'], windowsHide: true });
+    const child = fork(entry, ['server', '--runtime-dir', root, '--host', '127.0.0.1', '--port', '8104', '--legacy-knowledge-mcp'], { execPath: process.execPath, execArgv: ['--import', pathToFileURL(preload).href], cwd: home, env: { ...env, MCP_DEVICE_CONFIG_DIR: root }, stdio: ['ignore', 'pipe', 'pipe', 'ipc'], windowsHide: true });
     let buffer = '', stderr = '', pairing;
     const ready = new Promise((resolve, reject) => {
       const timer = setTimeout(() => reject(new Error('CLI startup timed out: ' + stderr)), 20000);

@@ -16,12 +16,14 @@
   },
   "bin": {
     "mcp-device": "dist/mcp-device.js",
-    "md": "dist/mcp-device.js"
+    "md": "dist/mcp-device.js",
+    "palace": "dist/plugins/palace/cli.js"
   },
   "files": [
     "dist",
     "config/revoked-approvals.json",
     "skills/mcp-device-context",
+    "skills/palace-cli",
     "control-plane/scripts",
     "control-plane/config",
     "control-plane/contracts"

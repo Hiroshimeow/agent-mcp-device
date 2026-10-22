@@ -1,0 +1,3 @@
+interface:
+  display_name: "Palace CLI"
+  short_description: "Retrieve verified historical evidence with the Palace CLI"

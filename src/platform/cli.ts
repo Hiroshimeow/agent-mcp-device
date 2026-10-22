@@ -9,7 +9,7 @@ const packageRoot = fileURLToPath(new URL('../../', import.meta.url));
 const usage = `MCP Device 1.0.12
   mcp-device start                         Existing Device-only runtime
   mcp-device device [start|status|...]      Alias for the Device-only commands
-  mcp-device server [--runtime-dir DIR] [--host HOST] [--port PORT] [--public-url URL] [--skill-root DIR] [--allow-http-lan]
+  mcp-device server [--runtime-dir DIR] [--host HOST] [--port PORT] [--loopback-port PORT] [--public-url URL] [--skill-root DIR] [--allow-http-lan] [--legacy-knowledge-mcp]
   mcp-device admin [--runtime-dir DIR] account|invite ...
   mcp-device plugins [--runtime-dir DIR] list|install|enable|disable|uninstall|purge|upgrade|configure ...
   mcp-device knowledge [--runtime-dir DIR] search|list|read|ingest|learn|correct|skills [JSON]
@@ -26,8 +26,8 @@ State migration defaults to a reviewable dry run; --apply writes only a new targ
 interface Parsed { values: Record<string, string[]>; flags: Set<string>; positional: string[]; }
 function parse(argv: string[]): Parsed {
   const values: Record<string, string[]> = {}, flags = new Set<string>(), positional: string[] = [];
-  const valued = new Set(['runtime-dir', 'host', 'port', 'public-url', 'skill-root', 'project-root', 'source-root', 'config', 'source', 'backup', 'target', 'device-root', 'gateway-root']);
-  const switches = new Set(['help', 'enable', 'apply', 'json', 'allow-http-lan']);
+  const valued = new Set(['runtime-dir', 'host', 'port', 'loopback-port', 'public-url', 'skill-root', 'project-root', 'source-root', 'config', 'source', 'backup', 'target', 'device-root', 'gateway-root']);
+  const switches = new Set(['help', 'enable', 'apply', 'json', 'allow-http-lan', 'legacy-knowledge-mcp']);
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === '--') { positional.push(...argv.slice(i + 1)); break; }
@@ -121,6 +121,10 @@ async function serverCli(args: Parsed): Promise<void> {
   if (args.positional.length && !(args.positional.length === 1 && args.positional[0] === 'start')) throw new CapabilityError('INVALID_ARGUMENT', 'server accepts only start; use Ctrl-C or the service manager to stop');
   const root = stateRoot(args, true), port = Number(one(args, 'port', '8104'));
   if (!Number.isInteger(port) || port < 1 || port > 65535) throw new CapabilityError('INVALID_ARGUMENT', 'Invalid server port');
+  const localPortInput = one(args, 'loopback-port');
+  const loopbackPort = localPortInput === undefined ? undefined : Number(localPortInput);
+  if (loopbackPort !== undefined && (!Number.isInteger(loopbackPort) || loopbackPort < 1 || loopbackPort > 65535 || loopbackPort === port))
+    throw new CapabilityError('INVALID_ARGUMENT', 'Loopback MCP port must be a distinct port in the range 1..65535');
   const { acquireServerLease } = await import('./runtime-lease.js');
   const release = await acquireServerLease(root);
   process.env.MCP_DEVICE_CONFIG_DIR = root;
@@ -146,14 +150,15 @@ async function serverCli(args: Parsed): Promise<void> {
     const identity = new GatewayDeviceIdentity(path.join(root, 'gateway-identity.json'));
     const record = await identity.loadOrCreate();
     const { createPlatformDeviceCore } = await import('./device-runtime.js');
-    core = await createPlatformDeviceCore({ deviceId: record.deviceId, stateRoot: root, projectRoots: args.values['project-root']?.map(item => path.resolve(item)), sourceRoots: args.values['source-root']?.map(item => path.resolve(item)) });
+    const legacyKnowledgeMcp = args.flags.has('legacy-knowledge-mcp');
+    core = await createPlatformDeviceCore({ deviceId: record.deviceId, stateRoot: root, projectRoots: args.values['project-root']?.map(item => path.resolve(item)), sourceRoots: args.values['source-root']?.map(item => path.resolve(item)), exposeKnowledgeMcp: legacyKnowledgeMcp });
     const { createPlatformTools } = await import('./knowledge-mcp.js');
     const { startServerRuntime } = await import(pathToFileURL(path.join(packageRoot, 'control-plane', 'scripts', 'authenticated-mcp-wrapper.mjs')).href);
     const configPath = typeof config.configPath === 'string' ? path.resolve(path.dirname(path.resolve(one(args, 'config')!)), config.configPath) : undefined;
-    runtime = await startServerRuntime({ core, identity, stateRoot: root, packageRoot, port, host: one(args, 'host', '127.0.0.1'), publicUrl, allowHttpLan, skillRoot, env: config.env ?? {}, configPath, extraTools: await createPlatformTools(root),
+    runtime = await startServerRuntime({ core, identity, stateRoot: root, packageRoot, port, loopbackPort, host: one(args, 'host', '127.0.0.1'), publicUrl, allowHttpLan, skillRoot, env: config.env ?? {}, configPath, extraTools: legacyKnowledgeMcp ? await createPlatformTools(root) : [],
       deviceName: 'localhost',
       onPairing: (pairing: unknown) => event({ event: 'device_pairing_required', pairing }) });
-    event({ event: 'server_ready', version: '1.0.12', url: runtime.baseUrl, device_id: record.deviceId, runtime_dir: root, local_runtime: 'shared-device-core', authentication: 'account-oauth-and-pairing' });
+    event({ event: 'server_ready', version: '1.0.12', url: runtime.baseUrl, ...(runtime.loopbackUrl ? { loopback_url: runtime.loopbackUrl } : {}), device_id: record.deviceId, runtime_dir: root, local_runtime: 'shared-device-core', authentication: 'account-oauth-and-pairing' });
     await new Promise<void>(resolve => {
       // A process manager may use Node's private parent/child IPC channel to stop
       // gracefully on Windows, where kill(SIGTERM) otherwise terminates abruptly.

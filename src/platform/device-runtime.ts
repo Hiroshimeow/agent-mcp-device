@@ -10,7 +10,7 @@ export interface PlatformDeviceCore extends DeviceCore {
   readonly capabilityContracts: Capability[];
   onCapabilitiesChanged(listener: () => void): () => void;
 }
-export async function createPlatformDeviceCore(options: DeviceCoreOptions & { projectRoots?: string[]; sourceRoots?: string[]; bundledPlugins?: boolean }): Promise<PlatformDeviceCore> {
+export async function createPlatformDeviceCore(options: DeviceCoreOptions & { projectRoots?: string[]; sourceRoots?: string[]; bundledPlugins?: boolean; exposeKnowledgeMcp?: boolean }): Promise<PlatformDeviceCore> {
   const core = await createDeviceCore(options);
   const activity = new ActivityJournal(core.stateRoot, core.deviceId, core.runtimeInstanceId);
   const plugins = new PluginHost({ stateRoot: core.stateRoot, deviceId: core.deviceId, projectRoots: options.projectRoots ?? options.allowedRoots ?? [], sourceRoots: options.sourceRoots ?? [path.join(core.stateRoot, 'logs')] });
@@ -19,16 +19,16 @@ export async function createPlatformDeviceCore(options: DeviceCoreOptions & { pr
   let closed = false;
   let closeRequest: Promise<void> | undefined;
   const pluginContracts = () => plugins.list().filter(record => record.installed && record.enabled && record.state === 'enabled').flatMap(record => record.manifest.capabilities).filter(capability => plugins.capabilities().includes(capability.name) && ['provider', 'fallback'].includes(capability.role ?? 'provider'));
-  const advertised = () => pluginContracts().filter(capability => !capability.name.startsWith('knowledge.') || compatible(capability.version, '^1.0.0'));
+  const advertised = () => pluginContracts().filter(capability => !capability.name.startsWith('knowledge.') ? true : options.exposeKnowledgeMcp !== false && compatible(capability.version, '^1.0.0'));
   const contracts = (): Capability[] => closed ? [] : [...core.capabilities.map(name => ({ name, version: '1.0.0' })), { name: 'platform.capabilities', version: '1.0.0' }, { name: 'platform.invoke', version: '1.0.0' }, ...pluginContracts()];
   return {
     deviceId: core.deviceId, stateRoot: core.stateRoot, runtimeInstanceId: core.runtimeInstanceId, plugins,
     get capabilities() { return closed ? [] : [...new Set([...core.capabilities, 'platform.capabilities', 'platform.invoke', ...advertised().map(capability => capability.name)])]; },
-    get capabilityContracts() { return contracts(); },
+    get capabilityContracts() { return contracts().filter(capability => options.exposeKnowledgeMcp !== false || !capability.name.startsWith('knowledge.')); },
     onCapabilitiesChanged: listener => plugins.onCapabilitiesChanged(listener),
     async invoke(tool, args = {}) {
       if (closed) throw Object.assign(new Error('Device runtime is closed'), { code: 'DEVICE_NOT_READY' });
-      if (tool === 'platform.capabilities') return { deviceId: core.deviceId, contracts: contracts() };
+      if (tool === 'platform.capabilities') return { deviceId: core.deviceId, contracts: contracts().filter(capability => options.exposeKnowledgeMcp !== false || !capability.name.startsWith('knowledge.')) };
       if (tool === 'platform.invoke') {
         const request = args as { name?: unknown; version?: unknown; input?: unknown };
         if (typeof request.name !== 'string' || request.name.length > 96 || (request.version !== undefined && (typeof request.version !== 'string' || request.version.length > 64))) throw new CapabilityError('INVALID_ARGUMENT', 'A capability name and optional compatible contract version are required');

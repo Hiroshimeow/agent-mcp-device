@@ -1,5 +1,6 @@
 import { createHash, randomUUID } from 'node:crypto';
 import fs from 'node:fs';
+import http from 'node:http';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -125,6 +126,9 @@ const runtimeDirectory = path.resolve(options.stateRoot);
 const repoRoot = options.repoRoot || packageRoot;
 const gatewayPort = Number(options.port ?? 8104);
 if (!Number.isInteger(gatewayPort) || gatewayPort < 1 || gatewayPort > 65535) throw new Error('Invalid server port.');
+const loopbackPort = options.loopbackPort == null ? null : Number(options.loopbackPort);
+if (loopbackPort !== null && (!Number.isInteger(loopbackPort) || loopbackPort < 1 || loopbackPort > 65535 || loopbackPort === gatewayPort))
+  throw new Error('Invalid loopback MCP port.');
 const gatewayHost = String(options.host || '127.0.0.1').trim();
 const advertisedHost = String(env.MCP_ADVERTISE_HOST || '').trim() || (gatewayHost === '0.0.0.0' ? '127.0.0.1' : gatewayHost);
 const advertisedUrl = String(options.publicUrl || env.MCP_ADVERTISE_URL || '').trim();
@@ -1157,6 +1161,7 @@ app.all('/mcp', mcpAuthMiddleware, unifiedMcpHandler);
 let localDevice = null;
 let shutdownPromise = null;
 const serverInstance = app.listen(gatewayPort, gatewayHost);
+let loopbackInstance = null;
 
 function shutdown() {
   // Keep the same failed result for every caller. A previous failed cleanup must
@@ -1169,9 +1174,10 @@ function shutdown() {
     }
 
     await attempt('embedded-device', () => localDevice?.close());
-    const serverClosed = new Promise(resolve => {
+    const listeners = [serverInstance, loopbackInstance].filter(Boolean);
+    const serverClosed = Promise.all(listeners.map(listener => new Promise(resolve => {
       try {
-        serverInstance.close(error => {
+        listener.close(error => {
           if (error && error.code !== 'ERR_SERVER_NOT_RUNNING') failures.push({ resource: 'http-server', error });
           resolve();
         });
@@ -1179,8 +1185,8 @@ function shutdown() {
         failures.push({ resource: 'http-server', error });
         resolve();
       }
-    });
-    await attempt('http-idle-connections', () => serverInstance.closeIdleConnections?.());
+    })));
+    for (const listener of listeners) await attempt('http-idle-connections', () => listener.closeIdleConnections?.());
     await attempt('workspace-registry', () => workspaceRegistry.close());
     await attempt('tool-metrics', () => toolMetrics.close());
     await attempt('device-audit', () => deviceAudit.close());
@@ -1194,7 +1200,7 @@ function shutdown() {
         activeProxyServers.delete(proxy);
       });
     }
-    await attempt('http-connections', () => serverInstance.closeAllConnections?.());
+    for (const listener of listeners) await attempt('http-connections', () => listener.closeAllConnections?.());
     await serverClosed;
     await attempt('oauth-state', () => oauthStateStore.close());
     await attempt('accounts', () => accountStore.close());
@@ -1221,6 +1227,27 @@ try {
     serverInstance.once('error', reject);
   });
   deviceBroker.attach(serverInstance);
+  if (loopbackPort !== null) {
+    // The same authenticated app and database serve both ports. Never bypass account authorization.
+    // Only bind loopback: a secondary port must not become an additional public listener.
+    // The old 8101 Cloudflare tunnel can still reach the local TCP listener.
+    // Reject routed/proxied requests: only direct same-machine HTTP clients may use this port.
+    loopbackInstance = http.createServer((req, res) => {
+      const hostname = String(req.headers.host || '').split(':')[0].toLowerCase();
+      const loopbackHost = hostname === '127.0.0.1' || hostname === 'localhost';
+      const proxied = Boolean(req.headers['cf-connecting-ip'] || req.headers['cf-ray'] || req.headers['x-forwarded-for'] || req.headers['x-forwarded-host']);
+      if (!loopbackHost || proxied) {
+        res.writeHead(421, { 'content-type': 'text/plain; charset=utf-8' });
+        res.end('Local MCP listener requires direct loopback access');
+        return;
+      }
+      app(req, res);
+    }).listen(loopbackPort, '127.0.0.1');
+    await new Promise((resolve, reject) => {
+      loopbackInstance.once('listening', resolve);
+      loopbackInstance.once('error', reject);
+    });
+  }
   localDevice = await createEmbeddedDeviceController({
     broker: deviceBroker, deviceStore, pairingStore: devicePairingStore,
     identity, core, deviceName: options.deviceName,
@@ -1235,6 +1262,7 @@ try {
 return {
   app, server: serverInstance,
   baseUrl: normalizeBaseUrl(advertisedUrl) || fallbackBaseUrl,
+  loopbackUrl: loopbackPort === null ? null : `http://127.0.0.1:${loopbackPort}/mcp`,
   broker: deviceBroker, accounts: accountStore, pairings: devicePairingStore,
   localDevice, dbPath: gatewayDbPath,
   refreshCapabilities: () => localDevice.refreshCapabilities(),
