@@ -1,0 +1,30 @@
+{
+  "benchmark": "palace-executable-replay-v1",
+  "node": "v22.22.2",
+  "tasks": 3,
+  "validationCalls": 1,
+  "taskPrompt": "Complete each new settlement after a reconnect while preserving its supplied idempotency key.",
+  "baseline": {
+    "taskSuccess": 3,
+    "repeatedErrors": 3,
+    "executionCalls": 9,
+    "retrievalCalls": 0,
+    "agentVisibleBytes": 630,
+    "elapsedMs": 1524.9635999999998
+  },
+  "palace": {
+    "taskSuccess": 3,
+    "repeatedErrors": 0,
+    "executionCalls": 3,
+    "retrievalCalls": 2,
+    "agentVisibleBytes": 3352,
+    "elapsedMs": 537.0225
+  },
+  "limits": [
+    "Deterministic fixture policies; no LLM productivity or general task-success claim.",
+    "Baseline retries once before its fixed diagnostic fallback; Palace reuses one selected validated recipe across three new task IDs.",
+    "All tasks execute a real child process and inspect ledger postconditions.",
+    "Agent-visible bytes include retrieval metadata/evidence and may increase despite fewer repeated errors.",
+    "Training/validation cost is reported separately and is not hidden in the replay improvement."
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "node": "v22.21.0",
+  "source": "/mnt/e/git-project/agent-mcp-device-v12",
+  "snapshot": "/home/ayumi/mcp-device-v12-parity-20261022/build13-snapshot",
+  "fingerprints": {
+    "platform/plugin-host.js": "2df2409471d9da28b603823e1ad76b473fbe86b0a4192474c3a337b8a829d2c2",
+    "platform/plugin-driver.js": "b63378746321e72dd9c5f619d3a7a26b596bc4da4ca9fd87dd38567b50a1f295",
+    "platform/plugin-child.js": "31ec6cfd72c5920c0dbe46e283bb75a6a7f7a3a5812cde22b166a7164a4d472b",
+    "platform/plugin-services.js": "d79c51a9e6d6d5ec83e8e74bcb677c23549b31222583b25e3b95d02e8e4b91d0",
+    "device/core.js": "e530a8711759ef54548d1f8f69e89eb3bfb56a23f25713e5be482d93e9d872d3",
+    "device/device.js": "9a9b5a9ecdd87de19451de3d92a6ea9d79dcf673c961b278b134f9be64a0e7b2",
+    "platform/runtime-lease.js": "6be851c7d43657c670ec3430edfeb6b147c7f9e43da225485b27439e856dcd6f"
+  },
+  "copiedAt": "2026-10-22T04:57:13.000Z"
+}

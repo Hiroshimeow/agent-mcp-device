@@ -12,7 +12,8 @@
   "candidate": {
     "path": "E:\\git-project\\agent-mcp-device-v12",
     "branch": "feat/v12-platform-20261022",
-    "targetVersion": "1.0.12"
+    "targetVersion": "1.0.12",
+    "runtimeCodeCommit": "532f0f1369105b01354507a98e45a8c652f9e75b"
   },
   "historicalEvidence": {
     "source": "docs/STATUS.md; specs/006-agent-memory-palace/HANDOFF.md section 10",
@@ -34,7 +35,8 @@
     "isolateConfig": true,
     "runTestsInCopiedWorkspace": true,
     "baselineBuild": "Never automatically rebuild or mutate authoritative source. Parent coordinates build.",
-    "noRealIdentity": true
+    "noExistingIdentityMutation": true,
+    "ownedAccountFixtures": "Port-free parity stubs identity. Separately identified localhost 8104 acceptance may create new private test accounts and identities under isolated roots; no existing user identity is used."
   },
   "knownBaselineGaps": [
     {
@@ -92,8 +94,14 @@
     {
       "id": "palace.advanced",
       "classification": "EXPERIMENTAL",
-      "freshStatus": "NOT_RUN",
-      "note": "Wiki/learning/federation were not implemented in accepted v11 source. New v12 acceptance is separate from parity."
+      "freshStatus": "OUTSIDE_BASELINE_PARITY",
+      "note": "Advanced wiki/learning/federation were not part of accepted v11 source, so no v11 parity claim is possible for them. The separate v12 acceptance receipts cover the new implementation and do not imply donor-system or production acceptance.",
+      "baselineOnly": true,
+      "candidateAcceptance": [
+        "windows-platform-final",
+        "wsl-platform-final",
+        "linux-package-cold"
+      ]
     }
   ],
   "families": [
@@ -544,11 +552,15 @@
       "assertions": [
         "No child execution runtime on start/shutdown",
         "Distinct direct-in-process generation each start",
-        "Repeated shutdown safe"
+        "Repeated shutdown safe",
+        "Concurrent shutdown callers share rejection; failed cleanup retains Core/state lease/owner and retries",
+        "Failed cleanup cannot arm remote update helper or force-exit signal handler; a later successful retry may exit"
       ],
       "freshEvidence": [
         "windows-native",
-        "wsl-native"
+        "wsl-native",
+        "windows-nochild-final",
+        "wsl-nochild-final"
       ]
     },
     {
@@ -1074,7 +1086,116 @@
         "failed": 0,
         "skipped": 0
       }
+    },
+    {
+      "id": "windows-platform-final",
+      "platform": "win32",
+      "node": "22.22.2",
+      "log": "E:/test/mcp-device-v12-20261022/platform-final-win-04.log",
+      "tests": 77,
+      "passed": 77,
+      "failed": 0,
+      "skipped": 0,
+      "status": "PASS",
+      "scope": "Candidate platform acceptance, including plugin services/bundle lifecycle, cleanup retry, Core composition and state ownership. Separate from v11 baseline union coverage."
+    },
+    {
+      "id": "windows-nochild-final",
+      "platform": "win32",
+      "node": "22.22.2",
+      "log": "E:/test/mcp-device-v12-20261022/startup-final-win.log",
+      "status": "PASS",
+      "scope": "Extended no-child fixture: shared failed cleanup result, retained Core/lease/RuntimeOwner, update handoff unarmed, signal sets exitCode=1 without forced exit, later successful retry."
+    },
+    {
+      "id": "wsl-platform-final",
+      "platform": "linux",
+      "node": "22.21.0",
+      "receipt": "E:/test/mcp-device-v12-20261022/wsl-build13/summary.json",
+      "snapshot": "E:/test/mcp-device-v12-20261022/wsl-build13/build-snapshot.json",
+      "log": "E:/test/mcp-device-v12-20261022/wsl-build13/platform-all.log",
+      "tests": 77,
+      "passed": 77,
+      "failed": 0,
+      "skipped": 0,
+      "tcpAllowed": false,
+      "status": "PASS"
+    },
+    {
+      "id": "wsl-core-final",
+      "platform": "linux",
+      "node": "22.21.0",
+      "receipt": "E:/test/mcp-device-v12-20261022/wsl-build13/core/device-parity-receipt.json",
+      "status": "PASS"
+    },
+    {
+      "id": "wsl-nochild-final",
+      "platform": "linux",
+      "node": "22.21.0",
+      "receipt": "E:/test/mcp-device-v12-20261022/wsl-build13/nochild/device-parity-receipt.json",
+      "status": "PASS"
+    },
+    {
+      "id": "windows-plugin-services-repeat",
+      "platform": "win32",
+      "node": "22.22.2",
+      "receipt": "E:/test/mcp-device-v12-20261022/services-stress13/receipt.json",
+      "runs": 3,
+      "testsPerRun": 10,
+      "passedPerRun": 10,
+      "failed": 0,
+      "skipped": 0,
+      "timedOut": false,
+      "durationMs": [
+        5412,
+        5427,
+        5033
+      ],
+      "status": "PASS",
+      "purpose": "Verify bounded actual child cleanup and cancellation propagation after the earlier Windows orphan/EBUSY failure; compiled plugin hashes recorded."
+    },
+    {
+      "id": "linux-package-production-install",
+      "platform": "linux",
+      "node": "22.21.0",
+      "receipt": "E:/test/mcp-device-v12-20261022/cold-linux03/install-receipt.json",
+      "artifact": "E:/test/mcp-device-v12-20261022/package-final03/hcu-lab.me-mcp-device-1.0.12.tgz",
+      "artifactSha256": "134e46e6487fc6900c2c4fd94b4184a034784936ba7d2626630c69ca82a043a0",
+      "command": "npm install --omit=dev --no-audit --no-fund --save-exact <exact tarball>",
+      "exitCode": 0,
+      "durationMs": 46902,
+      "runtimeStarted": false,
+      "status": "PASS",
+      "scope": "Fresh private Linux installation with production dependencies and lifecycle scripts; installed-package runtime acceptance is separate."
+    },
+    {
+      "id": "linux-package-cold",
+      "platform": "linux",
+      "node": "22.21.0",
+      "receipt": "E:/test/mcp-device-v12-20261022/cold-linux03/server-package-cold-receipt.json",
+      "log": "E:/test/mcp-device-v12-20261022/cold-linux03/server-package-cold.log",
+      "artifactSha256": "134e46e6487fc6900c2c4fd94b4184a034784936ba7d2626630c69ca82a043a0",
+      "fixtureSha256": "294fa76a4bfec087d4f4a81d03a7c9c3c968744eb6fc05038ee5a90cfe1c5069",
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "exitCode": 0,
+      "testDurationMs": 11569.880541,
+      "tapDurationMs": 11789.437741,
+      "status": "PASS",
+      "assertions": [
+        "Installed CLI server runs using production dependencies only",
+        "Default bundled Palace active",
+        "Ordinary account signup, OAuth and device pairing",
+        "Stopped backup/restore preserves paired identity, OAuth refresh and exact evidence"
+      ],
+      "listener": "127.0.0.1:8104",
+      "listenerReleased": true,
+      "releaseReceipt": "E:/test/mcp-device-v12-20261022/cold-linux03/listener-release.json",
+      "scope": "Owned isolated Linux install and account state; no G8, deployment or existing user identity."
     }
   ],
-  "acceptanceScope": "Fresh evidence covers only listed baseline/candidate behaviors and fingerprints. Build/package/server/federation/advanced Palace acceptance is tracked separately. Production, sockets, account identity mutation and unrun families are not implied."
+  "acceptanceScope": "Fresh evidence covers only explicitly listed baseline/candidate behaviors and recorded fingerprints. Candidate platform acceptance is tracked separately from baseline union. Full package/server/federation/advanced Palace evidence remains in its own acceptance receipts. No production deployment, G8 access, existing account mutation or unrun-family acceptance is implied."
 }

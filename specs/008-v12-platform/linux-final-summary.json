@@ -1,0 +1,28 @@
+{
+  "node": "v22.21.0",
+  "platform": "linux",
+  "snapshot": "/home/ayumi/mcp-device-v12-parity-20261022/build13-snapshot",
+  "results": [
+    {
+      "name": "core",
+      "exitCode": 0,
+      "receipt": "/mnt/e/test/mcp-device-v12-20261022/wsl-build13/core/device-parity-receipt.json"
+    },
+    {
+      "name": "nochild",
+      "exitCode": 0,
+      "receipt": "/mnt/e/test/mcp-device-v12-20261022/wsl-build13/nochild/device-parity-receipt.json"
+    },
+    {
+      "name": "platform-all",
+      "exitCode": 0,
+      "tests": 77,
+      "passed": 77,
+      "failed": 0,
+      "skipped": 0,
+      "tcpAllowed": false,
+      "ipcRoot": "/tmp/mcp-v12-final-x8mmUc",
+      "log": "/mnt/e/test/mcp-device-v12-20261022/wsl-build13/platform-all.log"
+    }
+  ]
+}

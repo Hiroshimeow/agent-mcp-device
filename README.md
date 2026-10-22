@@ -1,8 +1,21 @@
 # MCP Device
 
-The gateway owns accounts, OAuth, device ownership, MCP tool contracts, routing, and usage aggregation. MCP Device owns local device identity, pairing, reconnect lifecycle, bounded execution, background registration, and local status.
+MCP Device provides local identity, pairing, reconnect, bounded execution, background registration and status. In source 1.0.12, `mcp-device server` also runs the account/OAuth control plane and one mandatory local runtime through the same Device Core used by remote Devices. `mcp-device start` keeps the existing Device-only behavior.
 
-## Install
+## 1.0.12 source candidate
+
+The v12 increment remains the `@hcu-lab.me/mcp-device` product. It adds a generic versioned plugin host, default enabled Palace, platform knowledge federation, normal localhost account/pairing, and verified stopped-state backup/migration. Disabling Palace leaves native Device execution available; a Device without Palace can still read shared knowledge.
+
+See the [v12 platform guide](docs/v12-platform.md), [acceptance evidence](specs/008-v12-platform/ACCEPTANCE.md), [Device parity inventory](specs/008-v12-platform/device-parity.json), and [Gateway parity inventory](specs/008-v12-platform/gateway-parity.json). Source and isolated-package acceptance do not imply npm publication or production deployment.
+
+```text
+mcp-device start
+mcp-device device status
+mcp-device server --runtime-dir <isolated-state> --host 127.0.0.1 --port 8104
+mcp-device plugins --runtime-dir <isolated-state> list
+```
+
+## Historical installation example
 
 ```powershell
 npm install -g @hcu-lab.me/mcp-device@1.0.10

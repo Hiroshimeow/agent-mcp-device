@@ -147,6 +147,8 @@ Ordinary requests and host callbacks have distinct pending maps. A callback id e
 
 Lifecycle shutdown waits for isolated process resource release. Windows tree termination uses the system taskkill executable and falls back to direct termination when that command fails; a close event is still required as release evidence. Drivers removed from capability advertisements remain owned until cleanup succeeds. Unproven termination rejects host closure and blocks replacement or data rollback, so the enclosing Device/server must retain its state lease. Upgrade stops the old driver, backs up the private data, runs explicit schema migration when needed and restores the previous data/manifest on failure. Disable/uninstall preserve private data; explicit purge is separate.
 
+Remote Device shutdown shares a pending cleanup result and retries failed cleanup on a later request. It retains its Core reference, shared state lease and authenticated RuntimeOwner until cleanup succeeds. A failed update shutdown cannot write the helper handoff marker. A failed or slow signal shutdown sets a nonzero exit status and keeps the owner alive; it does not force the parent to exit while a provider may still hold state. A later successful signal may exit normally. RuntimeOwner acknowledges receipt of a stop request, while contenders must still observe actual ownership release.
+
 ## Bundled installation provenance and relocation
 
 The registry marks records created by `ensureBundled` with `installationSource: "distribution"`. Ordinary installs use `"manual"`; existing unmarked records are treated as user-managed. A matching plugin id alone never transfers ownership to the distribution.
@@ -180,4 +182,26 @@ Generic version descriptors and explicit versioned invocation may be exposed by 
 
 `test/v12/plugin-bundles.test.js` verifies retained data/settings across package relocation, disabled state, unchanged uninstall tombstones, manual/unmarked provenance, same-path replaced code blocked across restarts, explicit migration recovery and rollback, other contract mismatches and selective missing-entry recovery.
 
-The port-free runner executes all three plugin suites with `--only plugins --target candidate`. Windows build08b and native WSL build08 receipts already prove 19 lifecycle/dependency tests with zero skips on each platform, including the Python sidecar. Bundle reconciliation requires the subsequent compiled acceptance receipt; do not infer it from those earlier runs.
+The port-free runner executes all three plugin suites with `--only plugins --target candidate`. The complete platform gate executes with `node scripts/v12/run-platform-tests.mjs`.
+
+Final frozen-code receipts on G6 are:
+
+| Gate | Result | Evidence under `E:/test/mcp-device-v12-20261022/` |
+| --- | --- | --- |
+| Windows Node 22.22.2 complete platform suite | 77/77 passed; zero failed, cancelled or skipped; 34.042 s | `platform-final-win-04.log` |
+| Linux WSL Ubuntu 22.04, Node 22.21.0 complete platform suite | 77/77 passed; zero failed, cancelled or skipped; 20.780 s | `wsl-build13/platform-all.log`, `wsl-build13/summary.json` |
+| Final Linux Core comparator and extended no-child lifecycle fixture | Both passed | `wsl-build13/core/device-parity-receipt.json`, `wsl-build13/nochild/device-parity-receipt.json` |
+| Final Windows extended no-child lifecycle fixture | Passed | `startup-final-win.log` |
+| Windows dependency services repeat gate | Three sequential runs, 10/10 each; zero timeout or skip; 5.412/5.427/5.033 s | `services-stress13/receipt.json` |
+
+The 77-case platform suite includes the real Python callback sidecar, bundled relocation/upgrade gates, retained process cleanup ownership and trusted cooperative cleanup failure/retry. The separate no-child fixture injects only account, process-exit and helper boundaries while executing compiled Device lifecycle control flow. The Linux run rejects TCP and allows only its own temporary IPC endpoints; baseline parity uses isolated configuration and copied fixtures.
+
+Earlier assertion mismatches, the Windows orphan/EBUSY shutdown failure, invalid zero-assertion baseline attempts and intermediate passes remain in the evidence directory. They are not substituted for the final receipts. Final compiled fingerprints are recorded in `wsl-build13/build-snapshot.json` and the Windows repeat receipt. Installed-package cold acceptance and license-complete artifact identity are recorded separately from these runtime-code gates.
+
+## Installed package on Linux
+
+The final license-complete tarball is `E:/test/mcp-device-v12-20261022/package-final03/hcu-lab.me-mcp-device-1.0.12.tgz`, SHA-256 `134e46e6487fc6900c2c4fd94b4184a034784936ba7d2626630c69ca82a043a0`. A fresh private Ubuntu 22.04 installation used normal `npm install --omit=dev` with lifecycle scripts enabled and no global install. It passed on Node 22.21.0 in 46.902 s; the exact command and production dependency tree are retained in `cold-linux03/install-receipt.json` and `cold-linux03/production-dependency-tree.json`.
+
+The installed-package cold fixture passed 1/1 with zero failures, cancellations or skips: 11.570 s for the case, 11.789 s TAP total. It starts the installed CLI server with production dependencies, uses ordinary account/OAuth/pairing flow, verifies default Palace, and proves paired identity, OAuth refresh and exact evidence survive stopped backup/restore. Receipts are `cold-linux03/server-package-cold.log` and `cold-linux03/server-package-cold-receipt.json`; the executed fixture hash is `294fa76a4bfec087d4f4a81d03a7c9c3c968744eb6fc05038ee5a90cfe1c5069`.
+
+Only G6 loopback 8104 was leased for this fixture. After successful process completion, read-only Windows and Linux listener tables both showed no 8104 listener; the release observation is retained in `cold-linux03/listener-release.json`. This is isolated package acceptance, with no production deployment or G8 access.

@@ -1,0 +1,16 @@
+{
+  "artifactSha256": "134e46e6487fc6900c2c4fd94b4184a034784936ba7d2626630c69ca82a043a0",
+  "fixtureSha256": "294fa76a4bfec087d4f4a81d03a7c9c3c968744eb6fc05038ee5a90cfe1c5069",
+  "installedRoot": "/home/ayumi/mcp-device-v12-parity-20261022/cold-install-03/node_modules/@hcu-lab.me/mcp-device",
+  "node": "v22.21.0",
+  "platform": "linux",
+  "startedAt": "2026-10-22T05:07:24.896Z",
+  "completedAt": "2026-10-22T05:07:36.812Z",
+  "exitCode": 0,
+  "tests": 1,
+  "passed": 1,
+  "failed": 0,
+  "skipped": 0,
+  "listener": "127.0.0.1:8104",
+  "isolatedTemp": "/tmp/mcp-v12-cold-aF9U6B"
+}

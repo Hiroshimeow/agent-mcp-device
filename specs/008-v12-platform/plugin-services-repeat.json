@@ -1,0 +1,45 @@
+{
+  "node": "v22.22.2",
+  "platform": "win32",
+  "source": "E:/git-project/agent-mcp-device-v12",
+  "copiedTo": "E:/test/mcp-v12-stop-13",
+  "hashes": {
+    "plugin-host": "2df2409471d9da28b603823e1ad76b473fbe86b0a4192474c3a337b8a829d2c2",
+    "plugin-driver": "b63378746321e72dd9c5f619d3a7a26b596bc4da4ca9fd87dd38567b50a1f295",
+    "plugin-contract": "88dd61e800dc8e4efe2ceb9e53021e371717b7292e97dca2f2c4f3bc5bbf0057",
+    "plugin-child": "31ec6cfd72c5920c0dbe46e283bb75a6a7f7a3a5812cde22b166a7164a4d472b",
+    "plugin-services": "d79c51a9e6d6d5ec83e8e74bcb677c23549b31222583b25e3b95d02e8e4b91d0"
+  },
+  "results": [
+    {
+      "iteration": 1,
+      "exitCode": 0,
+      "timedOut": false,
+      "ms": 5412,
+      "tests": 10,
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "iteration": 2,
+      "exitCode": 0,
+      "timedOut": false,
+      "ms": 5427,
+      "tests": 10,
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "iteration": 3,
+      "exitCode": 0,
+      "timedOut": false,
+      "ms": 5033,
+      "tests": 10,
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0
+    }
+  ]
+}

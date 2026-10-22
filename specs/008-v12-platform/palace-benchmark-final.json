@@ -1,0 +1,271 @@
+{
+  "benchmark": "palace-scoped-heldout-v1",
+  "node": "v22.22.2",
+  "platform": "win32",
+  "sourceRecords": 121,
+  "targetRequests": 12,
+  "distractors": 108,
+  "method": "Fixed natural-language troubleshooting requests, separate expected IDs, 3 project scopes, no generation and no answer labels in provider inputs.",
+  "quality": {
+    "top1": 1,
+    "hitAt3": 1,
+    "precisionAt3": 0.3333333333333333,
+    "precisionAmongReturnedAtMost3": 0.8571428571428571,
+    "noAnswerAbstention": 1,
+    "scopeLeaks": 0,
+    "staleErrors": 0,
+    "budgetErrors": 0,
+    "staleStatus": "stale"
+  },
+  "efficiency": {
+    "indexMs": 650.6367,
+    "ingestRounds": 1,
+    "created": 121,
+    "searchSamples": 72,
+    "p50Ms": 0.7331000000000358,
+    "p95Ms": 1.6357999999999038,
+    "previewMeanBytes": 880.0833333333334,
+    "rawProjectMeanBytes": 5524,
+    "storageBeforeStopBytes": 5368224,
+    "storageCheckpointedBytes": 987136,
+    "modelCalls": 0
+  },
+  "cases": [
+    {
+      "key": "sqlite-lock",
+      "query": "How can the settlement writer recover from SQLITE_BUSY while preventing duplicate charges?",
+      "top1": true,
+      "hit3": true,
+      "returned": 1,
+      "bytes": 744,
+      "retrievedSummaries": [
+        "Source claim: Error SQLITE_BUSY in the settlement writer: a second transaction holds the database lock. Use a bounded busy timeout, retry the whole transaction, and retain the original idempotency key."
+      ]
+    },
+    {
+      "key": "cursor",
+      "query": "Why does order pagination skip rows when fulfillment status changes?",
+      "top1": true,
+      "hit3": true,
+      "returned": 1,
+      "bytes": 732,
+      "retrievedSummaries": [
+        "Source claim: Constraint: order pagination uses an immutable created_at plus order_id cursor. Sorting by a mutable status duplicates or skips rows when fulfillment changes during traversal."
+      ]
+    },
+    {
+      "key": "retry",
+      "query": "A payment request disconnected after submission; what evidence is needed before retrying?",
+      "top1": true,
+      "hit3": true,
+      "returned": 1,
+      "bytes": 755,
+      "retrievedSummaries": [
+        "Source claim: Decision: payment retries must reuse the first request idempotency key. A network disconnect after submission does not prove that the charge failed; query the payment receipt before another attempt."
+      ]
+    },
+    {
+      "key": "node-runtime",
+      "query": "The order worker cannot load node:sqlite although my terminal was upgraded; what should I inspect?",
+      "top1": true,
+      "hit3": true,
+      "returned": 1,
+      "bytes": 767,
+      "retrievedSummaries": [
+        "Source claim: Error node:sqlite import failed under Node 20 in the order worker. The package requires Node 22.13 or newer. Upgrade the actual service executable and verify process.execPath, not just the interactive terminal."
+      ]
+    },
+    {
+      "key": "auth-loopback",
+      "query": "Why is a localhost MCP connection rejected with HTTP 401?",
+      "top1": true,
+      "hit3": true,
+      "returned": 1,
+      "bytes": 756,
+      "retrievedSummaries": [
+        "Source claim: Error HTTP 401 for a localhost MCP client is expected until account login and device pairing finish. Loopback traffic uses the same account authentication and authorization checks as remote traffic."
+      ]
+    },
+    {
+      "key": "port",
+      "query": "How should an isolated gateway test handle EADDRINUSE without interrupting another listener?",
+      "top1": true,
+      "hit3": true,
+      "returned": 1,
+      "bytes": 756,
+      "retrievedSummaries": [
+        "Source claim: Error EADDRINUSE starting the isolated gateway: the chosen port already has a listener. Use the assigned test port after inspecting its owner. Production and backup listeners must not be terminated."
+      ]
+    },
+    {
+      "key": "proxy",
+      "query": "The reverse proxy serves the page but the device WebSocket handshake fails; which routing is required?",
+      "top1": true,
+      "hit3": true,
+      "returned": 1,
+      "bytes": 767,
+      "retrievedSummaries": [
+        "Source claim: Decision: a reverse proxy must forward WebSocket upgrades and preserve the original Host and authorization headers. Missing Upgrade routing causes the device tunnel handshake to fail after the HTTP page loads."
+      ]
+    },
+    {
+      "key": "revoke",
+      "query": "Can a connected device keep its tunnel permission after the account revokes pairing?",
+      "top1": true,
+      "hit3": true,
+      "returned": 3,
+      "bytes": 2171,
+      "retrievedSummaries": [
+        "Source claim: Constraint: revoking a paired device invalidates its routing permission immediately. Cached tunnel presence must never override a revoked account relationship; reconnect requires a new authorized pairing.",
+        "Source claim: Error HTTP 401 for a localhost MCP client is expected until account login and device pairing finish. Loopback traffic uses the same account authentication and authorization checks as remote traffic.",
+        "Source claim: Decision: a reverse proxy must forward WebSocket upgrades and preserve the original Host and authorization headers. Missing Upgrade routing causes the device tunnel handshake to fail after the HTTP page loads."
+      ]
+    },
+    {
+      "key": "rename",
+      "query": "How do I safely move an attachment when rename reports EXDEV across volumes?",
+      "top1": true,
+      "hit3": true,
+      "returned": 1,
+      "bytes": 775,
+      "retrievedSummaries": [
+        "Source claim: Error EXDEV while moving an attachment across volumes: atomic rename cannot cross a filesystem boundary. Copy to a temporary file on the destination volume, verify its hash, then rename locally and remove the old file."
+      ]
+    },
+    {
+      "key": "utf8",
+      "query": "What should an exact evidence read return for malformed UTF-8 bytes?",
+      "top1": true,
+      "hit3": true,
+      "returned": 1,
+      "bytes": 761,
+      "retrievedSummaries": [
+        "Source claim: Error invalid UTF-8 in a log evidence range: return an explicit decoding failure instead of replacement characters. Preserve byte offsets and the original source hash so a later exact read can be audited."
+      ]
+    },
+    {
+      "key": "tail",
+      "query": "When should the ingester advance its checkpoint for an unfinished JSONL tail?",
+      "top1": true,
+      "hit3": true,
+      "returned": 1,
+      "bytes": 778,
+      "retrievedSummaries": [
+        "Source claim: Decision: incremental JSONL ingestion checkpoints only complete newline-terminated records. An unfinished final line remains pending until appended bytes complete it; file growth alone is not proof of append-only content."
+      ]
+    },
+    {
+      "key": "backup",
+      "query": "Which data is necessary to restore knowledge evidence after moving to another machine?",
+      "top1": true,
+      "hit3": true,
+      "returned": 1,
+      "bytes": 799,
+      "retrievedSummaries": [
+        "Source claim: Constraint: a portable knowledge backup includes SQLite state and managed evidence files. Stop writes, checkpoint WAL, then copy the complete plugin root. External sources remain provenance references and must be reported unavailable if absen"
+      ]
+    }
+  ],
+  "noAnswerCases": [
+    {
+      "project": "orders",
+      "query": "How do I repair a Rust Cargo checksum mismatch in the package registry?",
+      "returned": 0,
+      "summaries": []
+    },
+    {
+      "project": "gateway",
+      "query": "Which PostgreSQL replication slot retains WAL after a subscriber disconnects?",
+      "returned": 0,
+      "summaries": []
+    },
+    {
+      "project": "assets",
+      "query": "How should a Kubernetes pod recover from an expired image pull credential?",
+      "returned": 0,
+      "summaries": []
+    }
+  ],
+  "heldout": {
+    "method": "Six additional paraphrases fixed after implementation; results do not tune the implementation.",
+    "top1": 0.8333333333333334,
+    "hitAt3": 0.8333333333333334,
+    "cases": [
+      {
+        "project": "orders",
+        "key": "sqlite-lock",
+        "query": "The settlement database is busy and a write must be retried. Which lock handling preserves idempotency?",
+        "top1": true,
+        "hit3": true,
+        "returned": 1,
+        "summaries": [
+          "Source claim: Error SQLITE_BUSY in the settlement writer: a second transaction holds the database lock. Use a bounded busy timeout, retry the whole transaction, and retain the original idempotency key."
+        ]
+      },
+      {
+        "project": "orders",
+        "key": "cursor",
+        "query": "We see missing orders while scrolling as fulfillment changes. Which stable pagination fields should drive the cursor?",
+        "top1": true,
+        "hit3": true,
+        "returned": 1,
+        "summaries": [
+          "Source claim: Constraint: order pagination uses an immutable created_at plus order_id cursor. Sorting by a mutable status duplicates or skips rows when fulfillment changes during traversal."
+        ]
+      },
+      {
+        "project": "gateway",
+        "key": "auth-loopback",
+        "query": "MCP from the same machine receives unauthorized. Is account pairing still part of the connection setup?",
+        "top1": true,
+        "hit3": true,
+        "returned": 1,
+        "summaries": [
+          "Source claim: Error HTTP 401 for a localhost MCP client is expected until account login and device pairing finish. Loopback traffic uses the same account authentication and authorization checks as remote traffic."
+        ]
+      },
+      {
+        "project": "gateway",
+        "key": "proxy",
+        "query": "The site opens, but upgraded socket traffic never reaches the paired device. What must the proxy forward?",
+        "top1": true,
+        "hit3": true,
+        "returned": 3,
+        "summaries": [
+          "Source claim: Decision: a reverse proxy must forward WebSocket upgrades and preserve the original Host and authorization headers. Missing Upgrade routing causes the device tunnel handshake to fail after the HTTP page loads.",
+          "Source claim: Constraint: revoking a paired device invalidates its routing permission immediately. Cached tunnel presence must never override a revoked account relationship; reconnect requires a new authorized pairing.",
+          "Source claim: Error HTTP 401 for a localhost MCP client is expected until account login and device pairing finish. Loopback traffic uses the same account authentication and authorization checks as remote traffic."
+        ]
+      },
+      {
+        "project": "assets",
+        "key": "backup",
+        "query": "How do we relocate persisted knowledge with enough evidence to audit it after recovery?",
+        "top1": true,
+        "hit3": true,
+        "returned": 2,
+        "summaries": [
+          "Source claim: Constraint: a portable knowledge backup includes SQLite state and managed evidence files. Stop writes, checkpoint WAL, then copy the complete plugin root. External sources remain provenance references and must be reported unavailable if absen",
+          "Source claim: Error invalid UTF-8 in a log evidence range: return an explicit decoding failure instead of replacement characters. Preserve byte offsets and the original source hash so a later exact read can be audited."
+        ]
+      },
+      {
+        "project": "gateway",
+        "key": "port",
+        "query": "A test gateway cannot bind its socket because another service owns the address; how do we investigate safely?",
+        "top1": false,
+        "hit3": false,
+        "returned": 0,
+        "summaries": []
+      }
+    ]
+  },
+  "limits": [
+    "Fixture relevance measurement is not downstream task success.",
+    "Bytes are measured, not model tokens.",
+    "Initial 12-case fixture became a regression set after it exposed common-word noise; separate paraphrases remain held out.",
+    "No semantic embedding/model retrieval is claimed.",
+    "Latency excludes connector and network overhead.",
+    "Managed state is measured; external source bytes are excluded."
+  ]
+}

@@ -1144,7 +1144,7 @@
     {
       "id": "e2e",
       "path": "specs/008-v12-platform/server-e2e-test.log",
-      "sha256": "52383c56e6203d72a6a4da98798cb3e4767d4d50df0a523e09821858f3ecda9c",
+      "sha256": "4cc604e18bd0045ca148fcb052771812d22a2f6270b9805b63c84f5957a9a28b",
       "tests": 18,
       "pass": 18,
       "fail": 0,

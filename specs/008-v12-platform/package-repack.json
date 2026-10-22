@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "artifact": "E:\\test\\mcp-device-v12-20261022\\package-final03\\hcu-lab.me-mcp-device-1.0.12.tgz",
+  "sha256": "134e46e6487fc6900c2c4fd94b4184a034784936ba7d2626630c69ca82a043a0",
+  "bytes": 2121956,
+  "files": 738,
+  "comparisonArtifact": "E:\\test\\mcp-device-v12-20261022\\package-final02\\hcu-lab.me-mcp-device-1.0.12.tgz",
+  "comparisonSha256": "d6f46f804962a5c2604cf7dd2157a8671ae12c592fbda47740a72932ef8bc16e",
+  "unchangedFiles": 737,
+  "added": [
+    "package/control-plane/scripts/GATEWAY-LICENSE.txt"
+  ],
+  "removed": [],
+  "changed": [],
+  "originalGatewayLicenseSha256": "9b71e99208c62a5b89a4fdeca714d80697ba62fb3e717a039ca20a36ec229d21",
+  "runtimePayloadUnchanged": true,
+  "status": "PASS"
+}

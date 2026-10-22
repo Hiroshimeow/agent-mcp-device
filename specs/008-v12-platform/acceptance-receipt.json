@@ -1,0 +1,247 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-22T05:12:04.559Z",
+  "status": "PASS_ISOLATED_CANDIDATE",
+  "product": "@hcu-lab.me/mcp-device",
+  "version": "1.0.12",
+  "runtimeCommit": "532f0f1369105b01354507a98e45a8c652f9e75b",
+  "runtimeSourceMatchesCommit": true,
+  "branch": "feat/v12-platform-20261022",
+  "baselines": [
+    {
+      "path": "E:/git-project/agent-mcp-device",
+      "head": "1df22e6bca3e4f5fa7bfd94f814c1b7409fd7848",
+      "clean": true
+    },
+    {
+      "path": "E:/git-project/agent-mcp-gateway",
+      "head": "7a5a30b4a5f6226cf65b395ddfa0424677184592",
+      "clean": true
+    }
+  ],
+  "artifact": {
+    "schemaVersion": 1,
+    "artifact": "E:\\test\\mcp-device-v12-20261022\\package-final03\\hcu-lab.me-mcp-device-1.0.12.tgz",
+    "sha256": "134e46e6487fc6900c2c4fd94b4184a034784936ba7d2626630c69ca82a043a0",
+    "bytes": 2121956,
+    "files": 738,
+    "comparisonArtifact": "E:\\test\\mcp-device-v12-20261022\\package-final02\\hcu-lab.me-mcp-device-1.0.12.tgz",
+    "comparisonSha256": "d6f46f804962a5c2604cf7dd2157a8671ae12c592fbda47740a72932ef8bc16e",
+    "unchangedFiles": 737,
+    "added": [
+      "package/control-plane/scripts/GATEWAY-LICENSE.txt"
+    ],
+    "removed": [],
+    "changed": [],
+    "originalGatewayLicenseSha256": "9b71e99208c62a5b89a4fdeca714d80697ba62fb3e717a039ca20a36ec229d21",
+    "runtimePayloadUnchanged": true,
+    "status": "PASS"
+  },
+  "tests": {
+    "windowsPlatform": {
+      "status": "PASS",
+      "tests": 77,
+      "pass": 77,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "duration_ms": 34042.0177,
+      "receipt": {
+        "path": "E:\\test\\mcp-device-v12-20261022\\platform-final-win-04.log",
+        "sha256": "2ec4f028846c9d3920e49e7d9c5f5b3edd1ef6eeee5adba4c3f0d32eec823af9"
+      }
+    },
+    "linuxPlatform": {
+      "status": "PASS",
+      "tests": 77,
+      "pass": 77,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "duration_ms": 20780.351044,
+      "receipt": {
+        "path": "E:\\test\\mcp-device-v12-20261022\\wsl-build13\\platform-all.log",
+        "sha256": "1fa88e88e87813e9549a29c63aa2e83af7ec532569e5ffa68edbf977a0c1b6e3"
+      }
+    },
+    "serverE2E": {
+      "status": "PASS",
+      "tests": 18,
+      "pass": 18,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "duration_ms": 57958.1241,
+      "receipt": {
+        "path": "E:\\test\\mcp-device-v12-20261022\\server-e2e-final02-win.log",
+        "sha256": "4cc604e18bd0045ca148fcb052771812d22a2f6270b9805b63c84f5957a9a28b"
+      }
+    },
+    "windowsColdPackage": {
+      "status": "PASS",
+      "tests": 1,
+      "pass": 1,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "duration_ms": 10448.971,
+      "receipt": {
+        "path": "E:\\test\\mcp-device-v12-20261022\\cold-server-final-win.log",
+        "sha256": "ba85891ca4e3743b6a7cbd9955ad0f67bdeaa50572ec5a5741a9b33c4dfa7b70"
+      }
+    },
+    "linuxColdPackage": {
+      "status": "PASS",
+      "tests": 1,
+      "pass": 1,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "duration_ms": 11789.437741,
+      "receipt": {
+        "path": "E:\\test\\mcp-device-v12-20261022\\cold-linux03\\server-package-cold.log",
+        "sha256": "a7b837a32ede422746ae8ce19da28ef0f66021272e6aae3cbb6665c23b36a34a"
+      }
+    },
+    "windowsServicesRepeat": {
+      "node": "v22.22.2",
+      "platform": "win32",
+      "source": "E:/git-project/agent-mcp-device-v12",
+      "copiedTo": "E:/test/mcp-v12-stop-13",
+      "hashes": {
+        "plugin-host": "2df2409471d9da28b603823e1ad76b473fbe86b0a4192474c3a337b8a829d2c2",
+        "plugin-driver": "b63378746321e72dd9c5f619d3a7a26b596bc4da4ca9fd87dd38567b50a1f295",
+        "plugin-contract": "88dd61e800dc8e4efe2ceb9e53021e371717b7292e97dca2f2c4f3bc5bbf0057",
+        "plugin-child": "31ec6cfd72c5920c0dbe46e283bb75a6a7f7a3a5812cde22b166a7164a4d472b",
+        "plugin-services": "d79c51a9e6d6d5ec83e8e74bcb677c23549b31222583b25e3b95d02e8e4b91d0"
+      },
+      "results": [
+        {
+          "iteration": 1,
+          "exitCode": 0,
+          "timedOut": false,
+          "ms": 5412,
+          "tests": 10,
+          "passed": 10,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "iteration": 2,
+          "exitCode": 0,
+          "timedOut": false,
+          "ms": 5427,
+          "tests": 10,
+          "passed": 10,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "iteration": 3,
+          "exitCode": 0,
+          "timedOut": false,
+          "ms": 5033,
+          "tests": 10,
+          "passed": 10,
+          "failed": 0,
+          "skipped": 0
+        }
+      ]
+    },
+    "linuxCoreAndDeviceLifecycle": [
+      {
+        "name": "core",
+        "exitCode": 0,
+        "receipt": "/mnt/e/test/mcp-device-v12-20261022/wsl-build13/core/device-parity-receipt.json"
+      },
+      {
+        "name": "nochild",
+        "exitCode": 0,
+        "receipt": "/mnt/e/test/mcp-device-v12-20261022/wsl-build13/nochild/device-parity-receipt.json"
+      }
+    ],
+    "windowsDeviceLifecycle": {
+      "status": "PASS",
+      "receipt": {
+        "path": "E:\\test\\mcp-device-v12-20261022\\startup-final-win.log",
+        "sha256": "7bb6b2dcf900a77c9eae7d40c342de73b9e7419782717f109fe0a08e5a12bcc6"
+      }
+    },
+    "serverUnit": {
+      "status": "PASS",
+      "tests": 14,
+      "receipt": {
+        "path": "E:\\test\\mcp-device-v12-20261022\\gateway-final-unit.log",
+        "sha256": "adf37ca737adc4ef2df0d4190e0d57f1b81d338e7b647c73cd3f57a7d5ff9c5d"
+      }
+    },
+    "importedSource": {
+      "status": "PASS",
+      "importedFiles": 457,
+      "unchanged": 450,
+      "adapted": 7,
+      "additions": 7,
+      "receipt": "E:\\git-project\\agent-mcp-device-v12\\specs\\008-v12-platform\\server-provenance-test.log"
+    }
+  },
+  "installations": {
+    "windows": {
+      "node": "v22.22.2",
+      "omitDev": true,
+      "packageRoot": "E:\\test\\mcp-device-v12-20261022\\cold-install-final03\\node_modules\\@hcu-lab.me\\mcp-device",
+      "tarballIntegrityVerified": true,
+      "log": {
+        "path": "E:\\test\\mcp-device-v12-20261022\\cold-install-final03.log",
+        "sha256": "f1a5774f46c46164f74ff0604383df204ef8108cdeb66cf2cd73f2871c0260c2"
+      }
+    },
+    "linux": {
+      "node": "v22.21.0",
+      "command": [
+        "npm",
+        "install",
+        "--omit=dev",
+        "--no-audit",
+        "--no-fund",
+        "--save-exact",
+        "/mnt/e/test/mcp-device-v12-20261022/package-final03/hcu-lab.me-mcp-device-1.0.12.tgz"
+      ],
+      "packageRoot": "/home/ayumi/mcp-device-v12-parity-20261022/cold-install-03/node_modules/@hcu-lab.me/mcp-device",
+      "artifactSha256": "134e46e6487fc6900c2c4fd94b4184a034784936ba7d2626630c69ca82a043a0",
+      "exitCode": 0,
+      "receipt": {
+        "path": "E:\\test\\mcp-device-v12-20261022\\cold-linux03\\install-receipt.json",
+        "sha256": "26810763343ad6ffa513a9dd9fa3bf527f74c333e16617a2c51da84c9cdc65df"
+      }
+    }
+  },
+  "portRelease": {
+    "artifactSha256": "134e46e6487fc6900c2c4fd94b4184a034784936ba7d2626630c69ca82a043a0",
+    "testReceipt": "server-package-cold-receipt.json",
+    "port": 8104,
+    "deviceId": "desktop-b5e4iue-87cea2af",
+    "windows": {
+      "method": "Get-NetTCPConnection -State Listen -LocalPort 8104",
+      "exitCode": 0,
+      "listeners": []
+    },
+    "linux": {
+      "method": "Read /proc/net/tcp and /proc/net/tcp6, state 0A and port 8104",
+      "exitCode": 0,
+      "listeners": []
+    },
+    "observedAfter": "2026-10-22T05:07:36.812Z",
+    "unknownProcessesTerminated": false,
+    "laneReleasedTo": "/root"
+  },
+  "productionVerified": false,
+  "deployed": false,
+  "published": false,
+  "limits": [
+    "Full historical network-negative/HTTP-upstream/deployment-update matrices are explicitly PARTIAL or NOT_RUN in the inventories.",
+    "Real Context execution retains its signed approval gate; no approval was forged.",
+    "Inherited native test wording/Windows path/symlink fixture gaps remain recorded separately from candidate failures.",
+    "Trusted cooperative plugins cannot provide hard preemption or an OS security sandbox.",
+    "Retrieval holdout is 5/6; response-byte costs increased in the measured task replay."
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "artifactSha256": "134e46e6487fc6900c2c4fd94b4184a034784936ba7d2626630c69ca82a043a0",
+  "testReceipt": "server-package-cold-receipt.json",
+  "port": 8104,
+  "deviceId": "desktop-b5e4iue-87cea2af",
+  "windows": {
+    "method": "Get-NetTCPConnection -State Listen -LocalPort 8104",
+    "exitCode": 0,
+    "listeners": []
+  },
+  "linux": {
+    "method": "Read /proc/net/tcp and /proc/net/tcp6, state 0A and port 8104",
+    "exitCode": 0,
+    "listeners": []
+  },
+  "observedAfter": "2026-10-22T05:07:36.812Z",
+  "unknownProcessesTerminated": false,
+  "laneReleasedTo": "/root"
+}
