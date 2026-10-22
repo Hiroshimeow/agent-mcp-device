@@ -1,0 +1,53 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import { PluginHost } from '../../dist/platform/plugin-host.js';
+import { bundledPluginManifests } from '../../dist/distribution.js';
+
+test('bundled provider lifecycle and fatal plugin leave the actual shared Device Core functional', { timeout: 30000 }, async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'v12-platform-core-'));
+  process.env.MCP_DEVICE_CONFIG_DIR = root;
+  const { GatewayDeviceIdentity } = await import('../../dist/device/gateway-identity.js');
+  const identity = new GatewayDeviceIdentity(path.join(root, 'gateway-identity.json'));
+  const record = await identity.loadOrCreate();
+  const setup = new PluginHost({ stateRoot: root, deviceId: record.deviceId });
+  for (const manifest of bundledPluginManifests()) await setup.install(manifest, { enabled: true, settings: { autoIndex: false, discoverKnownSources: false } });
+  await setup.close();
+  const { createPlatformDeviceCore } = await import('../../dist/platform/device-runtime.js');
+  const core = await createPlatformDeviceCore({ deviceId: record.deviceId, stateRoot: root, allowedRoots: [root], sourceRoots: [], projectRoots: [] });
+  t.after(async () => { await core.close(); await fs.rm(root, { recursive: true, force: true }); });
+  assert.ok(core.capabilities.includes('knowledge.search'));
+  assert.ok((await core.invoke('platform.capabilities')).contracts.some(capability => capability.name === 'knowledge.search' && capability.version === '1.0.0'));
+  await assert.rejects(core.invoke('platform.invoke', { name: 'knowledge.search', version: '^2.0.0', input: { query: 'fixture' } }), { code: 'CAPABILITY_UNAVAILABLE' });
+  const privateData = core.plugins.dataRoot('palace'), initialData = (await fs.readdir(privateData)).filter(name => !/-(?:wal|shm)$/.test(name));
+  assert.ok(initialData.length > 0);
+  const target = path.join(root, 'fixture.txt');
+  const written = await core.invokeNative('write_file', { path: target, content: 'ordinary tools survive', mode: 'rewrite' });
+  assert.notEqual(written.isError, true);
+  const read = async () => { const result = await core.invokeNative('read_file', { path: target }); assert.notEqual(result.isError, true); assert.match(JSON.stringify(result), /ordinary tools survive/); };
+  await core.plugins.disable('palace'); await read(); assert.equal(core.capabilities.includes('knowledge.search'), false);
+  await core.plugins.enable('palace'); assert.ok(core.capabilities.includes('knowledge.search'));
+  const faultEntry = path.join(root, 'fault.mjs');
+  await fs.writeFile(faultEntry, `export const createPlugin=()=>({invoke(n,i){if(i==='crash')process.exit(19);while(true){}}});`);
+  await core.plugins.install({ id: 'fatal-fixture', version: '1.0.0', dataSchemaVersion: 1, isolation: 'process', entry: faultEntry, capabilities: [{ name: 'fault.execute', version: '1.0.0' }], timeoutMs: 1000 }, { enabled: true });
+  const failed = assert.rejects(core.invoke('fault.execute', 'hang'), { code: 'PLUGIN_TIMEOUT' });
+  await read(); await failed;
+  await core.plugins.enable('fatal-fixture'); await assert.rejects(core.invoke('fault.execute', 'crash')); await read();
+  await core.plugins.uninstall('palace'); await read();
+  assert.equal(core.capabilities.includes('knowledge.search'), false);
+  const retainedData = await fs.readdir(privateData);
+  assert.ok(initialData.every(name => retainedData.includes(name)), 'Durable plugin files remain; SQLite may remove transient WAL/SHM when closed');
+  assert.equal((await identity.loadOrCreate()).deviceId, record.deviceId);
+  assert.equal(JSON.parse(await fs.readFile(path.join(root, 'gateway-identity.json'), 'utf8')).publicKeyPem, record.publicKeyPem);
+  const closePlugins = core.plugins.close.bind(core.plugins);
+  core.plugins.close = async () => { throw Object.assign(new Error('Fixture resource release refused'), { code: 'PLUGIN_TERMINATION_FAILED' }); };
+  try {
+    await assert.rejects(core.close(), { code: 'PLUGIN_TERMINATION_FAILED' });
+    await assert.rejects(core.close(), { code: 'PLUGIN_TERMINATION_FAILED' });
+    assert.deepEqual(core.capabilities, []);
+    await assert.rejects(core.invokeNative('read_file', { path: target }), { code: 'DEVICE_NOT_READY' });
+  } finally { core.plugins.close = closePlugins; }
+  await core.close();
+});
