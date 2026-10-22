@@ -9,7 +9,7 @@ const packageRoot = fileURLToPath(new URL('../../', import.meta.url));
 const usage = `MCP Device 1.0.12
   mcp-device start                         Existing Device-only runtime
   mcp-device device [start|status|...]      Alias for the Device-only commands
-  mcp-device server [--runtime-dir DIR] [--host HOST] [--port PORT] [--public-url URL]
+  mcp-device server [--runtime-dir DIR] [--host HOST] [--port PORT] [--public-url URL] [--skill-root DIR] [--allow-http-lan]
   mcp-device admin [--runtime-dir DIR] account|invite ...
   mcp-device plugins [--runtime-dir DIR] list|install|enable|disable|uninstall|purge|upgrade|configure ...
   mcp-device knowledge [--runtime-dir DIR] search|list|read|ingest|learn|correct|skills [JSON]
@@ -26,8 +26,8 @@ State migration defaults to a reviewable dry run; --apply writes only a new targ
 interface Parsed { values: Record<string, string[]>; flags: Set<string>; positional: string[]; }
 function parse(argv: string[]): Parsed {
   const values: Record<string, string[]> = {}, flags = new Set<string>(), positional: string[] = [];
-  const valued = new Set(['runtime-dir', 'host', 'port', 'public-url', 'project-root', 'source-root', 'config', 'source', 'backup', 'target', 'device-root', 'gateway-root']);
-  const switches = new Set(['help', 'enable', 'apply', 'json']);
+  const valued = new Set(['runtime-dir', 'host', 'port', 'public-url', 'skill-root', 'project-root', 'source-root', 'config', 'source', 'backup', 'target', 'device-root', 'gateway-root']);
+  const switches = new Set(['help', 'enable', 'apply', 'json', 'allow-http-lan']);
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === '--') { positional.push(...argv.slice(i + 1)); break; }
@@ -126,6 +126,19 @@ async function serverCli(args: Parsed): Promise<void> {
   try {
     const config = one(args, 'config') ? await jsonFile(one(args, 'config')!) : {};
     if (!config || typeof config !== 'object' || Array.isArray(config) || (config.env && (typeof config.env !== 'object' || Array.isArray(config.env)))) throw new CapabilityError('INVALID_ARGUMENT', 'Server config must be a JSON object with an optional env object');
+    const publicUrl = one(args, 'public-url');
+    const allowHttpLan = args.flags.has('allow-http-lan');
+    if (allowHttpLan) {
+      if (!publicUrl) throw new CapabilityError('INVALID_ARGUMENT', '--allow-http-lan requires --public-url http://<lan-host>:<port>');
+      let url: URL;
+      try { url = new URL(publicUrl); } catch { throw new CapabilityError('INVALID_ARGUMENT', '--public-url must be a valid absolute URL'); }
+      if (url.protocol !== 'http:') throw new CapabilityError('INVALID_ARGUMENT', '--allow-http-lan is only for an explicit http:// LAN public URL');
+    }
+    const configuredSkillRoot = one(args, 'skill-root', process.env.MCP_SKILL_ROOT);
+    const legacySharedSkillRoot = path.join(os.homedir(), '.mcp-device', 'skills');
+    const skillRoot = configuredSkillRoot
+      ? path.resolve(configuredSkillRoot)
+      : await fs.stat(legacySharedSkillRoot).then(stat => stat.isDirectory() ? legacySharedSkillRoot : undefined).catch(() => undefined);
     const { GatewayDeviceIdentity } = await import('../device/gateway-identity.js');
     const identity = new GatewayDeviceIdentity(path.join(root, 'gateway-identity.json'));
     const record = await identity.loadOrCreate();
@@ -134,7 +147,7 @@ async function serverCli(args: Parsed): Promise<void> {
     const { createPlatformTools } = await import('./knowledge-mcp.js');
     const { startServerRuntime } = await import(pathToFileURL(path.join(packageRoot, 'control-plane', 'scripts', 'authenticated-mcp-wrapper.mjs')).href);
     const configPath = typeof config.configPath === 'string' ? path.resolve(path.dirname(path.resolve(one(args, 'config')!)), config.configPath) : undefined;
-    runtime = await startServerRuntime({ core, identity, stateRoot: root, packageRoot, port, host: one(args, 'host', '127.0.0.1'), publicUrl: one(args, 'public-url'), env: config.env ?? {}, configPath, extraTools: await createPlatformTools(root),
+    runtime = await startServerRuntime({ core, identity, stateRoot: root, packageRoot, port, host: one(args, 'host', '127.0.0.1'), publicUrl, allowHttpLan, skillRoot, env: config.env ?? {}, configPath, extraTools: await createPlatformTools(root),
       onPairing: (pairing: unknown) => event({ event: 'device_pairing_required', pairing }) });
     event({ event: 'server_ready', version: '1.0.12', url: runtime.baseUrl, device_id: record.deviceId, runtime_dir: root, local_runtime: 'shared-device-core', authentication: 'account-oauth-and-pairing' });
     await new Promise<void>(resolve => {

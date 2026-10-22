@@ -338,6 +338,12 @@ test('one server on 8104 preserves account/OAuth/pairing and dispatches through 
     const selected = skills.result.skills[0];
     const loaded = await rpc(aliceTokens.access_token, 'skills/get', { uri: selected.uri }, true);
     assert.ok(loaded.result);
+    const bobSkills = await rpc(bobTokens.access_token, 'skills/list', {}, true);
+    assert.deepEqual(bobSkills.result.skills.map(skill => skill.uri), skills.result.skills.map(skill => skill.uri));
+    const bobLoaded = await rpc(bobTokens.access_token, 'skills/get', { uri: selected.uri }, true);
+    assert.equal(bobLoaded.result.skill.uri, selected.uri);
+    const bobFallback = await rpc(bobTokens.access_token, 'tools/call', { name: 'skill_catalog', arguments: {} }, true);
+    assert.match(JSON.stringify(bobFallback.result), new RegExp(selected.name));
     const devices = await rpc(aliceTokens.access_token, 'tools/call', { name: 'list_devices', arguments: {} }, true);
     assert.match(JSON.stringify(devices.result), new RegExp(record.deviceId));
     t.diagnostic('Legacy protocol2025-11-25 and modern2026-07-28 both dispatched with OAuth through the pinned SDK2.0.0 control plane.');

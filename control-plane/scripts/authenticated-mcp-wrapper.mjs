@@ -124,6 +124,13 @@ if (!Number.isInteger(gatewayPort) || gatewayPort < 1 || gatewayPort > 65535) th
 const gatewayHost = String(options.host || '127.0.0.1').trim();
 const advertisedHost = String(env.MCP_ADVERTISE_HOST || '').trim() || (gatewayHost === '0.0.0.0' ? '127.0.0.1' : gatewayHost);
 const advertisedUrl = String(options.publicUrl || env.MCP_ADVERTISE_URL || '').trim();
+const allowHttpLan = options.allowHttpLan === true;
+if (allowHttpLan) {
+  const explicitUrl = normalizeBaseUrl(advertisedUrl);
+  if (!explicitUrl || new URL(explicitUrl).protocol !== 'http:') {
+    throw new Error('allowHttpLan requires an explicit http:// publicUrl.');
+  }
+}
 const fallbackBaseUrl = `http://${advertisedHost}:${gatewayPort}`;
 // The operator dashboard is mounted on this same authenticated application.
 const staticBearerToken = env.MCP_BEARER_TOKEN;
@@ -903,6 +910,7 @@ function getAuthRouterForBaseUrl(baseUrl) {
     provider,
     issuerUrl,
     resourceServerUrl,
+    dangerouslyAllowInsecureIssuerUrl: allowHttpLan,
     authorizationOptions: {
       rateLimit: {
         validate: { creationStack: false }

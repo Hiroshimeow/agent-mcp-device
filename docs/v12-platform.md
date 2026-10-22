@@ -13,10 +13,14 @@ mcp-device start
 mcp-device device start
 mcp-device device status
 mcp-device server --runtime-dir <server-state> --host 127.0.0.1 --port 8104
+# Trusted-LAN HTTP example with one shared server Skill root:
+mcp-device server --runtime-dir <server-state> --host 0.0.0.0 --port 8101 --public-url http://abc:8101 --allow-http-lan --skill-root ~/.mcp-device/skills
 mcp-device --help
 ```
 
-Server state defaults to `~/.mcp-device/server`; legacy Device state defaults remain `~/.mcp-device`. An explicit `--runtime-dir` selects platform command state. `MCP_DEVICE_CONFIG_DIR` is also accepted by platform commands and the native execution configuration; it must be set before native modules load. Legacy Device identity and service configuration retain their existing path rules. Server starts the native modules only after selecting its state root.
+Server state defaults to `~/.mcp-device/server`; legacy Device state defaults remain `~/.mcp-device`. An explicit `--runtime-dir` selects platform command state. `MCP_DEVICE_CONFIG_DIR` is also accepted by platform commands and the native execution configuration; it must be set before native modules load. Legacy Device identity and service configuration retain their existing path rules. Server starts the native modules only after selecting its state root. `--skill-root DIR` selects the single server-global Skill catalog shared by authenticated accounts; when omitted, an existing `~/.mcp-device/skills` directory is preferred for legacy/shared-team compatibility, otherwise the bundled distribution Skills are used. `MCP_SKILL_ROOT` is the service-friendly equivalent.
+
+`--allow-http-lan` is an explicit trusted-LAN opt-in. It requires an explicit `--public-url http://...` and permits that non-loopback HTTP URL to be used as the OAuth issuer/resource base. Without the flag, non-loopback OAuth issuers remain HTTPS-only. This changes transport policy only; account authentication, Device ownership, pairing and cross-account isolation remain unchanged.
 
 Server is a foreground process. Stop it with Ctrl-C or the supervising process manager. A Node parent using a private IPC channel may send `{ "type": "mcp-device:shutdown" }` for graceful shutdown on Windows. This is a parent/child process channel, not a network endpoint.
 

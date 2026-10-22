@@ -45,7 +45,7 @@ test('maintenance lease detects Device-only ownership and refuses unresponsive l
 
 test('CLI help and plugin lifecycle work from the package entry without starting a runtime', async t => {
   const root = await rootFor(t), entry = fileURLToPath(new URL('../../dist/mcp-device.js', import.meta.url));
-  const help = await exec(process.execPath, [entry, '--help']); assert.match(help.stdout, /Device-only runtime/); assert.match(help.stdout, /account\/OAuth/);
+  const help = await exec(process.execPath, [entry, '--help']); assert.match(help.stdout, /Device-only runtime/); assert.match(help.stdout, /account\/OAuth/); assert.match(help.stdout, /--skill-root DIR/); assert.match(help.stdout, /--allow-http-lan/);
   const plugin = path.join(root, 'reference.mjs'); await fs.writeFile(plugin, 'export const createPlugin=()=>({invoke:()=>42});');
   const manifest = path.join(root, 'manifest.json'); await fs.writeFile(manifest, JSON.stringify({ id: 'cli-reference', version: '1.0.0', dataSchemaVersion: 1, isolation: 'in-process', trusted: true, entry: 'reference.mjs', capabilities: [{ name: 'test.reference', version: '1.0.0' }] }));
   const invoke = async (...args) => JSON.parse((await exec(process.execPath, [entry, 'plugins', '--runtime-dir', root, ...args])).stdout);
