@@ -1,0 +1,1080 @@
+{
+  "schemaVersion": 1,
+  "product": "@hcu-lab.me/mcp-device",
+  "baseline": {
+    "path": "E:\\git-project\\agent-mcp-device",
+    "sha": "1df22e6bca3e4f5fa7bfd94f814c1b7409fd7848",
+    "branch": "main",
+    "version": "1.0.11",
+    "trackedStatus": "clean",
+    "classificationNote": "Source and historical acceptance only. This inventory did not inspect deployed G8 production."
+  },
+  "candidate": {
+    "path": "E:\\git-project\\agent-mcp-device-v12",
+    "branch": "feat/v12-platform-20261022",
+    "targetVersion": "1.0.12"
+  },
+  "historicalEvidence": {
+    "source": "docs/STATUS.md; specs/006-agent-memory-palace/HANDOFF.md section 10",
+    "acceptedImplementationSha": "e1f74715b60a008171d3e0a9c27c8f4f2964ce2c",
+    "rootSuites": 66,
+    "logPalaceTests": 39,
+    "notFresh": true,
+    "caution": "Historical root66 suite exit codes alone do not prove assertion execution on Windows because several suite entry guards are false for Windows paths; current runner corrects invocation and records markers without editing source tests."
+  },
+  "safety": {
+    "allowedDevice": "desktop-b5e4iue-87cea2af",
+    "forbiddenProductionPorts": [
+      8101,
+      8102
+    ],
+    "runtimeTestPort": 8104,
+    "port8103": "occupied; do not stop or rebind",
+    "defaultGroup": "port-free",
+    "isolateConfig": true,
+    "runTestsInCopiedWorkspace": true,
+    "baselineBuild": "Never automatically rebuild or mutate authoritative source. Parent coordinates build.",
+    "noRealIdentity": true
+  },
+  "knownBaselineGaps": [
+    {
+      "code": "READ_HEAD_TAIL",
+      "owner": "src/device/gateway-tool-adapter.ts",
+      "behavior": "read_text_file consumes offset/length only; head/tail ignored; default length=200."
+    },
+    {
+      "code": "BROKER_REWRITE",
+      "owner": "src/device/gateway-tool-adapter.ts",
+      "behavior": "Broker write_file is rewrite; native write_file supports explicit append/rewrite."
+    },
+    {
+      "code": "EDIT_DRY_RUN",
+      "owner": "src/device/gateway-tool-adapter.ts",
+      "behavior": "edit_file dry_run verifies accessibility, not occurrence count."
+    },
+    {
+      "code": "CONTEXT_CURSOR",
+      "owner": "src/context/device-adapter.ts",
+      "behavior": "local_graph cursor returns CURSOR_INVALID; local_index budget_profile/idempotency_key returns ACTION_UNSUPPORTED."
+    },
+    {
+      "code": "P1_READ_ENVELOPE",
+      "owner": "src/log-palace/store.ts",
+      "behavior": "maxBytes caps text, not whole JSON; legacy selected Pi part has no raw-source cursor."
+    },
+    {
+      "code": "RUNNER_DISCOVERY",
+      "owner": "test/run-all-tests.js",
+      "behavior": "Root test runner omits Context, Log P1, and integration directories."
+    },
+    {
+      "code": "WINDOWS_TEST_ENTRY_GUARD",
+      "owner": "test/test-file-handlers.js and 11 other native root suites",
+      "behavior": "import.meta.url === `file://${process.argv[1]}` is false for Windows path argv: direct suite can exit0 without assertions. Runner now invokes exported runner and requires execution marker. Original unexecuted receipts are invalidated."
+    },
+    {
+      "code": "EDIT_SUCCESS_WORDING",
+      "owner": "test/test-edit-block-occurrences.js:158",
+      "behavior": "Existing suite asserts 'Successfully applied 4 edits'; accepted source returns 'Successfully applied 4 edit(s)'. Exact byte effects covered by v12 comparator; stale assertion remains a recorded baseline failure."
+    },
+    {
+      "code": "WINDOWS_SYMLINK_PRIVILEGE",
+      "owner": "test/test-symlink-security.js",
+      "behavior": "G6 Windows symlink creation denied EPERM; real symlink escape acceptance requires WSL fixture."
+    },
+    {
+      "code": "WINDOWS_ROOT_FIXTURE_DRIVE",
+      "owner": "test/test-allowed-directories.js:TEST_ROOT_PATH",
+      "behavior": "Fixture hardcodes C:/ but asserts home is inside that root. Hermetic E:/ fixture home invalidates this assumption. Linux fixture passes all allowed-root/prefix/tilde assertions; product ACL was not relaxed."
+    }
+  ],
+  "experimental": [
+    {
+      "id": "palace.advanced",
+      "classification": "EXPERIMENTAL",
+      "freshStatus": "NOT_RUN",
+      "note": "Wiki/learning/federation were not implemented in accepted v11 source. New v12 acceptance is separate from parity."
+    }
+  ],
+  "families": [
+    {
+      "id": "native.files",
+      "group": "port-free",
+      "classification": "SOURCE_ACCEPTED",
+      "freshStatus": "PASS",
+      "sourceOwners": [
+        "src/tools/filesystem.ts",
+        "src/handlers/filesystem-handlers.ts",
+        "src/utils/files/*"
+      ],
+      "tests": [
+        "test/test-file-handlers.js",
+        "test/test-negative-offset-readfile.js",
+        "test/test-line-count.js",
+        "test/test-directory-creation.js"
+      ],
+      "commands": [
+        [
+          "node",
+          "test/test-file-handlers.js"
+        ],
+        [
+          "node",
+          "test/test-negative-offset-readfile.js"
+        ],
+        [
+          "node",
+          "test/test-line-count.js"
+        ],
+        [
+          "node",
+          "test/test-directory-creation.js"
+        ]
+      ],
+      "assertions": [
+        "Text/binary dispatch and offset/length reads retain result/errors",
+        "Append/rewrite require explicit mode for existing nonempty files",
+        "Rejected operation preserves original bytes; directory/list/move/info behaviors"
+      ],
+      "freshEvidence": [
+        "windows-native",
+        "wsl-native"
+      ]
+    },
+    {
+      "id": "native.edit",
+      "group": "port-free",
+      "classification": "SOURCE_ACCEPTED",
+      "freshStatus": "BASELINE_FIXTURE_GAP",
+      "sourceOwners": [
+        "src/tools/edit.ts",
+        "src/handlers/edit-search-handlers.ts"
+      ],
+      "tests": [
+        "test/test-edit-block-occurrences.js",
+        "test/test-edit-block-line-endings.js"
+      ],
+      "commands": [
+        [
+          "node",
+          "test/test-edit-block-occurrences.js"
+        ],
+        [
+          "node",
+          "test/test-edit-block-line-endings.js"
+        ]
+      ],
+      "assertions": [
+        "Exact replacement counts",
+        "LF/CRLF/CR/mixed ending preservation",
+        "Failed occurrence check has no writes"
+      ],
+      "freshEvidence": [
+        "windows-native",
+        "wsl-native",
+        "windows-core"
+      ],
+      "freshNote": "No product regression: identical accepted success wording edit(s) disagrees with old test's edits. Exact edit and rejected atomic batch side effects pass independent old-vs-Core comparator."
+    },
+    {
+      "id": "native.excel",
+      "group": "port-free",
+      "classification": "SOURCE_ACCEPTED",
+      "freshStatus": "PASS",
+      "sourceOwners": [
+        "src/utils/files/excel.ts",
+        "src/tools/edit.ts"
+      ],
+      "tests": [
+        "test/test-excel-files.js"
+      ],
+      "commands": [
+        [
+          "node",
+          "test/test-excel-files.js"
+        ]
+      ],
+      "assertions": [
+        "Worksheet and quoted range selection",
+        "Range replacement and text edit",
+        "Append rows and malformed range errors"
+      ],
+      "freshEvidence": [
+        "windows-native",
+        "wsl-native"
+      ]
+    },
+    {
+      "id": "native.docx_pdf_batch",
+      "group": "integration",
+      "classification": "SOURCE_ACCEPTED",
+      "freshStatus": "PARTIAL",
+      "sourceOwners": [
+        "src/utils/files/docx.ts",
+        "src/utils/files/pdf.ts",
+        "src/tools/pdf/*",
+        "src/tools/edit.ts"
+      ],
+      "tests": [
+        "test/integration/edit-block-performance.js"
+      ],
+      "commands": [
+        [
+          "node",
+          "test/integration/edit-block-performance.js"
+        ]
+      ],
+      "assertions": [
+        "DOCX container remains valid after exact XML edits",
+        "PDF/text/Excel/DOCX real MCP round-trips",
+        "Batched text edits reject atomically"
+      ],
+      "freshEvidence": [
+        "windows-core",
+        "wsl-native"
+      ],
+      "freshNote": "Generated local PDF read and DOCX/XLSX edit/structural preservation, exact batch atomicity pass comparator. Original integration/demo/browser-generation suites are not claimed executed."
+    },
+    {
+      "id": "native.pdf",
+      "group": "manual-local-fixture",
+      "classification": "SOURCE_ACCEPTED",
+      "freshStatus": "PARTIAL",
+      "sourceOwners": [
+        "src/tools/pdf/*",
+        "src/utils/files/pdf.ts"
+      ],
+      "tests": [
+        "test/test-pdf-parsing.js",
+        "test/test-pdf-creation.js",
+        "test/test-pdf-chrome-cache.js"
+      ],
+      "commands": [
+        [
+          "node",
+          "test/test-pdf-parsing.js"
+        ],
+        [
+          "node",
+          "test/test-pdf-creation.js"
+        ],
+        [
+          "node",
+          "test/test-pdf-chrome-cache.js"
+        ]
+      ],
+      "assertions": [
+        "Text/pages/image behavior and generated PDF validity"
+      ],
+      "knownGap": "PDF parser demonstration includes an external URL and catches errors; not sufficient assertion-only offline parity.",
+      "freshEvidence": [
+        "windows-core",
+        "wsl-native"
+      ],
+      "freshNote": "Generated local PDF read and DOCX/XLSX edit/structural preservation, exact batch atomicity pass comparator. Original integration/demo/browser-generation suites are not claimed executed."
+    },
+    {
+      "id": "native.search",
+      "group": "port-free",
+      "classification": "SOURCE_ACCEPTED",
+      "freshStatus": "PASS",
+      "sourceOwners": [
+        "src/search-manager.ts",
+        "src/handlers/search-handlers.ts"
+      ],
+      "tests": [
+        "test/test-search-code.js",
+        "test/test-search-code-edge-cases.js",
+        "test/test-literal-search.js"
+      ],
+      "commands": [
+        [
+          "node",
+          "test/test-search-code.js"
+        ],
+        [
+          "node",
+          "test/test-search-code-edge-cases.js"
+        ],
+        [
+          "node",
+          "test/test-literal-search.js"
+        ]
+      ],
+      "assertions": [
+        "Filename/content; literal/regex; case; hidden/pattern filters",
+        "Result/timeout limits and concurrent jobs",
+        "Continue/stop/list and path-boundary errors"
+      ],
+      "freshEvidence": [
+        "windows-native",
+        "wsl-native"
+      ]
+    },
+    {
+      "id": "native.process",
+      "group": "port-free",
+      "classification": "SOURCE_ACCEPTED",
+      "freshStatus": "PASS",
+      "sourceOwners": [
+        "src/terminal-manager.ts",
+        "src/command-manager.ts",
+        "src/tools/improved-process-tools.ts"
+      ],
+      "tests": [
+        "test/test-process-pagination.js",
+        "test/test-read-completed-process.js",
+        "test/test-pid-collision-guard.js"
+      ],
+      "commands": [
+        [
+          "node",
+          "test/test-process-pagination.js"
+        ],
+        [
+          "node",
+          "test/test-read-completed-process.js"
+        ],
+        [
+          "node",
+          "test/test-pid-collision-guard.js"
+        ]
+      ],
+      "assertions": [
+        "Incremental/repeated/absolute/tail output",
+        "Runtime/execution identity and terminal retention",
+        "PID collision does not overwrite live session"
+      ],
+      "freshEvidence": [
+        "windows-native",
+        "wsl-native"
+      ]
+    },
+    {
+      "id": "native.path",
+      "group": "port-free",
+      "classification": "SOURCE_ACCEPTED",
+      "freshStatus": "PASS_LINUX_WINDOWS_FIXTURE_LIMIT",
+      "sourceOwners": [
+        "src/tools/filesystem.ts",
+        "src/device/gateway-tool-adapter.ts"
+      ],
+      "tests": [
+        "test/test-allowed-directories.js",
+        "test/test-symlink-security.js",
+        "test/test-error-sanitization.js"
+      ],
+      "commands": [
+        [
+          "node",
+          "test/test-allowed-directories.js"
+        ],
+        [
+          "node",
+          "test/test-symlink-security.js"
+        ],
+        [
+          "node",
+          "test/test-error-sanitization.js"
+        ]
+      ],
+      "assertions": [
+        "Allowed-root canonicalization and symlink boundary",
+        "Typed bounded errors; no alternate-path bypass"
+      ],
+      "freshEvidence": [
+        "windows-native",
+        "wsl-native"
+      ],
+      "freshNote": "Linux full fixture passes. Windows fixture assumes C:/ home drive and symlink creation privilege; strict broker root-denial comparator passes."
+    },
+    {
+      "id": "native.config",
+      "group": "port-free",
+      "classification": "SOURCE_ACCEPTED",
+      "freshStatus": "PASS",
+      "sourceOwners": [
+        "src/config-manager.ts",
+        "src/tools/config.ts",
+        "src/tools/usage.ts",
+        "src/tools/prompts.ts"
+      ],
+      "tests": [
+        "test/test-green-hardening.js",
+        "test/test-nonblocking-config-save.js",
+        "test/test-local-feature-flags.js"
+      ],
+      "commands": [
+        [
+          "node",
+          "test/test-green-hardening.js"
+        ],
+        [
+          "node",
+          "test/test-nonblocking-config-save.js"
+        ],
+        [
+          "node",
+          "test/test-local-feature-flags.js"
+        ]
+      ],
+      "assertions": [
+        "Config persistence/recovery and nonblocking save",
+        "Fixed remote feature behavior",
+        "No user configuration mutation during parity"
+      ],
+      "freshEvidence": [
+        "windows-native",
+        "wsl-native",
+        "windows-green-rerun"
+      ]
+    },
+    {
+      "id": "device.broker",
+      "group": "loopback-lane",
+      "classification": "SOURCE_ACCEPTED",
+      "freshStatus": "NOT_RUN",
+      "sourceOwners": [
+        "src/device/gateway-tool-adapter.ts",
+        "src/device/project-inspection.ts"
+      ],
+      "tests": [
+        "test/test-gateway-device-channel.js",
+        "test/test-public-contract.js"
+      ],
+      "commands": [
+        [
+          "node",
+          "test/test-gateway-device-channel.js"
+        ],
+        [
+          "node",
+          "test/test-public-contract.js"
+        ]
+      ],
+      "assertions": [
+        "Actual file/edit/shell/process/image/project dispatch",
+        "Root guard and errors; image output bounds",
+        "Read shape, write semantics, dry_run baseline"
+      ]
+    },
+    {
+      "id": "device.identity_pairing",
+      "group": "loopback-lane",
+      "classification": "SOURCE_ACCEPTED",
+      "freshStatus": "NOT_RUN",
+      "sourceOwners": [
+        "src/device/gateway-identity.ts",
+        "src/device/gateway-pairing.ts",
+        "src/device/device-status.ts"
+      ],
+      "tests": [
+        "test/test-gateway-pairing-status.js",
+        "test/test-gateway-account-link.js",
+        "test/test-forgotten-device-repair.js"
+      ],
+      "commands": [
+        [
+          "node",
+          "test/test-gateway-pairing-status.js"
+        ],
+        [
+          "node",
+          "test/test-gateway-account-link.js"
+        ],
+        [
+          "node",
+          "test/test-forgotten-device-repair.js"
+        ]
+      ],
+      "assertions": [
+        "Persistent identity/key ownership",
+        "Pairing/account status and forgotten repair",
+        "No repeated enrollment credential after normal pairing"
+      ]
+    },
+    {
+      "id": "device.transport",
+      "group": "loopback-lane",
+      "classification": "SOURCE_ACCEPTED",
+      "freshStatus": "NOT_RUN",
+      "sourceOwners": [
+        "src/device/gateway-secure-transport.ts",
+        "src/device/gateway-channel.ts"
+      ],
+      "tests": [
+        "test/test-gateway-secure-transport.js",
+        "test/test-gateway-device-channel.js"
+      ],
+      "commands": [
+        [
+          "node",
+          "test/test-gateway-secure-transport.js"
+        ],
+        [
+          "node",
+          "test/test-gateway-device-channel.js"
+        ]
+      ],
+      "assertions": [
+        "Inner TLS13, pinned application CA and exporter-bound proof",
+        "Protocol floor/no insecure downgrade",
+        "Reconnect no replay; reject mismatched Device; stale completion discard"
+      ]
+    },
+    {
+      "id": "device.no_child",
+      "group": "port-free",
+      "classification": "SOURCE_ACCEPTED",
+      "freshStatus": "PASS",
+      "sourceOwners": [
+        "src/device/device.ts",
+        "src/device/core.ts",
+        "src/device/runtime-owner.ts"
+      ],
+      "tests": [
+        "test/test-remote-startup-no-child.js"
+      ],
+      "commands": [
+        [
+          "node",
+          "test/test-remote-startup-no-child.js"
+        ]
+      ],
+      "assertions": [
+        "No child execution runtime on start/shutdown",
+        "Distinct direct-in-process generation each start",
+        "Repeated shutdown safe"
+      ],
+      "freshEvidence": [
+        "windows-native",
+        "wsl-native"
+      ]
+    },
+    {
+      "id": "device.lifecycle",
+      "group": "mocked-lifecycle",
+      "classification": "SOURCE_ACCEPTED",
+      "freshStatus": "NOT_RUN",
+      "sourceOwners": [
+        "src/device/windows-service.ts",
+        "src/device/linux-service.ts",
+        "src/device/self-update.ts",
+        "src/device/update-helper.cjs"
+      ],
+      "tests": [
+        "test/test-windows-device-service.js",
+        "test/test-linux-device-service.js",
+        "test/test-self-update.js",
+        "test/test-remote-service-status.js"
+      ],
+      "commands": [
+        [
+          "node",
+          "test/test-windows-device-service.js"
+        ],
+        [
+          "node",
+          "test/test-linux-device-service.js"
+        ],
+        [
+          "node",
+          "test/test-self-update.js"
+        ],
+        [
+          "node",
+          "test/test-remote-service-status.js"
+        ]
+      ],
+      "assertions": [
+        "Install/start/stop/uninstall semantics",
+        "Update handoff after owner release, backup/rollback state",
+        "Mocked tests do not prove live production upgrade"
+      ]
+    },
+    {
+      "id": "device.package_cli",
+      "group": "contract-static",
+      "classification": "SOURCE_ACCEPTED",
+      "freshStatus": "NOT_RUN",
+      "sourceOwners": [
+        "src/mcp-device.ts",
+        "package.json",
+        "scripts/*"
+      ],
+      "tests": [
+        "test/test-device-productization.js",
+        "test/test-package-publish-surface.js",
+        "test/test-version-consistency.js",
+        "test/test-release-flow.js"
+      ],
+      "commands": [
+        [
+          "node",
+          "test/test-device-productization.js"
+        ],
+        [
+          "node",
+          "test/test-package-publish-surface.js"
+        ],
+        [
+          "node",
+          "test/test-version-consistency.js"
+        ],
+        [
+          "node",
+          "test/test-release-flow.js"
+        ]
+      ],
+      "assertions": [
+        "start/login/logout/status/install/stop/uninstall unchanged",
+        "context/logs retained",
+        "Package name and version/build artifacts consistent"
+      ]
+    },
+    {
+      "id": "context.surface",
+      "group": "context",
+      "classification": "SOURCE_ACCEPTED",
+      "freshStatus": "PASS",
+      "sourceOwners": [
+        "src/context/tool-contract.ts",
+        "src/context/device-adapter.ts",
+        "src/context/gateway.ts"
+      ],
+      "tests": [
+        "test/context/adapter-parity.test.js",
+        "test/context/mcp-contract.test.js",
+        "test/context/cli.test.js"
+      ],
+      "commands": [
+        [
+          "node",
+          "--test",
+          "test/context/adapter-parity.test.js"
+        ],
+        [
+          "node",
+          "--test",
+          "test/context/mcp-contract.test.js"
+        ],
+        [
+          "node",
+          "--test",
+          "test/context/cli.test.js"
+        ]
+      ],
+      "assertions": [
+        "Six tools preserve scope/error/content behavior",
+        "No unsupported graph cursor/index orchestration claims",
+        "local_wiki remains reserved disabled status"
+      ],
+      "freshEvidence": [
+        "windows-context",
+        "wsl-context"
+      ]
+    },
+    {
+      "id": "context.retrieval",
+      "group": "context",
+      "classification": "SOURCE_ACCEPTED",
+      "freshStatus": "PASS",
+      "sourceOwners": [
+        "src/context/search.ts",
+        "src/context/service.ts",
+        "src/context/store.ts"
+      ],
+      "tests": [
+        "test/context/retrieval.test.js",
+        "test/context/retrieval-edge.test.js",
+        "test/context/read.test.js",
+        "test/context/read-ranges.test.js",
+        "test/context/access.test.js"
+      ],
+      "commands": [
+        [
+          "node",
+          "--test",
+          "test/context/retrieval.test.js"
+        ],
+        [
+          "node",
+          "--test",
+          "test/context/retrieval-edge.test.js"
+        ],
+        [
+          "node",
+          "--test",
+          "test/context/read.test.js"
+        ],
+        [
+          "node",
+          "--test",
+          "test/context/read-ranges.test.js"
+        ],
+        [
+          "node",
+          "--test",
+          "test/context/access.test.js"
+        ]
+      ],
+      "assertions": [
+        "Owner/project/source/time filters and signed cursor generation",
+        "Ordered selected ranges and aggregate UTF8 byte limits",
+        "No implicit index sync on read/search/status"
+      ],
+      "freshEvidence": [
+        "windows-context",
+        "wsl-context"
+      ]
+    },
+    {
+      "id": "context.graph_index",
+      "group": "context",
+      "classification": "SOURCE_ACCEPTED",
+      "freshStatus": "PASS",
+      "sourceOwners": [
+        "src/context/graph.ts",
+        "src/context/indexer.ts",
+        "src/context/repositories.ts"
+      ],
+      "tests": [
+        "test/context/graph-query.test.js",
+        "test/context/graph-integration.test.js",
+        "test/context/checkpoint.test.js",
+        "test/context/index-jobs.test.js",
+        "test/context/repositories.test.js"
+      ],
+      "commands": [
+        [
+          "node",
+          "--test",
+          "test/context/graph-query.test.js"
+        ],
+        [
+          "node",
+          "--test",
+          "test/context/graph-integration.test.js"
+        ],
+        [
+          "node",
+          "--test",
+          "test/context/checkpoint.test.js"
+        ],
+        [
+          "node",
+          "--test",
+          "test/context/index-jobs.test.js"
+        ],
+        [
+          "node",
+          "--test",
+          "test/context/repositories.test.js"
+        ]
+      ],
+      "assertions": [
+        "Graph examined/visited/node/edge/hop/time/byte bounds",
+        "Checkpoint separates reported summary from observed evidence",
+        "sync/rebuild/cancel and repository identity preserved"
+      ],
+      "freshEvidence": [
+        "windows-context",
+        "wsl-context"
+      ]
+    },
+    {
+      "id": "context.persistence",
+      "group": "context",
+      "classification": "SOURCE_ACCEPTED",
+      "freshStatus": "PASS",
+      "sourceOwners": [
+        "src/context/store.ts",
+        "src/context/migrations/index.ts"
+      ],
+      "tests": [
+        "test/context/store.test.js",
+        "test/context/durability-quota.test.js",
+        "test/context/atomic-blockers.test.js",
+        "test/context/reservation-liveness.test.js",
+        "test/context/foundation-edge.test.js"
+      ],
+      "commands": [
+        [
+          "node",
+          "--test",
+          "test/context/store.test.js"
+        ],
+        [
+          "node",
+          "--test",
+          "test/context/durability-quota.test.js"
+        ],
+        [
+          "node",
+          "--test",
+          "test/context/atomic-blockers.test.js"
+        ],
+        [
+          "node",
+          "--test",
+          "test/context/reservation-liveness.test.js"
+        ],
+        [
+          "node",
+          "--test",
+          "test/context/foundation-edge.test.js"
+        ]
+      ],
+      "assertions": [
+        "Restart/retention/migration and owner sealing",
+        "Cross-repo quotas and atomic rollback",
+        "No late worker commit after generation fence"
+      ],
+      "freshEvidence": [
+        "windows-context",
+        "wsl-context"
+      ]
+    },
+    {
+      "id": "context.capture",
+      "group": "context-gated",
+      "classification": "SOURCE_ACCEPTED",
+      "freshStatus": "NOT_RUN",
+      "sourceOwners": [
+        "src/context/capture.ts",
+        "src/context/authorization.ts"
+      ],
+      "tests": [
+        "test/context/capture-routes.test.js",
+        "test/context/capture-ownership.test.js",
+        "test/context/capture-faults.test.js",
+        "test/context/capture-outcomes.test.js",
+        "test/context/process-evidence.test.js",
+        "test/context/pinned-gates.test.js"
+      ],
+      "commands": [
+        [
+          "node",
+          "--test",
+          "test/context/capture-routes.test.js"
+        ],
+        [
+          "node",
+          "--test",
+          "test/context/capture-ownership.test.js"
+        ],
+        [
+          "node",
+          "--test",
+          "test/context/capture-faults.test.js"
+        ],
+        [
+          "node",
+          "--test",
+          "test/context/capture-outcomes.test.js"
+        ],
+        [
+          "node",
+          "--test",
+          "test/context/process-evidence.test.js"
+        ],
+        [
+          "node",
+          "--test",
+          "test/context/pinned-gates.test.js"
+        ]
+      ],
+      "assertions": [
+        "Exactly one intent/outcome per authorized invocation",
+        "No local_* output self-ingest",
+        "Transport failure never replays execution; retain accepted authorization semantics"
+      ]
+    },
+    {
+      "id": "palace.p1",
+      "group": "log-palace",
+      "classification": "SOURCE_ACCEPTED",
+      "freshStatus": "PASS",
+      "sourceOwners": [
+        "src/log-palace/formats.ts",
+        "src/log-palace/store.ts",
+        "src/log-palace/cli.ts"
+      ],
+      "tests": [
+        "test/log-palace/log-palace.test.js"
+      ],
+      "commands": [
+        [
+          "node",
+          "--test",
+          "test/log-palace/log-palace.test.js"
+        ]
+      ],
+      "assertions": [
+        "Pi/Codex/MCP/text source parsing and exact provenance",
+        "Append/partial tails/rewrite/deletion and durable budget fairness",
+        "Hash verified bounded original source reads; strict UTF8",
+        "No false session/call/file graph joins; immutable original source"
+      ],
+      "freshEvidence": [
+        "windows-p1",
+        "wsl-p1"
+      ]
+    },
+    {
+      "id": "device.remote_hygiene",
+      "group": "loopback-lane",
+      "classification": "SOURCE_ACCEPTED",
+      "freshStatus": "NOT_RUN",
+      "sourceOwners": [
+        "src/index.ts",
+        "src/server.ts"
+      ],
+      "tests": [
+        "test/test-remote-child-hygiene.js"
+      ],
+      "commands": [
+        [
+          "node",
+          "test/test-remote-child-hygiene.js"
+        ]
+      ],
+      "assertions": [
+        "Remote child skips external feature flags and prompt/onboarding mutation",
+        "Remote writes do not persist raw contents to inherited history"
+      ],
+      "knownGap": "Existing fixture binds a local flags server on ephemeral port; requires dedicated approved lane."
+    }
+  ],
+  "harnessNotes": [
+    "Existing installed-relative approval fixtures require copied dist/config, not junctions to source. Test-only throwaway signed approval and crypto fixture remain unchanged.",
+    "Per-test sandbox IDs are short hashes to avoid Windows SQLite MAX_PATH failures; os.homedir is redirected to an isolated staged home by preload, without setting HOME or touching account state.",
+    "All port-free suites deny socket listen/connect via preloaded builtins; full per-suite commands, stdout/stderr and exact dist fingerprints are captured."
+  ],
+  "freshEvidence": [
+    {
+      "id": "windows-native",
+      "platform": "win32",
+      "node": "22.22.2",
+      "receipt": "E:/test/mcp-device-v12-20261022/native03/device-parity-receipt.json",
+      "baseline": {
+        "passed": 17,
+        "failed": 3
+      },
+      "candidate": {
+        "passed": 16,
+        "failed": 4
+      },
+      "notes": "Three common fixture/platform limitations. Candidate green-hardening assertions passed but temporary cleanup hit EBUSY; isolated rerun passed and remains a separate receipt."
+    },
+    {
+      "id": "windows-green-rerun",
+      "platform": "win32",
+      "node": "22.22.2",
+      "receipt": "E:/test/mcp-device-v12-20261022/green-rerun01/device-parity-receipt.json",
+      "candidate": {
+        "passed": 1,
+        "failed": 0
+      }
+    },
+    {
+      "id": "windows-context",
+      "platform": "win32",
+      "node": "22.22.2",
+      "receipt": "E:/test/mcp-device-v12-20261022/ctx02/device-parity-receipt.json",
+      "baseline": {
+        "suites": 18,
+        "tests": 84,
+        "failed": 0,
+        "skipped": 0
+      },
+      "candidate": {
+        "suites": 18,
+        "tests": 84,
+        "failed": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "windows-p1",
+      "platform": "win32",
+      "node": "22.22.2",
+      "receipt": "E:/test/mcp-device-v12-20261022/device-log-p1-01/device-parity-receipt.json",
+      "baseline": {
+        "tests": 39,
+        "failed": 0,
+        "skipped": 0
+      },
+      "candidate": {
+        "tests": 39,
+        "failed": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "windows-core",
+      "platform": "win32",
+      "node": "22.22.2",
+      "receipt": "E:/test/mcp-device-v12-20261022/device-core-comparator01/device-parity-receipt.json",
+      "status": "PASS"
+    },
+    {
+      "id": "windows-capabilities",
+      "platform": "win32",
+      "node": "22.22.2",
+      "receipt": "E:/test/mcp-device-v12-20261022/device-capabilities01/device-parity-receipt.json",
+      "status": "PASS"
+    },
+    {
+      "id": "wsl-native",
+      "platform": "linux",
+      "node": "22.21.0",
+      "receipt": "E:/test/mcp-device-v12-20261022/wsl01/port-free/device-parity-receipt.json",
+      "baseline": {
+        "passed": 19,
+        "failed": 1
+      },
+      "candidate": {
+        "passed": 19,
+        "failed": 1
+      },
+      "coreComparator": "PASS",
+      "notes": "Only common failure is stale edit success wording assertion. Actual allowed-directory and symlink security assertions pass both."
+    },
+    {
+      "id": "wsl-context",
+      "platform": "linux",
+      "node": "22.21.0",
+      "receipt": "E:/test/mcp-device-v12-20261022/wsl01/context/device-parity-receipt.json",
+      "baseline": {
+        "suites": 18,
+        "tests": 84,
+        "failed": 0,
+        "skipped": 0
+      },
+      "candidate": {
+        "suites": 18,
+        "tests": 84,
+        "failed": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "wsl-p1",
+      "platform": "linux",
+      "node": "22.21.0",
+      "receipt": "E:/test/mcp-device-v12-20261022/wsl01/log-palace/device-parity-receipt.json",
+      "baseline": {
+        "tests": 39,
+        "failed": 0,
+        "skipped": 0
+      },
+      "candidate": {
+        "tests": 39,
+        "failed": 0,
+        "skipped": 0
+      }
+    }
+  ],
+  "acceptanceScope": "Fresh evidence covers only listed baseline/candidate behaviors and fingerprints. Build/package/server/federation/advanced Palace acceptance is tracked separately. Production, sockets, account identity mutation and unrun families are not implied."
+}
