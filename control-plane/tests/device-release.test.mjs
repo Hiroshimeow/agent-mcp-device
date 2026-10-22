@@ -54,3 +54,15 @@ test('release provider fails soft to configured fallback', async () => {
   });
   assert.equal(await provider.latestVersion(), '1.0.5');
 });
+
+test('release provider can be locked to local fallback without any registry call', async () => {
+  let calls = 0;
+  const provider = createDeviceReleaseProvider({
+    enabled: false,
+    fallbackVersion: '1.0.12',
+    fetchFn: async () => { calls += 1; throw new Error('network must stay disabled'); }
+  });
+  assert.equal(await provider.latestVersion(), '1.0.12');
+  assert.equal(await provider.latestVersion(), '1.0.12');
+  assert.equal(calls, 0);
+});

@@ -116,7 +116,11 @@ const gatewayBuildSha = String(env.MCP_GATEWAY_BUILD_SHA || '').trim() || (() =>
   catch { return ''; }
 })();
 const gatewayServerVersion = String(env.MCP_GATEWAY_SERVER_VERSION || '').trim() || [gatewayPackageVersion, gatewayBuildSha].filter(Boolean).join(' · ');
-const deviceReleaseProvider = options.deviceReleaseProvider || createDeviceReleaseProvider({ fallbackVersion: env.MCP_DEVICE_LATEST_VERSION || null });
+const releaseLookupEnabled = !['0', 'false', 'no', 'off'].includes(String(env.MCP_DEVICE_RELEASE_LOOKUP ?? 'true').trim().toLowerCase());
+const deviceReleaseProvider = options.deviceReleaseProvider || createDeviceReleaseProvider({
+  fallbackVersion: env.MCP_DEVICE_LATEST_VERSION || null,
+  enabled: releaseLookupEnabled
+});
 const runtimeDirectory = path.resolve(options.stateRoot);
 const repoRoot = options.repoRoot || packageRoot;
 const gatewayPort = Number(options.port ?? 8104);

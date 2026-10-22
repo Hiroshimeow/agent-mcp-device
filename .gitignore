@@ -62,3 +62,6 @@ test_files/
 test_fix.js
 test_search.js
 .ripgrep-downloads/
+
+# Portable LAN ZIP runtime
+runtime/

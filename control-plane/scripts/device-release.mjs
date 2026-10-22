@@ -40,6 +40,7 @@ export function createDeviceReleaseProvider(options = {}) {
   const packageName = String(options.packageName || DEFAULT_PACKAGE).trim();
   const registryUrl = String(options.registryUrl || DEFAULT_REGISTRY).replace(/\/+$/, '');
   const fetchFn = options.fetchFn || globalThis.fetch;
+  const enabled = options.enabled !== false;
   const ttlMs = Math.max(1_000, Number(options.ttlMs || 60_000));
   const timeoutMs = Math.max(500, Number(options.timeoutMs || 4_000));
   let fallbackVersion = null;
@@ -67,6 +68,7 @@ export function createDeviceReleaseProvider(options = {}) {
   }
 
   async function latestVersion() {
+    if (!enabled) return cachedVersion || fallbackVersion || null;
     const now = Date.now();
     if (cachedVersion && now - cachedAt < ttlMs) return cachedVersion;
     if (inFlight) return await inFlight;
