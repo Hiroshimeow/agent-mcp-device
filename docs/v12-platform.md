@@ -22,6 +22,8 @@ Server state defaults to `~/.mcp-device/server`; legacy Device state defaults re
 
 `--allow-http-lan` is an explicit trusted-LAN opt-in. It requires an explicit `--public-url http://...` and permits that non-loopback HTTP URL to be used as the OAuth issuer/resource base. Without the flag, non-loopback OAuth issuers remain HTTPS-only. This changes transport policy only; account authentication, Device ownership, pairing and cross-account isolation remain unchanged.
 
+TODO: external MCP upstreams are currently server-global. Before relying on upstreams in multi-account deployments, add per-upstream ownership (`owner_account_id`) with private-by-default visibility and explicit sharing. Shared server Skills remain intentionally cross-account.
+
 Server is a foreground process. Stop it with Ctrl-C or the supervising process manager. A Node parent using a private IPC channel may send `{ "type": "mcp-device:shutdown" }` for graceful shutdown on Windows. This is a parent/child process channel, not a network endpoint.
 
 The state root contains identity, pairing/account state, the Gateway SQLite database, plugin registry/private data, a persisted knowledge-reference signing key and bounded activity records. Concurrent server, Device and maintenance processes cannot take the same state lease. Existing Device RuntimeOwner IPC is also checked. An unresponsive legacy control file requires inspection; maintenance does not silently stop another runtime or discard the control state.
