@@ -1,0 +1,108 @@
+{
+  "node": "v22.22.2",
+  "sourceBaseline": "7a5a30b4a5f6226cf65b395ddfa0424677184592",
+  "repository": "E:\\git-project\\agent-mcp-device-v12\\control-plane",
+  "flavor": "CANDIDATE",
+  "group": "behavior",
+  "args": [
+    "--test",
+    "--test-concurrency=1",
+    "tests/device-inventory.test.mjs",
+    "tests/tool-risk.test.mjs",
+    "tests/runtime-profile.test.mjs",
+    "tests/device-release.test.mjs",
+    "tests/device-usage.test.mjs",
+    "tests/usage-events.test.mjs",
+    "tests/surface-config.test.mjs",
+    "tests/tool-surface-stability.test.mjs",
+    "tests/custom-tools-registry.test.mjs",
+    "tests/strict-structured-output.test.mjs",
+    "tests/response-utils.test.mjs",
+    "tests/pure-control-plane-contract.test.mjs",
+    "tests/catalog-scale.test.mjs",
+    "tests/benchmark-command.test.mjs",
+    "tests/skill-source-safety.test.mjs",
+    "tests/device-admin.test.mjs",
+    "tests/admin-cli.test.mjs"
+  ],
+  "networkPolicy": "No listener, socket connection or global fetch; inherited operational env removed; isolated home/temp/Git config.",
+  "testFiles": [
+    {
+      "path": "tests/device-inventory.test.mjs",
+      "sha256": "c10d3f3eff5cfb7f1878941fedcc31f8a0b1e870e986daec13eba4726a6cdeba"
+    },
+    {
+      "path": "tests/tool-risk.test.mjs",
+      "sha256": "073e11213ca514b831b3674052d1e42c1ec047c66a2d096d95b6cb022d5b1cd0"
+    },
+    {
+      "path": "tests/runtime-profile.test.mjs",
+      "sha256": "17a441a3f01e07feb57c66940779dde00c46bd25fb87e6758e7f5031a8ed96c1"
+    },
+    {
+      "path": "tests/device-release.test.mjs",
+      "sha256": "f4a60e4b5259e81841c76ce6f82cec5107e07139a383ff1d88952c420531bda6"
+    },
+    {
+      "path": "tests/device-usage.test.mjs",
+      "sha256": "8701067db9c05e5bcfab19b70bfe90966ecf699a90572d3ef4df550df5088094"
+    },
+    {
+      "path": "tests/usage-events.test.mjs",
+      "sha256": "ce44cce3cd6216feab6fbe42db74fa6ae84ceb82a497ff428e3794f6584ca902"
+    },
+    {
+      "path": "tests/surface-config.test.mjs",
+      "sha256": "dfd88a873ad9fe42be4aeab9918099d867b5dc923d84c651c65f55b4b2670dae"
+    },
+    {
+      "path": "tests/tool-surface-stability.test.mjs",
+      "sha256": "55c813b0f9240b8952680b4d43cb4ece28aac788c9626c013fc4efbd1541baac"
+    },
+    {
+      "path": "tests/custom-tools-registry.test.mjs",
+      "sha256": "14034907acb6e74bcd25f7a14a768758d7235ca7024e901ac8ea3da4ad46bab5"
+    },
+    {
+      "path": "tests/strict-structured-output.test.mjs",
+      "sha256": "72b42ff98d242dc7303871e47af47bc11febe2c5d197d2caf46c83580eb22229"
+    },
+    {
+      "path": "tests/response-utils.test.mjs",
+      "sha256": "1f4e73dd8ca59948ee45747ffe35e4c0c2483d0474dc53b8cd015014515ad911"
+    },
+    {
+      "path": "tests/pure-control-plane-contract.test.mjs",
+      "sha256": "7b9bae9d06ca8610ffa0ebc5849109df8db6fc2a9b89e151579c028dec3dfcf7"
+    },
+    {
+      "path": "tests/catalog-scale.test.mjs",
+      "sha256": "d05f7cd58421382263385397f1e4cdd63b560f744b0a33343e5135ed2b667d8f"
+    },
+    {
+      "path": "tests/benchmark-command.test.mjs",
+      "sha256": "778799d43b8707bdbb0d5d614f4b3c9597aed30083d764c62542f67c35d56325"
+    },
+    {
+      "path": "tests/skill-source-safety.test.mjs",
+      "sha256": "935fe6a038fbb9d1c8c90805cd67abeef158428b477a347551b5e0ba61f95a9d"
+    },
+    {
+      "path": "tests/device-admin.test.mjs",
+      "sha256": "a0bdc3c685fbd5b41bc3a95d60a953ab4feea4a8f2e14fbbfa987f12ad0b5d65"
+    },
+    {
+      "path": "tests/admin-cli.test.mjs",
+      "sha256": "bf7827748f8c183ccf22bc5af1957dd8303f45873e5fcc352b5d541a12942488"
+    }
+  ],
+  "tests": 63,
+  "pass": 63,
+  "fail": 0,
+  "skipped": 0,
+  "cancelled": 0,
+  "exitCode": 0,
+  "elapsedMs": 4499,
+  "cleanupError": null,
+  "status": "PASS"
+}

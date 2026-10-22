@@ -1,0 +1,60 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+
+import { createRemoteProcessSessionRegistry } from '../scripts/remote-process-sessions.mjs';
+
+test('remote process registry keeps device routing internal and caller-owned', () => {
+  let now = 1000;
+  const registry = createRemoteProcessSessionRegistry({ ttlMs: 1000, now: () => now });
+  const sessionId = registry.register({
+    ownerKey: 'caller-a',
+    deviceId: 'device',
+    connectionEpoch: 7,
+    executionRuntimeGeneration: 'runtime-a',
+    remoteSessionId: 'native-42'
+  });
+
+  assert.match(sessionId, /^remote-/);
+  assert.deepEqual(registry.resolve({ sessionId, ownerKey: 'caller-a' }), {
+    ownerKey: 'caller-a',
+    deviceId: 'device',
+    connectionEpoch: 7,
+    executionRuntimeGeneration: 'runtime-a',
+    remoteSessionId: 'native-42',
+    createdAt: 1000,
+    lastUsedAt: 1000
+  });
+  assert.throws(
+    () => registry.resolve({ sessionId, ownerKey: 'caller-b' }),
+    /different caller/
+  );
+
+  now = 1500;
+  assert.equal(registry.resolve({ sessionId, ownerKey: 'caller-a' }).lastUsedAt, 1000);
+  assert.equal(registry.touch({ sessionId, ownerKey: 'caller-a' }).lastUsedAt, 1500);
+
+  now = 2501;
+  assert.throws(() => registry.resolve({ sessionId, ownerKey: 'caller-a' }), /Unknown or expired/);
+});
+
+test('removing a remote process session requires the owning caller', () => {
+  const registry = createRemoteProcessSessionRegistry();
+  const sessionId = registry.register({ connectionEpoch: 1, executionRuntimeGeneration: 'runtime-test', ownerKey: 'a', deviceId: 'g8', remoteSessionId: '99' });
+  assert.throws(() => registry.remove({ sessionId, ownerKey: 'b' }), /different caller/);
+  assert.equal(registry.size(), 1);
+  assert.equal(registry.remove({ sessionId, ownerKey: 'a' }).deviceId, 'g8');
+  assert.equal(registry.size(), 0);
+});
+
+test('forgetting a device drops every retained process session for that device', () => {
+  const registry = createRemoteProcessSessionRegistry();
+  const first = registry.register({ connectionEpoch: 1, executionRuntimeGeneration: 'runtime-test', ownerKey: 'a', deviceId: 'g6', remoteSessionId: '1' });
+  const second = registry.register({ connectionEpoch: 1, executionRuntimeGeneration: 'runtime-test', ownerKey: 'b', deviceId: 'g6', remoteSessionId: '2' });
+  const other = registry.register({ connectionEpoch: 1, executionRuntimeGeneration: 'runtime-test', ownerKey: 'a', deviceId: 'g8', remoteSessionId: '3' });
+
+  assert.equal(registry.removeByDevice('g6'), 2);
+  assert.throws(() => registry.resolve({ sessionId: first, ownerKey: 'a' }), /Unknown or expired/);
+  assert.throws(() => registry.resolve({ sessionId: second, ownerKey: 'b' }), /Unknown or expired/);
+  assert.equal(registry.resolve({ sessionId: other, ownerKey: 'a' }).deviceId, 'g8');
+  assert.equal(registry.size(), 1);
+});

@@ -1,0 +1,222 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import test from 'node:test';
+
+import { createDeviceUsageStore } from '../scripts/device-usage.mjs';
+
+function fixture() {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hcu-usage-events-'));
+  const dbPath = path.join(dir, 'gateway.sqlite');
+  let now = 1_700_000_000_000;
+  const store = createDeviceUsageStore({ dbPath, now: () => now });
+  return {
+    dir,
+    dbPath,
+    store,
+    advance(ms = 1) { now += ms; },
+    close() {
+      store.close();
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  };
+}
+
+test('SQLite usage store is authoritative for account-scoped tool, skill, catalog, and schema metadata', () => {
+  const f = fixture();
+  try {
+    f.store.openActivitySession({ activitySessionId: 'activity-a', accountId: 'alice', clientId: 'chatgpt-a' });
+    f.store.openActivitySession({ activitySessionId: 'activity-b', accountId: 'bob', clientId: 'chatgpt-b' });
+
+    f.store.recordToolCall({
+      timestamp: new Date(1_700_000_000_000).toISOString(),
+      accountId: 'alice', activitySessionId: 'activity-a', deviceId: 'device-a',
+      tool: 'shell_execute', durationMs: 12, success: true, errorCode: null,
+      inputBytes: 123, outputBytes: 456, truncated: true, spill: true,
+      callerCategory: 'oauth', upstream: null,
+      payload: 'SECRET_COMMAND_BODY'
+    });
+    f.advance();
+    f.store.recordToolCall({
+      timestamp: new Date(1_700_000_000_001).toISOString(),
+      accountId: 'alice', activitySessionId: 'activity-a', deviceId: null,
+      tool: 'load_skill', skillName: 'mcp-builder', durationMs: 2, success: false,
+      errorCode: 'UNKNOWN_SKILL', inputBytes: 20, outputBytes: 401,
+      truncated: false, spill: false, callerCategory: 'oauth'
+    });
+    f.advance();
+    f.store.recordToolCall({
+      timestamp: new Date(1_700_000_000_002).toISOString(),
+      accountId: 'bob', activitySessionId: 'activity-b', deviceId: 'device-b',
+      tool: 'read_text_file', durationMs: 3, success: true,
+      inputBytes: 10, outputBytes: 30, callerCategory: 'oauth'
+    });
+
+    f.store.recordCatalogList({
+      accountId: 'alice', activitySessionId: 'activity-a', toolCount: 16, schemaBytes: 15297,
+      estimatedTokens: 3825, estimationMethod: 'utf8_bytes_div_4_estimate'
+    });
+    f.store.setSchemaSnapshot({
+      toolCount: 16, schemaBytes: 15297, estimatedTokens: 3825,
+      estimationMethod: 'utf8_bytes_div_4_estimate'
+    });
+
+    const alice = f.store.getAccountUsage('alice');
+    assert.deepEqual(alice.totals, {
+      toolCalls: 2, succeeded: 1, failed: 1, inputBytes: 143, outputBytes: 857
+    });
+    assert.equal(alice.topTools[0].tool, 'load_skill');
+    assert.equal(alice.topTools[0].calls, 1);
+    assert.equal(alice.topTools[1].tool, 'shell_execute');
+    assert.equal(alice.recentErrors[0].errorCode, 'UNKNOWN_SKILL');
+    assert.equal(alice.skillLoads[0].skillName, 'mcp-builder');
+    assert.equal(alice.skillLoads[0].loads, 1);
+    assert.equal(alice.skillLoads[0].failures, 1);
+    assert.equal(alice.skillLoads[0].outputBytes, 401);
+    assert.equal(alice.skillLoads[0].estimatedTokens, 101);
+    assert.equal(alice.skillLoads[0].estimationMethod, 'utf8_bytes_div_4_estimate');
+    assert.equal(alice.catalog.listCalls, 1);
+    assert.equal(alice.catalog.lastToolCount, 16);
+    assert.equal(alice.catalog.lastSchemaBytes, 15297);
+    assert.equal(alice.schema.toolCount, 16);
+    assert.equal(alice.schema.schemaBytes, 15297);
+    assert.equal(alice.schema.estimatedTokens, 3825);
+    assert.equal(alice.schema.estimationMethod, 'utf8_bytes_div_4_estimate');
+    assert.equal(JSON.stringify(alice).includes('device-b'), false);
+
+    const bob = f.store.getAccountUsage('bob');
+    assert.equal(bob.totals.toolCalls, 1);
+    assert.equal(JSON.stringify(bob).includes('shell_execute'), false);
+
+    const dbText = fs.readFileSync(f.dbPath).toString('utf8');
+    assert.doesNotMatch(dbText, /SECRET_COMMAND_BODY/);
+  } finally { f.close(); }
+});
+
+test('tool call events provide account-scoped per-device and per-tool attribution without assigning unattributed history', () => {
+  const f = fixture();
+  try {
+    const events = [
+      { accountId: 'alice', deviceId: 'device-a', tool: 'shell_execute', success: true, inputBytes: 40, outputBytes: 80 },
+      { accountId: 'alice', deviceId: 'device-a', tool: 'shell_execute', success: false, errorCode: 'TOOL_ERROR', inputBytes: 20, outputBytes: 20 },
+      { accountId: 'alice', deviceId: 'device-a', tool: 'read_text_file', success: true, inputBytes: 16, outputBytes: 24 },
+      { accountId: 'alice', deviceId: 'device-b', tool: 'load_skill', success: true, inputBytes: 8, outputBytes: 12 },
+      { accountId: 'alice', deviceId: null, tool: 'legacy_unattributed', success: true, inputBytes: 4, outputBytes: 8 },
+      { accountId: 'bob', deviceId: 'bob-device', tool: 'secret_tool', success: true, inputBytes: 100, outputBytes: 100 }
+    ];
+    for (const event of events) f.store.recordToolCall({ durationMs: 1, callerCategory: 'oauth', ...event });
+
+    assert.deepEqual(f.store.getDeviceUsageForAccount('alice'), [
+      {
+        deviceId: 'device-a',
+        lastSeenAt: 1_700_000_000_000,
+        toolCalls: 3,
+        succeeded: 2,
+        failed: 1,
+        inputBytes: 76,
+        outputBytes: 124,
+        estimatedIoTokens: 50,
+        estimationMethod: 'utf8_bytes_div_4_estimate'
+      },
+      {
+        deviceId: 'device-b',
+        lastSeenAt: 1_700_000_000_000,
+        toolCalls: 1,
+        succeeded: 1,
+        failed: 0,
+        inputBytes: 8,
+        outputBytes: 12,
+        estimatedIoTokens: 5,
+        estimationMethod: 'utf8_bytes_div_4_estimate'
+      }
+    ]);
+
+    assert.deepEqual(f.store.getDeviceToolUsage('alice', 'device-a'), [
+      { tool: 'shell_execute', calls: 2, failures: 1, inputBytes: 60, outputBytes: 100 },
+      { tool: 'read_text_file', calls: 1, failures: 0, inputBytes: 16, outputBytes: 24 }
+    ]);
+    assert.deepEqual(f.store.getDeviceToolUsage('alice', 'bob-device'), []);
+    assert.equal(JSON.stringify(f.store.getDeviceUsageForAccount('alice')).includes('bob-device'), false);
+
+    const alice = f.store.getAccountUsage('alice');
+    assert.deepEqual(alice.totals, {
+      toolCalls: 5, succeeded: 4, failed: 1, inputBytes: 88, outputBytes: 144
+    });
+    assert.equal(f.store.getDeviceUsageForAccount('alice').reduce((sum, row) => sum + row.toolCalls, 0), 4);
+  } finally { f.close(); }
+});
+
+test('activity sessions are account-scoped, refreshable, endable, and fail closed after end', () => {
+  const f = fixture();
+  try {
+    const opened = f.store.openActivitySession({ activitySessionId: 'activity-a', accountId: 'alice', clientId: 'chatgpt-a' });
+    assert.equal(opened.activitySessionId, 'activity-a');
+    assert.equal(opened.accountId, 'alice');
+    assert.equal(opened.endedAt, null);
+
+    f.advance(50);
+    const touched = f.store.touchActivitySession({ activitySessionId: 'activity-a', accountId: 'alice' });
+    assert.equal(touched.lastSeenAt, 1_700_000_000_050);
+    assert.throws(
+      () => f.store.touchActivitySession({ activitySessionId: 'activity-a', accountId: 'bob' }),
+      /not found|owned|account/i
+    );
+
+    const ended = f.store.endActivitySession({ activitySessionId: 'activity-a', accountId: 'alice' });
+    assert.ok(ended.endedAt);
+    assert.throws(
+      () => f.store.touchActivitySession({ activitySessionId: 'activity-a', accountId: 'alice' }),
+      /ended|inactive/i
+    );
+    assert.equal(f.store.listActivitySessions('bob').length, 0);
+    assert.equal(f.store.listActivitySessions('alice').length, 1);
+  } finally { f.close(); }
+});
+
+test('device status changes are stored without payloads and scoped by owner account', () => {
+  const f = fixture();
+  try {
+    f.store.recordDeviceStatus('device-a', { accountId: 'alice', status: 'online', connectionEpoch: 3, agentVersion: '1.2.3' });
+    f.advance();
+    f.store.recordDeviceStatus('device-a', { accountId: 'alice', status: 'offline', connectionEpoch: 3, agentVersion: '1.2.3' });
+    f.store.recordDeviceStatus('device-b', { accountId: 'bob', status: 'online', connectionEpoch: 1, agentVersion: '2.0.0' });
+
+    const alice = f.store.getAccountUsage('alice');
+    assert.equal(alice.deviceStatusEvents.length, 2);
+    assert.deepEqual(alice.deviceStatusEvents.map(event => event.status), ['offline', 'online']);
+    assert.equal(JSON.stringify(alice).includes('device-b'), false);
+  } finally { f.close(); }
+});
+test('usage queries honor a rolling since boundary and dashboard usage exposes only active OAuth sessions', () => {
+  const f = fixture();
+  try {
+    f.store.openActivitySession({ activitySessionId: 'active-session', accountId: 'alice', clientId: 'active-client' });
+    f.store.openActivitySession({ activitySessionId: 'ended-session', accountId: 'alice', clientId: 'ended-client' });
+    f.store.endActivitySession({ activitySessionId: 'ended-session', accountId: 'alice' });
+
+    f.store.recordToolCall({
+      timestamp: 1_700_000_000_000,
+      accountId: 'alice', activitySessionId: 'active-session', deviceId: 'device-a',
+      tool: 'old_tool', durationMs: 1, success: true, inputBytes: 10, outputBytes: 20
+    });
+    f.store.recordToolCall({
+      timestamp: 1_700_000_100_000,
+      accountId: 'alice', activitySessionId: 'active-session', deviceId: 'device-a',
+      tool: 'recent_tool', durationMs: 1, success: false, errorCode: 'RECENT_ERROR', inputBytes: 30, outputBytes: 40
+    });
+
+    const usage = f.store.getAccountUsage('alice', { since: 1_700_000_050_000 });
+    assert.deepEqual(usage.totals, { toolCalls: 1, succeeded: 0, failed: 1, inputBytes: 30, outputBytes: 40 });
+    assert.deepEqual(usage.topTools.map(item => item.tool), ['recent_tool']);
+    assert.deepEqual(usage.recentErrors.map(item => item.errorCode), ['RECENT_ERROR']);
+    assert.deepEqual(usage.activitySessions.map(item => item.activitySessionId), ['active-session']);
+
+    const devices = f.store.getDeviceUsageForAccount('alice', { since: 1_700_000_050_000 });
+    assert.equal(devices.length, 1);
+    assert.equal(devices[0].toolCalls, 1);
+    assert.equal(devices[0].inputBytes, 30);
+    assert.deepEqual(f.store.getDeviceToolUsage('alice', 'device-a', { since: 1_700_000_050_000 }).map(item => item.tool), ['recent_tool']);
+    assert.deepEqual(f.store.getDeviceRecentToolCalls('alice', 'device-a', { since: 1_700_000_050_000 }).map(item => item.tool), ['recent_tool']);
+  } finally { f.close(); }
+});

@@ -1,0 +1,1330 @@
+{
+  "schemaVersion": 1,
+  "product": "@hcu-lab.me/mcp-device",
+  "targetVersion": "1.0.12",
+  "inventory": "Gateway functional union",
+  "createdAt": "2026-10-22",
+  "baseline": {
+    "deviceId": "desktop-b5e4iue-87cea2af",
+    "sourceRoot": "E:\\git-project\\agent-mcp-gateway",
+    "branch": "develop",
+    "head": "7a5a30b4a5f6226cf65b395ddfa0424677184592",
+    "gitState": "clean",
+    "testFileCount": 65,
+    "syntacticTestDeclarations": 342,
+    "currentProductionVerified": false
+  },
+  "policy": {
+    "production": "G8 8102 production /8101 backup untouched",
+    "testListener": "127.0.0.1:8104 only; 8103 already occupied",
+    "runtimeRoot": "explicit isolated stateRoot; never source .runtime or existing identities",
+    "evidence": "All fresh results NOT_RUN until exact command output recorded; source acceptance is not deployment acceptance"
+  },
+  "entries": [
+    {
+      "id": "GW-accounts",
+      "title": "accounts and one-use invitations",
+      "classification": "SOURCE_ACCEPTED",
+      "status": "NOT_RUN",
+      "source": [
+        "scripts/account-store.mjs",
+        "scripts/account-http.mjs",
+        "scripts/admin.mjs"
+      ],
+      "tests": [
+        "tests/account-store.test.mjs",
+        "tests/account-http.test.mjs",
+        "tests/admin-cli.test.mjs"
+      ],
+      "command": {
+        "program": "node",
+        "args": [
+          "--test",
+          "tests/account-store.test.mjs",
+          "tests/account-http.test.mjs",
+          "tests/admin-cli.test.mjs"
+        ]
+      },
+      "assertions": [
+        "normal/admin role boundaries",
+        "scrypt verification and session hash-at-rest",
+        "atomic one-use invite consume; revoke",
+        "account revoke invalidates sessions"
+      ],
+      "listenerPolicy": "Legacy fixtures bind loopback port 0; NOT_RUN until constrained harness or approved lane adaptation",
+      "candidateExpectation": "Same behavior on candidate; all differences must be recorded",
+      "statusScope": "The original baseline command as a whole was not run; fresh candidate evidence is recorded separately.",
+      "candidateEvidence": {
+        "receipts": [
+          "security",
+          "e2e",
+          "behavior"
+        ],
+        "status": "TARGETED_PASS",
+        "covered": [
+          "account persistence/session hash and role boundaries",
+          "one-use invite signup",
+          "administrator login and account revocation",
+          "Original admin CLI create/list/revoke/delete accounts and create/revoke invites passed on both baseline and candidate."
+        ],
+        "gaps": [
+          "Complete historical HTTP presentation, anti-enumeration and cooldown suite not rerun."
+        ]
+      }
+    },
+    {
+      "id": "GW-oauth",
+      "title": "OAuth clients, consent and token lifecycle",
+      "classification": "SOURCE_ACCEPTED",
+      "status": "NOT_RUN",
+      "source": [
+        "scripts/oauth-authorization-server.mjs",
+        "scripts/auth-session.mjs"
+      ],
+      "tests": [
+        "tests/oauth-authorization-server.test.mjs",
+        "tests/account-oauth.test.mjs",
+        "tests/oauth-offline-access.test.mjs",
+        "tests/auth-session.test.mjs"
+      ],
+      "command": {
+        "program": "node",
+        "args": [
+          "--test",
+          "tests/oauth-authorization-server.test.mjs",
+          "tests/account-oauth.test.mjs",
+          "tests/oauth-offline-access.test.mjs",
+          "tests/auth-session.test.mjs"
+        ]
+      },
+      "assertions": [
+        "DCR/discovery, PKCE S256 and redirect checks",
+        "CSRF and account-bound consent",
+        "refresh rotation retains identity",
+        "access/refresh/session revocation"
+      ],
+      "listenerPolicy": "Legacy fixtures bind loopback port 0; NOT_RUN until constrained harness or approved lane adaptation",
+      "candidateExpectation": "Same behavior on candidate; all differences must be recorded",
+      "statusScope": "The original baseline command as a whole was not run; fresh candidate evidence is recorded separately.",
+      "candidateEvidence": {
+        "receipts": [
+          "security",
+          "e2e",
+          "compatibility",
+          "securityExtra"
+        ],
+        "status": "TARGETED_PASS",
+        "covered": [
+          "DCR/consent/S256 PKCE",
+          "CSRF denial",
+          "refresh and account revoke invalidation",
+          "legacy initialize and modern per-request metadata",
+          "Auth state survives reopening with tokens hashed at rest.",
+          "Offline access/refresh rotation preserves account identity across provider restart.",
+          "Redirect matching and typed invalid-token error contracts match baseline."
+        ],
+        "gaps": [
+          "Complete historical OAuth HTTP suite not rerun; actual application account/consent/PKCE/refresh/revoke flow is covered by E2E."
+        ]
+      }
+    },
+    {
+      "id": "GW-dashboard",
+      "title": "account dashboard and usage",
+      "classification": "SOURCE_ACCEPTED",
+      "status": "NOT_RUN",
+      "source": [
+        "scripts/dashboard-http.mjs",
+        "scripts/operator-dashboard-http.mjs",
+        "scripts/device-usage.mjs"
+      ],
+      "tests": [
+        "tests/dashboard-http.test.mjs",
+        "tests/operator-dashboard-http.test.mjs",
+        "tests/device-usage.test.mjs",
+        "tests/usage-events.test.mjs"
+      ],
+      "command": {
+        "program": "node",
+        "args": [
+          "--test",
+          "tests/dashboard-http.test.mjs",
+          "tests/operator-dashboard-http.test.mjs",
+          "tests/device-usage.test.mjs",
+          "tests/usage-events.test.mjs"
+        ]
+      },
+      "assertions": [
+        "account-scoped state and device inventory",
+        "CSRF mutations and foreign account refusal",
+        "rolling usage, live fragments and error bounds",
+        "operator view preserved on authenticated main application"
+      ],
+      "listenerPolicy": "Legacy fixtures bind loopback port 0; NOT_RUN until constrained harness or approved lane adaptation",
+      "candidateExpectation": "Same behavior on candidate; all differences must be recorded",
+      "statusScope": "The original baseline command as a whole was not run; fresh candidate evidence is recorded separately.",
+      "candidateEvidence": {
+        "receipts": [
+          "e2e",
+          "behavior"
+        ],
+        "status": "TARGETED_PASS",
+        "covered": [
+          "account dashboard access",
+          "anonymous/user/operator role boundary on same listener",
+          "Rolling usage windows, per-device/per-tool accounting, account-scoped sessions and bounded metadata are tested."
+        ],
+        "gaps": [
+          "Historical HTTP dashboard mutation/CSRF and presentation variants not fully rerun."
+        ]
+      }
+    },
+    {
+      "id": "GW-pairing",
+      "title": "paired Device ownership",
+      "classification": "SOURCE_ACCEPTED",
+      "status": "NOT_RUN",
+      "source": [
+        "scripts/device-pairing-http.mjs",
+        "scripts/device-pairing-store.mjs",
+        "scripts/device-broker.mjs"
+      ],
+      "tests": [
+        "tests/device-pairing-http.test.mjs",
+        "tests/device-pairing-store.test.mjs",
+        "tests/device-pairing-broker.test.mjs",
+        "tests/device-account-link.test.mjs"
+      ],
+      "command": {
+        "program": "node",
+        "args": [
+          "--test",
+          "tests/device-pairing-http.test.mjs",
+          "tests/device-pairing-store.test.mjs",
+          "tests/device-pairing-broker.test.mjs",
+          "tests/device-account-link.test.mjs"
+        ]
+      },
+      "assertions": [
+        "PKCE grant single-use/expiry/key binding",
+        "grant consumed after valid proof",
+        "owner filter and dispatch checks",
+        "relink/logout after proof"
+      ],
+      "listenerPolicy": "Legacy fixtures bind loopback port 0; NOT_RUN until constrained harness or approved lane adaptation",
+      "candidateExpectation": "Same behavior on candidate; all differences must be recorded",
+      "statusScope": "The original baseline command as a whole was not run; fresh candidate evidence is recorded separately.",
+      "candidateEvidence": {
+        "receipts": [
+          "security",
+          "broker",
+          "e2e"
+        ],
+        "status": "TARGETED_PASS",
+        "covered": [
+          "PKCE/grant binding and normal browser claim",
+          "invalid proof does not consume grant",
+          "local and remote account ownership/cross-account denial",
+          "remote account relink"
+        ],
+        "gaps": [
+          "Full historical HTTP pairing suite not rerun."
+        ]
+      }
+    },
+    {
+      "id": "GW-identity",
+      "title": "durable Device identity and authorization",
+      "classification": "SOURCE_ACCEPTED",
+      "status": "NOT_RUN",
+      "source": [
+        "scripts/device-store.mjs",
+        "scripts/device-broker.mjs",
+        "scripts/device-admin.mjs"
+      ],
+      "tests": [
+        "tests/device-store.test.mjs",
+        "tests/device-forget.test.mjs",
+        "tests/device-admin.test.mjs",
+        "tests/device-broker-auth.test.mjs"
+      ],
+      "command": {
+        "program": "node",
+        "args": [
+          "--test",
+          "tests/device-store.test.mjs",
+          "tests/device-forget.test.mjs",
+          "tests/device-admin.test.mjs",
+          "tests/device-broker-auth.test.mjs"
+        ]
+      },
+      "assertions": [
+        "key rotation and revocation",
+        "ABA authorization generation guards",
+        "persistent reconnect without re-enroll",
+        "forget removes product rows and leaves unrelated state"
+      ],
+      "listenerPolicy": "Legacy fixtures bind loopback port 0; NOT_RUN until constrained harness or approved lane adaptation",
+      "candidateExpectation": "Same behavior on candidate; all differences must be recorded",
+      "statusScope": "The original baseline command as a whole was not run; fresh candidate evidence is recorded separately.",
+      "candidateEvidence": {
+        "receipts": [
+          "security",
+          "broker",
+          "e2e",
+          "behavior",
+          "securityExtra"
+        ],
+        "status": "TARGETED_PASS",
+        "covered": [
+          "durable key/auth generation",
+          "rotation/revocation and ABA pending-call guard",
+          "proof reconnect and ownership",
+          "Operator pre-enroll/key rotate/revoke CLI passes baseline and candidate.",
+          "Forget transaction removes all product-facing rows; late usage does not recreate ghost device rows."
+        ],
+        "gaps": [
+          "Complete historical WebSocket key/ownership negative matrix not rerun."
+        ]
+      }
+    },
+    {
+      "id": "GW-transport",
+      "title": "secure Device transport",
+      "classification": "SOURCE_ACCEPTED",
+      "status": "NOT_RUN",
+      "source": [
+        "scripts/device-secure-transport.mjs",
+        "scripts/device-broker.mjs"
+      ],
+      "tests": [
+        "tests/device-secure-transport.test.mjs",
+        "tests/device-broker-auth.test.mjs",
+        "tests/device-broker.test.mjs"
+      ],
+      "command": {
+        "program": "node",
+        "args": [
+          "--test",
+          "tests/device-secure-transport.test.mjs",
+          "tests/device-broker-auth.test.mjs",
+          "tests/device-broker.test.mjs"
+        ]
+      },
+      "assertions": [
+        "TLS1.3, pinned CA, exporter-bound proof",
+        "replay/tamper/old-session refusal",
+        "monotonic protocol floor",
+        "no reconnect call replay"
+      ],
+      "listenerPolicy": "Legacy fixtures bind loopback port 0; NOT_RUN until constrained harness or approved lane adaptation",
+      "candidateExpectation": "Same behavior on candidate; all differences must be recorded",
+      "statusScope": "The original baseline command as a whole was not run; fresh candidate evidence is recorded separately.",
+      "candidateEvidence": {
+        "receipts": [
+          "broker",
+          "e2e",
+          "securityExtra"
+        ],
+        "status": "TARGETED_PASS",
+        "covered": [
+          "real remote TLSv2 channel using existing Device implementation",
+          "binary outer transport without tool-call plaintext",
+          "monotonic protocol floor retained for remote clients",
+          "local endpoint no self-WebSocket",
+          "reconnect/stale process-session behavior",
+          "Exporter-bound challenge encoding rejects every tested mode/nonce/exporter/key/grant/device mutation.",
+          "Framing handles split/coalesced messages and rejects zero/oversized frame lengths."
+        ],
+        "gaps": [
+          "Legacy network tamper/replay/bad-host certificate matrix still requires the exclusive 8104 lane."
+        ]
+      }
+    },
+    {
+      "id": "GW-dispatch",
+      "title": "runtime dispatch and retained process sessions",
+      "classification": "SOURCE_ACCEPTED",
+      "status": "NOT_RUN",
+      "source": [
+        "scripts/device-broker.mjs",
+        "scripts/remote-process-sessions.mjs"
+      ],
+      "tests": [
+        "tests/device-broker.test.mjs",
+        "tests/device-broker-runtime.test.mjs",
+        "tests/remote-process-sessions.test.mjs"
+      ],
+      "command": {
+        "program": "node",
+        "args": [
+          "--test",
+          "tests/device-broker.test.mjs",
+          "tests/device-broker-runtime.test.mjs",
+          "tests/remote-process-sessions.test.mjs"
+        ]
+      },
+      "assertions": [
+        "explicit target and capability checks",
+        "epoch/runtime generation affinity",
+        "pending request fails on replacement/not-ready/revoke",
+        "late stale result never accepted"
+      ],
+      "listenerPolicy": "Legacy fixtures bind loopback port 0; NOT_RUN until constrained harness or approved lane adaptation",
+      "candidateExpectation": "Same behavior on candidate; all differences must be recorded",
+      "statusScope": "The original baseline command as a whole was not run; fresh candidate evidence is recorded separately.",
+      "candidateEvidence": {
+        "receipts": [
+          "security",
+          "broker",
+          "e2e"
+        ],
+        "status": "TARGETED_PASS",
+        "covered": [
+          "shared real Core native filesystem/shell dispatch",
+          "explicit ownership/capability authorization",
+          "epoch/runtime affinity and pending replacement",
+          "late/stale results and no replay"
+        ],
+        "gaps": [
+          "Not every native tool has a real-server round trip; Device parity inventory owns full native surface."
+        ]
+      }
+    },
+    {
+      "id": "GW-access",
+      "title": "Device access policy and bounded inventory",
+      "classification": "SOURCE_ACCEPTED",
+      "status": "NOT_RUN",
+      "source": [
+        "scripts/device-access-policy.mjs",
+        "scripts/device-audit.mjs",
+        "scripts/device-inventory.mjs"
+      ],
+      "tests": [
+        "tests/device-access-policy.test.mjs",
+        "tests/device-inventory.test.mjs",
+        "tests/tool-risk.test.mjs",
+        "tests/runtime-profile.test.mjs"
+      ],
+      "command": {
+        "program": "node",
+        "args": [
+          "--test",
+          "tests/device-access-policy.test.mjs",
+          "tests/device-inventory.test.mjs",
+          "tests/tool-risk.test.mjs",
+          "tests/runtime-profile.test.mjs"
+        ]
+      },
+      "assertions": [
+        "account/caller/device/tool/path agreement",
+        "profile behavior and output/rate bounds",
+        "no ambiguous automatic device selection",
+        "bounded inventory and audit metadata"
+      ],
+      "listenerPolicy": "No runtime listener in selected family; inspect fixture subprocess effects before running",
+      "candidateExpectation": "Same behavior on candidate; all differences must be recorded",
+      "statusScope": "The original baseline command as a whole was not run; fresh candidate evidence is recorded separately.",
+      "candidateEvidence": {
+        "receipts": [
+          "security",
+          "broker",
+          "e2e",
+          "behavior"
+        ],
+        "status": "TARGETED_PASS",
+        "covered": [
+          "retained access policy assertions",
+          "same-account/foreign-account dispatch boundary",
+          "capability withdrawal",
+          "Inventory schema cardinality, pagination, ambiguity and revoked filtering match baseline.",
+          "Retained runtime profiles, risk annotations and exposure rules match baseline."
+        ],
+        "gaps": []
+      }
+    },
+    {
+      "id": "GW-release",
+      "title": "Device update compatibility",
+      "classification": "SOURCE_ACCEPTED",
+      "status": "NOT_RUN",
+      "source": [
+        "scripts/device-release.mjs",
+        "scripts/device-broker.mjs"
+      ],
+      "tests": [
+        "tests/device-release.test.mjs",
+        "tests/device-broker-auth.test.mjs"
+      ],
+      "command": {
+        "program": "node",
+        "args": [
+          "--test",
+          "tests/device-release.test.mjs",
+          "tests/device-broker-auth.test.mjs"
+        ]
+      },
+      "assertions": [
+        "fixed stable target versions",
+        "platform-aware minimum bootstrap version",
+        "failed/timeout update remains retryable",
+        "completion depends on reconnect version"
+      ],
+      "listenerPolicy": "Legacy fixtures bind loopback port 0; NOT_RUN until constrained harness or approved lane adaptation",
+      "candidateExpectation": "Same behavior on candidate; all differences must be recorded",
+      "statusScope": "The original baseline command as a whole was not run; fresh candidate evidence is recorded separately.",
+      "candidateEvidence": {
+        "receipts": [
+          "behavior"
+        ],
+        "status": "TARGETED_PASS",
+        "covered": [
+          "release provider source retained byte-for-byte",
+          "remote update path retained",
+          "Version parsing/minimum bootstrap policy and injected release lookup cache/fallback passed unchanged on baseline and candidate."
+        ],
+        "gaps": [
+          "No real package download/update/restart was performed; broker update-state E2E needs isolated network fixtures.",
+          "Embedded server updates require the owning service restart, preserving a single Core."
+        ]
+      }
+    },
+    {
+      "id": "GW-public-contract",
+      "title": "public broker envelopes and frozen contract",
+      "classification": "SOURCE_ACCEPTED",
+      "status": "NOT_RUN",
+      "source": [
+        "scripts/device-execution-tool-definitions.mjs",
+        "scripts/custom-tools/index.mjs",
+        "scripts/custom-tools/response-utils.mjs",
+        "scripts/remote-tool-result.mjs"
+      ],
+      "tests": [
+        "tests/device-public-contract.test.mjs",
+        "tests/strict-structured-output.test.mjs",
+        "tests/response-utils.test.mjs",
+        "tests/remote-tool-result.test.mjs",
+        "tests/pure-control-plane-contract.test.mjs"
+      ],
+      "command": {
+        "program": "node",
+        "args": [
+          "--test",
+          "tests/device-public-contract.test.mjs",
+          "tests/strict-structured-output.test.mjs",
+          "tests/response-utils.test.mjs",
+          "tests/remote-tool-result.test.mjs",
+          "tests/pure-control-plane-contract.test.mjs"
+        ]
+      },
+      "assertions": [
+        "12 frozen public broker schemas",
+        "SDK error envelopes and structured output",
+        "no hidden host execution fallback",
+        "exact native behavior must be checked by Device inventory separately"
+      ],
+      "listenerPolicy": "No runtime listener in selected family; inspect fixture subprocess effects before running",
+      "candidateExpectation": "Same behavior on candidate; all differences must be recorded",
+      "statusScope": "The original baseline command as a whole was not run; fresh candidate evidence is recorded separately.",
+      "candidateEvidence": {
+        "receipts": [
+          "security",
+          "context",
+          "e2e",
+          "behavior"
+        ],
+        "status": "TARGETED_PASS",
+        "covered": [
+          "all 12 frozen broker definitions byte/schema parity",
+          "SDK error/structured output assertions",
+          "additive full six Context definitions/argument routing",
+          "no host fallback on denied dispatch",
+          "Strict MCP SDK InMemoryTransport accepts every output shape and rejects missing structured output.",
+          "Public routing/no-host-fallback and byte-bound response utility assertions match baseline."
+        ],
+        "gaps": [
+          "Actual signed Context authorization artifact unavailable; gate denial tested with real Core and successful routing tested with a fixture Core."
+        ]
+      }
+    },
+    {
+      "id": "GW-projects",
+      "title": "projects, resources and prompts",
+      "classification": "SOURCE_ACCEPTED",
+      "status": "PASS",
+      "source": [
+        "scripts/project-inspection.mjs",
+        "scripts/projects/project-id.mjs",
+        "scripts/projects/trusted-roots-projects.mjs",
+        "scripts/resources/index.mjs",
+        "scripts/prompts/index.mjs",
+        "scripts/workspace-registry.mjs"
+      ],
+      "tests": [
+        "tests/project-id.test.mjs",
+        "tests/project-inspection.test.mjs",
+        "tests/project-public-contract.test.mjs",
+        "tests/project-device-routing.test.mjs",
+        "tests/resources.test.mjs",
+        "tests/prompts.test.mjs",
+        "tests/trusted-roots-projects.test.mjs",
+        "tests/workspace-registry.test.mjs",
+        "tests/path-utils.test.mjs"
+      ],
+      "command": {
+        "program": "node",
+        "args": [
+          "--test",
+          "tests/project-id.test.mjs",
+          "tests/project-inspection.test.mjs",
+          "tests/project-public-contract.test.mjs",
+          "tests/project-device-routing.test.mjs",
+          "tests/resources.test.mjs",
+          "tests/prompts.test.mjs",
+          "tests/trusted-roots-projects.test.mjs",
+          "tests/workspace-registry.test.mjs",
+          "tests/path-utils.test.mjs"
+        ]
+      },
+      "assertions": [
+        "explicit device/project pair",
+        "bounded tree and Git status/diff",
+        "resource/prompt device scoping",
+        "no project file read on control-plane host outside selected Device"
+      ],
+      "listenerPolicy": "No runtime listener in selected family; inspect fixture subprocess effects before running",
+      "candidateExpectation": "Same behavior on candidate; all differences must be recorded",
+      "statusScope": "Original nine-file project/resource/prompt command executed on the clean baseline and candidate through the isolated no-network harness.",
+      "candidateEvidence": {
+        "receipts": [
+          "projects"
+        ],
+        "status": "PARITY_TESTS_PASS",
+        "covered": [
+          "project/resource/prompt source and tests retained",
+          "56 unchanged assertions on both baseline and candidate: explicit device/project routing, summaries/trees/Git views, opaque pagination, resources/prompts, traversal/binary/size limits, trusted-root parsing, hot reload and subscriber rollback."
+        ],
+        "gaps": []
+      },
+      "baselineReceipt": "specs/008-v12-platform/server-gateway-projects-baseline.json"
+    },
+    {
+      "id": "GW-skills",
+      "title": "disk-backed progressive Skills",
+      "classification": "SOURCE_ACCEPTED",
+      "status": "NOT_RUN",
+      "source": [
+        "scripts/skills/index.mjs",
+        "scripts/skills/mcp-adapter.mjs"
+      ],
+      "tests": [
+        "tests/skills.test.mjs",
+        "tests/skills-mcp-adapter.test.mjs",
+        "tests/skill-sources.test.mjs",
+        "tests/skill-source-safety.test.mjs"
+      ],
+      "command": {
+        "program": "node",
+        "args": [
+          "--test",
+          "tests/skills.test.mjs",
+          "tests/skills-mcp-adapter.test.mjs",
+          "tests/skill-sources.test.mjs",
+          "tests/skill-source-safety.test.mjs"
+        ]
+      },
+      "assertions": [
+        "full frontmatter, bounded catalog, exact body/resources",
+        "asset/raw byte hashes, cache/pagination",
+        "hot add/edit/delete without stale snapshots",
+        "path/symlink/size/source constraints"
+      ],
+      "listenerPolicy": "No runtime listener in selected family; inspect fixture subprocess effects before running",
+      "candidateExpectation": "Same behavior on candidate; all differences must be recorded",
+      "statusScope": "The original baseline command as a whole was not run; fresh candidate evidence is recorded separately.",
+      "candidateEvidence": {
+        "receipts": [
+          "sources",
+          "e2e",
+          "compatibility",
+          "behavior"
+        ],
+        "status": "TARGETED_PASS",
+        "covered": [
+          "retained disk-backed Skills and MCP adapter assertions",
+          "raw assets/frontmatter/manifest/hash behavior",
+          "real modern MCP skills/list and skills/get",
+          "Source lock/manifest provenance, frontmatter descriptions, pinned self-contained assets and source file safety passed.",
+          "Skill catalog version/change semantics and lazy resource loading are covered by original custom-tools tests."
+        ],
+        "gaps": [
+          "The earlier raw symlink-creation fixture skip remains in the source receipt.",
+          "Source synchronization/check scripts are retained but not executed because --check clones external repositories."
+        ]
+      }
+    },
+    {
+      "id": "GW-upstreams",
+      "title": "external MCP routing and failure isolation",
+      "classification": "SOURCE_ACCEPTED",
+      "status": "NOT_RUN",
+      "source": [
+        "scripts/upstreams/manager.mjs",
+        "scripts/upstreams/config.mjs",
+        "scripts/upstreams/catalog-cache.mjs",
+        "scripts/upstreams/http-client.mjs",
+        "scripts/upstreams/stdio-client.mjs",
+        "scripts/external-tool-broker.mjs"
+      ],
+      "tests": [
+        "tests/upstream-stdio.test.mjs",
+        "tests/upstream-http.test.mjs",
+        "tests/upstream-config.test.mjs",
+        "tests/upstream-cache.test.mjs",
+        "tests/upstream-names.test.mjs",
+        "tests/upstream-resource-uri.test.mjs",
+        "tests/upstream-risk.test.mjs",
+        "tests/external-tool-broker.test.mjs"
+      ],
+      "command": {
+        "program": "node",
+        "args": [
+          "--test",
+          "tests/upstream-stdio.test.mjs",
+          "tests/upstream-http.test.mjs",
+          "tests/upstream-config.test.mjs",
+          "tests/upstream-cache.test.mjs",
+          "tests/upstream-names.test.mjs",
+          "tests/upstream-resource-uri.test.mjs",
+          "tests/upstream-risk.test.mjs",
+          "tests/external-tool-broker.test.mjs"
+        ]
+      },
+      "assertions": [
+        "stdio/HTTP and structured errors",
+        "namespace collisions and resource URI forwarding",
+        "startup/ttl/none cache modes",
+        "atomic reconcile rollback and optional provider failure"
+      ],
+      "listenerPolicy": "Legacy fixtures bind loopback port 0; NOT_RUN until constrained harness or approved lane adaptation",
+      "candidateExpectation": "Same behavior on candidate; all differences must be recorded",
+      "statusScope": "The original baseline command as a whole was not run; fresh candidate evidence is recorded separately.",
+      "candidateEvidence": {
+        "receipts": [
+          "sources",
+          "paths",
+          "upstreamStartup",
+          "e2e"
+        ],
+        "status": "TARGETED_PASS",
+        "covered": [
+          "real STDIO tool/resource/prompt forwarding",
+          "cache modes/reconcile/broker/error/risk/namespaces",
+          "explicit/default config startup parity",
+          "mandatory-provider/catalog failure cleanup",
+          "real unresponsive child timeout cleanup",
+          "configured STDIO provider appears and executes on the first HTTP server start"
+        ],
+        "gaps": [
+          "HTTP upstream listener suite not run."
+        ]
+      }
+    },
+    {
+      "id": "GW-catalog",
+      "title": "stable bounded catalog and surface",
+      "classification": "SOURCE_ACCEPTED",
+      "status": "NOT_RUN",
+      "source": [
+        "scripts/catalog-budget.mjs",
+        "scripts/surface-config.mjs",
+        "scripts/tool-surface-stability.mjs"
+      ],
+      "tests": [
+        "tests/catalog-budget.test.mjs",
+        "tests/catalog-scale.test.mjs",
+        "tests/catalog-output-bounds.test.mjs",
+        "tests/tool-surface-stability.test.mjs",
+        "tests/surface-config.test.mjs",
+        "tests/custom-tools-registry.test.mjs",
+        "tests/benchmark-mcp-catalog.test.mjs",
+        "tests/benchmark-command.test.mjs"
+      ],
+      "command": {
+        "program": "node",
+        "args": [
+          "--test",
+          "tests/catalog-budget.test.mjs",
+          "tests/catalog-scale.test.mjs",
+          "tests/catalog-output-bounds.test.mjs",
+          "tests/tool-surface-stability.test.mjs",
+          "tests/surface-config.test.mjs",
+          "tests/custom-tools-registry.test.mjs",
+          "tests/benchmark-mcp-catalog.test.mjs",
+          "tests/benchmark-command.test.mjs"
+        ]
+      },
+      "assertions": [
+        "device cardinality independent schema",
+        "bounded deferred catalogs",
+        "stable names and risk lanes",
+        "portable benchmark command quoting"
+      ],
+      "listenerPolicy": "No runtime listener in selected family; inspect fixture subprocess effects before running",
+      "candidateExpectation": "Same behavior on candidate; all differences must be recorded",
+      "statusScope": "The original baseline command as a whole was not run; fresh candidate evidence is recorded separately.",
+      "candidateEvidence": {
+        "receipts": [
+          "sources",
+          "context",
+          "e2e",
+          "behavior",
+          "compatibility"
+        ],
+        "status": "TARGETED_PASS",
+        "covered": [
+          "catalog budget and output bounds",
+          "frozen public schemas plus additive Context/platform tools",
+          "Fixed cardinality/serialized schema sizes across 1–1000 projects/devices/Skills.",
+          "External eager-byte budgets, resource surface modes, static collision names and portable benchmark command construction.",
+          "Exact UTF-8 catalog byte accounting and deterministic synthetic input."
+        ],
+        "gaps": [
+          "This is behavioral catalog/measurement validation, not a runtime latency benchmark."
+        ]
+      }
+    },
+    {
+      "id": "GW-metrics",
+      "title": "usage, metrics and shared durable DB",
+      "classification": "SOURCE_ACCEPTED",
+      "status": "NOT_RUN",
+      "source": [
+        "scripts/tool-metrics.mjs",
+        "scripts/device-usage.mjs",
+        "scripts/auth-session.mjs"
+      ],
+      "tests": [
+        "tests/tool-metrics.test.mjs",
+        "tests/runtime-db-contract.test.mjs"
+      ],
+      "command": {
+        "program": "node",
+        "args": [
+          "--test",
+          "tests/tool-metrics.test.mjs",
+          "tests/runtime-db-contract.test.mjs"
+        ]
+      },
+      "assertions": [
+        "metadata-only metrics",
+        "duration/error/byte accounting",
+        "account/device/OAuth use coherent database"
+      ],
+      "listenerPolicy": "No runtime listener in selected family; inspect fixture subprocess effects before running",
+      "candidateExpectation": "Same behavior on candidate; all differences must be recorded",
+      "statusScope": "The original baseline command as a whole was not run; fresh candidate evidence is recorded separately.",
+      "candidateEvidence": {
+        "receipts": [
+          "security",
+          "e2e",
+          "behavior",
+          "securityExtra"
+        ],
+        "status": "TARGETED_PASS",
+        "covered": [
+          "tool metric metadata/duration/bytes assertions",
+          "unified account/device/OAuth gateway.sqlite state",
+          "Device usage persists metadata-only counters across reopening.",
+          "Activity sessions and tool/catalog/skill/schema events retain account attribution and reject ended sessions.",
+          "Forgotten devices cannot regain product rows through late metrics."
+        ],
+        "gaps": [
+          "Old runtime-db-contract file depends on the removed Gateway-specific launcher/package layout; real shared-database behavior is covered by store/E2E/cold-package tests."
+        ]
+      }
+    },
+    {
+      "id": "GW-packaging",
+      "title": "legacy distribution and source consistency",
+      "classification": "SOURCE_ACCEPTED",
+      "status": "NOT_RUN",
+      "source": [
+        "scripts/sync-skills.mjs"
+      ],
+      "tests": [
+        "tests/repo-hygiene.test.mjs"
+      ],
+      "command": {
+        "program": "node",
+        "args": [
+          "--test",
+          "tests/repo-hygiene.test.mjs"
+        ]
+      },
+      "assertions": [
+        "legacy manifest/source consistency",
+        "v12 replaces product-layout assertions with one-package cold-install checks"
+      ],
+      "listenerPolicy": "No runtime listener in selected family; inspect fixture subprocess effects before running",
+      "candidateExpectation": "Preserve behavior; old product-layout text assertions remain legacy-only",
+      "statusScope": "The original baseline command as a whole was not run; fresh candidate evidence is recorded separately.",
+      "candidateEvidence": {
+        "receipts": [
+          "paths"
+        ],
+        "status": "ROOT_OWNED_FINAL_ACCEPTANCE",
+        "covered": [
+          "one root package and explicit package/asset paths",
+          "disk Skills/default config/contract closure",
+          "Gateway MIT attribution and retained upstream Skill licenses/notices are inside the npm files whitelist",
+          "startup failure releases Windows SQLite handles",
+          "normal shutdown preserves Core cleanup failures for repeated callers and still closes unrelated resources"
+        ],
+        "gaps": [
+          "Cold tarball install/CLI/service acceptance is tracked by the root coordinator."
+        ]
+      }
+    }
+  ],
+  "additionalCommands": [
+    {
+      "id": "skills-check",
+      "program": "node",
+      "args": [
+        "scripts/sync-skills.mjs",
+        "--check"
+      ],
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "mcp-schema-smoke",
+      "program": "node",
+      "args": [
+        "scripts/smoke-mcp-schemas.mjs"
+      ],
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "live-mcp-smoke",
+      "program": "node",
+      "args": [
+        "scripts/smoke-mcp-endpoint.mjs"
+      ],
+      "status": "NOT_RUN",
+      "requires": "Explicit isolated MCP_SMOKE_URL and authenticated test token; default8101 forbidden"
+    }
+  ],
+  "knownBaselineLimits": [
+    "Gateway source at7a5a30b does not expose Device Context local_*; routing is additive v12 work.",
+    "Legacy wrapper starts separate unauthenticated loopback operator dashboard; v12 preserves view in same authenticated app per locked contract.",
+    "Gateway read_text_file head/tail forwarding discrepancy recorded by Device inventory; do not claim stronger behavior than existing offset/length implementation."
+  ],
+  "newAcceptance": [
+    "Embedded mandatory same DeviceCore; no child Device/no self-WebSocket",
+    "Anonymous localhost /mcp denied",
+    "Normal account login/PKCE claim binds local Device",
+    "Local dispatch applies identical owner/key-generation/epoch/pending-result rules",
+    "One server listener with authenticated operator view",
+    "Context contracts forwarded without parameter loss"
+  ],
+  "executionGroups": [
+    {
+      "id": "gateway-security",
+      "cwd": "control-plane",
+      "args": [
+        "--test",
+        "tests/device-public-contract.test.mjs",
+        "tests/account-store.test.mjs",
+        "tests/account-oauth.test.mjs",
+        "tests/device-pairing-store.test.mjs",
+        "tests/device-store.test.mjs",
+        "tests/device-access-policy.test.mjs",
+        "tests/remote-process-sessions.test.mjs",
+        "tests/remote-tool-result.test.mjs",
+        "tests/tool-metrics.test.mjs"
+      ],
+      "listener": "NONE",
+      "minimumTests": 45
+    },
+    {
+      "id": "gateway-sources",
+      "cwd": "control-plane",
+      "args": [
+        "--test",
+        "tests/skills.test.mjs",
+        "tests/skills-mcp-adapter.test.mjs",
+        "tests/upstream-config.test.mjs",
+        "tests/upstream-names.test.mjs",
+        "tests/upstream-risk.test.mjs",
+        "tests/upstream-resource-uri.test.mjs",
+        "tests/upstream-cache.test.mjs",
+        "tests/upstream-stdio.test.mjs",
+        "tests/external-tool-broker.test.mjs",
+        "tests/catalog-budget.test.mjs",
+        "tests/catalog-output-bounds.test.mjs"
+      ],
+      "listener": "NONE",
+      "minimumTests": 63
+    },
+    {
+      "id": "server-unit",
+      "cwd": ".",
+      "args": [
+        "--test",
+        "--test-concurrency=1",
+        "test/v12/server-broker.test.mjs",
+        "test/v12/server-paths.test.mjs",
+        "test/v12/server-upstream-startup.test.mjs"
+      ],
+      "listener": "NONE",
+      "minimumTests": 14
+    },
+    {
+      "id": "server-8104",
+      "cwd": ".",
+      "args": [
+        "--test",
+        "--test-concurrency=1",
+        "test/v12/server-context.test.mjs",
+        "test/v12/server-e2e.test.mjs"
+      ],
+      "listener": "127.0.0.1:8104",
+      "minimumTests": 26,
+      "precondition": "Coordinator owns exclusive isolated 8104 lease; never stop/rebind 8103 or G8."
+    },
+    {
+      "id": "gateway-projects",
+      "cwd": ".",
+      "args": [
+        "control-plane/run-portfree-union.mjs",
+        "projects"
+      ],
+      "listener": "NONE",
+      "minimumTests": 56,
+      "resultFormat": "json-summary"
+    },
+    {
+      "id": "gateway-behavior",
+      "cwd": ".",
+      "args": [
+        "control-plane/run-portfree-union.mjs",
+        "behavior"
+      ],
+      "listener": "NONE",
+      "minimumTests": 63,
+      "resultFormat": "json-summary"
+    },
+    {
+      "id": "gateway-compatibility",
+      "cwd": ".",
+      "args": [
+        "control-plane/run-portfree-union.mjs",
+        "compatibility"
+      ],
+      "listener": "NONE",
+      "minimumTests": 13,
+      "resultFormat": "json-summary"
+    },
+    {
+      "id": "gateway-security-extra",
+      "cwd": ".",
+      "args": [
+        "control-plane/run-portfree-union.mjs",
+        "security-extra"
+      ],
+      "listener": "NONE",
+      "minimumTests": 7,
+      "resultFormat": "json-summary"
+    }
+  ],
+  "runner": {
+    "entry": "control-plane/verify-parity.mjs",
+    "readOnlyCommand": [
+      "node",
+      "control-plane/verify-parity.mjs",
+      "--source"
+    ],
+    "runSafeCommand": [
+      "node",
+      "control-plane/verify-parity.mjs",
+      "--run",
+      "all-safe"
+    ],
+    "runNetworkCommand": [
+      "node",
+      "control-plane/verify-parity.mjs",
+      "--run",
+      "server-8104"
+    ],
+    "nodeUsed": "C:/Program Files/nodejs/node.exe v22.22.2",
+    "nonvacuity": "Each execution group must exit zero and report at least minimumTests TAP tests.",
+    "comparisonCommands": [
+      [
+        "node",
+        "control-plane/run-portfree-union.mjs",
+        "projects",
+        "--baseline"
+      ],
+      [
+        "node",
+        "control-plane/run-portfree-union.mjs",
+        "behavior",
+        "--baseline"
+      ],
+      [
+        "node",
+        "control-plane/run-portfree-union.mjs",
+        "compatibility",
+        "--baseline"
+      ],
+      [
+        "node",
+        "control-plane/run-portfree-union.mjs",
+        "security-extra",
+        "--baseline"
+      ]
+    ]
+  },
+  "candidateReceipts": [
+    {
+      "id": "security",
+      "path": "specs/008-v12-platform/server-gateway-security-tests.log",
+      "sha256": "5ad516c2f1e88a6e069f2813b374bde993d887243b78bee520114a0d37b02a8c",
+      "tests": 45,
+      "pass": 45,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0,
+      "status": "PASS_WITH_RECORDED_COVERAGE",
+      "node": "v22.22.2",
+      "environment": "G6 isolated test roots; no G8 access"
+    },
+    {
+      "id": "sources",
+      "path": "specs/008-v12-platform/server-gateway-source-tests.log",
+      "sha256": "9d1ee861a17ad00c292d2289305181e880df3a5f9055e2eea5091867b2713065",
+      "tests": 63,
+      "pass": 62,
+      "fail": 0,
+      "skipped": 1,
+      "cancelled": 0,
+      "status": "PASS_WITH_RECORDED_COVERAGE",
+      "node": "v22.22.2",
+      "environment": "G6 isolated test roots; no G8 access"
+    },
+    {
+      "id": "broker",
+      "path": "specs/008-v12-platform/server-broker-test.log",
+      "sha256": "4e97ace7703a4e52dbbd5fc37704f8aeda038ce165ae1f76b9772a1bb573587e",
+      "tests": 7,
+      "pass": 7,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0,
+      "status": "PASS_WITH_RECORDED_COVERAGE",
+      "node": "v22.22.2",
+      "environment": "G6 isolated test roots; no G8 access"
+    },
+    {
+      "id": "context",
+      "path": "specs/008-v12-platform/server-context-test.log",
+      "sha256": "b8cd4e0bffdde36c988efc57d1fd75f1e09184d32985879f8c2927128e2683bf",
+      "tests": 8,
+      "pass": 8,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0,
+      "status": "PASS_WITH_RECORDED_COVERAGE",
+      "node": "v22.22.2",
+      "environment": "G6 isolated test roots; no G8 access"
+    },
+    {
+      "id": "e2e",
+      "path": "specs/008-v12-platform/server-e2e-test.log",
+      "sha256": "52383c56e6203d72a6a4da98798cb3e4767d4d50df0a523e09821858f3ecda9c",
+      "tests": 18,
+      "pass": 18,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0,
+      "status": "PASS_WITH_RECORDED_COVERAGE",
+      "node": "v22.22.2",
+      "environment": "G6 isolated test roots; no G8 access"
+    },
+    {
+      "id": "paths",
+      "path": "specs/008-v12-platform/server-paths-test.log",
+      "sha256": "85ae2ceef723549df42155949dce4b3ea226e98687f07dc00a010c8e04ba3f87",
+      "tests": 4,
+      "pass": 4,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0,
+      "status": "PASS_WITH_RECORDED_COVERAGE",
+      "node": "v22.22.2",
+      "environment": "G6 isolated test roots; no G8 access"
+    },
+    {
+      "id": "upstreamStartup",
+      "path": "specs/008-v12-platform/server-upstream-startup-test.log",
+      "sha256": "a74373f53454a65c993eb6a88f5bd5a19b4b5d2f813915379653aedb08b101e1",
+      "tests": 3,
+      "pass": 3,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0,
+      "status": "PASS_WITH_RECORDED_COVERAGE",
+      "node": "v22.22.2",
+      "environment": "G6 isolated test roots; no G8 access"
+    },
+    {
+      "id": "projects",
+      "path": "specs/008-v12-platform/server-gateway-projects-candidate.log",
+      "metadata": "specs/008-v12-platform/server-gateway-projects-candidate.json",
+      "sha256": "14e3298f66103a223b35180988044eae5e7ed5263a876ff9e688e404afd3c97e",
+      "tests": 56,
+      "pass": 56,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0,
+      "status": "PASS_WITH_RECORDED_COVERAGE",
+      "node": "v22.22.2",
+      "environment": "No listener, socket connection or global fetch; inherited operational env removed; isolated home/temp/Git config."
+    },
+    {
+      "id": "behavior",
+      "path": "specs/008-v12-platform/server-gateway-behavior-candidate.log",
+      "metadata": "specs/008-v12-platform/server-gateway-behavior-candidate.json",
+      "sha256": "78c45c012bb4d843bf6d4d5a5c82aeb48e78e1b73691ad6e581507558fb04b12",
+      "tests": 63,
+      "pass": 63,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0,
+      "status": "PASS_WITH_RECORDED_COVERAGE",
+      "node": "v22.22.2",
+      "environment": "No listener, socket connection or global fetch; inherited operational env removed; isolated home/temp/Git config."
+    },
+    {
+      "id": "compatibility",
+      "path": "specs/008-v12-platform/server-gateway-compatibility-candidate.log",
+      "metadata": "specs/008-v12-platform/server-gateway-compatibility-candidate.json",
+      "sha256": "5d3286b562b172c1b28831b3060e12725b1be400a03a03ac4bc6fd3de0749cab",
+      "tests": 13,
+      "pass": 13,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0,
+      "status": "PASS_WITH_RECORDED_COVERAGE",
+      "node": "v22.22.2",
+      "environment": "No listener, socket connection or global fetch; inherited operational env removed; isolated home/temp/Git config."
+    },
+    {
+      "id": "securityExtra",
+      "path": "specs/008-v12-platform/server-gateway-security-extra-candidate.log",
+      "metadata": "specs/008-v12-platform/server-gateway-security-extra-candidate.json",
+      "sha256": "689a3a08183216afa5e675609aacf60e4a68c94d3c098cc18af665d013cbf2e3",
+      "tests": 7,
+      "pass": 7,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0,
+      "status": "PASS_WITH_RECORDED_COVERAGE",
+      "node": "v22.22.2",
+      "environment": "No listener, socket connection or global fetch; inherited operational env removed; isolated home/temp/Git config."
+    }
+  ],
+  "integrationAcceptance": {
+    "latestRealServerTests": 18,
+    "protocols": [
+      "2025-11-25 legacy initialize",
+      "2026-07-28 modern per-request metadata/server discovery"
+    ],
+    "localSharedCore": true,
+    "actualRemoteDeviceChildren": 2,
+    "oneListener": "127.0.0.1:8104",
+    "federation": [
+      "A and B have real Palace process providers; C is disabled and never creates a Palace database.",
+      "Search/list leave A with zero cards; selected read imports exactly one source-backed B card.",
+      "Repeated read deduplicates and preserves origin/provenance/version/hash/evidence receipt.",
+      "B correction refreshes the existing imported A card without a duplicate.",
+      "C can use shared knowledge without Palace; same-account relink is performed through ordinary pairing.",
+      "Plugin disable withdraws capabilities; native Device actions continue; offline session cache returns stale metadata."
+    ],
+    "limitations": [
+      "These are G6 isolated acceptance receipts, not production observations.",
+      "The real Core retains its existing signed Context authorization gate; no forged approval artifact was created.",
+      "Final root build/versioned capability facade changes require the coordinator final server regression.",
+      "First configured-upstream startup test is only covered when latestRealServerTests is at least 18.",
+      "No full replication or background n-by-n knowledge sync is introduced."
+    ]
+  },
+  "comparativeRuns": [
+    {
+      "group": "projects",
+      "baselineReceipt": "specs/008-v12-platform/server-gateway-projects-baseline.json",
+      "candidateReceipt": "specs/008-v12-platform/server-gateway-projects-candidate.json",
+      "baselineTests": 56,
+      "baselinePass": 56,
+      "candidateTests": 56,
+      "candidatePass": 56,
+      "status": "BEHAVIOR_PARITY_PASS",
+      "exclusions": []
+    },
+    {
+      "group": "behavior",
+      "baselineReceipt": "specs/008-v12-platform/server-gateway-behavior-baseline.json",
+      "candidateReceipt": "specs/008-v12-platform/server-gateway-behavior-candidate.json",
+      "baselineTests": 63,
+      "baselinePass": 63,
+      "candidateTests": 63,
+      "candidatePass": 63,
+      "status": "BEHAVIOR_PARITY_PASS",
+      "exclusions": []
+    },
+    {
+      "group": "compatibility",
+      "baselineReceipt": "specs/008-v12-platform/server-gateway-compatibility-baseline.json",
+      "candidateReceipt": "specs/008-v12-platform/server-gateway-compatibility-candidate.json",
+      "baselineTests": 16,
+      "baselinePass": 16,
+      "candidateTests": 13,
+      "candidatePass": 13,
+      "status": "BEHAVIOR_PARITY_PASS",
+      "exclusions": [
+        "static bearer docs describe optional dual auth without replacing OAuth",
+        "package exposes benchmark:catalog command",
+        "package exposes cross-platform sync commands"
+      ]
+    },
+    {
+      "group": "security-extra",
+      "baselineReceipt": "specs/008-v12-platform/server-gateway-security-extra-baseline.json",
+      "candidateReceipt": "specs/008-v12-platform/server-gateway-security-extra-candidate.json",
+      "baselineTests": 7,
+      "baselinePass": 7,
+      "candidateTests": 7,
+      "candidatePass": 7,
+      "status": "BEHAVIOR_PARITY_PASS",
+      "exclusions": []
+    }
+  ],
+  "layoutOnlyExclusions": {
+    "initialReceipt": "specs/008-v12-platform/server-gateway-compatibility-candidate-layout-initial.log",
+    "initialResult": "13 behavioral passes / 3 ENOENT failures for old nested package/docs paths; no source/runtime mutation was used to hide these failures.",
+    "rerun": "Explicit --test-skip-pattern excludes only three legacy package/docs assertions; candidate 13/13 and original package 16/16.",
+    "preservedDeveloperCommands": [
+      "node control-plane/scripts/benchmark-mcp-catalog.mjs",
+      "node control-plane/scripts/sync-skills.mjs",
+      "node control-plane/scripts/sync-skills.mjs --check"
+    ],
+    "unexecutedLayoutFamilies": [
+      "tests/repo-hygiene.test.mjs",
+      "tests/runtime-db-contract.test.mjs"
+    ],
+    "replacement": "One-package cold installation and actual account/device/OAuth persistence tests replace old README/package/PowerShell launcher layout assertions."
+  }
+}

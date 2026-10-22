@@ -1,0 +1,74 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { processToolSchemas, shellExecuteSchema } from '../scripts/device-execution-tool-definitions.mjs';
+
+const wrapper = fs.readFileSync(new URL('../scripts/authenticated-mcp-wrapper.mjs', import.meta.url), 'utf8');
+const customTools = fs.readFileSync(new URL('../scripts/custom-tools/index.mjs', import.meta.url), 'utf8');
+const projectInspection = fs.readFileSync(new URL('../scripts/project-inspection.mjs', import.meta.url), 'utf8');
+const repoResources = fs.readFileSync(new URL('../scripts/resources/index.mjs', import.meta.url), 'utf8');
+const workspaceRegistry = fs.readFileSync(new URL('../scripts/workspace-registry.mjs', import.meta.url), 'utf8');
+
+test('gateway execution surface requires explicit device routing and has no local execution fallback', () => {
+  assert.deepEqual(shellExecuteSchema.required, ['command', 'working_directory', 'device_id']);
+  assert.deepEqual(processToolSchemas.start_process.required, ['command', 'working_directory', 'device_id']);
+  assert.match(wrapper, /function requireDeviceId\(/);
+  assert.match(wrapper, /DEVICE_ID_REQUIRED/);
+
+  for (const deadLocalPrimitive of [
+    "from '@modelcontextprotocol/sdk/client/stdio.js'",
+    "from './direct-shell.mjs'",
+    "from './process-session-manager.mjs'",
+    'filesystemClient',
+    'filesystemTransport',
+    'executeDirectShell',
+    'processSessions.start',
+    'processSessions.read',
+    'processSessions.interact',
+    'processSessions.terminate',
+    'workspaceRegistry.ensureTrustedPath'
+  ]) {
+    assert.doesNotMatch(wrapper, new RegExp(deadLocalPrimitive.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  }
+});
+
+test('dead gateway-host execution modules are removed from the runtime tree', () => {
+  for (const relativePath of [
+    '../scripts/direct-shell.mjs',
+    '../scripts/process-session-manager.mjs',
+    '../scripts/shell-policy.mjs',
+    '../scripts/custom-tools/image-preview-tool.mjs',
+    '../config/shell.mcp.json'
+  ]) {
+    assert.equal(fs.existsSync(new URL(relativePath, import.meta.url)), false, `${relativePath} must not remain as a hidden host executor`);
+  }
+});
+
+test('image_preview is device-routed at the public contract', () => {
+  assert.match(customTools, /name:\s*'image_preview'[\s\S]*device_id:[\s\S]*\},\s*\['device_id'\]\)/);
+  assert.doesNotMatch(customTools, /handler:\s*imagePreviewTool/);
+});
+
+test('project inspection keeps filesystem and git execution on the selected device', () => {
+  assert.doesNotMatch(projectInspection, /node:fs|node:child_process|execFile\(|readdirSync|readFile\(/);
+  assert.match(projectInspection, /context\.callDeviceTool\('project_inspect'/);
+});
+
+test('project resources do not read project files from the gateway host', () => {
+  assert.doesNotMatch(repoResources, /from 'node:fs'|fs\.promises\.|fs\.existsSync/);
+  assert.match(repoResources, /readProjectResourceFile/);
+});
+
+test('workspace registry has no runtime trusted-root auto-grant overlay', () => {
+  assert.doesNotMatch(wrapper, /runtimeRootsPath/);
+  for (const deadOverlayPrimitive of [
+    'runtimeRootsPath',
+    'ensureTrustedPath',
+    'persistTrustedRoot',
+    'insertTrustedRootText',
+    'acquireLock',
+    'atomicReplace'
+  ]) {
+    assert.doesNotMatch(workspaceRegistry, new RegExp(deadOverlayPrimitive));
+  }
+});

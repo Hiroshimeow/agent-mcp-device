@@ -1,0 +1,14 @@
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { Server, Socket } from 'node:net';
+import { syncBuiltinESMExports } from 'node:module';
+const root = process.env.MCP_V12_UNION_FIXTURE_ROOT;
+if (!root || !path.isAbsolute(root)) throw new Error('ISOLATED_UNION_FIXTURE_ROOT_REQUIRED');
+const home = path.join(root, 'home'), temp = path.join(root, 'temp');
+fs.mkdirSync(home, { recursive: true }); fs.mkdirSync(temp, { recursive: true });
+os.homedir = () => home; os.tmpdir = () => temp;
+syncBuiltinESMExports();
+Server.prototype.listen = function () { throw new Error('PORT_FREE_UNION_TEST_FORBIDS_LISTENERS'); };
+Socket.prototype.connect = function () { throw new Error('PORT_FREE_UNION_TEST_FORBIDS_NETWORK_CONNECTIONS'); };
+globalThis.fetch = async () => { throw new Error('PORT_FREE_UNION_TEST_FORBIDS_FETCH'); };

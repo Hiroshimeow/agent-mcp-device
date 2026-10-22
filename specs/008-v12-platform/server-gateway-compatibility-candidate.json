@@ -1,0 +1,39 @@
+{
+  "node": "v22.22.2",
+  "sourceBaseline": "7a5a30b4a5f6226cf65b395ddfa0424677184592",
+  "repository": "E:\\git-project\\agent-mcp-device-v12\\control-plane",
+  "flavor": "CANDIDATE",
+  "group": "compatibility",
+  "args": [
+    "--test",
+    "--test-concurrency=1",
+    "--test-skip-pattern=static bearer docs describe|package exposes",
+    "tests/auth-session.test.mjs",
+    "tests/benchmark-mcp-catalog.test.mjs",
+    "tests/skill-sources.test.mjs"
+  ],
+  "networkPolicy": "No listener, socket connection or global fetch; inherited operational env removed; isolated home/temp/Git config.",
+  "testFiles": [
+    {
+      "path": "tests/auth-session.test.mjs",
+      "sha256": "091360b6533723f02fbbaa0ec175efd8e5c809458318e8207799b5a0734bdf5f"
+    },
+    {
+      "path": "tests/benchmark-mcp-catalog.test.mjs",
+      "sha256": "e116ed5df6b942aa64cb8ab3f6f65afd88a2f42624431267c27a05b0a2ca53e5"
+    },
+    {
+      "path": "tests/skill-sources.test.mjs",
+      "sha256": "cc195db6c47448301a8f37cb3d3b9ba4cdffe9bcbe8cd000b10a6f2cdc802a8e"
+    }
+  ],
+  "tests": 13,
+  "pass": 13,
+  "fail": 0,
+  "skipped": 0,
+  "cancelled": 0,
+  "exitCode": 0,
+  "elapsedMs": 1683,
+  "cleanupError": null,
+  "status": "PASS"
+}

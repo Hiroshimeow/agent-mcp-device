@@ -1,0 +1,49 @@
+{
+  "node": "v22.22.2",
+  "sourceBaseline": "7a5a30b4a5f6226cf65b395ddfa0424677184592",
+  "repository": "E:/git-project/agent-mcp-gateway",
+  "flavor": "BASELINE",
+  "group": "security-extra",
+  "args": [
+    "--test",
+    "--test-concurrency=1",
+    "--test-name-pattern=^(?:OAuth advertises offline_access|revoke hard-forgets every|OAuth redirect matching|AccountAuthProvider emits v2|inner TLS config requires|uint32 framing parses|v2 challenge encoding)",
+    "tests/device-forget.test.mjs",
+    "tests/oauth-offline-access.test.mjs",
+    "tests/oauth-authorization-server.test.mjs",
+    "tests/device-secure-transport.test.mjs",
+    "tests/device-broker-auth.test.mjs"
+  ],
+  "networkPolicy": "No listener, socket connection or global fetch; inherited operational env removed; isolated home/temp/Git config.",
+  "testFiles": [
+    {
+      "path": "tests/device-forget.test.mjs",
+      "sha256": "c29fcb9682456a26cf616f1bde5ad1679065278c64adf2d07f5c0b09ab619f84"
+    },
+    {
+      "path": "tests/oauth-offline-access.test.mjs",
+      "sha256": "4f3c467b28046fe5c6c74339b21141fc1c91058f992ec9669721e1fe71ef9b81"
+    },
+    {
+      "path": "tests/oauth-authorization-server.test.mjs",
+      "sha256": "ac9be2c7097c8552cd2b0ab6039fd0cbad90b163078086b84078278d3d905cf0"
+    },
+    {
+      "path": "tests/device-secure-transport.test.mjs",
+      "sha256": "4ed9f170fb409cf97092758b9e59a150fc10d5fe0880b954eb44983bdd845ec5"
+    },
+    {
+      "path": "tests/device-broker-auth.test.mjs",
+      "sha256": "eb8f35ece4631f8ebf971a934f3a543e7b333de0f8877ba11ac89cfd6c47e618"
+    }
+  ],
+  "tests": 7,
+  "pass": 7,
+  "fail": 0,
+  "skipped": 0,
+  "cancelled": 0,
+  "exitCode": 0,
+  "elapsedMs": 4795,
+  "cleanupError": null,
+  "status": "PASS"
+}

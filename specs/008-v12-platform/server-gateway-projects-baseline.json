@@ -1,0 +1,68 @@
+{
+  "node": "v22.22.2",
+  "sourceBaseline": "7a5a30b4a5f6226cf65b395ddfa0424677184592",
+  "repository": "E:/git-project/agent-mcp-gateway",
+  "flavor": "BASELINE",
+  "group": "projects",
+  "args": [
+    "--test",
+    "--test-concurrency=1",
+    "tests/project-id.test.mjs",
+    "tests/project-inspection.test.mjs",
+    "tests/project-public-contract.test.mjs",
+    "tests/project-device-routing.test.mjs",
+    "tests/resources.test.mjs",
+    "tests/prompts.test.mjs",
+    "tests/trusted-roots-projects.test.mjs",
+    "tests/workspace-registry.test.mjs",
+    "tests/path-utils.test.mjs"
+  ],
+  "networkPolicy": "No listener, socket connection or global fetch; inherited operational env removed; isolated home/temp/Git config.",
+  "testFiles": [
+    {
+      "path": "tests/project-id.test.mjs",
+      "sha256": "f96d15d78ed9ef3b9f83df30b9b11f06ac6f9bca9b5eab76bfbd091b769a7c30"
+    },
+    {
+      "path": "tests/project-inspection.test.mjs",
+      "sha256": "f57799714304093f18f4c46c5513d11c5e188522d68e7cba659c2526b8ce816d"
+    },
+    {
+      "path": "tests/project-public-contract.test.mjs",
+      "sha256": "727f88d941b0946530ab852f3ab8df805302cf00002cfda7d8388598bcc027e0"
+    },
+    {
+      "path": "tests/project-device-routing.test.mjs",
+      "sha256": "3ae571d042af83e08953d5cfe3325bf8bc99aa11ec79afa62b9b8d047c7efd38"
+    },
+    {
+      "path": "tests/resources.test.mjs",
+      "sha256": "e30ddaac6b8f2b4faae1908e1f2ba9f5885fa9e214565ef54fcfcb13f5fde112"
+    },
+    {
+      "path": "tests/prompts.test.mjs",
+      "sha256": "0bab9a276d4f14b447289bebbbe5795ceb46e2c230b7a5c42be4f9354b5bba77"
+    },
+    {
+      "path": "tests/trusted-roots-projects.test.mjs",
+      "sha256": "69d6c119bd23053d71085f1b74cccff6f2eed2602c13d1dafb6b8702c0edc852"
+    },
+    {
+      "path": "tests/workspace-registry.test.mjs",
+      "sha256": "5c6b3359ea0efd4a0a7c7eff3f79dc339b8b6c414c92d039e78747d8125443d2"
+    },
+    {
+      "path": "tests/path-utils.test.mjs",
+      "sha256": "6910a243bc40c175b0eec42e57254109eb96839d287a4e7d3f09d681602019ee"
+    }
+  ],
+  "tests": 56,
+  "pass": 56,
+  "fail": 0,
+  "skipped": 0,
+  "cancelled": 0,
+  "exitCode": 0,
+  "elapsedMs": 5100,
+  "cleanupError": null,
+  "status": "PASS"
+}

@@ -1,0 +1,52 @@
+# Unified MCP gateway config example.
+# Keep secrets and machine-specific paths out of Git; use environment variables
+# and runtime overlays for private values.
+
+[server]
+name = "mcp-device"
+title = "MCP Device"
+description = "Remote MCP gateway for filesystem, shell, device routing, optional skills, and external MCP upstreams."
+instructions = "Use filesystem tools for file content, shell/process tools for terminal workflows, and list_devices for remote machines. Native Skills clients use the MCP Skills extension; other clients may use skill_catalog and load_skill."
+
+[surface]
+mode = "agent"
+
+[trusted_roots]
+# Generic trusted paths do not become routable projects automatically.
+# Put machine-specific project routes in a private/runtime overlay, for example:
+# { path = "/srv/app", project_id = "app", display_name = "App", device_id = "device-id" }
+roots = ["${repoRoot}"]
+
+[openai_tunnel]
+enabled = false
+command = "tunnel-client"
+profile = "default"
+
+[external_mcp]
+enabled = true
+fail_gateway_on_startup_error = false
+catalog_cache = "startup"
+exposure_mode = "hybrid"
+eager_schema_budget_bytes = 24576
+eager_allowlist = []
+startup_timeout_sec = 30.0
+shutdown_timeout_sec = 5.0
+default_enabled = false
+
+[mcp_servers.context7]
+enabled = false
+url = "https://mcp.context7.com/mcp"
+
+[mcp_servers.exa]
+enabled = false
+url = "https://mcp.exa.ai/mcp"
+
+[mcp_servers.deepwiki]
+enabled = false
+url = "https://mcp.deepwiki.com/mcp"
+
+[mcp_servers.eslint]
+enabled = false
+preset = "eslint"
+
+# Add optional upstreams with enabled = false, then opt in explicitly.

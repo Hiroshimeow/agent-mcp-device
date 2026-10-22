@@ -1,6 +1,6 @@
 {
   "name": "@hcu-lab.me/mcp-device",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "MCP Device runtime.",
   "license": "MIT",
   "author": "Hirohimeow",
@@ -21,7 +21,10 @@
   "files": [
     "dist",
     "config/revoked-approvals.json",
-    "skills/mcp-device-context"
+    "skills/mcp-device-context",
+    "control-plane/scripts",
+    "control-plane/config",
+    "control-plane/contracts"
   ],
   "scripts": {
     "device:install": "cd src/device && npm install",
@@ -53,7 +56,10 @@
     "logs:clear": "npm run build && node scripts/clear-fuzzy-logs.js",
     "logs:export": "npm run build && node scripts/export-fuzzy-logs.js",
     "count-tokens": "npm run build && node scripts/count-tokens.js",
-    "count-tokens:json": "npm run build && node scripts/count-tokens.js --json"
+    "count-tokens:json": "npm run build && node scripts/count-tokens.js --json",
+    "test:v12": "node scripts/v12/run-platform-tests.mjs",
+    "test:v12:server": "node scripts/v12/run-platform-tests.mjs --server",
+    "test:parity": "node scripts/v12/run-device-parity.mjs"
   },
   "keywords": [
     "mcp",
@@ -106,9 +112,19 @@
     "tiptap-markdown": "^0.9.0",
     "unified": "^11.0.5",
     "unpdf": "^1.4.0",
-    "ws": "^8.18.3",
+    "ws": "^8.21.3",
     "zod": "^3.24.1",
-    "zod-to-json-schema": "^3.23.5"
+    "zod-to-json-schema": "^3.23.5",
+    "@modelcontextprotocol/client": "2.0.0",
+    "@modelcontextprotocol/core": "2.0.0",
+    "@modelcontextprotocol/express": "2.0.0",
+    "@modelcontextprotocol/node": "2.0.0",
+    "@modelcontextprotocol/server": "2.0.0",
+    "cors": "^2.8.6",
+    "express": "5.1.0",
+    "express-rate-limit": "^8.7.0",
+    "smol-toml": "^1.4.2",
+    "yaml": "^2.9.1"
   },
   "optionalDependencies": {
     "caffeinate": "^1.0.1"
