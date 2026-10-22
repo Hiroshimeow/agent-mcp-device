@@ -96,6 +96,9 @@ test('cold installed package runs CLI server, persists pairing/OAuth and restore
   assert.equal(signup.status, 302);
   const cookie = signup.headers.get('set-cookie').split(';')[0];
   assert.equal((await http('/operator', { cookie })).status, 403);
+  const verify = await http('/device/verify?user_code=' + encodeURIComponent(initial.pairing.user_code), { cookie });
+  assert.equal(verify.status, 200);
+  assert.match(await verify.text(), /localhost/);
   const claimed = await http('/device/verify', { cookie, form: { user_code: initial.pairing.user_code } }); assert.equal(claimed.status, 200);
   const tokens = await authorize(cookie);
   const initialized = await rpc(tokens.access_token, 'initialize', { protocolVersion: '2025-11-25', capabilities: {}, clientInfo: { name: 'cold-package-acceptance', version: '1.0.12' } });

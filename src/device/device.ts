@@ -123,7 +123,7 @@ export class MCPDevice {
             this.gatewayProxyAgent = proxy.agent;
 
             process.env.MCP_DEVICE_REMOTE = 'true';
-            console.log(`⏳ Connecting directly to MCP Gateway ${gatewayUrl}`);
+            console.log(`⏳ Connecting directly to MCP Device server ${gatewayUrl}`);
 
             const identity = new GatewayDeviceIdentity();
             const identityRecord = await identity.loadOrCreate();

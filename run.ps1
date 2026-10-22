@@ -210,10 +210,10 @@ if ($inviteCode) {
 Write-Host " 3. In the member MCP client add: $baseUrl/mcp"
 Write-Host ' 4. Login with that member account.'
 Write-Host ''
-Write-Host ' LOCAL DEVICE A1'
-Write-Host ' The server includes Local Device A1.'
+Write-Host ' LOCALHOST DEVICE'
+Write-Host ' This server includes one built-in Device named localhost.'
 Write-Host ' On first start, open the device_pairing_required URL printed below,'
-Write-Host ' login as the admin account, and approve A1.'
+Write-Host ' login with the member account that should own localhost, and approve it.'
 Write-Host ''
 Write-Host ' LAN/local-only profile: external MCP, tunnel and package release'
 Write-Host ' lookup are disabled. Press Ctrl+C to stop the server.'

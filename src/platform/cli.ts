@@ -151,6 +151,7 @@ async function serverCli(args: Parsed): Promise<void> {
     const { startServerRuntime } = await import(pathToFileURL(path.join(packageRoot, 'control-plane', 'scripts', 'authenticated-mcp-wrapper.mjs')).href);
     const configPath = typeof config.configPath === 'string' ? path.resolve(path.dirname(path.resolve(one(args, 'config')!)), config.configPath) : undefined;
     runtime = await startServerRuntime({ core, identity, stateRoot: root, packageRoot, port, host: one(args, 'host', '127.0.0.1'), publicUrl, allowHttpLan, skillRoot, env: config.env ?? {}, configPath, extraTools: await createPlatformTools(root),
+      deviceName: 'localhost',
       onPairing: (pairing: unknown) => event({ event: 'device_pairing_required', pairing }) });
     event({ event: 'server_ready', version: '1.0.12', url: runtime.baseUrl, device_id: record.deviceId, runtime_dir: root, local_runtime: 'shared-device-core', authentication: 'account-oauth-and-pairing' });
     await new Promise<void>(resolve => {
