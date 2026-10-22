@@ -31,7 +31,9 @@ export interface GatewayChannelOptions {
     proxyAgent?: Agent;
     securityProtocolFloor?: number;
     appCaPem?: string;
-    adapter: GatewayToolAdapter;
+    adapter: Pick<GatewayToolAdapter, 'call'>;
+    /** Healthy current capabilities, including optional extensions. */
+    capabilities?: () => string[];
     runtimeState?: () => {
         runtime_ready: boolean;
         runtime_reason: string | null;
@@ -63,9 +65,55 @@ export class GatewayDeviceChannel {
     private secureSocket?: tls.TLSSocket;
     private authMode: 'reconnect' | 'enroll' | 'pair' = 'reconnect';
     private updateInFlight?: string;
+    private lastAdvertisedCapabilities?: string;
 
     constructor(private options: GatewayChannelOptions) {
         this.identity = options.identity || new GatewayDeviceIdentity();
+    }
+
+
+    private currentCapabilities(): string[] {
+        try {
+            const supplied = this.options.capabilities?.() ?? gatewayCapabilities();
+            return [...new Set(supplied.filter(value => typeof value === 'string' && value.length > 0 && value.length <= 128))];
+        } catch {
+            // Extension metadata must not take ordinary Device execution offline.
+            return gatewayCapabilities();
+        }
+    }
+
+    private capabilityPayload() {
+        const capabilities = this.currentCapabilities();
+        this.lastAdvertisedCapabilities = JSON.stringify(capabilities);
+        return { capabilities, context_version: capabilities.includes('local_status') ? 1 : undefined };
+    }
+
+    /** Uses the existing authenticated v11 capability_sync frame. No reconnect. */
+    updateCapabilities(): boolean {
+        if (!this.authenticatedDeviceId || this.connectionEpoch === undefined ||
+            !this.socket || this.socket.readyState !== WebSocket.OPEN) return false;
+        const capabilities = this.currentCapabilities();
+        const serialized = JSON.stringify(capabilities);
+        if (serialized === this.lastAdvertisedCapabilities) return false;
+        try {
+            this.send({
+                protocol_version: this.protocolVersion,
+                type: 'capability_sync',
+                device_id: this.authenticatedDeviceId,
+                connection_epoch: this.connectionEpoch,
+                timestamp: Date.now(),
+                payload: {
+                    capabilities,
+                    agent_version: this.options.agentVersion || 'mcp-device-1',
+                    package_version: VERSION
+                }
+            });
+            this.lastAdvertisedCapabilities = serialized;
+            return true;
+        } catch {
+            // A reconnect will advertise the current getter in its normal hello.
+            return false;
+        }
     }
 
     private runtimePayload(): Record<string, unknown> {
@@ -84,6 +132,7 @@ export class GatewayDeviceChannel {
     async start(): Promise<void> {
         this.authenticatedDeviceId = undefined;
         this.connectionEpoch = undefined;
+        this.lastAdvertisedCapabilities = undefined;
         this.messageQueue = Promise.resolve();
         const record = await this.identity.loadOrCreate();
         this.protocolVersion = Number(this.options.securityProtocolFloor || 1) >= 2 ? PROTOCOL_VERSION_V2 : PROTOCOL_VERSION;
@@ -200,8 +249,7 @@ export class GatewayDeviceChannel {
                 platform: process.platform,
                 arch: process.arch,
                 path_style: process.platform === 'win32' ? 'windows' : 'posix',
-                capabilities: gatewayCapabilities(),
-                context_version: gatewayCapabilities().includes('local_status') ? 1 : undefined,
+                ...this.capabilityPayload(),
                 ...this.runtimePayload(),
                 ...(enrolling || pairing ? { public_key_pem: record.publicKeyPem } : {})
             }
@@ -226,8 +274,7 @@ export class GatewayDeviceChannel {
                 platform: process.platform,
                 arch: process.arch,
                 path_style: process.platform === 'win32' ? 'windows' : 'posix',
-                capabilities: gatewayCapabilities(),
-                context_version: gatewayCapabilities().includes('local_status') ? 1 : undefined,
+                ...this.capabilityPayload(),
                 ...this.runtimePayload(),
                 ...(pairing || enrolling ? { public_key_pem: record.publicKeyPem, enrollment_grant: grant } : {})
             }
@@ -281,6 +328,7 @@ export class GatewayDeviceChannel {
             await this.identity.markEnrolled();
             this.options.pairingGrant = undefined;
             if (this.options.onStatus && message.payload) await this.options.onStatus(message.payload);
+            this.updateCapabilities();
             this.startHeartbeat();
             this.reconnectAttempt = 0;
             this.readyResolve?.();
@@ -504,6 +552,7 @@ export class GatewayDeviceChannel {
     private startHeartbeat(): void {
         this.stopHeartbeat();
         this.heartbeat = setInterval(async () => {
+            this.updateCapabilities();
             const record = await this.identity.loadOrCreate();
             this.send({
                 protocol_version: this.protocolVersion,

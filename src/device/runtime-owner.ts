@@ -115,7 +115,13 @@ export class RuntimeOwner {
                 }
                 if (message?.action === 'stop' && message?.nonce === this.nonce) {
                     socket.end(JSON.stringify({ ok: true }));
-                    await this.onStop?.();
+                    try { await this.onStop?.(); }
+                    catch (error) {
+                        // This frame acknowledges acceptance, not completed cleanup.
+                        // Do not force release here: takeover must still prove it.
+                        // An async socket callback must not reject unhandled.
+                        console.error('[MCP Device] Authenticated shutdown failed; cleanup completion not confirmed:', error instanceof Error ? error.message : String(error));
+                    }
                     return;
                 }
                 socket.end(JSON.stringify({ ok: false }));

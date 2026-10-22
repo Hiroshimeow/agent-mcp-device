@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import { fileURLToPath } from 'url';
-import { randomUUID } from 'crypto';
 import os from 'os';
 import path from 'path';
 
@@ -12,8 +11,9 @@ import { GatewayDeviceIdentity } from './gateway-identity.js';
 import { pairGatewayDevice } from './gateway-pairing.js';
 import { bootstrapOfficialGatewayTrust } from './official-trust.js';
 import { GatewayDeviceStatusStore } from './device-status.js';
-import { GatewayToolAdapter } from './gateway-tool-adapter.js';
+import { createPlatformDeviceCore as createDeviceCore, type PlatformDeviceCore as DeviceCore } from '../platform/device-runtime.js';
 import { RuntimeOwner, acquireRuntimeOwner, type RuntimeOwnerStatus } from './runtime-owner.js';
+import { acquireServerLease } from '../platform/runtime-lease.js';
 import {
     assertDeviceStartupAllowedDuringUpdate,
     launchDeviceUpdateHelper,
@@ -27,11 +27,14 @@ import { VERSION } from '../version.js';
 
 export class MCPDevice {
     private isShuttingDown = false;
-    private bootNonce = '';
+    private shutdownRequest?: Promise<void>;
+    private core?: DeviceCore;
+    private unsubscribeCapabilities?: () => void;
     private executionEngine = new LocalExecutionEngine();
     private gatewayChannel?: GatewayDeviceChannel;
     private gatewayProxyAgent?: { destroy: () => void };
     private runtimeOwner?: RuntimeOwner;
+    private stateLeases: Array<() => Promise<void>> = [];
 
     constructor() {
         this.setupShutdownHandlers();
@@ -39,26 +42,25 @@ export class MCPDevice {
 
     private setupShutdownHandlers() {
         const handleShutdown = async (signal: string) => {
-            if (this.isShuttingDown) {
-                console.log(`\n${signal} received, but already shutting down...`);
-                process.exit(1);
-                return;
-            }
-
-            console.log(`\n${signal} received, initiating graceful shutdown...`);
-            const forceExit = setTimeout(() => {
-                console.error('\n⚠️ Graceful shutdown timed out, forcing exit...');
-                process.exit(1);
+            console.log(this.isShuttingDown
+                ? `\n${signal} received, waiting for owned resources to stop...`
+                : `\n${signal} received, initiating graceful shutdown...`);
+            const shutdownWarning = setTimeout(() => {
+                console.error('\n⚠️ Graceful shutdown is still waiting for owned resources; runtime ownership is retained.');
+                process.exitCode = 1;
             }, 5000);
 
             try {
                 await this.shutdown();
-                clearTimeout(forceExit);
                 process.exit(0);
             } catch (error) {
                 console.error('Error during shutdown:', error);
-                await captureRemote('remote_device_shutdown_handler_error', { error });
-                process.exit(1);
+                await captureRemote('remote_device_shutdown_handler_error', { error }).catch(() => {});
+                // Exiting here would make the PID lease stale while a plugin
+                // may still own its files. Keep the owner available for retry.
+                process.exitCode = 1;
+            } finally {
+                clearTimeout(shutdownWarning);
             }
         };
 
@@ -66,7 +68,7 @@ export class MCPDevice {
             handleShutdown('SIGINT').catch((error) => {
                 console.error('Fatal error during shutdown:', error);
                 captureRemote('remote_device_shutdown_handler_error', { error, signal: 'SIGINT' }).catch(() => {});
-                process.exit(1);
+                process.exitCode = 1;
             });
         });
 
@@ -74,13 +76,12 @@ export class MCPDevice {
             handleShutdown('SIGTERM').catch((error) => {
                 console.error('Fatal error during shutdown:', error);
                 captureRemote('remote_device_shutdown_handler_error', { error, signal: 'SIGTERM' }).catch(() => {});
-                process.exit(1);
+                process.exitCode = 1;
             });
         });
     }
 
     async start(options: { confirmTakeover?: (existing: RuntimeOwnerStatus) => Promise<boolean> | boolean } = {}) {
-        this.bootNonce = randomUUID();
         try {
             console.log('🚀 Starting MCP Device...');
             if (process.env.DEBUG_MODE === 'true') console.log('  - 🐞 DEBUG_MODE');
@@ -96,6 +97,15 @@ export class MCPDevice {
                 : 'foreground';
             this.runtimeOwner = new RuntimeOwner({ mode, onStop: () => this.shutdown() });
             await acquireRuntimeOwner(this.runtimeOwner, { confirmTakeover: options.confirmTakeover });
+            const { CONFIG_DIR } = await import('../config.js');
+            const stateRoots = new Map<string, string>();
+            for (const root of [this.runtimeOwner.paths.root, CONFIG_DIR]) {
+                const absolute = path.resolve(root);
+                stateRoots.set(process.platform === 'win32' ? absolute.toLowerCase() : absolute, absolute);
+            }
+            for (const [, root] of [...stateRoots].sort(([a], [b]) => a.localeCompare(b))) {
+                this.stateLeases.push(await acquireServerLease(root, { allowDeviceOwnerPid: process.pid }));
+            }
             await this.runtimeOwner.bootstrap();
             await bootstrapOfficialGatewayTrust(new GatewayDeviceConfigStore());
             // Remote mode uses direct in-process dispatch (tool-dispatcher.ts).
@@ -118,6 +128,11 @@ export class MCPDevice {
             const identity = new GatewayDeviceIdentity();
             const identityRecord = await identity.loadOrCreate();
             this.runtimeOwner.setDeviceId(identityRecord.deviceId);
+            // Local providers start before pairing; local indexing needs no account session.
+            this.core = await createDeviceCore({
+                deviceId: identityRecord.deviceId,
+                allowedRoots: gatewayConfig.allowedRoots
+            });
             const enrollmentCredential = String(
                 process.env.MCP_GATEWAY_ENROLLMENT_TOKEN || process.env.MCP_DEVICE_ENROLLMENT_TOKEN || ''
             ).trim() || undefined;
@@ -145,12 +160,13 @@ export class MCPDevice {
                 proxyAgent: proxy.agent,
                 securityProtocolFloor: gatewayConfig.securityProtocolFloor,
                 appCaPem: gatewayConfig.appCaPem || undefined,
-                adapter: new GatewayToolAdapter(undefined, { allowedRoots: gatewayConfig.allowedRoots, context: { deviceId: identityRecord.deviceId } }),
+                adapter: { call: (tool, args) => this.core!.invoke(tool, args) },
+                capabilities: () => this.core?.capabilities ?? [],
                 // In remote direct-dispatch mode, the daemon is ready once the gateway channel & dispatch are established.
                 runtimeState: () => ({
                     runtime_ready: true,
                     runtime_reason: null,
-                    execution_runtime_generation: `direct-in-process:${this.bootNonce}`
+                    execution_runtime_generation: this.core!.runtimeInstanceId
                 }),
                 agentVersion: VERSION || process.env.npm_package_version || '1.0.11',
                 onUpdateRequest: async (targetVersion, { requestId }) => {
@@ -204,6 +220,9 @@ export class MCPDevice {
                 }
             });
 
+            this.unsubscribeCapabilities = this.core.onCapabilitiesChanged?.(() => {
+                this.gatewayChannel?.updateCapabilities();
+            });
             await this.gatewayChannel.start();
 
             const updateReconciliation = await reconcileDeviceUpdateAfterStart(VERSION);
@@ -247,31 +266,55 @@ export class MCPDevice {
         }
     }
 
-    async shutdown() {
-        if (this.isShuttingDown) return;
+    shutdown(): Promise<void> {
+        if (this.shutdownRequest) return this.shutdownRequest;
         this.isShuttingDown = true;
+        const request = this.performShutdown();
+        this.shutdownRequest = request;
+        // Concurrent callers share the same outcome. A rejected cleanup keeps
+        // ownership and resources available for a real retry; only success is cached.
+        void request.catch(() => {
+            if (this.shutdownRequest === request) this.shutdownRequest = undefined;
+        });
+        return request;
+    }
 
+    private async performShutdown(): Promise<void> {
         console.log('\n🛑 Shutting down device...');
         try {
-            if (this.gatewayChannel) {
-                console.log('  → Closing direct Gateway channel...');
-                await this.gatewayChannel.stop();
-                this.gatewayChannel = undefined;
-            }
-            if (this.gatewayProxyAgent) {
-                this.gatewayProxyAgent.destroy();
-                this.gatewayProxyAgent = undefined;
-            }
-            await new GatewayDeviceStatusStore().markOffline().catch(() => {});
-            await this.executionEngine.shutdown();
-            if (this.runtimeOwner) {
-                await this.runtimeOwner.release().catch(() => {});
-                this.runtimeOwner = undefined;
+            try {
+                this.unsubscribeCapabilities?.();
+                this.unsubscribeCapabilities = undefined;
+                if (this.gatewayChannel) {
+                    console.log('  → Closing direct Gateway channel...');
+                    await this.gatewayChannel.stop();
+                    this.gatewayChannel = undefined;
+                }
+                if (this.gatewayProxyAgent) {
+                    this.gatewayProxyAgent.destroy();
+                    this.gatewayProxyAgent = undefined;
+                }
+                await new GatewayDeviceStatusStore().markOffline().catch(() => {});
+            } finally {
+                // Release shared state only after the same Core and its plugins
+                // have stopped, including failures partway through startup.
+                await this.core?.close();
+                this.core = undefined;
+                await this.executionEngine.shutdown();
+                while (this.stateLeases.length) {
+                    await this.stateLeases[this.stateLeases.length - 1]();
+                    this.stateLeases.pop();
+                }
+                if (this.runtimeOwner) {
+                    await this.runtimeOwner.release();
+                    this.runtimeOwner = undefined;
+                }
             }
             console.log('✓ Device shutdown complete');
         } catch (error: any) {
             console.error('Shutdown error:', error.message);
-            await captureRemote('remote_device_shutdown_error', { error });
+            await captureRemote('remote_device_shutdown_error', { error }).catch(() => {});
+            throw error;
         }
     }
 }
