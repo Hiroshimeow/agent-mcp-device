@@ -45,25 +45,41 @@ Write-Host ' no SSO | no cloud tunnel | no external MCP | no registry'
 Write-Host '============================================================'
 Write-Host ''
 
-if ($env:MCP_LAN_ADMIN_PASS) {
-    $adminPassword = $env:MCP_LAN_ADMIN_PASS
+$runtimeRoot = if ($env:MCP_LAN_RUNTIME_ROOT) { [Environment]::ExpandEnvironmentVariables($env:MCP_LAN_RUNTIME_ROOT) } else { Join-Path $env:USERPROFILE '.mcp-device\server' }
+
+$listJson = Invoke-Mcp -Arguments @('admin','--runtime-dir',$runtimeRoot,'account','list') -Capture
+$list = $listJson | ConvertFrom-Json
+$activeAdmins = @($list.accounts | Where-Object { $_.role -eq 'admin' -and $null -eq $_.revokedAt })
+$firstSetup = $activeAdmins.Count -eq 0
+
+if ($firstSetup) {
+    if ($env:MCP_LAN_ADMIN_PASS) {
+        $adminPassword = $env:MCP_LAN_ADMIN_PASS
+    } else {
+        $secure = Read-Host 'Admin_pass' -AsSecureString
+        $ptr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure)
+        try {
+            $adminPassword = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($ptr)
+        } finally {
+            [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ptr)
+        }
+    }
+    if ([string]::IsNullOrWhiteSpace($adminPassword)) { throw 'Admin password cannot be empty.' }
+
+    if ($env:MCP_LAN_ADMIN_MAIL) {
+        $adminMail = $env:MCP_LAN_ADMIN_MAIL.Trim()
+    } else {
+        do { $adminMail = (Read-Host 'Mail').Trim() } until ($adminMail -match '^[^@\s]+@[^@\s]+\.[^@\s]+$')
+    }
+    if ($adminMail -notmatch '^[^@\s]+@[^@\s]+\.[^@\s]+$') { throw 'Invalid admin email.' }
 } else {
-    $secure = Read-Host 'Admin_pass' -AsSecureString
-    $ptr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure)
-    try {
-        $adminPassword = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($ptr)
-    } finally {
-        [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ptr)
+    $adminMail = [string]$activeAdmins[0].email
+    $adminPassword = $null
+    Write-Host "Admin: $adminMail (existing; password not requested)"
+    if ($activeAdmins.Count -gt 1) {
+        Write-Host "  Note: $($activeAdmins.Count) active admin accounts exist; launcher displays the first one."
     }
 }
-if ([string]::IsNullOrWhiteSpace($adminPassword)) { throw 'Admin password cannot be empty.' }
-
-if ($env:MCP_LAN_ADMIN_MAIL) {
-    $adminMail = $env:MCP_LAN_ADMIN_MAIL.Trim()
-} else {
-    do { $adminMail = (Read-Host 'Mail').Trim() } until ($adminMail -match '^[^@\s]+@[^@\s]+\.[^@\s]+$')
-}
-if ($adminMail -notmatch '^[^@\s]+@[^@\s]+\.[^@\s]+$') { throw 'Invalid admin email.' }
 
 $detectedIp = Resolve-LanIPv4
 $publicHost = if ($env:MCP_LAN_HOST) { $env:MCP_LAN_HOST.Trim() } else { Read-Default 'Host/IP' $detectedIp }
@@ -83,7 +99,6 @@ $skillRoot = if ($env:MCP_LAN_SKILL_ROOT) { $env:MCP_LAN_SKILL_ROOT.Trim() } els
 $skillRoot = [Environment]::ExpandEnvironmentVariables($skillRoot)
 New-Item -ItemType Directory -Force -Path $skillRoot | Out-Null
 
-$runtimeRoot = if ($env:MCP_LAN_RUNTIME_ROOT) { [Environment]::ExpandEnvironmentVariables($env:MCP_LAN_RUNTIME_ROOT) } else { Join-Path $env:USERPROFILE '.mcp-device\server' }
 $configRoot = Join-Path $runtimeRoot 'lan-local-config'
 New-Item -ItemType Directory -Force -Path $configRoot | Out-Null
 
@@ -127,10 +142,7 @@ if ($busy) { throw "Port $port is already in use. Run again and choose another p
 
 Write-Host ''
 Write-Host '[1/4] Preparing local account database...'
-$listJson = Invoke-Mcp -Arguments @('admin','--runtime-dir',$runtimeRoot,'account','list') -Capture
-$list = $listJson | ConvertFrom-Json
-$existing = @($list.accounts | Where-Object { $_.email -eq $adminMail })
-if ($existing.Count -eq 0) {
+if ($firstSetup) {
     $env:HCU_ADMIN_PASSWORD = $adminPassword
     try {
         $null = Invoke-Mcp -Arguments @('admin','--runtime-dir',$runtimeRoot,'account','create-admin',$adminMail) -Capture
@@ -139,18 +151,20 @@ if ($existing.Count -eq 0) {
         $adminPassword = $null
     }
     Write-Host "  Admin created: $adminMail"
-} elseif ($existing[0].role -eq 'admin') {
-    $adminPassword = $null
-    Write-Host "  Admin already exists: $adminMail"
-    Write-Host '  Existing password was not changed.'
 } else {
-    throw "Account $adminMail already exists but is not an admin."
+    Write-Host "  Reusing existing admin: $adminMail"
 }
 
-Write-Host '[2/4] Creating one-use invite code...'
-$inviteJson = Invoke-Mcp -Arguments @('admin','--runtime-dir',$runtimeRoot,'invite','create','1') -Capture
-$invite = $inviteJson | ConvertFrom-Json
-$inviteCode = [string]$invite.codes[0]
+$inviteCode = $null
+if ($firstSetup) {
+    Write-Host '[2/4] Creating first one-use invite code...'
+    $inviteJson = Invoke-Mcp -Arguments @('admin','--runtime-dir',$runtimeRoot,'invite','create','1') -Capture
+    $invite = $inviteJson | ConvertFrom-Json
+    $inviteCode = [string]$invite.codes[0]
+} else {
+    Write-Host '[2/4] Invite creation skipped on restart.'
+    Write-Host '  Run invite.bat whenever you need a fresh one-use invite.'
+}
 
 Write-Host '[3/4] Restricting Windows Firewall to Private/LocalSubnet...'
 $ruleName = "MCPDevice-LAN-$port"
@@ -178,13 +192,21 @@ Write-Host " MCP URL     : $baseUrl/mcp"
 Write-Host " Dashboard   : $baseUrl/dashboard"
 Write-Host " Login       : $baseUrl/login"
 Write-Host " Signup      : $baseUrl/signup"
-Write-Host " Invite code : $inviteCode"
+if ($inviteCode) {
+    Write-Host " Invite code : $inviteCode"
+} else {
+    Write-Host ' Invite code : not generated on restart (run invite.bat)'
+}
 Write-Host " Shared Skill: $skillRoot"
 Write-Host " Admin       : $adminMail"
 Write-Host ''
 Write-Host ' ADD MEMBER'
 Write-Host " 1. Open: $baseUrl/signup"
-Write-Host " 2. Enter member email/password + invite: $inviteCode"
+if ($inviteCode) {
+    Write-Host " 2. Enter member email/password + invite: $inviteCode"
+} else {
+    Write-Host ' 2. Run invite.bat to create a fresh invite, then use it on signup.'
+}
 Write-Host " 3. In the member MCP client add: $baseUrl/mcp"
 Write-Host ' 4. Login with that member account.'
 Write-Host ''
