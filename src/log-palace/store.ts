@@ -114,6 +114,35 @@ export class LogPalace {
       indexed_files:Number((this.db.prepare('SELECT count(*) n FROM files').get() as Row).n),
       indexed_records:Number((this.db.prepare('SELECT count(*) n FROM records').get() as Row).n)};
   }
+
+  /**
+   * Read-only bounded feed for evidence consumers. It does not index or verify source bytes.
+   * Consumers must call read(ref) before deriving knowledge; the stored hash is a locator,
+   * not proof of truth. Resume by opaque ref cursor; restart a completed pass to see inserts.
+   */
+  observations(options:{cursor?:string;limit?:number;maxBytes?:number}={}) {
+    const limit=safeInt(options.limit??64,1,256),maxBytes=safeInt(options.maxBytes??65536,1024,1024*1024);
+    const cursor=options.cursor??'';
+    if(typeof cursor!=='string'||cursor.length>512)throw new Error('INVALID_CURSOR');
+    const rows=this.db.prepare(
+      'SELECT r.ref,r.kind,r.tool,r.session,r.turn,r.call_id,r.outcome,r.timestamp,r.preview,r.hash,'+
+      'r.position,r.bytes,r.part,r.file_path,f.path AS source_path,f.format,f.missing '+
+      'FROM records r JOIN files f ON f.id=r.file_id WHERE r.ref>? ORDER BY r.ref LIMIT ?'
+    ).all(cursor,limit+1) as Row[];
+    const items:Row[]=[];
+    let next=cursor;
+    for(const row of rows.slice(0,limit)){
+      const candidate={...row,source_available:!Number(row.missing)};
+      const envelope={items:[...items,candidate],nextCursor:value(row.ref),complete:false};
+      if(Buffer.byteLength(JSON.stringify(envelope),'utf8')>maxBytes){
+        if(!items.length)throw new Error('BUDGET_TOO_SMALL');
+        return {items,nextCursor:next,complete:false};
+      }
+      items.push(candidate);next=value(row.ref);
+    }
+    const complete=rows.length<=limit;
+    return {items,nextCursor:complete?null:next,complete};
+  }
   private scanPage(source:Row,maxEntries:number,maxFiles:number):{paths:string[],complete:boolean,epoch:number} {
     const sourceId=Number(source.id),root=value(source.path);
     if(!Number(source.dir))return {paths:[root],complete:true,epoch:1};
