@@ -90,7 +90,8 @@ New-Item -ItemType Directory -Force -Path $configRoot | Out-Null
 $tomlPath = Join-Path $configRoot 'mcp-servers.toml'
 $jsonPath = Join-Path $configRoot 'server.json'
 
-@'
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+$tomlContent = @'
 [server]
 name = "mcp-device-lan"
 title = "MCP Device LAN"
@@ -108,16 +109,18 @@ enabled = false
 default_enabled = false
 catalog_cache = "none"
 exposure_mode = "brokered"
-'@ | Set-Content -LiteralPath $tomlPath -Encoding UTF8
+'@
+[System.IO.File]::WriteAllText($tomlPath, $tomlContent, $utf8NoBom)
 
-@{
+$jsonContent = @{
     configPath = 'mcp-servers.toml'
     env = @{
         MCP_EXTERNAL_MCP_ENABLED = 'false'
         MCP_DEVICE_RELEASE_LOOKUP = 'false'
         MCP_DEVICE_LATEST_VERSION = '1.0.12'
     }
-} | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $jsonPath -Encoding UTF8
+} | ConvertTo-Json -Depth 5
+[System.IO.File]::WriteAllText($jsonPath, $jsonContent, $utf8NoBom)
 
 $busy = Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue
 if ($busy) { throw "Port $port is already in use. Run again and choose another port." }

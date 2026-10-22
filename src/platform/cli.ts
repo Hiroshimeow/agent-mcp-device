@@ -49,7 +49,10 @@ function stateRoot(args: Parsed, serverDefault = false): string {
 function required(args: Parsed, key: string): string {
   const value = one(args, key); if (!value) throw new CapabilityError('INVALID_ARGUMENT', '--' + key + ' is required'); return path.resolve(value);
 }
-async function jsonFile(filename: string): Promise<any> { return JSON.parse(await fs.readFile(path.resolve(filename), 'utf8')); }
+async function jsonFile(filename: string): Promise<any> {
+  const text = await fs.readFile(path.resolve(filename), 'utf8');
+  return JSON.parse(text.replace(/^\uFEFF/, ''));
+}
 const print = (value: unknown) => process.stdout.write(JSON.stringify(value, null, 2) + '\n');
 const event = (value: unknown) => process.stdout.write(JSON.stringify(value) + '\n');
 
