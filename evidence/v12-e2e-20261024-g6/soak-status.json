@@ -1,0 +1,31 @@
+{
+  "maxWalBytes": 4235392,
+  "recordedAt": "2026-10-27T13:44:08.6729660Z",
+  "productionTouched": false,
+  "secondLeaseDenied": true,
+  "maxHandles": 1065,
+  "completed": 81395,
+  "maxRssBytes": 148942848,
+  "restarts": 24,
+  "schemaVersion": 1,
+  "errors": [],
+  "limits": [
+    "No production auth/reconnect traffic; full S7 comparative production workload gate remains separate.",
+    "A short self-test cannot establish the 24-hour release gate."
+  ],
+  "receiptPath": "E:/test/mcp-device-v12-e2e-20261024-g6/pi-g6-2080-20261026/soak-24h-20261026T1342/receipt.json",
+  "latencySummaryMs": {
+    "p50": 8.712799996137619,
+    "p95": 14.827500000596046,
+    "p99": 19.77130000293255
+  },
+  "appends": 1414,
+  "startedAt": "2026-10-26T13:42:27.336Z",
+  "endedAt": "2026-10-27T13:43:27.946Z",
+  "status": "PASS_DURATION_AND_ISOLATED_CHECKS",
+  "integrity": {
+    "integrity_check": "ok"
+  },
+  "cliReads": 5658,
+  "elapsedSeconds": 86460.608
+}
