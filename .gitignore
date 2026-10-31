@@ -65,3 +65,17 @@ test_search.js
 
 # Portable LAN ZIP runtime
 runtime/
+
+# Local agent scratch and generated v12 review transport (not acceptance receipts)
+/.tmp/
+/nul
+/evidence/v12-e2e-20261024-g6/D0-review-bundle.zip
+/evidence/v12-e2e-20261024-g6/D1-source-pack.txt
+/evidence/v12-e2e-20261024-g6/D1-transfer/
+/evidence/v12-e2e-20261024-g6/D1-review-current/untracked/
+/evidence/v12-e2e-20261024-g6/D1-bridge-checkpoint-20261029/packet/source-*.txt
+/evidence/v12-e2e-20261024-g6/D1-bridge-checkpoint-20261029/packet/evidence-content.txt
+/evidence/v12-e2e-20261024-g6/**/*.patch
+/evidence/v12-e2e-20261024-g6/before-*
+/evidence/v12-e2e-20261024-g6/branding-before.js
+/evidence/v12-e2e-20261024-g6/cli-live-final.jsonl

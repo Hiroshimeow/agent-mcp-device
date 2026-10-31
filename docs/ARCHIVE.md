@@ -30,4 +30,16 @@ Prior G6 backups at `E:\git-project\_mcp-consolidation-20261010\` include 168 ra
 **2026-10-11 evidence cleanup:** copied/verified **all 227 accepted evidence files** (4,923,239 bytes) into `E:\git-project\_mcp-consolidation-20261011\device-evidence\files\` with `manifest.json` and per-file SHA-256. Retired **166 raw `.log`, `.tap`, `.txt`, `.jsonl`, `.sha256`, `.patch`, `.diff` and completed v1.0.10 evidence files** (4,285,080 bytes) from Git HEAD; **61 Context `.md`/fixture reports** (638,159 bytes) remain, including `evidence/context/decisions.md` required by tests. Original tracked content is also recoverable from Git SHA `8f3794a`. Do not publish private raw logs or delete the external evidence archive before retention review.
 This cleanup uses `E:\git-project\_mcp-consolidation-20261011\` for reviewed G6 Gateway old plan/log/config sidecars with SHA-256 receipts. Contains local data that must **not** be pushed to public GitHub.
 
+## V12 generated review transport cleanup (2026-10-31)
+
+Authorized by the owner's cleanup option B and instruction to perform the remaining work sequentially without subagents. A separate cleanup commit untracks 64 generated files (7.78 MiB): review ZIP/source bundles, transfer chunks, copied source/test/spec trees, patch snapshots, before-edit copies and the raw CLI transcript under `evidence/v12-e2e-20261024-g6/`. `.gitignore` prevents accidental re-addition and excludes local `.tmp/` and the stray root `nul` artifact.
+
+These files remain on disk; this is not a deletion or history rewrite. Original tracked bytes are recoverable from commit `0ad01ba82e28a7e394e4e9410b04e7d12c424c01`, for example:
+
+```text
+git show 0ad01ba82e28a7e394e4e9410b04e7d12c424c01:evidence/v12-e2e-20261024-g6/D1-source-pack.txt
+```
+
+Verdicts, handoffs, receipts, hash manifests, structured test results, active specs, `evidence/context`, and executable benchmark/test sources remain tracked. Links from historical manifests to untracked transport files require the retained local checkout or the historical commit above; they are not promises that every payload is present in a fresh checkout. Local preservation verification is recorded in `.tmp/cleanup-b-preservation.json` with a per-file SHA-256. No runtime operation, test acceptance, release approval, registry publication or rollout is implied.
+
 This document does not grant permission to delete auth/identity state, protected execution artifacts or production-linked config just because a filename is under `logs/`.
