@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-24T15:06:09Z",
+  "host": "G8",
+  "method": "md read-only commands; no configuration, process or package changes",
+  "repository": "/home/ayumi/Workspace/git_project/agent-mcp-device-v12",
+  "head": "1e454c1cdcbe3265892f751034fa389432d65405",
+  "gitStatusAt145135Z": "clean",
+  "pm2": {"name":"mcp-device-v12-8102","pid":333369,"status":"online","restarts":0,"uptimeEpochMs":1792673435461},
+  "listeners": [{"host":"127.0.0.1","port":8101,"pid":333369,"anonymousMcpStatus":401},{"host":"127.0.0.1","port":8102,"pid":333369,"anonymousMcpStatus":401}],
+  "runtimeNodeExecutable": "/home/ayumi/.nvm/versions/node/v22.22.1/bin/node",
+  "runtimeNodeVersion": "v22.22.1",
+  "interactiveNodeVersion": "v24.18.0",
+  "publicHealth": {"ok":true,"enableFilesystem":true,"enableShell":true,"skills":{"status":"healthy","count":34,"version":"sha256:82e437bacf485444e73d0b488bc42ecce3a0ade49a788c1d8f64b554beaff727"}},
+  "oauth": {"issuer":"https://device.hcu-lab.me/","authorizationEndpoint":"https://device.hcu-lab.me/authorize","tokenEndpoint":"https://device.hcu-lab.me/token","codeChallengeMethods":["S256"]},
+  "deploymentPerformed": false,
+  "productionRollbackVerified": false
+}

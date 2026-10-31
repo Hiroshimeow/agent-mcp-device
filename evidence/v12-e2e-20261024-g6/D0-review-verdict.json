@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-24T12:27:27.776Z",
+  "gate": "D0",
+  "verdict": "PASS",
+  "consensus": "NO_MATERIAL_D0_DISAGREEMENT",
+  "releaseVerdict": "RELEASE_BLOCKED_WITH_EVIDENCE",
+  "reviewer": {
+    "host": "FJP",
+    "worker": "m365.cmd",
+    "requestedModel": "opus",
+    "verifiedModelLabel": "Opus 5.5",
+    "conversationId": "a39299d6-2bc1-486f-9d62-2f972057cae3"
+  },
+  "turns": [
+    "2e4a9646-m365-worker-20261024-204724-e130ec0b",
+    "2e4a9646-m365-worker-20261024-205806-2ae0d903",
+    "2e4a9646-m365-worker-20261024-210240-c810909d",
+    "2e4a9646-m365-worker-20261024-211244-cd24b7d4",
+    "2e4a9646-m365-worker-20261024-212145-e2a2b3ec",
+    "2e4a9646-m365-worker-20261024-212628-17acf0e4"
+  ],
+  "implementationBlockers": [
+    "skill-lifecycle",
+    "runtime-aware-cli",
+    "default-runtime-root",
+    "wrong-schema-no-mutation",
+    "shared-search-pipeline",
+    "cooperative-cancel",
+    "registry-lock-race",
+    "plugin-provenance",
+    "bundled-upgrade-path",
+    "standalone-license-closure-manifest",
+    "same-prefix-bin-collision-policy",
+    "skill-wording"
+  ],
+  "laterGates": [
+    "real-agent",
+    "validation-runner",
+    "provider-token-ab",
+    "full-parity",
+    "24h-soak",
+    "rollback",
+    "g8",
+    "fleet"
+  ]
+}

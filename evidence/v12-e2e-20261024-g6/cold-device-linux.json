@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "label": "cold-device-linux",
+  "cwd": "E:/git-project/agent-mcp-device-v12",
+  "command": "wsl.exe",
+  "args": [
+    "-d",
+    "Ubuntu-22.04",
+    "--exec",
+    "/usr/bin/node",
+    "/mnt/e/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/cold-install.mjs",
+    "mcp-device",
+    "/mnt/e/test/mcp-device-v12-e2e-20261024-g6/artifacts/hcu-lab.me-mcp-device-1.0.12.tgz",
+    "/tmp/mcp-device-v12-e2e-20261024-g6/cold-device",
+    "/mnt/e/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6"
+  ],
+  "startedAt": "2026-10-24T10:58:06.238Z",
+  "endedAt": "2026-10-24T10:59:05.781Z",
+  "durationMs": 59540.6561,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 0,
+  "signal": null,
+  "counts": {},
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\cold-device-linux.stdout.log",
+    "sha256": "bcb0be7c0b6b3c6289504b2713d50782a0d869597ee188d069f7a9c3e37cd9f6"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\cold-device-linux.stderr.log",
+    "sha256": "b5f8505ed4a6efadbc4506d0bfb5af194212d2ac9c697082593609a225fca333"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-25T08:23:29.468Z",
+  "status": "PASS_BYTE_IDENTITY_BRIDGE",
+  "priorRealAgentEvidence": "completion-real-agent-discovery-2.json",
+  "currentArtifactDeviceSha256": "cd20147d602e9b498d6a76e6847263908940f6ded04ef04ceb74b1b402ac1970",
+  "files": [
+    {
+      "path": "skills/palace-cli/SKILL.md",
+      "priorSha256": "3910c44e9cb76998397428a14ffd0b968b176626be938666669dd074bfeb219e",
+      "currentSha256": "3910c44e9cb76998397428a14ffd0b968b176626be938666669dd074bfeb219e"
+    },
+    {
+      "path": "skills/palace-cli/agents/openai.yaml",
+      "priorSha256": "22b24f98d8f91f3f72462b6cb576f3651fb512cad7d9eabf36f23a075b370b6f",
+      "currentSha256": "22b24f98d8f91f3f72462b6cb576f3651fb512cad7d9eabf36f23a075b370b6f"
+    }
+  ],
+  "note": "The prior real Pi agent discovery/invocation consumed byte-identical Skill payload. Current package installation/discovery is separately proven owned-pristine on Windows/Linux."
+}

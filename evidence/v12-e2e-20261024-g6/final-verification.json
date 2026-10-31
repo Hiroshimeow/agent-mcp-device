@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-10-24T11:36:23.267Z",
+  "status": "PASS_EVIDENCE_CONSISTENCY_ONLY",
+  "releaseVerdict": "RELEASE_BLOCKED_WITH_EVIDENCE",
+  "sourceManifestVerified": "6876ad09877e2facd2a71eb66256862980ba0fd5c28fd4bc98bb849612174e26",
+  "artifactManifestVerified": "58e8f644b11cdab96d6579b63ac08cdd2cf5fe92060edac137584ad590939e59",
+  "artifactHashes": [
+    {
+      "product": "mcp-device",
+      "sha256": "e494d7be162390b1aaf2359112e103b1cbcad13885c71b21c9a5b948c3d8343b"
+    },
+    {
+      "product": "palace",
+      "sha256": "db27ab6c60cbb14eb65ffd25424ed9bd867868061c332dba0d1353b9590133a6"
+    }
+  ],
+  "runtimeLogHashesVerified": true,
+  "liveRawLines": 1000,
+  "reviewBundleHash": "27fc890a1ac319f8c2cec0f610239fd56fb05212b89ef7068ee928b382273b45",
+  "reviewBundleRoundtripVerified": true,
+  "patchApplyCheck": "PASS",
+  "unexpectedSourceChanges": [],
+  "head": "1e454c1cdcbe3265892f751034fa389432d65405",
+  "externalReview": false,
+  "publication": false,
+  "deployment": false,
+  "activeSoak": false
+}

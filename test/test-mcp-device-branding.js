@@ -13,11 +13,14 @@ assert.match(versionSource, new RegExp(`VERSION = ['\"]${pkg.version.replace(/\\
 assert.equal(pkg.author, 'Hirohimeow');
 assert.equal(pkg.bin?.['mcp-device'], 'dist/mcp-device.js');
 assert.equal(pkg.bin?.md, 'dist/mcp-device.js');
-assert.deepEqual(Object.keys(pkg.bin || {}).sort(), ['mcp-device', 'md']);
+assert.equal(pkg.bin?.palace, 'dist/plugins/palace/cli.js');
+assert.deepEqual(Object.keys(pkg.bin || {}).sort(), ['mcp-device', 'md', 'palace']);
 assert.equal(pkg.mcpName, undefined);
 assert.equal(pkg.repository?.url, 'git+https://github.com/Hiroshimeow/agent-mcp-device.git');
-assert.deepEqual(pkg.files, ['dist', 'config/revoked-approvals.json', 'skills/mcp-device-context'],
-  'published package includes only runtime, approval revocations and the local context skill; no upstream marketing assets');
+assert.deepEqual(pkg.files, [
+  'dist', 'config/revoked-approvals.json', 'skills/mcp-device-context', 'skills/palace-cli',
+  'control-plane/scripts', 'control-plane/config', 'control-plane/contracts', 'scripts/v12/install-palace-skill.cjs'
+], 'v12 ships the runtime, control plane, local skills and the owned Palace Skill installer; no upstream marketing assets');
 for (const name of ['release:dry', 'release:mcp', 'release:alpha', 'release:skip-mcp', 'build:mcpb', 'validate:tools', 'open-chat', 'setup', 'setup:debug', 'remove']) {
   assert.equal(pkg.scripts?.[name], undefined, `upstream product script ${name} must not remain in MCP Device`);
 }
@@ -27,7 +30,8 @@ assert.equal(pkg.scripts?.['release:major'], 'node scripts/release.js major');
 assert.equal(pkg.scripts?.version, 'node scripts/sync-version.js && git add src/version.ts package-lock.json');
 assert.equal(pkg.scripts?.start, 'node dist/mcp-device.js');
 assert.equal(pkg.scripts?.['start:debug'], 'node --inspect-brk=9229 dist/mcp-device.js');
-assert.equal(pkg.scripts?.postinstall, undefined, 'MCP Device must not run install-time telemetry');
+assert.equal(pkg.scripts?.postinstall, 'node scripts/v12/install-palace-skill.cjs',
+  'v12 installs its Palace Skill through the explicit local installer; install-time telemetry remains absent');
 assert.equal(fs.existsSync(new URL('../scripts/release.js', import.meta.url)), true);
 assert.equal(fs.existsSync(new URL('../scripts/publish-release.cjs', import.meta.url)), false);
 assert.equal(fs.existsSync(new URL('../scripts/build-mcpb.cjs', import.meta.url)), false);
@@ -45,7 +49,9 @@ assert.equal(fs.existsSync(new URL('../PUBLISH.md', import.meta.url)), false);
 
 const readme = fs.readFileSync(new URL('../README.md', import.meta.url), 'utf8');
 assert.match(readme, /^# MCP Device/m);
-assert.match(readme, /The gateway owns accounts, OAuth, device ownership, MCP tool contracts, routing, and usage aggregation\. MCP Device owns local device identity, pairing, reconnect lifecycle, bounded execution, background registration, and local status\./);
+assert.match(readme, /MCP Device provides local identity, pairing, reconnect, bounded execution, background registration and status\./);
+assert.match(readme, /`mcp-device server` also runs the account\/OAuth control plane/);
+assert.match(readme, /`mcp-device start` keeps the existing Device-only behavior\./);
 assert.match(readme, /npm install -g @hcu-lab\.me\/mcp-device@1\.0\.10/);
 for (const command of ['login', 'logout', 'status', 'install', 'stop', 'uninstall']) {
   assert.match(readme, new RegExp(`mcp-device ${command}\\b`));
@@ -58,7 +64,7 @@ assert.match(wrapper, /splice\(2,\s*0,\s*['\"]remote['\"]\)/);
 
 const helpHome = fs.mkdtempSync(path.join(os.tmpdir(), 'mcp-device-help-'));
 try {
-  const result = spawnSync(process.execPath, ['dist/mcp-device.js', '--help'], {
+  const result = spawnSync(process.execPath, ['dist/mcp-device.js', 'device', '--help'], {
     cwd: new URL('..', import.meta.url),
     encoding: 'utf8',
     timeout: process.platform === 'win32' ? 20000 : 5000,
@@ -75,6 +81,19 @@ try {
   assert.match(output, /Usage:\s+mcp-device/);
   assert.match(output, /Commands:\s+start, login, logout, status, install, stop, uninstall/);
   assert.doesNotMatch(output, /\brun\b|autostart|Starting MCP Device/i);
+  const platformHelp = spawnSync(process.execPath, ['dist/mcp-device.js', '--help'], {
+    cwd: new URL('..', import.meta.url),
+    encoding: 'utf8',
+    timeout: process.platform === 'win32' ? 20000 : 5000,
+    env: { ...process.env, HOME: helpHome, USERPROFILE: helpHome, MCP_GATEWAY_URL: '' }
+  });
+  assert.equal(platformHelp.error, undefined, platformHelp.error?.message);
+  assert.equal(platformHelp.status, 0, platformHelp.stderr);
+  assert.equal(platformHelp.stdout.split(/\r?\n/)[0], 'MCP Device ' + pkg.version);
+  for (const command of ['start', 'device', 'server', 'admin', 'plugins', 'state']) {
+    assert.match(platformHelp.stdout, new RegExp('mcp-device ' + command + '\\b'));
+  }
+  assert.doesNotMatch(platformHelp.stdout, /Starting MCP Device/);
 } finally {
   fs.rmSync(helpHome, { recursive: true, force: true });
 }

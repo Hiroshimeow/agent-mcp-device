@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "label": "linux-stage",
+  "cwd": "E:/git-project/agent-mcp-device-v12",
+  "command": "wsl.exe",
+  "args": [
+    "-d",
+    "Ubuntu-22.04",
+    "--exec",
+    "/usr/bin/node",
+    "/mnt/e/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/stage-linux.mjs"
+  ],
+  "startedAt": "2026-10-24T11:01:08.344Z",
+  "endedAt": "2026-10-24T11:01:21.156Z",
+  "durationMs": 12809.942000000001,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 1,
+  "signal": null,
+  "counts": {},
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\linux-stage.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\linux-stage.stderr.log",
+    "sha256": "e20142b93a342267950d132252fbcf9434abe8a9f998c3b1a34ab4d078b42d7a"
+  }
+}

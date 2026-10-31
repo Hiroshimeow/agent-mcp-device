@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "label": "finalize-report",
+  "cwd": "E:/git-project/agent-mcp-device-v12",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "evidence/v12-e2e-20261024-g6/finalize-report.cjs"
+  ],
+  "startedAt": "2026-10-24T11:33:52.215Z",
+  "endedAt": "2026-10-24T11:33:52.372Z",
+  "durationMs": 154.9808,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 0,
+  "signal": null,
+  "counts": {},
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\finalize-report.stdout.log",
+    "sha256": "1d526cec789486b4c6292c1baa35ea8310daf8036eab7bfa6ab7e72d18d74796"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\finalize-report.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

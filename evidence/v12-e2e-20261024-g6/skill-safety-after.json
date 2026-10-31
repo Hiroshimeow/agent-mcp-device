@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "label": "skill-safety-after",
+  "cwd": "E:/git-project/agent-mcp-device-v12",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "--test",
+    "evidence/v12-e2e-20261024-g6/skill-safety-probes.mjs"
+  ],
+  "startedAt": "2026-10-24T10:49:14.404Z",
+  "endedAt": "2026-10-24T10:49:15.328Z",
+  "durationMs": 921.7071,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 1,
+  "signal": null,
+  "counts": {
+    "tests": 2,
+    "pass": 1,
+    "fail": 1,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\skill-safety-after.stdout.log",
+    "sha256": "000bba32813f82e0af9c449bdfc4b40fb9eaab84941064b15974bd292e37f987"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\skill-safety-after.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

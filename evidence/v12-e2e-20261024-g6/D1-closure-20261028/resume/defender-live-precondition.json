@@ -1,0 +1,16 @@
+{
+  "available": true,
+  "settings": {
+    "AntivirusEnabled": true,
+    "RealTimeProtectionEnabled": true,
+    "AMProductVersion": "4.18.26090.9",
+    "AntivirusSignatureVersion": "1.461.224.0",
+    "DisableRealtimeMonitoring": false,
+    "ExclusionPath": [
+      "N/A: Must be an administrator to view exclusions"
+    ],
+    "ExclusionProcess": [
+      "N/A: Must be an administrator to view exclusions"
+    ]
+  }
+}

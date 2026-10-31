@@ -4,6 +4,7 @@ import os from 'node:os';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawn } from 'node:child_process';
 import { CapabilityError, type PluginManifest } from './plugin-contract.js';
+import { resolveRuntimeRoot } from './runtime-root.js';
 
 const packageRoot = fileURLToPath(new URL('../../', import.meta.url));
 const usage = `MCP Device 1.0.12
@@ -12,6 +13,9 @@ const usage = `MCP Device 1.0.12
   mcp-device server [--runtime-dir DIR] [--host HOST] [--port PORT] [--loopback-port PORT] [--public-url URL] [--skill-root DIR] [--allow-http-lan] [--legacy-knowledge-mcp]
   mcp-device admin [--runtime-dir DIR] account|invite ...
   mcp-device plugins [--runtime-dir DIR] list|install|enable|disable|uninstall|purge|upgrade|configure ...
+  mcp-device plugins install palace --bundled --enable  Reinstall bundled Palace after an uninstall
+  mcp-device plugins upgrade palace --bundled  Upgrade the bundled Palace contract safely
+  mcp-device plugins repair-lock              Recover a proved-abandoned/incomplete registry lock
   mcp-device knowledge [--runtime-dir DIR] search|list|read|ingest|learn|correct|skills [JSON]
   mcp-device state backup|verify|restore|migrate [--source DIR] [--backup DIR] [--target DIR]
   mcp-device context ...                   Existing local Context commands
@@ -27,7 +31,7 @@ interface Parsed { values: Record<string, string[]>; flags: Set<string>; positio
 function parse(argv: string[]): Parsed {
   const values: Record<string, string[]> = {}, flags = new Set<string>(), positional: string[] = [];
   const valued = new Set(['runtime-dir', 'host', 'port', 'loopback-port', 'public-url', 'skill-root', 'project-root', 'source-root', 'config', 'source', 'backup', 'target', 'device-root', 'gateway-root']);
-  const switches = new Set(['help', 'enable', 'apply', 'json', 'allow-http-lan', 'legacy-knowledge-mcp']);
+  const switches = new Set(['help', 'enable', 'bundled', 'apply', 'json', 'allow-http-lan', 'legacy-knowledge-mcp']);
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === '--') { positional.push(...argv.slice(i + 1)); break; }
@@ -58,21 +62,31 @@ const event = (value: unknown) => process.stdout.write(JSON.stringify(value) + '
 
 async function pluginCli(args: Parsed): Promise<void> {
   const { PluginHost } = await import('./plugin-host.js');
-  const root = stateRoot(args), [action = 'list', target, extra] = args.positional;
+  const root = await resolveRuntimeRoot(one(args, 'runtime-dir')), [action = 'list', target, extra] = args.positional;
   const host = new PluginHost({ stateRoot: root, deviceId: 'local-plugin-management' });
   let release: (() => Promise<void>) | undefined;
   await host.load();
   try {
     if (action === 'list') { print({ runtime_dir: root, plugins: host.list(), diagnostics: host.diagnostics() }); return; }
+    if (action === 'repair-lock') { print({runtime_dir:root,...await host.repairRegistryLock()}); return; }
     if (!target) throw new CapabilityError('INVALID_ARGUMENT', 'Plugin id or manifest file is required');
     if (action === 'install' || action === 'upgrade') {
-      const manifest = await jsonFile(target) as PluginManifest;
-      manifest.entry = path.resolve(path.dirname(path.resolve(target)), manifest.entry);
-      if (action === 'install') await host.install(manifest, { enabled: args.flags.has('enable') });
+      let manifest: PluginManifest;
+      if(args.flags.has('bundled')){
+        const { bundledPluginManifests }=await import('../distribution.js');
+        const bundled=bundledPluginManifests().find(item=>item.id===target);
+        if(!bundled)throw new CapabilityError('PLUGIN_NOT_FOUND','Unknown bundled plugin: '+target);
+        manifest=bundled;
+      }else{
+        manifest=await jsonFile(target) as PluginManifest;
+        manifest.entry=path.resolve(path.dirname(path.resolve(target)),manifest.entry);
+      }
+      if (action === 'install') await host.install(manifest, { enabled: args.flags.has('enable'), installationSource: args.flags.has('bundled')?'distribution':'manual' });
       else {
         // Migration must not race a running provider in a different process.
         const { acquireServerLease } = await import('./runtime-lease.js');
-        release = await acquireServerLease(root); await host.upgrade(manifest);
+        release = await acquireServerLease(root);
+        await host.upgrade(manifest,{installationSource:args.flags.has('bundled')?'distribution':'manual'});
       }
     } else if (action === 'configure') {
       if (!extra) throw new CapabilityError('INVALID_ARGUMENT', 'configure requires a settings JSON file');
@@ -92,7 +106,7 @@ async function pluginCli(args: Parsed): Promise<void> {
 }
 
 async function knowledgeCli(args: Parsed): Promise<void> {
-  const root = stateRoot(args), [action = 'search', payload = '{}'] = args.positional;
+  const root = await resolveRuntimeRoot(one(args, 'runtime-dir')), [action = 'search', payload = '{}'] = args.positional;
   if (!['search', 'list', 'read', 'ingest', 'learn', 'correct', 'skills'].includes(action)) throw new CapabilityError('INVALID_ARGUMENT', 'Unknown knowledge action');
   const input = payload.startsWith('@') ? await jsonFile(payload.slice(1)) : JSON.parse(payload);
   const { acquireServerLease } = await import('./runtime-lease.js');

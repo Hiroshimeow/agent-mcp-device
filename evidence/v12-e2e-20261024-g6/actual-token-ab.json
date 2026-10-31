@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 2,
+  "status": "FAIL",
+  "savingsVerdict": "NOT_PROVEN",
+  "recordedAt": "2026-10-26T14:06:23.747Z",
+  "pairedTasks": 24,
+  "validTelemetryPairs": 23,
+  "artifacts": {
+    "device": {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\final-current\\hcu-lab.me-mcp-device-1.0.12.tgz",
+      "sha256": "bf575c83646dfd98ad09ffad2cfab6324d085f17544793ce8301f67a39053cdf"
+    },
+    "palace": {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\final-current\\hcu-lab.me-palace-1.0.12.tgz",
+      "sha256": "60a9054a2e5e3b6917d26903b18046921319a299778595891430b5f88f5176b1"
+    }
+  },
+  "correctness": {
+    "control": 21,
+    "treatment": 22,
+    "difference": 1,
+    "criticalRegressions": [],
+    "unsupportedProcedureUse": []
+  },
+  "tokens": {
+    "medianControl": 181124,
+    "medianTreatment": 231385,
+    "medianReductionTokens": -50261,
+    "medianReductionPercent": -27.749497581767184,
+    "medianPairedDelta": -36284,
+    "pairedDeltaBootstrap95": [
+      -90988,
+      -8169
+    ],
+    "medianRelativeReductionPercent": -20.119838559453584,
+    "uncachedPlusOutputMedianControl": 29056,
+    "uncachedPlusOutputMedianTreatment": 27809
+  },
+  "latency": {
+    "controlP50Ms": 69167.41940000001,
+    "treatmentP50Ms": 85085.35319999978,
+    "controlP95Ms": 92219.29550000001,
+    "treatmentP95Ms": 134637.49899999984
+  },
+  "billedCost": null,
+  "rawEvidence": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final",
+  "audit": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\pi-g6-2080-20261026\\benchmark-audit.json",
+  "newArtifactMeasurement": "NOT_RUN",
+  "reason": "One no-usage capacity-failed control; even valid pairs use more total treatment tokens; no selected retries or threshold relaxation."
+}

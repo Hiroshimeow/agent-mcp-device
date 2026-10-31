@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "label": "release-contracts-green",
+  "cwd": "E:/test/mcp-device-v12-e2e-20261024-g6/candidate-three",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "--test",
+    "--test-concurrency=1",
+    "test/test-canonical-release-cleanup.js",
+    "test/test-mcp-device-branding.js",
+    "test/test-version-consistency.js"
+  ],
+  "startedAt": "2026-10-24T11:08:01.005Z",
+  "endedAt": "2026-10-24T11:08:01.710Z",
+  "durationMs": 702.9436999999999,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 1,
+  "signal": null,
+  "counts": {
+    "tests": 3,
+    "pass": 2,
+    "fail": 1,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\release-contracts-green.stdout.log",
+    "sha256": "a5c3a0e6e0e41e466ba930adeee9139b97d1f22cc848d40cff06ad4c39b3b984"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\release-contracts-green.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

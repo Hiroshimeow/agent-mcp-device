@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "label": "skill-preservation-red",
+  "cwd": "E:/test/mcp-device-v12-e2e-20261024-g6/baseline",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "--test",
+    "test/v12/palace-skill-preservation.test.mjs"
+  ],
+  "startedAt": "2026-10-24T10:50:00.895Z",
+  "endedAt": "2026-10-24T10:50:01.788Z",
+  "durationMs": 889.4789000000001,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 1,
+  "signal": null,
+  "counts": {
+    "tests": 3,
+    "pass": 1,
+    "fail": 2,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\skill-preservation-red.stdout.log",
+    "sha256": "0c23a548851aa0c1a101879d30f0550f53f5ce258d2eccd9d6fdeda1ffe53d82"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\skill-preservation-red.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

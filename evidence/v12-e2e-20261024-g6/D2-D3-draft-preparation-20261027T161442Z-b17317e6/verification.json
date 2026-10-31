@@ -1,0 +1,11 @@
+{
+  "status": "PASS_PACKET_INTEGRITY_ONLY",
+  "packetStatus": "NOT_READY_FOR_SUBMISSION",
+  "checkedAt": "2026-10-27T23:51:50.4174814Z",
+  "checks": 619,
+  "indexedInputFiles": 94,
+  "historicalProviderEventFiles": 48,
+  "packetPayloadFiles": 11,
+  "packetManifestSha256": "fb2bcba8782a03674e1ba36250de6f55fe3a8032ea22dec076e4fd5f78ed1812",
+  "limitations": "File/hash/link/declared-state consistency only. No builds/tests/workloads, raw telemetry recomputation, current source freeze, independent review, privacy clearance or acceptance. verification.json is excluded from self-hashing; rerun this read-only verifier for fresh evidence."
+}

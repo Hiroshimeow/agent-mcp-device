@@ -92,9 +92,12 @@ await fs.writeFile(guardFile, [
     "import os from 'node:os';",
     "if (process.env.DEVICE_PARITY_HOME) os.homedir = () => process.env.DEVICE_PARITY_HOME;",
     "import { syncBuiltinESMExports } from 'node:module';",
-    "const denied = () => { throw Object.assign(new Error('PARITY_PORT_FREE_GUARD: socket operation is outside this fixture group'), { code: 'PARITY_PORT_FREE_GUARD' }); };",
-    'net.Server.prototype.listen = denied;',
-    'net.Socket.prototype.connect = denied;',
+    "const denied = () => { throw Object.assign(new Error('PARITY_PORT_FREE_GUARD: TCP socket operation is outside this fixture group'), { code: 'PARITY_PORT_FREE_GUARD' }); };",
+    'const listen = net.Server.prototype.listen;',
+    'const connect = net.Socket.prototype.connect;',
+    "const tcp = value => typeof value === 'number' || (Array.isArray(value) && value.some(tcp)) || Boolean(value && typeof value === 'object' && ('port' in value || typeof value.host === 'string'));",
+    'net.Server.prototype.listen = function(...args) { if (tcp(args[0])) return denied(); return listen.apply(this, args); };',
+    'net.Socket.prototype.connect = function(...args) { if (tcp(args[0])) return denied(); return connect.apply(this, args); };',
     'syncBuiltinESMExports();',
     ''
 ].join('\n'));
@@ -114,14 +117,19 @@ async function stage(target, label) {
         recursive: true,
         filter: source => !source.split(path.sep).some(piece => ['test_output', 'node_modules'].includes(piece))
     });
-    await fs.copyFile(path.join(target, 'package.json'), path.join(root, 'package.json'));
+    for (const name of ['package.json', 'package-lock.json']) {
+        try { await fs.copyFile(path.join(target, name), path.join(root, name)); }
+        catch (error) { if (error.code !== 'ENOENT') throw error; }
+    }
     // Resolve installed-relative fixtures against their isolated installation;
     // symlinking dist would resolve authorization's config path back to source.
-    for (const name of ['dist', 'config']) {
+    // Scripts are copied as well: direct-entry guards compare process.argv[1]
+    // with import.meta.url and intentionally do not execute through a symlink.
+    for (const name of ['dist', 'config', 'scripts', '.github']) {
         try { await fs.cp(path.join(target, name), path.join(root, name), { recursive: true }); }
         catch (error) { if (error.code !== 'ENOENT') throw error; }
     }
-    for (const name of ['node_modules', 'src', 'scripts', 'specs']) {
+    for (const name of ['node_modules', 'src', 'specs']) {
         const source = name === 'node_modules' ? dependencyRoots[label] : path.join(target, name);
         try { await fs.access(source); await linkDirectory(source, path.join(root, name)); }
         catch (error) { if (error.code !== 'ENOENT') throw error; }

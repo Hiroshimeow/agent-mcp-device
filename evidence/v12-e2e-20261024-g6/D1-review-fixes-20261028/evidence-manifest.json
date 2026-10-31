@@ -1,0 +1,154 @@
+[
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/changed-files.json",
+    "bytes": 1079,
+    "sha256": "621252110cee0edcf12e3a34093298b855a704c85e2f84c0ec3959a34e7e352a"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/HANDOFF.md",
+    "bytes": 9026,
+    "sha256": "2182c48ef32451f0407a4176dfd61c4d47dab9c113299cf0db91a71ca4781eda"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/logs/diff-check-final.log",
+    "bytes": 2055,
+    "sha256": "f2ffe2c9b35a5b82612b87f751942b4e4c75e1e6c4b64d9cb05bf16e6756f1bb"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/logs/diff-check.log",
+    "bytes": 2055,
+    "sha256": "f2ffe2c9b35a5b82612b87f751942b4e4c75e1e6c4b64d9cb05bf16e6756f1bb"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/logs/focused-final.log",
+    "bytes": 3863,
+    "sha256": "0937e380209bfc7a8c1068d890f8ca5ce8e771508d330a08c9d18ce012b53184"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/logs/git-after.txt",
+    "bytes": 143990,
+    "sha256": "a2ad5bb189475fabd0b07a117a96659cb4d30c352a8df5a34d64b75032735031"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/logs/git-before.txt",
+    "bytes": 14572,
+    "sha256": "253565c494328c6b27997fd6a36e1e6f5b404ae82652cff457356abff739b897"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/logs/git-ignored-after.txt",
+    "bytes": 36280,
+    "sha256": "4448aaa387acd4513cc5686ef03b802e314865dbe566a94c5206d9b90acf047b"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/logs/git-ignored-before.txt",
+    "bytes": 35624,
+    "sha256": "b00ea5dbd55bc3d7328d9ca7b4dd0ef634ca5533c689c5ed3892997e4da921ba"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/logs/green.log",
+    "bytes": 1006,
+    "sha256": "c49c01e46bc17a55005026b675a94af95cb90a1efe7473612e744224ff070e78"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/logs/head-provenance.txt",
+    "bytes": 314,
+    "sha256": "ff877667949cb8f8ee8fba48ca2a84e8601e9d1b9a8a111b738fb8b8eda4f7c9"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/logs/package.json",
+    "bytes": 5872,
+    "sha256": "2d88f02d0f0b94fd032e2708a8d71185c4a21acca0bef2621fa0e9e9709a61a1"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/logs/process-before.json",
+    "bytes": 198475,
+    "sha256": "3aa82b2539b629222345db63a5d3eb1018de0745c57683438c26a117ed9a4209"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/logs/process-cwd.json",
+    "bytes": 425,
+    "sha256": "78992213b51a341b5c95f497bceaf07a31d6788eb2dd2ae9b0b6ecb06014d163"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/logs/read-functional-final.log",
+    "bytes": 14482,
+    "sha256": "116078a676a25b6eb985e6f85477e03ec86f8b9830f8e0ce7761bfa648879505"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/logs/red-foreign-prefix.log",
+    "bytes": 1614,
+    "sha256": "87086edb4135879e4849f137dba870b80727374f0c9c0a78fbc4c95976dea61e"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/logs/red.log",
+    "bytes": 3575,
+    "sha256": "cb9b739bd61ef9b88e6b9d366945961b86d17dd72c17698f5f81adcbd22474f7"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/logs/tsc-final.log",
+    "bytes": 1080,
+    "sha256": "41de0b6a0c2a98abec5ed6701a7ede52d3b7f380925c6a25fb3ac0f8d727637a"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/logs/tsc-green.log",
+    "bytes": 1080,
+    "sha256": "ca24453cb1aa23c49ed37c588ff627f9f1a8f06ce07b74f3fd5d6d9d7a1bb695"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/logs/tsc-red.log",
+    "bytes": 1080,
+    "sha256": "7ed313b298f3196db9b6855fae43ef080229d59466a3ef6994458d48146d0817"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/logs/wip-before.patch",
+    "bytes": 148084,
+    "sha256": "0ef03f9e457e226888134df6ebed6406c361f1a7c34b0cf4fb35a6040a8f24fd"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/receipt.json",
+    "bytes": 1719,
+    "sha256": "fbdf1e010d5f6dac0c4d48b3c4e94734e9c284af6b7c97e4cdd57c87503754c1"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/REVIEW-DISPOSITION.md",
+    "bytes": 10058,
+    "sha256": "730bad85236d47817d3520e800e81a0f9a6d16126957b36c5b71e9f7d0bb0bfa"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/review-extraction.json",
+    "bytes": 630,
+    "sha256": "31c202cab558b376b9def8a1d444fb3d4b78ead7bb1fc33dbebcc111a3b562e9"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/review-response-extracted.md",
+    "bytes": 13882,
+    "sha256": "5043be6f052e26f46448152d3b836b2a819e0173863c4e4019f188999febb794"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/stable-source-manifest.json",
+    "bytes": 40946,
+    "sha256": "ad560cb878bf4a86803ac8b841f44800fddffcddddaab35903f7f7a87e5e0b2e"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/verification-commands.json",
+    "bytes": 3140,
+    "sha256": "754ab14a9dd26e560dcaaaa8007b551f969d302bd522d7f40df6f2c864f548f9"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/writer-source-operations.json",
+    "bytes": 10429,
+    "sha256": "05131a66c937162db340aea72469bff0b90cd680ec99613dfcf584a40d4fd88f"
+  },
+  {
+    "path": "test/v12/d0-architecture-regressions.test.mjs",
+    "bytes": 15130,
+    "sha256": "9e2abe20819edd539ac0f4f1b5798e14d37bb56b0f35dd845f4bfac82594131f",
+    "scope": "historical dependency; not fresh execution"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-closure-20261028/resume/lock-cancel-final.log",
+    "bytes": 1442,
+    "sha256": "0bfcec74665a512f5aeba45630a199b70e02af5379b79fc8a2bedf2da6735b7b",
+    "scope": "historical dependency; not fresh execution"
+  }
+]

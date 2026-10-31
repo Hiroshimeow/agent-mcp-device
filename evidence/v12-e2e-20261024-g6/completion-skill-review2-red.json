@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "label": "skill-review2-red",
+  "startedAt": "2026-10-24T23:57:57.668Z",
+  "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z",
+  "program": "node",
+  "argv": [
+    "--test",
+    "--test-concurrency=1",
+    "test/v12/palace-skill-review2.test.mjs"
+  ],
+  "pid": 50012,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "stdout": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\skill-review2-red.stdout.log",
+  "stderr": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\skill-review2-red.stderr.log",
+  "state": "COMPLETED",
+  "endedAt": "2026-10-24T23:58:04.059Z",
+  "elapsedMs": 6391,
+  "exitCode": 1,
+  "signal": null,
+  "counts": {
+    "tests": 8,
+    "pass": 2,
+    "fail": 6,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "stdoutSha256": "6977505e036a968ca9843bd484dbfb5cbf9ded234e5c37cda81457f1d80a2e07",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

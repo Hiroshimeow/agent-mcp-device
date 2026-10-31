@@ -1,0 +1,26 @@
+{
+  "startedAt": "2026-10-24T11:12:09.992Z",
+  "node": "v22.21.0",
+  "platform": "linux",
+  "base": "/var/tmp/mcp-device-v12-e2e-20261024-g6/final",
+  "steps": [
+    {
+      "label": "final-cold-linux-mcp-device",
+      "exitCode": 0
+    },
+    {
+      "label": "final-cold-linux-palace",
+      "exitCode": 0
+    },
+    {
+      "label": "platform-linux-final",
+      "exitCode": 0
+    },
+    {
+      "label": "server-cold-linux-final",
+      "exitCode": 0
+    }
+  ],
+  "status": "PASS",
+  "endedAt": "2026-10-24T11:15:13.534Z"
+}

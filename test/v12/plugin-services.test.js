@@ -87,7 +87,12 @@ test('undeclared services are denied before a real provider receives a call', as
 });
 
 test('a non-Node JSON-lines sidecar invokes dependencies and callback ids cannot settle ordinary requests', { timeout: 15000 }, async t => {
-  const executable = process.env.DEVICE_PARITY_PYTHON ?? (process.platform === 'win32' ? 'python' : 'python3');
+  let executable=process.env.DEVICE_PARITY_PYTHON;
+  if(!executable&&process.platform==='win32'){
+    const resolved=spawnSync('py',['-3','-c','import sys;print(sys.executable)'],{encoding:'utf8',windowsHide:true});
+    if(resolved.status===0)executable=resolved.stdout.trim();
+  }
+  executable??=process.platform==='win32'?'python':'python3';
   if (spawnSync(executable, ['--version'], { windowsHide: true }).status !== 0) { t.skip('Python executable unavailable'); return; }
   const { host, write, manifest } = await fixture(t);
   const provider = await write('scale', "export const createPlugin=()=>({invoke:(n,i)=>({scaled:i*5})});");
@@ -162,6 +167,16 @@ test('loss of a pinned provider cannot turn a formerly acyclic dependency graph 
   assert.deepEqual(host.capabilities(), []);
   assert.equal(host.list().find(item => item.manifest.id === 'middle').state, 'faulted');
   assert.equal(host.list().find(item => item.manifest.id === 'leaf').state, 'faulted');
-  await assert.rejects(host.enable('middle'), { code: 'CAPABILITY_CYCLE' });
+  // The only fallback is itself faulted after losing its pinned provider.
+  // Sticky fault policy excludes it before graph traversal: retrying middle
+  // must not implicitly resurrect leaf in order to discover the old cycle.
+  await assert.rejects(host.enable('middle'), { code: 'CAPABILITY_DEPENDENCY_MISSING' });
+  assert.equal(host.list().find(item => item.manifest.id === 'leaf').state, 'faulted');
   assert.deepEqual(host.capabilities(), []);
+  await host.enable('root-provider');
+  assert.equal(host.list().find(item => item.manifest.id === 'middle').state, 'faulted');
+  assert.equal(host.list().find(item => item.manifest.id === 'leaf').state, 'faulted');
+  await host.enable('middle');
+  await host.enable('leaf');
+  assert.deepEqual(host.capabilities(), ['graph.x', 'graph.y']);
 });

@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-25T08:23:21.412Z",
+  "artifact": {
+    "device": {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\candidate-20261025\\hcu-lab.me-mcp-device-1.0.12.tgz",
+      "sha256": "cd20147d602e9b498d6a76e6847263908940f6ded04ef04ceb74b1b402ac1970"
+    },
+    "palace": {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\candidate-20261025\\hcu-lab.me-palace-1.0.12.tgz",
+      "sha256": "033df49857fe43f0158446a8afb9e336477a4d4d5014a37c064771b1fa3482dc"
+    }
+  },
+  "windows": {
+    "platform": {
+      "tests": 160,
+      "pass": 160,
+      "fail": 0,
+      "skip": 0
+    },
+    "server": {
+      "tests": 42,
+      "pass": 42,
+      "fail": 0,
+      "skip": 0,
+      "coldPackageRoot": true
+    },
+    "coldInstall": {
+      "deviceVersion": "1.0.12",
+      "palaceVersion": "1.0.12",
+      "deviceLicense": true,
+      "palaceLicense": true,
+      "standaloneHasMcpDeviceDependency": false,
+      "deviceSkill": "owned-pristine",
+      "palaceSkill": "owned-pristine"
+    }
+  },
+  "linuxWslUbuntu2204": {
+    "platform": {
+      "tests": 160,
+      "pass": 160,
+      "fail": 0,
+      "skip": 0
+    },
+    "coldInstall": {
+      "deviceVersion": "1.0.12",
+      "palaceVersion": "1.0.12",
+      "deviceSkill": "owned-pristine",
+      "palaceSkill": "owned-pristine"
+    },
+    "exactArtifactHashesMatched": true
+  },
+  "status": "PASS_CURRENT_ARTIFACT_TESTS"
+}

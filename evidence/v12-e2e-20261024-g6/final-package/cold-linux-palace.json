@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "product": "palace",
+  "startedAt": "2026-10-24T11:13:55.019Z",
+  "host": "DESKTOP-B5E4IUE",
+  "platform": "linux",
+  "node": "v22.21.0",
+  "artifact": "/mnt/e/test/mcp-device-v12-e2e-20261024-g6/artifacts/final/hcu-lab.me-palace-1.0.12.tgz",
+  "artifactSha256": "db27ab6c60cbb14eb65ffd25424ed9bd867868061c332dba0d1353b9590133a6",
+  "work": "/var/tmp/mcp-device-v12-e2e-20261024-g6/final/palace",
+  "checks": [
+    {
+      "name": "npm-install",
+      "passed": true,
+      "args": [
+        "install",
+        "--omit=dev",
+        "--no-audit",
+        "--no-fund",
+        "--save-exact",
+        "/mnt/e/test/mcp-device-v12-e2e-20261024-g6/artifacts/final/hcu-lab.me-palace-1.0.12.tgz"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 1031.2805799999999,
+      "stdout": "/var/tmp/mcp-device-v12-e2e-20261024-g6/final/palace/npm-install.stdout.log",
+      "stdoutSha256": "eb4eb967d2679c5e9b05b9106142995e7fd8dcd0d7bbfb468d63b772361b8cf2",
+      "stderr": "/var/tmp/mcp-device-v12-e2e-20261024-g6/final/palace/npm-install.stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "package-identity",
+      "passed": true
+    },
+    {
+      "name": "no-device-package-dependency",
+      "passed": true
+    },
+    {
+      "name": "palace-bin",
+      "args": [
+        "--help"
+      ],
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "palace [--data-root DIR|--runtime-dir DIR] status|search QUERY|read ID|skills [--project-id ID] [--limit N] [--max-bytes N] [--include-candidates] [--full]\n",
+      "stderr": "(node:2229) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+    },
+    {
+      "name": "actual-installed-cli-help",
+      "passed": true
+    },
+    {
+      "name": "skill-asset",
+      "passed": true
+    },
+    {
+      "name": "palace-bin",
+      "args": [
+        "--data-root",
+        "/var/tmp/mcp-device-v12-e2e-20261024-g6/final/palace/fixture-data",
+        "status"
+      ],
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "{\"ok\":true,\"plugin\":\"palace\",\"mode\":\"read-only\",\"dataRoot\":\"/var/tmp/mcp-device-v12-e2e-20261024-g6/final/palace/fixture-data\",\"totals\":{\"cards\":1,\"evidence\":1,\"versions\":1},\"counts\":[{\"kind\":\"observation\",\"status\":\"hypothesis\",\"count\":1}]}\n",
+      "stderr": "(node:2246) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+    },
+    {
+      "name": "live-read-only-status",
+      "passed": true
+    },
+    {
+      "name": "palace-bin",
+      "args": [
+        "--data-root",
+        "/var/tmp/mcp-device-v12-e2e-20261024-g6/final/palace/fixture-data",
+        "search",
+        "COLD_PALACE_MARKER",
+        "--limit",
+        "1"
+      ],
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "{\"ok\":true,\"plugin\":\"palace\",\"mode\":\"read-only\",\"query\":\"COLD_PALACE_MARKER\",\"items\":[{\"id\":\"k:4177263ba25d057dbf7e57bb8606e661eec087b490cfd513af0f54450ae90030\",\"read_ref\":\"k:4177263ba25d057dbf7e57bb8606e661eec087b490cfd513af0f54450ae90030\",\"version\":1,\"contentHash\":\"ad6dd2e291649dc6461806a9fb964b00ad9abbb7d28eacb9f4f9ee7b16dbbe79\",\"summary\":\"Source claim: Error COLD_PALACE_MARKER: preserve source identity through package installation.\",\"status\":\"hypothesis\",\"originDeviceId\":\"cold-palace-fixture\",\"servingDeviceId\":\"cold-palace-fixture\",\"scope\":{\"visibility\":\"account\"},\"evidenceCount\":1,\"updatedAt\":1792840436340,\"lastVerifiedAt\":1792840436340}],\"returned\":1,\"candidates\":1,\"note\":\"Snapshot results; evidence bytes not reverified by read-only CLI\"}\n",
+      "stderr": "(node:2253) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+    },
+    {
+      "name": "live-search",
+      "passed": true
+    },
+    {
+      "name": "palace-bin",
+      "args": [
+        "--data-root",
+        "/var/tmp/mcp-device-v12-e2e-20261024-g6/final/palace/fixture-data",
+        "read",
+        "k:4177263ba25d057dbf7e57bb8606e661eec087b490cfd513af0f54450ae90030"
+      ],
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "{\"ok\":true,\"plugin\":\"palace\",\"mode\":\"read-only\",\"kind\":\"observation\",\"card\":{\"id\":\"k:4177263ba25d057dbf7e57bb8606e661eec087b490cfd513af0f54450ae90030\",\"version\":1,\"contentHash\":\"ad6dd2e291649dc6461806a9fb964b00ad9abbb7d28eacb9f4f9ee7b16dbbe79\",\"summary\":\"Source claim: Error COLD_PALACE_MARKER: preserve source identity through package installation.\",\"body\":\"Error COLD_PALACE_MARKER: preserve source identity through package installation.\",\"status\":\"hypothesis\",\"originDeviceId\":\"cold-palace-fixture\",\"servingDeviceId\":\"cold-palace-fixture\",\"scope\":{\"visibility\":\"account\"},\"evidence\":[{\"id\":\"ev:fc328367e28c553f1de00e837ca929bbe427312ab18ff500817ad2be9c0c499d\",\"originDeviceId\":\"cold-palace-fixture\",\"sourceId\":\"source:27cb1b48e3c0d9a12d29e7b168bbf42248458a40aeff645cb8ef9f1d080e0461\",\"sourceRef\":\"3561e381f96e725eee11bdd06ad49084633ffdb9ba799786\",\"recordHash\":\"b098f7f375438dcbe12e4cf63e647227c167b96b084ee39c8fda402692c2f7b6\",\"kind\":\"source_trace\",\"sourceAvailable\":true,\"observedAt\":1792840436339}],\"derivedFrom\":[],\"provenance\":[\"cold-palace-fixture\"],\"updatedAt\":1792840436340,\"lastVerifiedAt\":1792840436340},\"evidenceVerifiedNow\":false,\"note\":\"Source integrity must be verified separately before treating this card as an established fact.\"}\n",
+      "stderr": "(node:2260) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+    },
+    {
+      "name": "honest-snapshot-evidence",
+      "passed": true
+    },
+    {
+      "name": "canonical-source-byte-verification",
+      "passed": true
+    },
+    {
+      "name": "palace-bin",
+      "args": [
+        "--data-root",
+        "/var/tmp/mcp-device-v12-e2e-20261024-g6/final/palace/fixture-data",
+        "status"
+      ],
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "{\"ok\":true,\"plugin\":\"palace\",\"mode\":\"read-only\",\"dataRoot\":\"/var/tmp/mcp-device-v12-e2e-20261024-g6/final/palace/fixture-data\",\"totals\":{\"cards\":1,\"evidence\":1,\"versions\":1},\"counts\":[{\"kind\":\"observation\",\"status\":\"hypothesis\",\"count\":1}]}\n",
+      "stderr": "(node:2267) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+    },
+    {
+      "name": "persisted-cli-after-writer-stops",
+      "passed": true
+    },
+    {
+      "name": "dependency-tree",
+      "passed": true,
+      "args": [
+        "ls",
+        "--omit=dev",
+        "--json"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 535.106982,
+      "stdout": "/var/tmp/mcp-device-v12-e2e-20261024-g6/final/palace/dependency-tree.stdout.log",
+      "stdoutSha256": "54228c38a845ec0d064586817bc2506d29cfeeb80e021ecc46b92e996c301942",
+      "stderr": "/var/tmp/mcp-device-v12-e2e-20261024-g6/final/palace/dependency-tree.stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "packageRoot": "/var/tmp/mcp-device-v12-e2e-20261024-g6/final/palace/node_modules/@hcu-lab.me/palace",
+  "version": "1.0.12",
+  "skillDiscoveryFiles": [
+    {
+      "path": "/var/tmp/mcp-device-v12-e2e-20261024-g6/final/palace/agent-home/.agents/skills/palace-cli/SKILL.md",
+      "exists": false
+    },
+    {
+      "path": "/var/tmp/mcp-device-v12-e2e-20261024-g6/final/palace/agent-home/.pi/agent/skills/palace-cli/SKILL.md",
+      "exists": false
+    }
+  ],
+  "status": "PASS",
+  "endedAt": "2026-10-24T11:13:57.232Z"
+}

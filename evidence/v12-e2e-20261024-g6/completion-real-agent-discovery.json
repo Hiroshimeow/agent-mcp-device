@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-24T23:48:57.258Z",
+  "type": "real-Pi-native-Skill-discovery",
+  "fixture": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\real-agent-discovery-20261025",
+  "model": "gpt-6.1-sol",
+  "provider": "configured-cliproxy-g8",
+  "piVersion": "1.4.0",
+  "artifactSha256": "f54807566a0b073b85e0bc9e19703c7ef888da8047d372f2bc3e2258dd3322a0",
+  "sourceFiles": [
+    {
+      "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\package-types-red.stdout.log",
+      "copiedTo": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\real-agent-discovery-20261025\\workspace\\source-traces\\01-public-types-red.log",
+      "sha256": "6be78766883039672abe3878f48bf46c86e094b926a77d11f63a4346d59f101a",
+      "bytes": 1007
+    },
+    {
+      "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\package-closure-green-2.stdout.log",
+      "copiedTo": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\real-agent-discovery-20261025\\workspace\\source-traces\\02-public-types-and-closure-green.log",
+      "sha256": "46c606f39741df88421ae9a1bca81b240f97c2cb5e10d44654faf3ca1fc93f2f",
+      "bytes": 997
+    },
+    {
+      "source": "E:/git-project/agent-mcp-device-v12/scripts/v12/palace-package-closure.mjs",
+      "copiedTo": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\real-agent-discovery-20261025\\workspace\\source-traces\\03-closure-implementation.mjs",
+      "sha256": "78431132f63c7a50f2a15001a8f950e79020f395cac3d4e5e229b1e67abce4d5",
+      "bytes": 5587
+    },
+    {
+      "source": "E:/git-project/agent-mcp-device-v12/test/v12/palace-package-types.test.mjs",
+      "copiedTo": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\real-agent-discovery-20261025\\workspace\\source-traces\\04-independent-closure-check.test.mjs",
+      "sha256": "4a63f774da07f94ee44fbceb72a9786c50e122620ed213c18af29e6990da3c2c",
+      "bytes": 3235
+    },
+    {
+      "source": "E:/git-project/agent-mcp-device-v12/scripts/v12/build-palace-package.mjs",
+      "copiedTo": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\real-agent-discovery-20261025\\workspace\\source-traces\\05-standalone-builder.mjs",
+      "sha256": "83ff8fa92af330a826a379ebacebd651af2e76ebbcf3f156e83bb4c3fb6b94b9",
+      "bytes": 3218
+    },
+    {
+      "source": "secondary summary of recorded execution",
+      "copiedTo": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\real-agent-discovery-20261025\\workspace\\source-traces\\incident.md",
+      "sha256": "123e326367d4df5c93a7412235972b13a874f1b6554dd14a463dd48bdd06e481",
+      "classification": "not independent execution evidence"
+    }
+  ],
+  "status": "FAIL",
+  "skillInstall": {
+    "ok": true,
+    "skill": "palace-cli",
+    "home": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\real-agent-discovery-20261025\\home",
+    "selectedOwner": "7c658d0a94650f4d3b9b3c5b4fb27a55",
+    "optedOut": false,
+    "stillProvidedBy": {
+      "packageName": "@hcu-lab.me/mcp-device",
+      "version": "1.0.12",
+      "root": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-mcp-device\\prefix\\node_modules\\@hcu-lab.me\\mcp-device"
+    },
+    "ownerProblems": [],
+    "retained": {},
+    "owners": [
+      {
+        "key": "7c658d0a94650f4d3b9b3c5b4fb27a55",
+        "packageName": "@hcu-lab.me/mcp-device",
+        "version": "1.0.12",
+        "root": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-mcp-device\\prefix\\node_modules\\@hcu-lab.me\\mcp-device"
+      }
+    ],
+    "result": [
+      {
+        "target": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\real-agent-discovery-20261025\\home\\.agents\\skills\\palace-cli",
+        "state": "copied",
+        "owner": "7c658d0a94650f4d3b9b3c5b4fb27a55",
+        "version": "1.0.12"
+      },
+      {
+        "target": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\real-agent-discovery-20261025\\home\\.pi\\agent\\skills\\palace-cli",
+        "state": "copied",
+        "owner": "7c658d0a94650f4d3b9b3c5b4fb27a55",
+        "version": "1.0.12"
+      }
+    ]
+  },
+  "error": "CapabilityError: BUDGET_EXCEEDED\n    at Socket.<anonymous> (file:///E:/test/mcp-device-v12-e2e-20261024-g6/completion-2026-10-24T23-18-37-628Z-cold-mcp-device/prefix/node_modules/@hcu-lab.me/mcp-device/dist/platform/plugin-driver.js:68:39)\n    at Socket.emit (node:events:519:28)\n    at addChunk (node:internal/streams/readable:561:12)\n    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)\n    at Readable.push (node:internal/streams/readable:392:5)\n    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)",
+  "endedAt": "2026-10-24T23:48:59.521Z",
+  "cleanup": {
+    "completed": true,
+    "at": "2026-10-24T23:48:59.590Z"
+  }
+}

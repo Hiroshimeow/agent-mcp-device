@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "label": "final-cold-windows-device",
+  "cwd": "E:/git-project/agent-mcp-device-v12",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\cold-install.mjs",
+    "mcp-device",
+    "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\final\\hcu-lab.me-mcp-device-1.0.12.tgz",
+    "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\final\\cold-device",
+    "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\final-package"
+  ],
+  "startedAt": "2026-10-24T11:11:39.455Z",
+  "endedAt": "2026-10-24T11:13:30.630Z",
+  "durationMs": 111171.5378,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 0,
+  "signal": null,
+  "counts": {},
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\final-cold-windows-device.stdout.log",
+    "sha256": "5993a9eebc37d4f20d6573a72a18c51ea682fd653cb94842574f178667cd6ecd"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\final-cold-windows-device.stderr.log",
+    "sha256": "d61a79fe5a0a5d4ecff33621377657a04539493ea7deb5eb2e291c751bd3831d"
+  }
+}

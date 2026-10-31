@@ -26,7 +26,8 @@
     "skills/palace-cli",
     "control-plane/scripts",
     "control-plane/config",
-    "control-plane/contracts"
+    "control-plane/contracts",
+    "scripts/v12/install-palace-skill.cjs"
   ],
   "scripts": {
     "device:install": "cd src/device && npm install",
@@ -45,6 +46,9 @@
     "start": "node dist/mcp-device.js",
     "start:debug": "node --inspect-brk=9229 dist/mcp-device.js",
     "prepack": "node scripts/verify-production-trust.cjs",
+    "postinstall": "node scripts/v12/install-palace-skill.cjs",
+    "build:palace": "npm run build && node scripts/v12/build-palace-package.mjs --stable",
+    "pack:palace": "npm run build:palace && npm pack .tmp/v12-palace-standalone/package --pack-destination .tmp/v12-palace-standalone",
     "prepare": "npm run build",
     "clean": "shx rm -rf dist",
     "test": "npm run build && node test/run-all-tests.js",

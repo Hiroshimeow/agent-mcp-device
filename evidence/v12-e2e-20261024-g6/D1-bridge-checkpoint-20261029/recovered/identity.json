@@ -1,0 +1,27 @@
+{
+  "turnId": "183b8083-m365-worker-20261028-012828-16970c16",
+  "status": "COMPLETED",
+  "conversationId": "a39299d6-2bc1-486f-9d62-2f972057cae3",
+  "model": "Opus 5.5",
+  "promptSHA256": "70b1f348bc23e2fad3ea159e131463f25cfbfd547d8bec24a6ad0ce0f4f15901",
+  "oldAttachment": [
+    {
+      "name": "001_D1-current-source-tests-evidence.txt",
+      "size": 919832,
+      "sha256": "f05d541839ecc8570b697b6ee42117e432af216fb694d54c7cceb5f0a689e656",
+      "source_name": "D1-current-source-tests-evidence.txt"
+    }
+  ],
+  "state": {
+    "path": "recovered/state.json",
+    "bytes": 2622,
+    "sha256": "4999e2fd715b25d1e2aabfbf48e83a531abc91830323f8ef60076af1ea33c999"
+  },
+  "response": {
+    "path": "recovered/response.md",
+    "bytes": 13883,
+    "sha256": "e901a780bb44e8f345c81a78edaee3fe37af712bb38178d9b971defceb2eafd8"
+  },
+  "historicalOnly": true,
+  "currentSourceReview": false
+}

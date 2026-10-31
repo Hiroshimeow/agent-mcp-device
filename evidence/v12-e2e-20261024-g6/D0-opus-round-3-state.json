@@ -1,0 +1,56 @@
+{
+  "job_id": "2e4a9646-m365-worker-20261024-210240-c810909d",
+  "status": "COMPLETED",
+  "model": "opus",
+  "prompt_hash": "3a65a8f3872643f7b6b0c61f89dfae9af182b65ff238a8f4b9e7bc00f9c91655",
+  "prompt_match_hash": "3a65a8f3872643f7b6b0c61f89dfae9af182b65ff238a8f4b9e7bc00f9c91655",
+  "input_hash": "cedaac6b5e2f287963a7aa1fe173e7df8fafc7ef55e332c8e655e87aa775c452",
+  "output_marker": "2e4a9646-m365-worker-20261024-210240-c810909d:f1fb6753251c",
+  "page_token": "m365-job:2e4a9646-m365-worker-20261024-210240-c810909d:03465d39e1d8",
+  "attachments": [
+    {
+      "name": "001_D0-source-pack.md",
+      "size": 76717,
+      "sha256": "742c074c97f8dd515636aad1ee2154faa1014f5035ff1f9b2bfab72fa03c7973",
+      "source_name": "D0-source-pack.md"
+    }
+  ],
+  "created_at": "2026-10-24T12:02:43.001895+00:00",
+  "state_schema": 2,
+  "runner_version": "0.2.0",
+  "runner_commit": "6baa56c1955c",
+  "workspace": "C:\\Users\\DuongNH66\\AppData\\Local\\Temp\\mcp-device-v12-review-20261024",
+  "cdp_url": "http://127.0.0.1:9212",
+  "requested_conversation_url": "https://m365.cloud.microsoft/chat/conversation/a39299d6-2bc1-486f-9d62-2f972057cae3",
+  "send_intent": true,
+  "send_confirmed": true,
+  "updated_at": "2026-10-24T12:06:26.251621+00:00",
+  "tab_origin": "borrowed",
+  "cdp_instance_id": "747ac2ad685263319df078ca",
+  "page_url": "https://copilot.cloud.microsoft/chat/conversation/a39299d6-2bc1-486f-9d62-2f972057cae3?redirfrom=mcmToCcm",
+  "conversation_id": "a39299d6-2bc1-486f-9d62-2f972057cae3",
+  "verified_model_label": "Opus 5.5",
+  "attachment_receipts": [
+    {
+      "name": "001_D0-source-pack.md",
+      "size": 76717,
+      "sha256": "742c074c97f8dd515636aad1ee2154faa1014f5035ff1f9b2bfab72fa03c7973",
+      "source_name": "D0-source-pack.md",
+      "chip_text": "001_D0-source-pack.md"
+    }
+  ],
+  "prepared_composer_hash": "3a65a8f3872643f7b6b0c61f89dfae9af182b65ff238a8f4b9e7bc00f9c91655",
+  "send_intent_at": "2026-10-24T12:02:58.048099+00:00",
+  "dom_prompt_hash": "3a65a8f3872643f7b6b0c61f89dfae9af182b65ff238a8f4b9e7bc00f9c91655",
+  "pre_send_user_count": 2,
+  "pre_send_last_user_hash": "bd0a5c81da17ee751808b3ccb576f622e8e52c9e788de3d3f56495b2c82c97de",
+  "pre_send_prompt_matches": [],
+  "pre_send_assistant_count": 2,
+  "send_attempts": 1,
+  "send_nonce": "0f905088b2814e7dbddc3404dc1cfa5b",
+  "reconciled_user_index": 2,
+  "sent_at": "2026-10-24T12:02:59.753599+00:00",
+  "model_label_at_completion": "Opus 5.5",
+  "completed_at": "2026-10-24T12:06:26.251569+00:00",
+  "response_chars": 21721
+}

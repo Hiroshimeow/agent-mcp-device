@@ -98,6 +98,8 @@ export class MCPDevice {
             this.runtimeOwner = new RuntimeOwner({ mode, onStop: () => this.shutdown() });
             await acquireRuntimeOwner(this.runtimeOwner, { confirmTakeover: options.confirmTakeover });
             const { CONFIG_DIR } = await import('../config.js');
+            // Child shell/CLI processes must resolve the same Device-only runtime.
+            process.env.MCP_DEVICE_CONFIG_DIR = CONFIG_DIR;
             const stateRoots = new Map<string, string>();
             for (const root of [this.runtimeOwner.paths.root, CONFIG_DIR]) {
                 const absolute = path.resolve(root);
@@ -168,7 +170,7 @@ export class MCPDevice {
                     runtime_reason: null,
                     execution_runtime_generation: this.core!.runtimeInstanceId
                 }),
-                agentVersion: VERSION || process.env.npm_package_version || '1.0.11',
+                agentVersion: VERSION || process.env.npm_package_version || '1.0.12',
                 onUpdateRequest: async (targetVersion, { requestId }) => {
                     const record = await identity.loadOrCreate();
                     const prepared = await prepareDevicePackageUpdate({

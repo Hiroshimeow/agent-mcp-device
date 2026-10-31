@@ -1,6 +1,5 @@
-import { mkdirSync, readFileSync, existsSync, writeFileSync, renameSync } from 'node:fs';
+import { closeSync, fsyncSync, mkdirSync, openSync, readFileSync, existsSync, writeFileSync, renameSync } from 'node:fs';
 import { basename, join, resolve, relative, sep, isAbsolute } from 'node:path';
-import { rankCandidates } from './retrieval.js';
 import { LogPalace } from '../../log-palace/store.js';
 import type { KnowledgeCard, KnowledgeEvidence, KnowledgePreview, PalaceOptions, PalaceProvider, InvokeContext, KnowledgeScope } from './types.js';
 import { PalaceStore, type EvidenceLocation } from './store.js';
@@ -32,6 +31,7 @@ class Provider implements PalaceProvider {
     if(this.store)return;
     this.stopping=false;mkdirSync(this.options.dataRoot,{recursive:true});
     this.store=new PalaceStore(this.options.dataRoot,this.options.deviceId);
+    this.store.setMeta('activationPolicy',this.options.validationRunner?'configured':'candidate_only');
     try {this.logs=new LogPalace(join(this.options.dataRoot,'source-index'));}
     catch(error){this.store.close();this.store=undefined;throw error;}
     for(const path of this.catalog.logRoots()) {
@@ -39,7 +39,12 @@ class Provider implements PalaceProvider {
       try {this.logs.add(path);}catch(error){this.store.setMeta('lastDiscoveryError',String(error).slice(0,512));}
     }
     if(this.options.autoIndex!==false) {
-      try {await this.invoke('knowledge.ingest',this.indexBudget);}catch(error){this.store.setMeta('lastIndexError',String(error).slice(0,512));}
+      // Startup establishes ownership and the writer first; initial indexing is
+      // queued after start returns so a large corpus cannot consume the plugin
+      // driver's init deadline. All writes still serialize through this provider.
+      setImmediate(()=>{if(!this.stopping)void this.invoke('knowledge.ingest',this.indexBudget).catch(error=>{
+        if(this.store)this.store.setMeta('lastIndexError',String(error).slice(0,512));
+      });});
       this.timer=setInterval(()=>{void this.invoke('knowledge.ingest',this.indexBudget).catch(error=>{
         if(this.store)this.store.setMeta('lastIndexError',String(error).slice(0,512));
       });},this.indexInterval);
@@ -75,8 +80,13 @@ class Provider implements PalaceProvider {
     const bytes=Buffer.from(canonical(value)+'\n'),recordHash=hash(bytes);
     if(bytes.length>128*1024)throw new Error('EVIDENCE_TOO_LARGE');
     const relativePath=join('evidence',recordHash+'.json'),path=join(this.options.dataRoot,relativePath);
-    mkdirSync(join(this.options.dataRoot,'evidence'),{recursive:true});
-    if(!existsSync(path)){const tmp=path+'.tmp';writeFileSync(tmp,bytes);renameSync(tmp,path);}
+    const evidenceDir=join(this.options.dataRoot,'evidence');mkdirSync(evidenceDir,{recursive:true});
+    if(!existsSync(path)){
+      const tmp=path+'.tmp-'+process.pid+'-'+Date.now(),fd=openSync(tmp,'wx',0o600);
+      try{writeFileSync(fd,bytes);fsyncSync(fd);}finally{closeSync(fd);}
+      renameSync(tmp,path);
+      if(process.platform!=='win32'){const dirfd=openSync(evidenceDir,'r');try{fsyncSync(dirfd);}finally{closeSync(dirfd);}}
+    }
     const evidence:KnowledgeEvidence={id:'ev:'+hash(this.options.deviceId+':managed:'+recordHash),
       originDeviceId:this.options.deviceId,sourceId:'managed:'+recordHash,sourceRef:'managed:'+recordHash,recordHash,
       kind,sourceAvailable:true,observedAt:Date.now()};
@@ -130,10 +140,10 @@ class Provider implements PalaceProvider {
     const query=list?'':text(input.query,2048);
     if(!list&&!query.trim())throw new Error('QUERY_REQUIRED');
     const limit=boundedInt(input.limit,8,1,50),maxBytes=boundedInt(input.maxBytes,8192,512,65536);
-    let rows=this.db.query({query,projectId:text(input.projectId,512)||undefined,
-      includeInactive:input.includeInactive===true,kind:text(input.kind,64)||undefined,status:text(input.status,64)||undefined,limit:list?limit+1:Math.min(200,Math.max(40,limit*8)),
-      cursor:list?text(input.cursor,512)||undefined:undefined});
-    if(!list)rows=rankCandidates(rows,query,limit+1);
+    const common={query,projectId:text(input.projectId,512)||undefined,
+      includeInactive:input.includeInactive===true,kind:text(input.kind,64)||undefined,status:text(input.status,64)||undefined,
+      cursor:list?text(input.cursor,512)||undefined:undefined};
+    const rows=list?this.db.query({...common,limit:limit+1}):this.db.search({...common,limit:0,query,resultLimit:limit,lookahead:true}).items;
     const items:KnowledgePreview[]=[];
     let truncated=rows.length>limit;
     for(const card of rows.slice(0,limit)){
@@ -234,7 +244,7 @@ class Provider implements PalaceProvider {
         });created++;
         if(saved.evidence.length>=2){
           const fix=saved.body.match(/(?:fix|solution|resolved by)\s*:\s*([^\n]{8,1024})/i)?.[1];
-          if(fix)await this.learn({key:'automatic:'+saved.id,summary:clip('Procedure candidate: '+fix,256),steps:[fix],evidenceRefs:[saved.id]},signal);
+          if(fix)await this.learn({key:'automatic:'+saved.id,summary:clip('Procedure candidate: '+fix,256),steps:[fix],evidenceRefs:[saved.id],autoActivate:false},signal);
         }
       }catch{skipped++;}
     }
@@ -375,7 +385,7 @@ class Provider implements PalaceProvider {
     if(action!=='list')throw new Error('SKILL_ACTION_UNSUPPORTED');
     const maxBytes=boundedInt(input.maxBytes,8192,512,65536);
     const response={...(this.search({...input,kind:'procedure',status:input.includeCandidates===true?undefined:'validated',
-      includeInactive:input.includeCandidates===true},true) as {items:KnowledgePreview[];truncated:boolean;nextCursor:string|null}),
+      includeInactive:false},true) as {items:KnowledgePreview[];truncated:boolean;nextCursor:string|null}),
       activationPolicy:this.options.validationRunner?'configured':'candidate_only'};
     while(Buffer.byteLength(JSON.stringify(response),'utf8')>maxBytes&&response.items.length){
       response.items.pop();response.truncated=true;response.nextCursor=response.items.length?response.items[response.items.length-1].id:null;

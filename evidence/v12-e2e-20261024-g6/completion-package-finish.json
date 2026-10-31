@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-24T23:33:38.822Z",
+  "previousReceipt": "completion-package.json",
+  "reason": "Complete cold installs after giving the disposable npm fixture valid root package metadata; artifacts are unchanged.",
+  "artifacts": [
+    {
+      "product": "mcp-device",
+      "file": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\hcu-lab.me-mcp-device-1.0.12.tgz",
+      "bytes": 2139826,
+      "sha256": "f54807566a0b073b85e0bc9e19703c7ef888da8047d372f2bc3e2258dd3322a0"
+    },
+    {
+      "product": "palace",
+      "file": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\hcu-lab.me-palace-1.0.12.tgz",
+      "bytes": 49557,
+      "sha256": "1be1d4ff69eb86ce5f29af74f81db9652394e9c76e8597328439398305a9fdc4"
+    }
+  ],
+  "installs": [
+    {
+      "product": "mcp-device",
+      "fixture": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-mcp-device",
+      "home": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-mcp-device\\home",
+      "prefix": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-mcp-device\\prefix",
+      "packageRoot": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-mcp-device\\prefix\\node_modules\\@hcu-lab.me\\mcp-device",
+      "version": "1.0.12",
+      "packageLockSha256": "fe4a2bb93d6f3b9610f86be38c2c62d6a8fb1085e910e53eb09cee369ffdcba1",
+      "skillStates": [
+        {
+          "target": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-mcp-device\\home\\.agents\\skills\\palace-cli",
+          "state": "owned-pristine"
+        },
+        {
+          "target": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-mcp-device\\home\\.pi\\agent\\skills\\palace-cli",
+          "state": "owned-pristine"
+        }
+      ],
+      "sbom": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\sbom-fixed-mcp-device.stdout.log"
+    },
+    {
+      "product": "palace",
+      "fixture": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-palace",
+      "home": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-palace\\home",
+      "prefix": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-palace\\prefix",
+      "packageRoot": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-palace\\prefix\\node_modules\\@hcu-lab.me\\palace",
+      "version": "1.0.12",
+      "standaloneDeviceDependencyAbsent": true,
+      "packageLockSha256": "1b1fa246280f2c7c5bc11c8adacf2d3b886b5a89e5aed5a3b1b46f7c28cc9546",
+      "skillStates": [
+        {
+          "target": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-palace\\home\\.agents\\skills\\palace-cli",
+          "state": "owned-pristine"
+        },
+        {
+          "target": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-palace\\home\\.pi\\agent\\skills\\palace-cli",
+          "state": "owned-pristine"
+        }
+      ],
+      "sbom": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\sbom-palace-finish.stdout.log"
+    }
+  ],
+  "steps": [
+    {
+      "label": "sbom-root-lock-mcp-device",
+      "program": "C:\\WINDOWS\\system32\\cmd.exe",
+      "args": [
+        "/d",
+        "/c",
+        "npm.cmd install --package-lock-only --ignore-scripts --no-audit --no-fund --prefix E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-mcp-device\\prefix"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-mcp-device\\prefix",
+      "startedAt": "2026-10-24T23:33:38.878Z",
+      "endedAt": "2026-10-24T23:33:44.953Z",
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\sbom-root-lock-mcp-device.stdout.log",
+      "stderr": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\sbom-root-lock-mcp-device.stderr.log"
+    },
+    {
+      "label": "sbom-fixed-mcp-device",
+      "program": "C:\\WINDOWS\\system32\\cmd.exe",
+      "args": [
+        "/d",
+        "/c",
+        "npm.cmd sbom --sbom-format cyclonedx --omit=dev --prefix E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-mcp-device\\prefix"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-mcp-device\\prefix",
+      "startedAt": "2026-10-24T23:33:44.956Z",
+      "endedAt": "2026-10-24T23:33:51.349Z",
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\sbom-fixed-mcp-device.stdout.log",
+      "stderr": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\sbom-fixed-mcp-device.stderr.log"
+    },
+    {
+      "label": "install-palace-finish",
+      "program": "C:\\WINDOWS\\system32\\cmd.exe",
+      "args": [
+        "/d",
+        "/c",
+        "npm.cmd install --prefix E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-palace\\prefix --omit=dev --ignore-scripts=false --no-audit --no-fund E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\hcu-lab.me-palace-1.0.12.tgz"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6",
+      "startedAt": "2026-10-24T23:33:51.360Z",
+      "endedAt": "2026-10-24T23:33:54.807Z",
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\install-palace-finish.stdout.log",
+      "stderr": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\install-palace-finish.stderr.log"
+    },
+    {
+      "label": "help-palace-finish",
+      "program": "C:\\Program Files\\nodejs\\node.exe",
+      "args": [
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-palace\\prefix\\node_modules\\@hcu-lab.me\\palace\\dist\\plugins\\palace\\cli.js",
+        "--help"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6",
+      "startedAt": "2026-10-24T23:33:54.809Z",
+      "endedAt": "2026-10-24T23:33:55.035Z",
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\help-palace-finish.stdout.log",
+      "stderr": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\help-palace-finish.stderr.log"
+    },
+    {
+      "label": "skill-palace-finish",
+      "program": "C:\\Program Files\\nodejs\\node.exe",
+      "args": [
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-palace\\prefix\\node_modules\\@hcu-lab.me\\palace\\dist\\plugins\\palace\\cli.js",
+        "skill",
+        "status"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6",
+      "startedAt": "2026-10-24T23:33:55.037Z",
+      "endedAt": "2026-10-24T23:33:55.302Z",
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\skill-palace-finish.stdout.log",
+      "stderr": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\skill-palace-finish.stderr.log"
+    },
+    {
+      "label": "sbom-palace-finish",
+      "program": "C:\\WINDOWS\\system32\\cmd.exe",
+      "args": [
+        "/d",
+        "/c",
+        "npm.cmd sbom --sbom-format cyclonedx --omit=dev --prefix E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-palace\\prefix"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-palace\\prefix",
+      "startedAt": "2026-10-24T23:33:55.305Z",
+      "endedAt": "2026-10-24T23:33:57.609Z",
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\sbom-palace-finish.stdout.log",
+      "stderr": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\sbom-palace-finish.stderr.log"
+    }
+  ],
+  "status": "PASS",
+  "endedAt": "2026-10-24T23:33:57.619Z"
+}

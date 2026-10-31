@@ -1,0 +1,97 @@
+{
+  "recordedAt": "2026-10-24T11:29:02.903Z",
+  "head": "1e454c1cdcbe3265892f751034fa389432d65405",
+  "branch": "feat/v12-platform-20261022",
+  "status": "M package.json\n M src/device/device.ts\n M src/plugins/palace/cli.ts\n M test/test-canonical-release-cleanup.js\n M test/test-green-hardening.js\n M test/test-mcp-device-branding.js\n M test/test-version-consistency.js\n M test/v12/server-package-cold.test.mjs\n?? .tmp/\n?? evidence/v12-e2e-20261024-g6/\n?? nul\n?? scripts/v12/build-palace-package.mjs\n?? scripts/v12/install-palace-skill.cjs\n?? specs/008-v12-platform/ONE_AGENT_EXECUTION_PROMPT.md\n?? specs/008-v12-platform/RUN_STATE.md\n?? specs/008-v12-platform/V12_END_TO_END_COMPLETION_SPEC.md\n?? test/v12/palace-cli-contract.test.mjs\n?? test/v12/palace-distribution.test.mjs\n?? test/v12/palace-skill-preservation.test.mjs",
+  "changedSinceStart": [
+    "src/device/device.ts",
+    "src/plugins/palace/cli.ts",
+    "test/test-canonical-release-cleanup.js",
+    "test/test-green-hardening.js",
+    "test/test-mcp-device-branding.js",
+    "test/test-version-consistency.js",
+    "scripts/v12/install-palace-skill.cjs"
+  ],
+  "unexpectedChanges": [],
+  "addedTests": [
+    {
+      "path": "test/v12/palace-cli-contract.test.mjs",
+      "sha256": "494cb25bfeb755dd9239e6bd1dd1e7592535ba17e5a8fe84df542c2295008453"
+    },
+    {
+      "path": "test/v12/palace-skill-preservation.test.mjs",
+      "sha256": "f46f6d309988caf7bff04a152e11e1a98b1c4b54fed40568d48e0e892b24d037"
+    }
+  ],
+  "preservedWip": [
+    {
+      "path": "package.json",
+      "originalSha256": "d13e818b01224310e5c4f91025efe67516229ea45290e05d33e07b2458a99b09",
+      "backup": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\preserved-wip\\package.json",
+      "backupSha256": "d13e818b01224310e5c4f91025efe67516229ea45290e05d33e07b2458a99b09",
+      "currentSha256": "d13e818b01224310e5c4f91025efe67516229ea45290e05d33e07b2458a99b09",
+      "intentionalChange": false
+    },
+    {
+      "path": "test/v12/server-package-cold.test.mjs",
+      "originalSha256": "2ef6ee2ebc03fc8b4d5edf667fd8586da842a919d047f06f23789ad55bb97dbd",
+      "backup": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\preserved-wip\\test\\v12\\server-package-cold.test.mjs",
+      "backupSha256": "2ef6ee2ebc03fc8b4d5edf667fd8586da842a919d047f06f23789ad55bb97dbd",
+      "currentSha256": "2ef6ee2ebc03fc8b4d5edf667fd8586da842a919d047f06f23789ad55bb97dbd",
+      "intentionalChange": false
+    },
+    {
+      "path": "scripts/v12/build-palace-package.mjs",
+      "originalSha256": "c06375416ab76d7488124fb70b19854b29adeb2d21758a7663940a6ce4235443",
+      "backup": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\preserved-wip\\scripts\\v12\\build-palace-package.mjs",
+      "backupSha256": "c06375416ab76d7488124fb70b19854b29adeb2d21758a7663940a6ce4235443",
+      "currentSha256": "c06375416ab76d7488124fb70b19854b29adeb2d21758a7663940a6ce4235443",
+      "intentionalChange": false
+    },
+    {
+      "path": "scripts/v12/install-palace-skill.cjs",
+      "originalSha256": "eaef6a15afd8292e8b65425e3c483ddd9e903f83a732f50eb162c6c2736928cc",
+      "backup": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\preserved-wip\\scripts\\v12\\install-palace-skill.cjs",
+      "backupSha256": "eaef6a15afd8292e8b65425e3c483ddd9e903f83a732f50eb162c6c2736928cc",
+      "currentSha256": "cf7c7a8c051e007fb4885106ac61b1f6d17cb9c2241c33ad15633922b82bae6d",
+      "intentionalChange": true
+    },
+    {
+      "path": "test/v12/palace-distribution.test.mjs",
+      "originalSha256": "2fb05f474df414256d35da018e5f1a4345ff26ebdcfa612fbc72cc6944d8c377",
+      "backup": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\preserved-wip\\test\\v12\\palace-distribution.test.mjs",
+      "backupSha256": "2fb05f474df414256d35da018e5f1a4345ff26ebdcfa612fbc72cc6944d8c377",
+      "currentSha256": "2fb05f474df414256d35da018e5f1a4345ff26ebdcfa612fbc72cc6944d8c377",
+      "intentionalChange": false
+    },
+    {
+      "path": "specs/008-v12-platform/ONE_AGENT_EXECUTION_PROMPT.md",
+      "originalSha256": "ddb64872c03b6e589ac21254713bd8ef91e1bcdfd81179573125860c66a76def",
+      "backup": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\preserved-wip\\specs\\008-v12-platform\\ONE_AGENT_EXECUTION_PROMPT.md",
+      "backupSha256": "ddb64872c03b6e589ac21254713bd8ef91e1bcdfd81179573125860c66a76def",
+      "currentSha256": "ddb64872c03b6e589ac21254713bd8ef91e1bcdfd81179573125860c66a76def",
+      "intentionalChange": false
+    },
+    {
+      "path": "specs/008-v12-platform/V12_END_TO_END_COMPLETION_SPEC.md",
+      "originalSha256": "d4bde67dcb43fabc967060c4254378f1f2871d10179fedf8d4233a174f45c394",
+      "backup": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\preserved-wip\\specs\\008-v12-platform\\V12_END_TO_END_COMPLETION_SPEC.md",
+      "backupSha256": "d4bde67dcb43fabc967060c4254378f1f2871d10179fedf8d4233a174f45c394",
+      "currentSha256": "d4bde67dcb43fabc967060c4254378f1f2871d10179fedf8d4233a174f45c394",
+      "intentionalChange": false
+    }
+  ],
+  "canonicalDistUnchanged": true,
+  "canonicalDistFiles": 347,
+  "canonicalDistManifestSha256": "6ab40b01267a0723e2411f69e6b164abad51b3649ff31bb00b9c3226bcceb5f0",
+  "commitsCreated": 0,
+  "reviewRequiredBeforeCommit": true,
+  "patch": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\implementation-diff.patch",
+    "sha256": "7dec2362ac16834914cf0e09b9ad07b048ec95c40f1b7b4aaf6721cd14f74860",
+    "checkExitCode": 1,
+    "checkStdout": "",
+    "checkStderr": "error: test/v12/palace-cli-contract.test.mjs: already exists in working directory\nerror: test/v12/palace-skill-preservation.test.mjs: already exists in working directory\n",
+    "applied": false
+  }
+}

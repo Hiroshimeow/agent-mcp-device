@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "label": "core-parity-windows-final",
+  "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\candidate-three",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "--test",
+    "test/v12/device-core-parity.test.js"
+  ],
+  "startedAt": "2026-10-24T11:18:20.668Z",
+  "endedAt": "2026-10-24T11:19:13.737Z",
+  "durationMs": 53066.7678,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 0,
+  "signal": null,
+  "counts": {
+    "tests": 1,
+    "pass": 1,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\core-parity-windows-final.stdout.log",
+    "sha256": "82476b2f831e8cc295886ad102df213d323139bb79f9d773660b626556a3c553"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\core-parity-windows-final.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

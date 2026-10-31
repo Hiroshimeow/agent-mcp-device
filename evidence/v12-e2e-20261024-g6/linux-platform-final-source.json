@@ -1,0 +1,8 @@
+{
+  "createdAt": "2026-10-24T11:14:32.776Z",
+  "target": "/var/tmp/mcp-device-v12-e2e-20261024-g6/final/platform",
+  "sourceSha256": "cc68ed16ff0e5bd64ffdc977eb2d2ba53f1592b5c2486178ecfed992617ce39d",
+  "artifactSha256": "e494d7be162390b1aaf2359112e103b1cbcad13885c71b21c9a5b948c3d8343b",
+  "runtimeManifestSha256": "58e8f644b11cdab96d6579b63ac08cdd2cf5fe92060edac137584ad590939e59",
+  "runtimeFiles": 347
+}

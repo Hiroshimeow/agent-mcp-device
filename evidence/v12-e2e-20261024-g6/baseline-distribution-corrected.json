@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "label": "baseline-distribution-corrected",
+  "cwd": "E:/test/mcp-device-v12-e2e-20261024-g6/baseline",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "--test",
+    "test/v12/palace-distribution.test.mjs"
+  ],
+  "startedAt": "2026-10-24T10:41:46.126Z",
+  "endedAt": "2026-10-24T10:41:47.537Z",
+  "durationMs": 1409.6103999999998,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 0,
+  "signal": null,
+  "counts": {
+    "tests": 2,
+    "pass": 2,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\baseline-distribution-corrected.stdout.log",
+    "sha256": "59800436e50ec952748073959cc167b2214259708944fbcc69327dfc0cfcd724"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\baseline-distribution-corrected.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

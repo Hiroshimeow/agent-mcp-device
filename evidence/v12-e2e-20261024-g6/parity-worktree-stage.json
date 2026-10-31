@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "label": "parity-worktree-stage",
+  "cwd": "E:/git-project/agent-mcp-device-v12",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "evidence/v12-e2e-20261024-g6/stage-parity-worktree.cjs"
+  ],
+  "startedAt": "2026-10-24T11:24:09.122Z",
+  "endedAt": "2026-10-24T11:24:23.680Z",
+  "durationMs": 14557.2404,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 0,
+  "signal": null,
+  "counts": {},
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-worktree-stage.stdout.log",
+    "sha256": "94e1e898cf275bb7c15cc3d9f41651930e500df2d56a6e0d6d7dd8042812395b"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-worktree-stage.stderr.log",
+    "sha256": "627881619c82002a08159d395db723e0914e16f92260478adce7356387733ef0"
+  }
+}

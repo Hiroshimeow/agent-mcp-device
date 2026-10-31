@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "label": "cli-contract-red",
+  "cwd": "E:/test/mcp-device-v12-e2e-20261024-g6/baseline",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "--test",
+    "test/v12/palace-cli-contract.test.mjs"
+  ],
+  "startedAt": "2026-10-24T10:43:35.219Z",
+  "endedAt": "2026-10-24T10:43:36.590Z",
+  "durationMs": 1368.948,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 1,
+  "signal": null,
+  "counts": {
+    "tests": 4,
+    "pass": 1,
+    "fail": 3,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\cli-contract-red.stdout.log",
+    "sha256": "ad2f8d00bae7421193a294b484e2dbcd2c4565e0c037a062a1c1e581f5699bb4"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\cli-contract-red.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

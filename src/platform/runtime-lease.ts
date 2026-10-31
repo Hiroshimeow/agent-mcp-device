@@ -3,6 +3,7 @@ import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { CapabilityError } from './plugin-contract.js';
 import { probeRuntimeOwner } from '../device/runtime-owner.js';
+import { processBirth, processNamespace } from './process-identity.js';
 
 /** No listener is created and no prior runtime is stopped by taking this lease. */
 export async function acquireServerLease(stateRoot: string, options: { allowDeviceOwnerPid?: number } = {}): Promise<() => Promise<void>> {
@@ -12,7 +13,8 @@ export async function acquireServerLease(stateRoot: string, options: { allowDevi
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
       const handle = await fs.open(filename, 'wx', 0o600);
-      try { await handle.writeFile(JSON.stringify({ pid: process.pid, token, startedAt: Date.now() }) + '\n'); }
+      const [birth, namespace] = await Promise.all([processBirth(process.pid), processNamespace()]);
+      try { await handle.writeFile(JSON.stringify({ pid: process.pid, token, startedAt: Date.now(), ...(birth ? { processBirth: birth } : {}), ...(namespace ? { namespace } : {}) }) + '\n'); await handle.sync(); }
       finally { await handle.close(); }
       const release = async () => {
         try { const current = JSON.parse(await fs.readFile(filename, 'utf8')); if (current.token === token) await fs.unlink(filename); }

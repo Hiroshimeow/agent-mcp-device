@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "label": "core-parity-final-run",
+  "cwd": "E:/git-project/agent-mcp-device-v12",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "evidence/v12-e2e-20261024-g6/core-parity-final.cjs"
+  ],
+  "startedAt": "2026-10-24T11:18:09.594Z",
+  "endedAt": "2026-10-24T11:19:14.216Z",
+  "durationMs": 64619.8847,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 0,
+  "signal": null,
+  "counts": {
+    "tests": 1,
+    "pass": 1,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\core-parity-final-run.stdout.log",
+    "sha256": "a3e700b75a1fdd014a49d18fef6acd855072151b8ae1c275e30e58b6deeb6f74"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\core-parity-final-run.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

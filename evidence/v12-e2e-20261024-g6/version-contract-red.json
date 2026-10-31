@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "label": "version-contract-red",
+  "cwd": "E:/git-project/agent-mcp-device-v12",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "test/test-version-consistency.js"
+  ],
+  "startedAt": "2026-10-24T11:07:02.266Z",
+  "endedAt": "2026-10-24T11:07:02.368Z",
+  "durationMs": 100.58439999999999,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 1,
+  "signal": null,
+  "counts": {},
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\version-contract-red.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\version-contract-red.stderr.log",
+    "sha256": "e01ae9c1c645de5766a09693a148d15580e38e2c4e3a9e81cd0537a2d94b1154"
+  }
+}

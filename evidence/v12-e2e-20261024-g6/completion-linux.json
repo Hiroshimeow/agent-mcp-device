@@ -1,0 +1,323 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-24T23:43:46.412Z",
+  "source": "/mnt/e/test/mcp-device-v12-e2e-20261024-g6/completion-2026-10-24T23-18-37-628Z",
+  "native": "/var/tmp/mcp-device-v12-completion-20261025",
+  "node": "v22.21.0",
+  "platform": "linux",
+  "steps": [
+    {
+      "label": "test-dependencies",
+      "program": "npm",
+      "args": [
+        "ci",
+        "--ignore-scripts",
+        "--no-audit",
+        "--no-fund"
+      ],
+      "cwd": "/var/tmp/mcp-device-v12-completion-20261025/platform",
+      "pid": 1955,
+      "startedAt": "2026-10-24T23:44:59.693Z",
+      "stdout": "/var/tmp/mcp-device-v12-completion-20261025/test-dependencies.stdout.log",
+      "stderr": "/var/tmp/mcp-device-v12-completion-20261025/test-dependencies.stderr.log",
+      "state": "COMPLETED",
+      "exitCode": 0,
+      "endedAt": "2026-10-24T23:45:45.963Z",
+      "elapsedMs": 46270,
+      "counts": {},
+      "stdoutSha256": "6f5249227c46f96f2c05122c8f461c7a69a076d2090f12df52b30e55e836a787",
+      "stderrSha256": "c19dc7333cd2ee8bed7771e5715d44157c58356fb5c25e90e8a2a2fff6c0408c"
+    },
+    {
+      "label": "cold-install-mcp-device",
+      "program": "npm",
+      "args": [
+        "install",
+        "--prefix",
+        "/var/tmp/mcp-device-v12-completion-20261025/cold-mcp-device/prefix",
+        "--omit=dev",
+        "--ignore-scripts=false",
+        "--no-audit",
+        "--no-fund",
+        "/mnt/e/test/mcp-device-v12-e2e-20261024-g6/artifacts/completion-2026-10-24T23-18-37-628Z/hcu-lab.me-mcp-device-1.0.12.tgz"
+      ],
+      "cwd": "/var/tmp/mcp-device-v12-completion-20261025/cold-mcp-device",
+      "pid": 2305,
+      "startedAt": "2026-10-24T23:45:46.097Z",
+      "stdout": "/var/tmp/mcp-device-v12-completion-20261025/cold-install-mcp-device.stdout.log",
+      "stderr": "/var/tmp/mcp-device-v12-completion-20261025/cold-install-mcp-device.stderr.log",
+      "state": "COMPLETED",
+      "exitCode": 0,
+      "endedAt": "2026-10-24T23:47:16.990Z",
+      "elapsedMs": 90893,
+      "counts": {},
+      "stdoutSha256": "83cc0493eba64fb2bb0811fca775a40d9ff8bd2a93ce6a8db51c386c56634ff2",
+      "stderrSha256": "003a2d8ce1c828381280702800eeb6a0c837bc07512f7c32e52c889a5ee0e458"
+    },
+    {
+      "label": "cli-help-mcp-device",
+      "program": "/usr/bin/node",
+      "args": [
+        "/var/tmp/mcp-device-v12-completion-20261025/cold-mcp-device/prefix/node_modules/@hcu-lab.me/mcp-device/dist/plugins/palace/cli.js",
+        "--help"
+      ],
+      "cwd": "/var/tmp/mcp-device-v12-completion-20261025/cold-mcp-device",
+      "pid": 2766,
+      "startedAt": "2026-10-24T23:47:17.011Z",
+      "stdout": "/var/tmp/mcp-device-v12-completion-20261025/cli-help-mcp-device.stdout.log",
+      "stderr": "/var/tmp/mcp-device-v12-completion-20261025/cli-help-mcp-device.stderr.log",
+      "state": "COMPLETED",
+      "exitCode": 0,
+      "endedAt": "2026-10-24T23:47:17.089Z",
+      "elapsedMs": 78,
+      "counts": {},
+      "stdoutSha256": "a9950cf3ca46a6ccd7210966edc6d31244073fa19efbeaab44879344c3aa6609",
+      "stderrSha256": "e19f305c870e7524366d6d74b87f35bb69fa634003e5a64b0b9b646012827d41"
+    },
+    {
+      "label": "skill-state-mcp-device",
+      "program": "/usr/bin/node",
+      "args": [
+        "/var/tmp/mcp-device-v12-completion-20261025/cold-mcp-device/prefix/node_modules/@hcu-lab.me/mcp-device/dist/plugins/palace/cli.js",
+        "skill",
+        "status"
+      ],
+      "cwd": "/var/tmp/mcp-device-v12-completion-20261025/cold-mcp-device",
+      "pid": 2773,
+      "startedAt": "2026-10-24T23:47:17.101Z",
+      "stdout": "/var/tmp/mcp-device-v12-completion-20261025/skill-state-mcp-device.stdout.log",
+      "stderr": "/var/tmp/mcp-device-v12-completion-20261025/skill-state-mcp-device.stderr.log",
+      "state": "COMPLETED",
+      "exitCode": 0,
+      "endedAt": "2026-10-24T23:47:17.192Z",
+      "elapsedMs": 91,
+      "counts": {},
+      "stdoutSha256": "fc9febbe616a202667acd854ee1668c7db59c38f6f2fc03fa5928a4debc21fee",
+      "stderrSha256": "997c2d2435cb3f1c434cf7ca3d81a8b3772bdacd5f34ab8b4d785ecefb9239fa"
+    },
+    {
+      "label": "sbom-mcp-device",
+      "program": "npm",
+      "args": [
+        "sbom",
+        "--prefix",
+        "/var/tmp/mcp-device-v12-completion-20261025/cold-mcp-device/prefix",
+        "--sbom-format",
+        "cyclonedx",
+        "--omit=dev"
+      ],
+      "cwd": "/var/tmp/mcp-device-v12-completion-20261025/cold-mcp-device/prefix",
+      "pid": 2784,
+      "startedAt": "2026-10-24T23:47:17.205Z",
+      "stdout": "/var/tmp/mcp-device-v12-completion-20261025/sbom-mcp-device.stdout.log",
+      "stderr": "/var/tmp/mcp-device-v12-completion-20261025/sbom-mcp-device.stderr.log",
+      "state": "COMPLETED",
+      "exitCode": 0,
+      "endedAt": "2026-10-24T23:47:20.521Z",
+      "elapsedMs": 3316,
+      "counts": {},
+      "stdoutSha256": "d1da25302757b9e5ef1ee7435da4bfee86f017deceb950c212a4c78fddf1be36",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "cold-install-palace",
+      "program": "npm",
+      "args": [
+        "install",
+        "--prefix",
+        "/var/tmp/mcp-device-v12-completion-20261025/cold-palace/prefix",
+        "--omit=dev",
+        "--ignore-scripts=false",
+        "--no-audit",
+        "--no-fund",
+        "/mnt/e/test/mcp-device-v12-e2e-20261024-g6/artifacts/completion-2026-10-24T23-18-37-628Z/hcu-lab.me-palace-1.0.12.tgz"
+      ],
+      "cwd": "/var/tmp/mcp-device-v12-completion-20261025/cold-palace",
+      "pid": 2808,
+      "startedAt": "2026-10-24T23:47:20.588Z",
+      "stdout": "/var/tmp/mcp-device-v12-completion-20261025/cold-install-palace.stdout.log",
+      "stderr": "/var/tmp/mcp-device-v12-completion-20261025/cold-install-palace.stderr.log",
+      "state": "COMPLETED",
+      "exitCode": 0,
+      "endedAt": "2026-10-24T23:47:21.320Z",
+      "elapsedMs": 732,
+      "counts": {},
+      "stdoutSha256": "7eb3937688ed3817ce4692a04fad8fd676a894b6a7cdc4c219351e630d27df20",
+      "stderrSha256": "73f575da7dba651daed0b0f46ace3afd77694f51e16a81ab8785475d25847425"
+    },
+    {
+      "label": "cli-help-palace",
+      "program": "/usr/bin/node",
+      "args": [
+        "/var/tmp/mcp-device-v12-completion-20261025/cold-palace/prefix/node_modules/@hcu-lab.me/palace/dist/plugins/palace/cli.js",
+        "--help"
+      ],
+      "cwd": "/var/tmp/mcp-device-v12-completion-20261025/cold-palace",
+      "pid": 2834,
+      "startedAt": "2026-10-24T23:47:21.334Z",
+      "stdout": "/var/tmp/mcp-device-v12-completion-20261025/cli-help-palace.stdout.log",
+      "stderr": "/var/tmp/mcp-device-v12-completion-20261025/cli-help-palace.stderr.log",
+      "state": "COMPLETED",
+      "exitCode": 0,
+      "endedAt": "2026-10-24T23:47:21.403Z",
+      "elapsedMs": 69,
+      "counts": {},
+      "stdoutSha256": "a9950cf3ca46a6ccd7210966edc6d31244073fa19efbeaab44879344c3aa6609",
+      "stderrSha256": "015350cf7e61eb0a7859202e423ca1b902aadc1066cfb1437ebbc276c8fc6473"
+    },
+    {
+      "label": "skill-state-palace",
+      "program": "/usr/bin/node",
+      "args": [
+        "/var/tmp/mcp-device-v12-completion-20261025/cold-palace/prefix/node_modules/@hcu-lab.me/palace/dist/plugins/palace/cli.js",
+        "skill",
+        "status"
+      ],
+      "cwd": "/var/tmp/mcp-device-v12-completion-20261025/cold-palace",
+      "pid": 2841,
+      "startedAt": "2026-10-24T23:47:21.414Z",
+      "stdout": "/var/tmp/mcp-device-v12-completion-20261025/skill-state-palace.stdout.log",
+      "stderr": "/var/tmp/mcp-device-v12-completion-20261025/skill-state-palace.stderr.log",
+      "state": "COMPLETED",
+      "exitCode": 0,
+      "endedAt": "2026-10-24T23:47:21.505Z",
+      "elapsedMs": 91,
+      "counts": {},
+      "stdoutSha256": "d30235b43f4689c2aaabc0762fa02cb5800ee50acf21a1d6aba294558909e6a0",
+      "stderrSha256": "d1c4f9f5114e6e4c396fc8952da29b842a47d094d4172f2a303d66af4c0ff8de"
+    },
+    {
+      "label": "sbom-palace",
+      "program": "npm",
+      "args": [
+        "sbom",
+        "--prefix",
+        "/var/tmp/mcp-device-v12-completion-20261025/cold-palace/prefix",
+        "--sbom-format",
+        "cyclonedx",
+        "--omit=dev"
+      ],
+      "cwd": "/var/tmp/mcp-device-v12-completion-20261025/cold-palace/prefix",
+      "pid": 2852,
+      "startedAt": "2026-10-24T23:47:21.517Z",
+      "stdout": "/var/tmp/mcp-device-v12-completion-20261025/sbom-palace.stdout.log",
+      "stderr": "/var/tmp/mcp-device-v12-completion-20261025/sbom-palace.stderr.log",
+      "state": "COMPLETED",
+      "exitCode": 0,
+      "endedAt": "2026-10-24T23:47:21.996Z",
+      "elapsedMs": 479,
+      "counts": {},
+      "stdoutSha256": "a9856fc826ff5b99356fdb525786717d44fef1053d3a46f7b4206b353fa1b7c0",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "platform",
+      "program": "/usr/bin/node",
+      "args": [
+        "scripts/v12/run-platform-tests.mjs"
+      ],
+      "cwd": "/var/tmp/mcp-device-v12-completion-20261025/platform",
+      "pid": 2873,
+      "startedAt": "2026-10-24T23:47:22.028Z",
+      "stdout": "/var/tmp/mcp-device-v12-completion-20261025/platform.stdout.log",
+      "stderr": "/var/tmp/mcp-device-v12-completion-20261025/platform.stderr.log",
+      "state": "COMPLETED",
+      "exitCode": 0,
+      "endedAt": "2026-10-24T23:48:10.707Z",
+      "elapsedMs": 48679,
+      "counts": {
+        "tests": 133,
+        "pass": 133,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      "stdoutSha256": "fcb8ce4c008a160660c251f6c154a9bb3dd30c346e38061b30cd5c47a6e5bda8",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "server",
+      "program": "/usr/bin/node",
+      "args": [
+        "scripts/v12/run-platform-tests.mjs",
+        "--server"
+      ],
+      "cwd": "/var/tmp/mcp-device-v12-completion-20261025/platform",
+      "pid": 4185,
+      "startedAt": "2026-10-24T23:48:10.721Z",
+      "stdout": "/var/tmp/mcp-device-v12-completion-20261025/server.stdout.log",
+      "stderr": "/var/tmp/mcp-device-v12-completion-20261025/server.stderr.log",
+      "state": "COMPLETED",
+      "exitCode": 0,
+      "endedAt": "2026-10-24T23:48:54.712Z",
+      "elapsedMs": 43991,
+      "counts": {
+        "tests": 42,
+        "pass": 42,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      "stdoutSha256": "f963b8411fd70cf4eb40720b591df7225f05de452bdc2cbcc34d32cae7b042fe",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "artifacts": [
+    {
+      "product": "mcp-device",
+      "file": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\hcu-lab.me-mcp-device-1.0.12.tgz",
+      "bytes": 2139826,
+      "sha256": "f54807566a0b073b85e0bc9e19703c7ef888da8047d372f2bc3e2258dd3322a0",
+      "linuxPath": "/mnt/e/test/mcp-device-v12-e2e-20261024-g6/artifacts/completion-2026-10-24T23-18-37-628Z/hcu-lab.me-mcp-device-1.0.12.tgz"
+    },
+    {
+      "product": "palace",
+      "file": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\hcu-lab.me-palace-1.0.12.tgz",
+      "bytes": 49557,
+      "sha256": "1be1d4ff69eb86ce5f29af74f81db9652394e9c76e8597328439398305a9fdc4",
+      "linuxPath": "/mnt/e/test/mcp-device-v12-e2e-20261024-g6/artifacts/completion-2026-10-24T23-18-37-628Z/hcu-lab.me-palace-1.0.12.tgz"
+    }
+  ],
+  "installs": [
+    {
+      "product": "mcp-device",
+      "fixture": "/var/tmp/mcp-device-v12-completion-20261025/cold-mcp-device",
+      "home": "/var/tmp/mcp-device-v12-completion-20261025/cold-mcp-device/home",
+      "prefix": "/var/tmp/mcp-device-v12-completion-20261025/cold-mcp-device/prefix",
+      "packageRoot": "/var/tmp/mcp-device-v12-completion-20261025/cold-mcp-device/prefix/node_modules/@hcu-lab.me/mcp-device",
+      "version": "1.0.12",
+      "packageLockSha256": "5f790a03e2795c9d37a64811c37cb2e49d8e88c1809daf98f56ed660169c56cf",
+      "skillStates": [
+        {
+          "target": "/var/tmp/mcp-device-v12-completion-20261025/cold-mcp-device/home/.agents/skills/palace-cli",
+          "state": "owned-pristine"
+        },
+        {
+          "target": "/var/tmp/mcp-device-v12-completion-20261025/cold-mcp-device/home/.pi/agent/skills/palace-cli",
+          "state": "owned-pristine"
+        }
+      ]
+    },
+    {
+      "product": "palace",
+      "fixture": "/var/tmp/mcp-device-v12-completion-20261025/cold-palace",
+      "home": "/var/tmp/mcp-device-v12-completion-20261025/cold-palace/home",
+      "prefix": "/var/tmp/mcp-device-v12-completion-20261025/cold-palace/prefix",
+      "packageRoot": "/var/tmp/mcp-device-v12-completion-20261025/cold-palace/prefix/node_modules/@hcu-lab.me/palace",
+      "version": "1.0.12",
+      "packageLockSha256": "e04cf3b4c11f2894d5cae361eeadeca6eab6af053de0c3998140e14d9be5b478",
+      "skillStates": [
+        {
+          "target": "/var/tmp/mcp-device-v12-completion-20261025/cold-palace/home/.agents/skills/palace-cli",
+          "state": "owned-pristine"
+        },
+        {
+          "target": "/var/tmp/mcp-device-v12-completion-20261025/cold-palace/home/.pi/agent/skills/palace-cli",
+          "state": "owned-pristine"
+        }
+      ]
+    }
+  ],
+  "status": "PASS",
+  "endedAt": "2026-10-24T23:48:54.724Z"
+}

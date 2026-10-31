@@ -1,0 +1,265 @@
+{
+  "schemaVersion": 2,
+  "head": "1e454c1cdcbe3265892f751034fa389432d65405",
+  "branch": "feat/v12-platform-20261022",
+  "files": [
+    {
+      "status": " M",
+      "path": "docs/v12-platform.md",
+      "bytes": 18970,
+      "sha256": "4f55ea9ad50ff240faec439cf743499ebb35d0334f6936ead6261aeb42bc8d66"
+    },
+    {
+      "status": " M",
+      "path": "package.json",
+      "bytes": 5872,
+      "sha256": "2d88f02d0f0b94fd032e2708a8d71185c4a21acca0bef2621fa0e9e9709a61a1"
+    },
+    {
+      "status": " M",
+      "path": "scripts/v12/run-device-parity.mjs",
+      "bytes": 14760,
+      "sha256": "17112663947dd8de35741b4b806f7f13e8822f47dfd940bdacd367e89ab7fbc2"
+    },
+    {
+      "status": " M",
+      "path": "skills/palace-cli/SKILL.md",
+      "bytes": 3673,
+      "sha256": "3910c44e9cb76998397428a14ffd0b968b176626be938666669dd074bfeb219e"
+    },
+    {
+      "status": " M",
+      "path": "src/device/device.ts",
+      "bytes": 17280,
+      "sha256": "53b801fc4069797dab2d321658d2dd8e659cde649ac75668732abf0fbcfa9bfd"
+    },
+    {
+      "status": " M",
+      "path": "src/mcp-device.ts",
+      "bytes": 2106,
+      "sha256": "6bbb904c0fc23163f75cfaa031f3f80f4d5edc39b3a61038fa0aca08b8cc5be4"
+    },
+    {
+      "status": " M",
+      "path": "src/platform/cli.ts",
+      "bytes": 16464,
+      "sha256": "e353c5b45531c14d358e1ebbb9f5b5f12cd69607a8bf6395d4b1ac2cd37d3bdc"
+    },
+    {
+      "status": " M",
+      "path": "src/platform/plugin-driver.ts",
+      "bytes": 18142,
+      "sha256": "c665d203ef6d50c2d970b9a632283817e7b1428f9a5273674cec58758611821e"
+    },
+    {
+      "status": " M",
+      "path": "src/platform/plugin-host.ts",
+      "bytes": 37351,
+      "sha256": "9d550c33e09db9be4f861dd4f414390abcfdb2acb412360e461a7a7da402f346"
+    },
+    {
+      "status": " M",
+      "path": "src/plugins/palace/cli.ts",
+      "bytes": 16571,
+      "sha256": "38e822d798bb3196900bffb7a071a4a233960b88063ab24d8562851284906b9d"
+    },
+    {
+      "status": " M",
+      "path": "src/plugins/palace/index.ts",
+      "bytes": 27156,
+      "sha256": "917e00877212a0cf114c780a790df520a28e0fbce9622674a5c6cb9175cfcce2"
+    },
+    {
+      "status": " M",
+      "path": "src/plugins/palace/store.ts",
+      "bytes": 15116,
+      "sha256": "1ff26916cf5e0c71ae46950a48ade4fd32325656a683d907e6d6748f13358b21"
+    },
+    {
+      "status": " M",
+      "path": "test/test-canonical-release-cleanup.js",
+      "bytes": 6963,
+      "sha256": "cee12b65436a8194b560ff14242b3f79c58bb17f05b87dec9a87da5d182f1d2e"
+    },
+    {
+      "status": " M",
+      "path": "test/test-green-hardening.js",
+      "bytes": 6014,
+      "sha256": "27aa8385badad5bf7cca8f5a3bfddabad7dfb99b6dd5edfa58b3c7590f0924ca"
+    },
+    {
+      "status": " M",
+      "path": "test/test-mcp-device-branding.js",
+      "bytes": 6586,
+      "sha256": "107a7ade420ad60082e72f88b6beb603e86037b82e05a2aa5e0f8c9897485307"
+    },
+    {
+      "status": " M",
+      "path": "test/test-version-consistency.js",
+      "bytes": 1226,
+      "sha256": "202a1a11385fed28702d06e86d7fa84e8436413168044e148884afe69932709c"
+    },
+    {
+      "status": " M",
+      "path": "test/v12/palace-task-replay.test.js",
+      "bytes": 6747,
+      "sha256": "03d082674955872a165079287a06a995991dd2cf891b17eb98944ace1437da43"
+    },
+    {
+      "status": " M",
+      "path": "test/v12/plugin-host.test.js",
+      "bytes": 16984,
+      "sha256": "fc302e76aae31de88cdce79b5bc0c3b9b181f8807959bc7a0e9b4df6166382fd"
+    },
+    {
+      "status": " M",
+      "path": "test/v12/plugin-services.test.js",
+      "bytes": 11489,
+      "sha256": "7719c947fb25013596189d71b408df4bcc8b3c7fe3245abfca2e29975d8dda9e"
+    },
+    {
+      "status": " M",
+      "path": "test/v12/server-package-cold.test.mjs",
+      "bytes": 13968,
+      "sha256": "d9358e60e1c1210e8d6c69c084612890c786ae0a069eba4b48fd3cf2e6baf2f9"
+    },
+    {
+      "status": "??",
+      "path": "scripts/v12/build-palace-package.mjs",
+      "bytes": 3943,
+      "sha256": "8bd6012805c8846b8a4b2392eeaadf75ea5e2d1d21020cac19f6ebc1003e21a8"
+    },
+    {
+      "status": "??",
+      "path": "scripts/v12/install-palace-skill.cjs",
+      "bytes": 935,
+      "sha256": "43fc72c2aa6590d99fffd85913ef5e1f1179e5b58a880d12d5cfeabf06f1458d"
+    },
+    {
+      "status": "??",
+      "path": "scripts/v12/palace-package-closure.mjs",
+      "bytes": 5587,
+      "sha256": "78431132f63c7a50f2a15001a8f950e79020f395cac3d4e5e229b1e67abce4d5"
+    },
+    {
+      "status": "??",
+      "path": "specs/008-v12-platform/ONE_AGENT_EXECUTION_PROMPT.md",
+      "bytes": 5860,
+      "sha256": "ddb64872c03b6e589ac21254713bd8ef91e1bcdfd81179573125860c66a76def"
+    },
+    {
+      "status": "??",
+      "path": "specs/008-v12-platform/V12_END_TO_END_COMPLETION_SPEC.md",
+      "bytes": 31891,
+      "sha256": "d4bde67dcb43fabc967060c4254378f1f2871d10179fedf8d4233a174f45c394"
+    },
+    {
+      "status": "??",
+      "path": "src/platform/coordination-lock.ts",
+      "bytes": 8218,
+      "sha256": "c2da0700e8488bf31fdaa9545aebfa6761a731df5dd14b6bb1f884ef5414805b"
+    },
+    {
+      "status": "??",
+      "path": "src/platform/process-identity.ts",
+      "bytes": 2809,
+      "sha256": "06602c6742b13b979ea06526de5d1a95cdb7d09de3d34d1b7284de433177ecf2"
+    },
+    {
+      "status": "??",
+      "path": "src/plugins/palace/process-birth.ts",
+      "bytes": 130,
+      "sha256": "30b48cb1f42b20a576f84ede1389c311d218385e969b6b77864fc770605e5f34"
+    },
+    {
+      "status": "??",
+      "path": "src/plugins/palace/skill-manager.ts",
+      "bytes": 51051,
+      "sha256": "5010166436bf73c3b10aa2cec003fa6287cb26a3b81b65fde8b463f086917e95"
+    },
+    {
+      "status": "??",
+      "path": "test/v12/d0-architecture-regressions.test.mjs",
+      "bytes": 14787,
+      "sha256": "4b5b216a9122753a7939c3693df332650ef5b45ef3afde2c58787bef929cb47e"
+    },
+    {
+      "status": "??",
+      "path": "test/v12/d1-opus-regressions.test.mjs",
+      "bytes": 8928,
+      "sha256": "1a840741d799aa586cb0cd1ed3f5abc312429aed9b8729ff98b74858388e0f5a"
+    },
+    {
+      "status": "??",
+      "path": "test/v12/palace-cli-contract.test.mjs",
+      "bytes": 3551,
+      "sha256": "494cb25bfeb755dd9239e6bd1dd1e7592535ba17e5a8fe84df542c2295008453"
+    },
+    {
+      "status": "??",
+      "path": "test/v12/palace-distribution.test.mjs",
+      "bytes": 5108,
+      "sha256": "2fb05f474df414256d35da018e5f1a4345ff26ebdcfa612fbc72cc6944d8c377"
+    },
+    {
+      "status": "??",
+      "path": "test/v12/palace-managed-data-root.test.mjs",
+      "bytes": 3131,
+      "sha256": "8ebf1f417cba8db078a7d0e183f21f1851a601084e4a5ddc6885167a3d2dc696"
+    },
+    {
+      "status": "??",
+      "path": "test/v12/palace-owner-policy.test.mjs",
+      "bytes": 3380,
+      "sha256": "3d7d2d6c772d0618ee1fc5a06bee324734ba9d07079e451c9c6662e5f960ebaf"
+    },
+    {
+      "status": "??",
+      "path": "test/v12/palace-package-types.test.mjs",
+      "bytes": 3235,
+      "sha256": "4a63f774da07f94ee44fbceb72a9786c50e122620ed213c18af29e6990da3c2c"
+    },
+    {
+      "status": "??",
+      "path": "test/v12/palace-process-identity.test.mjs",
+      "bytes": 3958,
+      "sha256": "2c7b4a031c9edee2e57c921e886f14d68f4f4fb0052b84b02e56e3d93a0aefef"
+    },
+    {
+      "status": "??",
+      "path": "test/v12/palace-skill-lifecycle.test.mjs",
+      "bytes": 9004,
+      "sha256": "01d76c12725bed7ac15d5e85d963b5d7330269491e063c78f1687afc79fe7176"
+    },
+    {
+      "status": "??",
+      "path": "test/v12/palace-skill-preservation.test.mjs",
+      "bytes": 2274,
+      "sha256": "f46f6d309988caf7bff04a152e11e1a98b1c4b54fed40568d48e0e892b24d037"
+    },
+    {
+      "status": "??",
+      "path": "test/v12/palace-skill-probe.test.mjs",
+      "bytes": 7512,
+      "sha256": "b538856b1bfa391f5b51f9c02ac587ee8c5462a9975879af81931613ba000008"
+    },
+    {
+      "status": "??",
+      "path": "test/v12/palace-skill-recovery-guards.test.mjs",
+      "bytes": 5207,
+      "sha256": "316589037728065184188f458cd61bffc24518d6379699b64965621db908473e"
+    },
+    {
+      "status": "??",
+      "path": "test/v12/palace-skill-review-regressions.test.mjs",
+      "bytes": 9427,
+      "sha256": "356d101dddaef7af5891bc48846c12398457b2953ba3c7cab988ed27afb2edaa"
+    },
+    {
+      "status": "??",
+      "path": "test/v12/palace-skill-review2.test.mjs",
+      "bytes": 8602,
+      "sha256": "652532bf0043a5b3d0d709e935799b004cda90ec1eeeb2adfabb00489106c10f"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "label": "windows-final-completion-run",
+  "cwd": "E:/git-project/agent-mcp-device-v12",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "evidence/v12-e2e-20261024-g6/complete-windows-final.cjs"
+  ],
+  "startedAt": "2026-10-24T11:21:58.865Z",
+  "endedAt": "2026-10-24T11:27:24.348Z",
+  "durationMs": 325480.5451,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 0,
+  "signal": null,
+  "counts": {
+    "tests": 87,
+    "pass": 87,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\windows-final-completion-run.stdout.log",
+    "sha256": "e71649953cd2e4ffa3337cee612b992677f7165c9f98dcb3756fc2f3e4d63996"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\windows-final-completion-run.stderr.log",
+    "sha256": "a3abb6f7f46927f7cb68f0d287d7c1a445db355c207f99fa482e50cf1c87c50e"
+  }
+}

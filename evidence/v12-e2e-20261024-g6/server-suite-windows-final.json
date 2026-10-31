@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "label": "server-suite-windows-final",
+  "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\candidate-three",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "scripts/v12/run-platform-tests.mjs",
+    "--server"
+  ],
+  "startedAt": "2026-10-24T11:17:23.633Z",
+  "endedAt": "2026-10-24T11:18:33.434Z",
+  "durationMs": 69799.39069999999,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 0,
+  "signal": null,
+  "counts": {
+    "tests": 42,
+    "pass": 42,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\server-suite-windows-final.stdout.log",
+    "sha256": "ab53b218f9009ad71270bb4cb99e94703690cc97dd5bb0826b14abff49137286"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\server-suite-windows-final.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

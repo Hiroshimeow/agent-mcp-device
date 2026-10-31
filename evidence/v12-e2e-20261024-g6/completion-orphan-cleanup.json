@@ -1,0 +1,7 @@
+﻿{
+    "exitCode":  0,
+    "command":  "\"C:\\Program Files\\nodejs\\node.exe\" --test --test-concurrency=1 test/v12/d0-architecture-regressions.test.mjs",
+    "testPid":  36384,
+    "recordedAt":  "2026-10-24T23:19:34.6520361Z",
+    "reason":  "Abandoned test tree from prior continuation; no live service targeted"
+}

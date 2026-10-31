@@ -1,0 +1,19 @@
+{
+  "observedAt": "2026-10-29T23:49:37.647Z",
+  "sessionId": "remote-ea947b2f-25c8-42a0-978b-19304e57f1b1",
+  "command": "& 'C:/Users/DuongNH66/.m365-copilot2dom/m365.cmd' doctor",
+  "deviceId": "lppduongnh66-1-7337f19f",
+  "host": "LPP00374779A",
+  "ready": false,
+  "reason": "CDP_UNREACHABLE",
+  "detail": "http://127.0.0.1:9222=CDP_UNREACHABLE:TimeoutError; http://127.0.0.1:9223=CDP_UNREACHABLE:json/version unavailable",
+  "runnerVersion": "0.2.0",
+  "runnerCommit": "6baa56c1955c",
+  "wrapperExitCode": 1,
+  "innerDoctorExitCode": "not captured by this direct launcher retained process; prior separate doctor exit7 is historical only",
+  "runtimeSeconds": 36.04,
+  "rawReceipt": "receipts/tool-faae0895.json",
+  "newSubmission": false,
+  "remoteCurrentPacketStaged": false,
+  "browserMaintenancePerformed": false
+}

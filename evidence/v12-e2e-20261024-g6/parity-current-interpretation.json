@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 2,
+  "recordedAt": "2026-10-25T02:58:00.000Z",
+  "baseline": {
+    "path": "E:/git-project/agent-mcp-device",
+    "head": "1df22e6",
+    "trackedState": "clean"
+  },
+  "candidate": {
+    "path": "E:/git-project/agent-mcp-device-v12",
+    "head": "1e454c1cdcbe3265892f751034fa389432d65405",
+    "artifactDeviceSha256": "cd20147d602e9b498d6a76e6847263908940f6ded04ef04ceb74b1b402ac1970",
+    "artifactPalaceSha256": "033df49857fe43f0158446a8afb9e336477a4d4d5014a37c064771b1fa3482dc"
+  },
+  "lanes": {
+    "windowsPortFree": {"passed": 35, "failed": 6, "receipt": "E:/test/mcp-device-v12-e2e-20261024-g6/parity-current/port-free/device-parity-receipt.json"},
+    "linuxPortFree": {"passed": 39, "failed": 2, "receipt": "/var/tmp/mcp-device-v12-parity-linux-port-free/device-parity-receipt.json"},
+    "context": {"passed": 36, "failed": 0, "receipt": "E:/test/mcp-device-v12-e2e-20261024-g6/parity-current/context/device-parity-receipt.json"},
+    "logPalace": {"passed": 2, "failed": 0, "receipt": "E:/test/mcp-device-v12-e2e-20261024-g6/parity-current/log-palace/device-parity-receipt.json"},
+    "contractStatic": {"passed": 8, "failed": 0, "receipt": "E:/test/mcp-device-v12-e2e-20261024-g6/parity-current/contract-static-fixed2/device-parity-receipt.json"}
+  },
+  "coreComparator": {
+    "status": "PASS",
+    "platforms": ["win32", "linux"],
+    "results": 14,
+    "sideEffectFamilies": 4,
+    "snapshotsDeepEqual": true,
+    "windowsSnapshot": "E:/test/mcp-device-v12-e2e-20261024-g6/parity-current/port-free/core-comparator",
+    "linuxSnapshot": "/var/tmp/mcp-device-v12-parity-linux-port-free/core-comparator"
+  },
+  "legacyFailures": [
+    {
+      "test": "test/test-allowed-directories.js",
+      "windows": "baseline+candidate FAIL",
+      "linux": "baseline+candidate PASS",
+      "classification": "WINDOWS_FIXTURE_PATH_DEFECT",
+      "reason": "Legacy fixture hard-codes C:/ while isolated HOME/staging is on E:. Linux proves product behavior; no candidate-only regression."
+    },
+    {
+      "test": "test/test-symlink-security.js",
+      "windows": "baseline+candidate FAIL EPERM",
+      "linux": "baseline+candidate PASS",
+      "classification": "WINDOWS_PRIVILEGE_FIXTURE_DEFECT",
+      "reason": "Directory symlink creation requires unavailable Windows privilege in the legacy fixture. Linux executes the behavior and passes for both targets."
+    },
+    {
+      "test": "test/test-edit-block-occurrences.js",
+      "windows": "baseline+candidate FAIL",
+      "linux": "baseline+candidate FAIL",
+      "classification": "STALE_LEGACY_MESSAGE_ASSERTION",
+      "reason": "The legacy test asserts the obsolete exact phrase 'Successfully applied 4 edits'. The stronger production Core comparator executes multi-occurrence edit, expected-occurrence atomic failure, exact result shape/text and final file bytes against original v11 and v12; all snapshots are deeply equal. This is replacement evidence, not a waiver of product behavior."
+    }
+  ],
+  "harnessRepairs": [
+    "Allow local named-pipe/Unix-socket IPC while still denying TCP in port-free groups.",
+    "Copy package-lock.json into staged targets.",
+    "Copy scripts and .github instead of symlinking scripts whose direct-entry guards compare import.meta.url.",
+    "Use unique package-builder outputs for concurrent tests."
+  ],
+  "verdict": "NO_CANDIDATE_NATIVE_REGRESSION_IN_EXECUTED_FAMILIES",
+  "limitations": "This receipt does not replace D2/D3 review, production soak, or unexecuted production-only families."
+}

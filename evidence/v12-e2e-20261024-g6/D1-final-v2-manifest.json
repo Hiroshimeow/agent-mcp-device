@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "head": "1e454c1cdcbe3265892f751034fa389432d65405",
+  "branch": "feat/v12-platform-20261022",
+  "patch": {
+    "path": "evidence/v12-e2e-20261024-g6/D1-final-v2-tracked.patch",
+    "bytes": 284562,
+    "sha256": "77e6885d4ff520fc5ac440452300309f995bf30677bb50f8bd29f7fcd406bd17"
+  },
+  "artifacts": [
+    {
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/artifacts/final-v2/hcu-lab.me-mcp-device-1.0.12.tgz",
+      "bytes": 2156228,
+      "sha256": "3abbe9d03f2351b10359344f11d9fe8fca6b95e93a3f486a70d79e692b3723a3"
+    },
+    {
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/artifacts/final-v2/hcu-lab.me-palace-1.0.12.tgz",
+      "bytes": 62090,
+      "sha256": "60a9054a2e5e3b6917d26903b18046921319a299778595891430b5f88f5176b1"
+    }
+  ],
+  "skill": {
+    "path": "skills/palace-cli/SKILL.md",
+    "bytes": 4913,
+    "sha256": "4e8642d49528be37b37c1bc82e6a5c2706cc49032a7a1ad645b1ddf737c14788"
+  },
+  "recordedAt": "2026-10-25T13:22:13.381Z"
+}

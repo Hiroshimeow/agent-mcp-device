@@ -1,0 +1,238 @@
+{
+  "observedAt": "2026-10-24T23:27:49.841Z",
+  "type": "configured-provider-model-discovery",
+  "secretsIncluded": false,
+  "result": [
+    {
+      "provider": "cliproxy-g8",
+      "httpStatus": 200,
+      "models": [
+        {
+          "id": "gpt-oss-120b-medium",
+          "owned_by": "antigravity"
+        },
+        {
+          "id": "gemini-3.5-flash-lite",
+          "owned_by": "antigravity"
+        },
+        {
+          "id": "gryphe/mythomax-l2-13b",
+          "owned_by": "openrouter zeroclaw wsl",
+          "created": 1791304897
+        },
+        {
+          "id": "gemini-3.8-flash-high",
+          "owned_by": "antigravity"
+        },
+        {
+          "id": "gpt-6-luna",
+          "owned_by": "openai",
+          "created": 1790035200
+        },
+        {
+          "id": "gpt-5.6-sol",
+          "owned_by": "openai",
+          "created": 1783616400
+        },
+        {
+          "id": "gpt-5.6-luna",
+          "owned_by": "openai",
+          "created": 1783616400
+        },
+        {
+          "id": "gemini-3-flash",
+          "owned_by": "antigravity"
+        },
+        {
+          "id": "gpt-image-2",
+          "owned_by": "openai",
+          "created": 1704067200
+        },
+        {
+          "id": "gpt-image-2.5-flare",
+          "owned_by": "openai",
+          "created": 1704067200
+        },
+        {
+          "id": "gpt-image-2.5",
+          "owned_by": "openai",
+          "created": 1704067200
+        },
+        {
+          "id": "gpt-image-1.5",
+          "owned_by": "openai",
+          "created": 1704067200
+        },
+        {
+          "id": "gemini-3.1-flash-lite",
+          "owned_by": "antigravity"
+        },
+        {
+          "id": "anthropic/claude-3.5-sonnet",
+          "owned_by": "openrouter zeroclaw wsl",
+          "created": 1791304897
+        },
+        {
+          "id": "gpt-6-astra",
+          "owned_by": "openai",
+          "created": 1783616400
+        },
+        {
+          "id": "gpt-6-sol",
+          "owned_by": "openai",
+          "created": 1790035200
+        },
+        {
+          "id": "gpt-6.1-sol",
+          "owned_by": "openai",
+          "created": 1790640000
+        },
+        {
+          "id": "codex-auto-review",
+          "owned_by": "openai",
+          "created": 1776902400
+        },
+        {
+          "id": "gpt-image-2.5-sunburst",
+          "owned_by": "openai",
+          "created": 1704067200
+        },
+        {
+          "id": "claude-opus-4-6-thinking",
+          "owned_by": "antigravity"
+        },
+        {
+          "id": "openrouter/auto",
+          "owned_by": "openrouter zeroclaw wsl",
+          "created": 1791304897
+        },
+        {
+          "id": "gpt-5.6-terra",
+          "owned_by": "openai",
+          "created": 1783616400
+        },
+        {
+          "id": "claude-sonnet-4-6",
+          "owned_by": "antigravity"
+        },
+        {
+          "id": "gemini-3.1-flash-image",
+          "owned_by": "antigravity"
+        }
+      ]
+    },
+    {
+      "provider": "cliproxy-2080",
+      "httpStatus": 200,
+      "models": [
+        {
+          "id": "claude-sonnet-4-6",
+          "owned_by": "antigravity"
+        },
+        {
+          "id": "gemini-3.1-flash-image",
+          "owned_by": "antigravity"
+        },
+        {
+          "id": "claude-opus-5-5-high",
+          "owned_by": "antigravity"
+        },
+        {
+          "id": "gemini-4-argon-high",
+          "owned_by": "antigravity"
+        },
+        {
+          "id": "gemini-3.8-flash-high",
+          "owned_by": "antigravity"
+        },
+        {
+          "id": "gemini-3.1-pro-preview",
+          "owned_by": "google"
+        },
+        {
+          "id": "gemini-2.5-flash",
+          "owned_by": "google"
+        },
+        {
+          "id": "gemini-3.1-flash-lite-preview",
+          "owned_by": "google"
+        },
+        {
+          "id": "gpt-6.1-sol",
+          "owned_by": "openai",
+          "created": 1790640000
+        },
+        {
+          "id": "gpt-oss-120b-medium",
+          "owned_by": "antigravity"
+        },
+        {
+          "id": "gemini-3.5-flash-lite",
+          "owned_by": "antigravity"
+        },
+        {
+          "id": "gemini-3-flash-preview",
+          "owned_by": "google"
+        },
+        {
+          "id": "claude-opus-4-6-thinking",
+          "owned_by": "antigravity"
+        },
+        {
+          "id": "gemini-3.1-flash-lite",
+          "owned_by": "antigravity"
+        },
+        {
+          "id": "claude-sonnet-5-5-high",
+          "owned_by": "antigravity"
+        },
+        {
+          "id": "gemini-3-flash",
+          "owned_by": "antigravity"
+        },
+        {
+          "id": "gemini-2.5-pro",
+          "owned_by": "google"
+        },
+        {
+          "id": "gemini-2.5-flash-lite",
+          "owned_by": "google"
+        },
+        {
+          "id": "gemini-3-pro-preview",
+          "owned_by": "google"
+        },
+        {
+          "id": "gemini-3.5-flash",
+          "owned_by": "google"
+        }
+      ]
+    },
+    {
+      "provider": "a5-local",
+      "httpStatus": 200,
+      "models": [
+        {
+          "id": "qwen-flash",
+          "owned_by": "llamacpp",
+          "created": 1792884469
+        },
+        {
+          "id": "qwen36genesis",
+          "owned_by": "llamacpp",
+          "created": 1792884469
+        },
+        {
+          "id": "qwen36hauhau",
+          "owned_by": "llamacpp",
+          "created": 1792884469
+        },
+        {
+          "id": "qwen38a",
+          "owned_by": "llamacpp",
+          "created": 1792884469
+        }
+      ]
+    }
+  ]
+}

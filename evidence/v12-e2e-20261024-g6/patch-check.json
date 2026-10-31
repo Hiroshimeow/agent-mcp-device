@@ -1,0 +1,21 @@
+{
+  "checkedAt": "2026-10-24T11:30:29.232Z",
+  "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\patch-verification",
+  "originalFiles": [
+    "src/device/device.ts",
+    "src/plugins/palace/cli.ts",
+    "test/test-canonical-release-cleanup.js",
+    "test/test-green-hardening.js",
+    "test/test-mcp-device-branding.js",
+    "test/test-version-consistency.js",
+    "scripts/v12/install-palace-skill.cjs"
+  ],
+  "patch": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\implementation-diff.patch",
+  "patchSha256": "7dec2362ac16834914cf0e09b9ad07b048ec95c40f1b7b4aaf6721cd14f74860",
+  "exitCode": 0,
+  "stdout": "",
+  "stderr": "",
+  "applied": false,
+  "status": "PASS",
+  "priorCheck": "The TDD baseline already held the new test files; the earlier check could not add them. This check uses their verified absent-before state."
+}

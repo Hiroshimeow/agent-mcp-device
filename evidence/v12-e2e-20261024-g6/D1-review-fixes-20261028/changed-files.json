@@ -1,0 +1,26 @@
+[
+  {
+    "path": "src/platform/runtime-root.ts",
+    "bytes": 2850,
+    "sha256": "92f816aff464174a9718af7a7cbf99ab07fcdc01a9f3c2bb802f210c1497abe8",
+    "scope": "This writer changed this file; inherited WIP also exists, so HEAD diff is not this writer delta."
+  },
+  {
+    "path": "src/plugins/palace/cli.ts",
+    "bytes": 19052,
+    "sha256": "d16f99897596de1846ca2b93f736bcfa88bf136fc8157cdc9c57ff9f580d08e6",
+    "scope": "This writer changed this file; inherited WIP also exists, so HEAD diff is not this writer delta."
+  },
+  {
+    "path": "src/plugins/palace/store.ts",
+    "bytes": 16390,
+    "sha256": "2eb29b42afbf222c7b478e9636f74cf31cb9bf4eede3916ff3d786a571860945",
+    "scope": "This writer changed this file; inherited WIP also exists, so HEAD diff is not this writer delta."
+  },
+  {
+    "path": "test/v12/d1-read-init-regressions.test.mjs",
+    "bytes": 4412,
+    "sha256": "b5d0a2967cb4109987737095dd9dc935723fcde5ad167ed8bca9a602ac893782",
+    "scope": "This writer changed this file; inherited WIP also exists, so HEAD diff is not this writer delta."
+  }
+]

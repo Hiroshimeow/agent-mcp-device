@@ -1,0 +1,24 @@
+{
+  "startedAt": "2026-10-24T11:21:58.936Z",
+  "platform": "win32",
+  "node": "v22.22.2",
+  "steps": [
+    {
+      "label": "root-suite-windows-after-cleanup",
+      "exitCode": 0
+    },
+    {
+      "label": "platform-windows-final",
+      "exitCode": 0
+    },
+    {
+      "label": "live-cli-1000-windows-final",
+      "exitCode": 0
+    }
+  ],
+  "artifactSourceSha256": "cc68ed16ff0e5bd64ffdc977eb2d2ba53f1592b5c2486178ecfed992617ce39d",
+  "validationSourceSha256": "6876ad09877e2facd2a71eb66256862980ba0fd5c28fd4bc98bb849612174e26",
+  "runtimeMatchesArtifact": true,
+  "status": "PASS",
+  "endedAt": "2026-10-24T11:27:24.322Z"
+}

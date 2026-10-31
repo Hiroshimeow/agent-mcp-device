@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 2,
+  "createdAt": "2026-10-26T14:06:23.747Z",
+  "currentEntries": [
+    {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\pi-g6-2080-20261026\\candidate-2026-10-26T13-38-22-991Z\\artifacts\\hcu-lab.me-mcp-device-1.0.12.tgz",
+      "bytes": 2157078,
+      "sha256": "8307a856353e64da7e2912f3d7c584a9b2ee3eccc7df578f325185421edec324"
+    },
+    {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\pi-g6-2080-20261026\\candidate-2026-10-26T13-38-22-991Z\\artifacts\\hcu-lab.me-palace-1.0.12.tgz",
+      "bytes": 62906,
+      "sha256": "609a228b80063d2c53dd4d63cbe834afe4cf3dc8277d483e23cdf6a01db56a7f"
+    },
+    {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\pi-g6-2080-20261026\\candidate-2026-10-26T13-38-22-991Z\\build-receipt.json",
+      "bytes": 1372,
+      "sha256": "478c56b64c78a76a2ff7f745b6557c40a54a20ad8a314930f531d870038e5e42"
+    },
+    {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\pi-g6-2080-20261026\\candidate-2026-10-26T13-38-22-991Z\\artifact-audit\\receipt.json",
+      "bytes": 3152,
+      "sha256": "989357fd2dc2460c03f70ee294d2b62a35e296e2ea952221a2433a087424f98e"
+    },
+    {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\pi-g6-2080-20261026\\candidate-2026-10-26T13-38-22-991Z\\windows-gates\\receipt.json",
+      "bytes": 5673,
+      "sha256": "4d88db2e5e0569e5142be7edb35b95b52f4b87f6ddab30e3158a7e33d896dcad"
+    },
+    {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\pi-g6-2080-20261026\\candidate-2026-10-26T13-38-22-991Z\\linux-gates\\receipt.json",
+      "bytes": 93,
+      "sha256": "34eaa85a47a7011b2c5417de477050823307c3c426de0782689063b863f849ee"
+    },
+    {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\pi-g6-2080-20261026\\candidate-2026-10-26T13-38-22-991Z\\supporting-gates\\receipt.json",
+      "bytes": 2383,
+      "sha256": "a3140265490ae3dd337823a6d70fd34aa2d8a9a19e41cb3a6a415e029afe4b7f"
+    },
+    {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\pi-g6-2080-20261026\\benchmark-audit.json",
+      "bytes": 30117,
+      "sha256": "85408caffab1240704cf38f8206742ae6e9367cbee1e35ba33d81ec7c8f7dd66"
+    },
+    {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\pi-g6-2080-20261026\\withdrawal-red-green-receipt.json",
+      "bytes": 271,
+      "sha256": "d1c976f344c6b448ecfb4df6623769fe473f1c982aed11955966084df645736a"
+    },
+    {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\pi-g6-2080-20261026\\linux-core-parity.stdout.log",
+      "bytes": 422,
+      "sha256": "5f168af4262674a0e136bd782b264c75525308a1bf8e7b3a3fdac4549842826d"
+    },
+    {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\pi-g6-2080-20261026\\linux-root-privileged.stdout.log",
+      "bytes": 522,
+      "sha256": "056a2264dfdf3618b4cccbfa5af0bb05c2486110837abf9c1976caf2fcb8b3a4"
+    },
+    {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\pi-g6-2080-20261026\\linux-packed-validator.stdout.log",
+      "bytes": 986,
+      "sha256": "3387f49293e33dc1aa3ee21318287a836e2608272e30ec3f953a7a56e1371df2"
+    },
+    {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\pi-g6-2080-20261026\\same-prefix-1793022426539\\receipt.json",
+      "bytes": 1028,
+      "sha256": "7f3e7661b0c7d08ab60d5512d58f7c63b7cd3836ed640898ecbbcdc2723d0322"
+    },
+    {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\pi-g6-2080-20261026\\review-packet-20261026\\manifest.json",
+      "bytes": 9273,
+      "sha256": "63cd2d2a86238a047acf0b3d08a7f4e9b17069504c33c344c2a7aa5bda4558ed"
+    },
+    {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\pi-g6-2080-20261026\\review-packet-20261026\\EVIDENCE_ADDENDUM.md",
+      "bytes": 1445,
+      "sha256": "b650c23ae4de5fa307f87506de17e6b62d4612db940691cad43b44479cff368a"
+    },
+    {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\pi-g6-2080-20261026\\procedure-audit.stdout.log",
+      "bytes": 3091,
+      "sha256": "061559616abfe4488abf2a75dc211e939039a985a72b512474fccb71b579e313"
+    },
+    {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\pi-g6-2080-20261026\\live-cli-1000-final-receipt.json",
+      "bytes": 238530,
+      "sha256": "b0bc8970836d411e1bc44b6aca531f5966979ec47f99de0e99e7b7df23654d48"
+    },
+    {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\pi-g6-2080-20261026\\final-skill-agent-1793023278515\\receipt.json",
+      "bytes": 7864,
+      "sha256": "51fa7dafc199cf65b6d973a1f73ce58e4f126cee06b7c56b89c31fbcb0dce861"
+    },
+    {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\pi-g6-2080-20261026\\final-skill-agent-1793023278515\\independent-disposition.json",
+      "bytes": 1050,
+      "sha256": "805c24b28d9a2eb8f19c0068fb5a5756a30d47f598ff7e72a2ef39c64647f1a3"
+    },
+    {
+      "path": "E:\\git-project\\agent-mcp-device-v12\\specs\\008-v12-platform\\RUN_STATE.md",
+      "bytes": 16877,
+      "sha256": "aabd3dcce35e1a35c7cdc4244f3e3841ff4ea08b7c4ba8076fb9d94784c98549"
+    },
+    {
+      "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\FINAL_REPORT.md",
+      "bytes": 15560,
+      "sha256": "68f9589949cf1b693ed2b4ae7b08e7a3b8aa559f850d39f398add80b2c407f84"
+    },
+    {
+      "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\release-checklist.json",
+      "bytes": 52407,
+      "sha256": "12410cd7e523118ac16dd9be04279f9da115d19969db75d2ac8a410ad3215d1e"
+    },
+    {
+      "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\soak-status.json",
+      "bytes": 1237,
+      "sha256": "0414d41225060ed63f167dc1e98790e7a6faec87d854907e4046c520f6f6e7b5"
+    },
+    {
+      "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\actual-token-ab.json",
+      "bytes": 1770,
+      "sha256": "4c38f9b4f0773eb94fbcca87ca892198931cd15e0657b771b747e2c9a7b74db4"
+    },
+    {
+      "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\reviews-status.json",
+      "bytes": 1038,
+      "sha256": "594fb7e19a1da10cd2dca586c3c1caf50102aa42ffca53ff3d04f7a92ecfb2cc"
+    }
+  ],
+  "historicalIndex": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\pi-g6-2080-20261026\\prior-release-ledger\\evidence-index.json",
+  "historicalEntriesPreserved": 331,
+  "liveSoak": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\pi-g6-2080-20261026\\soak-24h-20261026T1342\\status.json",
+  "reviewPacket": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\pi-g6-2080-20261026\\review-packet-20261026\\REVIEW_PACKET.md",
+  "verdict": "RELEASE_BLOCKED_WITH_EVIDENCE"
+}

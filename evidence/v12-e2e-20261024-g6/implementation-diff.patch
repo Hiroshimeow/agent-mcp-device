@@ -1,0 +1,319 @@
+diff --git a/src/device/device.ts b/src/device/device.ts
+index 47546b0..b01d216 100644
+--- a/src/device/device.ts
++++ b/src/device/device.ts
+@@ -168,7 +168,7 @@ export class MCPDevice {
+                     runtime_reason: null,
+                     execution_runtime_generation: this.core!.runtimeInstanceId
+                 }),
+-                agentVersion: VERSION || process.env.npm_package_version || '1.0.11',
++                agentVersion: VERSION || process.env.npm_package_version || '1.0.12',
+                 onUpdateRequest: async (targetVersion, { requestId }) => {
+                     const record = await identity.loadOrCreate();
+                     const prepared = await prepareDevicePackageUpdate({
+diff --git a/src/plugins/palace/cli.ts b/src/plugins/palace/cli.ts
+index 6c98b26..a2bf4b9 100644
+--- a/src/plugins/palace/cli.ts
++++ b/src/plugins/palace/cli.ts
+@@ -76,7 +76,7 @@ function main():void {
+       }
+       sql+=where+' order by c.id limit ?';args.push(Math.max(limit,300));
+       const cards=(db.prepare(sql).all(...args) as {json:string}[]).map(row=>JSON.parse(row.json) as KnowledgeCard);
+-      const selected=terms.length?rankCandidates(cards,query,limit):cards.slice(0,limit);
++      const selected=command==='search'?rankCandidates(cards,query,limit):cards.slice(0,limit);
+       const result=selected.map(x=>full?x:preview(x));
+       response={ok:true,plugin:'palace',mode:'read-only',query:command==='search'?query:undefined,items:result,
+         returned:result.length,candidates:cards.length, note:'Snapshot results; evidence bytes not reverified by read-only CLI'};
+@@ -91,9 +91,9 @@ function main():void {
+       response={ok:true,plugin:'palace',mode:'read-only',kind:row.kind,card,
+         evidenceVerifiedNow:false,note:'Source integrity must be verified separately before treating this card as an established fact.'};
+     }else throw new Error('UNKNOWN_COMMAND');
+-    const bytes=Buffer.from(JSON.stringify(response));
++    const bytes=Buffer.from(JSON.stringify(response)+'\n');
+     if(bytes.length>maxBytes)throw new Error('BUDGET_TOO_SMALL: '+bytes.length+' > '+maxBytes);
+-    process.stdout.write(JSON.stringify(response,null,2)+'\n');
++    process.stdout.write(bytes);
+   } finally {db.close();}
+ }
+ try{main()}catch(error){
+diff --git a/test/test-canonical-release-cleanup.js b/test/test-canonical-release-cleanup.js
+index 8248fd5..489dd69 100644
+--- a/test/test-canonical-release-cleanup.js
++++ b/test/test-canonical-release-cleanup.js
+@@ -111,6 +111,8 @@ const brandSurfaceFiles = [
+ for (const rel of brandSurfaceFiles) {
+   let content = read(rel);
+   for (const literal of allowedIdentityLiterals) content = content.split(literal).join(' '.repeat(literal.length));
++  // Palace must recognize existing source-format directories without adopting their product branding.
++  if (rel === 'src/plugins/palace/sources.ts') content = content.split("'.claude'").join("'source-format'");
+   const matches = content.match(forbiddenBrandPattern) || [];
+   assert.deepEqual(matches, [], `${rel} exposes legacy/vendor branding: ${matches.join(', ')}`);
+ }
+diff --git a/test/test-green-hardening.js b/test/test-green-hardening.js
+index c8297bf..6fc71fc 100644
+--- a/test/test-green-hardening.js
++++ b/test/test-green-hardening.js
+@@ -2,6 +2,7 @@ import assert from 'assert';
+ import fs from 'fs/promises';
+ import os from 'os';
+ import path from 'path';
++import { once } from 'node:events';
+ 
+ // Self-sandbox even when this file is run directly instead of through
+ // test/run-all-tests.js. No test may touch the user's real ~/.mcp-device.
+@@ -87,7 +88,10 @@ try {
+   assert(liveSession, 'background session must remain registered');
+   liveSession.process.emit('error', new Error('synthetic late error'));
+   assert(terminals.sessions.has(background.pid), 'late error must not retire a live session');
+-  terminals.forceTerminate(background.pid);
++  // forceTerminate signals asynchronously; Windows still owns the fixture cwd until close.
++  const backgroundClosed = once(liveSession.process, 'close', { signal: AbortSignal.timeout(5000) });
++  assert.equal(terminals.forceTerminate(background.pid), true);
++  await backgroundClosed;
+ 
+   // 5) Remote inherited read_file URL support must fail closed before any fetch.
+   process.env.MCP_DEVICE_REMOTE = 'true';
+diff --git a/test/test-mcp-device-branding.js b/test/test-mcp-device-branding.js
+index 2d9972f..3d78bbe 100644
+--- a/test/test-mcp-device-branding.js
++++ b/test/test-mcp-device-branding.js
+@@ -13,11 +13,14 @@ assert.match(versionSource, new RegExp(`VERSION = ['\"]${pkg.version.replace(/\\
+ assert.equal(pkg.author, 'Hirohimeow');
+ assert.equal(pkg.bin?.['mcp-device'], 'dist/mcp-device.js');
+ assert.equal(pkg.bin?.md, 'dist/mcp-device.js');
+-assert.deepEqual(Object.keys(pkg.bin || {}).sort(), ['mcp-device', 'md']);
++assert.equal(pkg.bin?.palace, 'dist/plugins/palace/cli.js');
++assert.deepEqual(Object.keys(pkg.bin || {}).sort(), ['mcp-device', 'md', 'palace']);
+ assert.equal(pkg.mcpName, undefined);
+ assert.equal(pkg.repository?.url, 'git+https://github.com/Hiroshimeow/agent-mcp-device.git');
+-assert.deepEqual(pkg.files, ['dist', 'config/revoked-approvals.json', 'skills/mcp-device-context'],
+-  'published package includes only runtime, approval revocations and the local context skill; no upstream marketing assets');
++assert.deepEqual(pkg.files, [
++  'dist', 'config/revoked-approvals.json', 'skills/mcp-device-context', 'skills/palace-cli',
++  'control-plane/scripts', 'control-plane/config', 'control-plane/contracts', 'scripts/v12/install-palace-skill.cjs'
++], 'v12 ships the runtime, control plane, local skills and the owned Palace Skill installer; no upstream marketing assets');
+ for (const name of ['release:dry', 'release:mcp', 'release:alpha', 'release:skip-mcp', 'build:mcpb', 'validate:tools', 'open-chat', 'setup', 'setup:debug', 'remove']) {
+   assert.equal(pkg.scripts?.[name], undefined, `upstream product script ${name} must not remain in MCP Device`);
+ }
+@@ -27,7 +30,8 @@ assert.equal(pkg.scripts?.['release:major'], 'node scripts/release.js major');
+ assert.equal(pkg.scripts?.version, 'node scripts/sync-version.js && git add src/version.ts package-lock.json');
+ assert.equal(pkg.scripts?.start, 'node dist/mcp-device.js');
+ assert.equal(pkg.scripts?.['start:debug'], 'node --inspect-brk=9229 dist/mcp-device.js');
+-assert.equal(pkg.scripts?.postinstall, undefined, 'MCP Device must not run install-time telemetry');
++assert.equal(pkg.scripts?.postinstall, 'node scripts/v12/install-palace-skill.cjs',
++  'v12 installs its Palace Skill through the explicit local installer; install-time telemetry remains absent');
+ assert.equal(fs.existsSync(new URL('../scripts/release.js', import.meta.url)), true);
+ assert.equal(fs.existsSync(new URL('../scripts/publish-release.cjs', import.meta.url)), false);
+ assert.equal(fs.existsSync(new URL('../scripts/build-mcpb.cjs', import.meta.url)), false);
+@@ -45,7 +49,9 @@ assert.equal(fs.existsSync(new URL('../PUBLISH.md', import.meta.url)), false);
+ 
+ const readme = fs.readFileSync(new URL('../README.md', import.meta.url), 'utf8');
+ assert.match(readme, /^# MCP Device/m);
+-assert.match(readme, /The gateway owns accounts, OAuth, device ownership, MCP tool contracts, routing, and usage aggregation\. MCP Device owns local device identity, pairing, reconnect lifecycle, bounded execution, background registration, and local status\./);
++assert.match(readme, /MCP Device provides local identity, pairing, reconnect, bounded execution, background registration and status\./);
++assert.match(readme, /`mcp-device server` also runs the account\/OAuth control plane/);
++assert.match(readme, /`mcp-device start` keeps the existing Device-only behavior\./);
+ assert.match(readme, /npm install -g @hcu-lab\.me\/mcp-device@1\.0\.10/);
+ for (const command of ['login', 'logout', 'status', 'install', 'stop', 'uninstall']) {
+   assert.match(readme, new RegExp(`mcp-device ${command}\\b`));
+@@ -58,7 +64,7 @@ assert.match(wrapper, /splice\(2,\s*0,\s*['\"]remote['\"]\)/);
+ 
+ const helpHome = fs.mkdtempSync(path.join(os.tmpdir(), 'mcp-device-help-'));
+ try {
+-  const result = spawnSync(process.execPath, ['dist/mcp-device.js', '--help'], {
++  const result = spawnSync(process.execPath, ['dist/mcp-device.js', 'device', '--help'], {
+     cwd: new URL('..', import.meta.url),
+     encoding: 'utf8',
+     timeout: process.platform === 'win32' ? 20000 : 5000,
+@@ -75,6 +81,19 @@ try {
+   assert.match(output, /Usage:\s+mcp-device/);
+   assert.match(output, /Commands:\s+start, login, logout, status, install, stop, uninstall/);
+   assert.doesNotMatch(output, /\brun\b|autostart|Starting MCP Device/i);
++  const platformHelp = spawnSync(process.execPath, ['dist/mcp-device.js', '--help'], {
++    cwd: new URL('..', import.meta.url),
++    encoding: 'utf8',
++    timeout: process.platform === 'win32' ? 20000 : 5000,
++    env: { ...process.env, HOME: helpHome, USERPROFILE: helpHome, MCP_GATEWAY_URL: '' }
++  });
++  assert.equal(platformHelp.error, undefined, platformHelp.error?.message);
++  assert.equal(platformHelp.status, 0, platformHelp.stderr);
++  assert.equal(platformHelp.stdout.split(/\r?\n/)[0], 'MCP Device ' + pkg.version);
++  for (const command of ['start', 'device', 'server', 'admin', 'plugins', 'state']) {
++    assert.match(platformHelp.stdout, new RegExp('mcp-device ' + command + '\\b'));
++  }
++  assert.doesNotMatch(platformHelp.stdout, /Starting MCP Device/);
+ } finally {
+   fs.rmSync(helpHome, { recursive: true, force: true });
+ }
+diff --git a/test/test-version-consistency.js b/test/test-version-consistency.js
+index c3ee32a..45aba35 100644
+--- a/test/test-version-consistency.js
++++ b/test/test-version-consistency.js
+@@ -1,7 +1,6 @@
+ import assert from 'node:assert/strict';
+ import { readFile } from 'node:fs/promises';
+ 
+-const expectedVersion = '1.0.11';
+ const read = relativePath => readFile(new URL(relativePath, import.meta.url), 'utf8');
+ 
+ const packageJson = JSON.parse(await read('../package.json'));
+@@ -9,7 +8,8 @@ const lockfile = JSON.parse(await read('../package-lock.json'));
+ const versionSource = await read('../src/version.ts');
+ const deviceSource = await read('../src/device/device.ts');
+ 
+-assert.equal(packageJson.version, expectedVersion, 'package.json version');
++const expectedVersion = packageJson.version;
++assert.match(expectedVersion, /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/, 'package.json semantic version');
+ assert.equal(lockfile.version, expectedVersion, 'package-lock.json root version');
+ assert.equal(lockfile.packages[''].version, expectedVersion, 'package-lock.json root package version');
+ assert.equal(versionSource.match(/export const VERSION\s*=\s*['"]([^'"]+)['"]/)?.[1], expectedVersion, 'src/version.ts VERSION');
+diff --git a/scripts/v12/install-palace-skill.cjs b/scripts/v12/install-palace-skill.cjs
+index 4091410..9e36767 100644
+--- a/scripts/v12/install-palace-skill.cjs
++++ b/scripts/v12/install-palace-skill.cjs
+@@ -5,6 +5,19 @@ const fs = require('node:fs/promises');
+ const path = require('node:path');
+ const os = require('node:os');
+ 
++async function unchangedCopy(source, target, top = true) {
++  // The legacy marker proves provenance, not permission to discard later edits.
++  const [a, b] = await Promise.all([fs.lstat(source), fs.lstat(target)]);
++  if (a.isSymbolicLink() || b.isSymbolicLink()) return false;
++  if (a.isFile() && b.isFile()) return (await fs.readFile(source)).equals(await fs.readFile(target));
++  if (!a.isDirectory() || !b.isDirectory()) return false;
++  const names = await fs.readdir(source);
++  const existing = (await fs.readdir(target)).filter(name => !top || name !== '.mcp-device-palace-owned');
++  if (names.length !== existing.length || names.some(name => !existing.includes(name))) return false;
++  for (const name of names) if (!await unchangedCopy(path.join(source, name), path.join(target, name), false)) return false;
++  return true;
++}
++
+ async function main() {
+   if (process.env.MCP_DEVICE_SKIP_SKILL_INSTALL === '1') return {ok:true,skipped:'disabled'};
+   const root = path.resolve(__dirname, '..','..');
+@@ -34,7 +47,9 @@ async function main() {
+         const marker = path.join(target,'.mcp-device-palace-owned');
+         let owned=false;
+         try {owned=(await fs.readFile(marker,'utf8')).trim()==='palace-cli';}catch{}
+-        if (!owned) {result.push({target,state:'preserved-existing'});continue;}
++        if (!owned || !await unchangedCopy(source, target).catch(() => false)) {
++          result.push({target,state:'preserved-existing'});continue;
++        }
+         await fs.rm(target,{recursive:true,force:true});
+       }
+       try {
+diff --git a/test/v12/palace-cli-contract.test.mjs b/test/v12/palace-cli-contract.test.mjs
+new file mode 100644
+--- /dev/null
++++ b/test/v12/palace-cli-contract.test.mjs
+@@ -0,0 +1,70 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import fs from 'node:fs/promises';
++import os from 'node:os';
++import path from 'node:path';
++import { fileURLToPath } from 'node:url';
++import { spawnSync } from 'node:child_process';
++import { createPalaceProvider } from '../../dist/plugins/palace/index.js';
++
++const root=fileURLToPath(new URL('../../',import.meta.url));
++const cli=path.join(root,'dist/plugins/palace/cli.js');
++
++async function fixture(t) {
++  const dir=await fs.mkdtemp(path.join(os.tmpdir(),'palace-cli-contract-'));
++  const logs=path.join(dir,'logs'),dataRoot=path.join(dir,'data');
++  await fs.mkdir(logs);
++  await fs.writeFile(path.join(logs,'events.log'),'Error CLI_BUDGET_MARKER: '+('preserve identity and original evidence. '.repeat(12))+'\n');
++  const provider=createPalaceProvider({dataRoot,deviceId:'cli-contract-fixture',sourceRoots:[logs],discoverKnownSources:false,autoIndex:false});
++  await provider.start();
++  t.after(async()=>{await provider.stop();await fs.rm(dir,{recursive:true,force:true,maxRetries:5,retryDelay:50});});
++  await provider.invoke('knowledge.ingest',{});
++  const found=await provider.invoke('knowledge.search',{query:'CLI_BUDGET_MARKER'});
++  assert.equal(found.items.length,1);
++  const run=(args)=>spawnSync(process.execPath,[cli,'--data-root',dataRoot,...args],{cwd:root,encoding:'utf8',timeout:10000});
++  return {run,provider,id:found.items[0].id};
++}
++
++// The break is successful stdout exceeding the caller's byte budget after JSON indentation.
++for(const command of ['search','read']) {
++  test('CLI '+command+' bounds the actual UTF-8 stdout including its newline',async t=>{
++    const f=await fixture(t),args=command==='search'?['search','CLI_BUDGET_MARKER']:['read',f.id];
++    const full=f.run([...args,'--max-bytes','65536']);
++    assert.equal(full.status,0,full.stderr);
++    const budget=Math.max(512,Buffer.byteLength(JSON.stringify(JSON.parse(full.stdout)),'utf8')+1);
++    assert.ok(budget<=65536);
++    const bounded=f.run([...args,'--max-bytes',String(budget)]);
++    if(bounded.status===0) {
++      assert.ok(Buffer.byteLength(bounded.stdout,'utf8')<=budget,
++        'successful stdout must fit --max-bytes: '+Buffer.byteLength(bounded.stdout)+' > '+budget);
++      assert.deepEqual(JSON.parse(bounded.stdout),JSON.parse(full.stdout));
++    } else {
++      assert.equal(bounded.stdout,'');
++      assert.match(bounded.stderr,/"code":"BUDGET_TOO_SMALL"/);
++    }
++  });
++}
++
++// The break is treating a query with no lexical terms as a request to list every card.
++test('punctuation-only CLI search abstains like the canonical provider',async t=>{
++  const f=await fixture(t);
++  const canonical=await f.provider.invoke('knowledge.search',{query:'!!!'});
++  assert.equal(canonical.items.length,0);
++  const result=f.run(['search','!!!']);
++  assert.equal(result.status,0,result.stderr);
++  assert.equal(JSON.parse(result.stdout).returned,0);
++  assert.deepEqual(JSON.parse(result.stdout).items,[]);
++});
++
++test('CLI live read leaves the writer in control and explicitly disclaims fresh evidence verification',async t=>{
++  const f=await fixture(t);
++  const result=f.run(['read',f.id]);
++  assert.equal(result.status,0,result.stderr);
++  const selected=JSON.parse(result.stdout);
++  assert.equal(selected.evidenceVerifiedNow,false);
++  assert.equal(selected.mode,'read-only');
++  await f.provider.invoke('knowledge.ingest',{});
++  const after=await f.provider.invoke('knowledge.read',{ref:f.id,evidence:true});
++  assert.equal(after.card.id,f.id);
++  assert.equal(after.evidence[0].verifiedBytes,true);
++});
+diff --git a/test/v12/palace-skill-preservation.test.mjs b/test/v12/palace-skill-preservation.test.mjs
+new file mode 100644
+--- /dev/null
++++ b/test/v12/palace-skill-preservation.test.mjs
+@@ -0,0 +1,35 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import fs from 'node:fs/promises';
++import os from 'node:os';
++import path from 'node:path';
++import {fileURLToPath} from 'node:url';
++import {spawnSync} from 'node:child_process';
++const root=fileURLToPath(new URL('../../',import.meta.url));
++const source=path.join(root,'skills/palace-cli'),installer=path.join(root,'scripts/v12/install-palace-skill.cjs');
++async function fixture(t){
++  const home=await fs.mkdtemp(path.join(os.tmpdir(),'palace-skill-preserve-'));
++  t.after(()=>fs.rm(home,{recursive:true,force:true,maxRetries:5,retryDelay:50}));
++  const target=path.join(home,'.agents/skills/palace-cli');
++  await fs.mkdir(path.dirname(target),{recursive:true});await fs.cp(source,target,{recursive:true});
++  await fs.writeFile(path.join(target,'.mcp-device-palace-owned'),'palace-cli\n');
++  const run=()=>{const env={...process.env,MCP_DEVICE_INSTALL_SKILLS_FORCE:'1',MCP_DEVICE_SKILL_HOME:home};delete env.MCP_DEVICE_SKIP_SKILL_INSTALL;const r=spawnSync(process.execPath,[installer],{env,encoding:'utf8',timeout:10000});assert.equal(r.status,0,r.stderr);return JSON.parse(r.stdout);};
++  return {home,target,run};
++}
++test('a legacy owned copy never grants permission to discard a modified Skill',async t=>{
++  const f=await fixture(t),text='# My own amended procedure\n';
++  await fs.writeFile(path.join(f.target,'SKILL.md'),text);
++  const result=f.run();assert.equal(result.ok,true);
++  assert.equal(await fs.readFile(path.join(f.target,'SKILL.md'),'utf8'),text);
++});
++test('a legacy owned copy preserves files added by the user',async t=>{
++  const f=await fixture(t),notes=path.join(f.target,'my-notes.txt');
++  await fs.writeFile(notes,'keep this extra evidence\n');
++  const result=f.run();assert.equal(result.ok,true);
++  assert.equal(await fs.readFile(notes,'utf8'),'keep this extra evidence\n');
++});
++test('an unchanged legacy copy remains readable and a repeated install is idempotent',async t=>{
++  const f=await fixture(t),expected=await fs.readFile(path.join(source,'SKILL.md'));
++  assert.equal(f.run().ok,true);assert.deepEqual(await fs.readFile(path.join(f.target,'SKILL.md')),expected);
++  assert.equal(f.run().ok,true);assert.deepEqual(await fs.readFile(path.join(f.target,'SKILL.md')),expected);
++});

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "label": "platform-linux-final",
+  "cwd": "/var/tmp/mcp-device-v12-e2e-20261024-g6/final/platform",
+  "command": "/usr/bin/node",
+  "args": [
+    "scripts/v12/run-platform-tests.mjs"
+  ],
+  "startedAt": "2026-10-24T11:14:32.859Z",
+  "endedAt": "2026-10-24T11:15:00.254Z",
+  "durationMs": 27391.937492,
+  "node": "v22.21.0",
+  "platform": "linux",
+  "exitCode": 0,
+  "signal": null,
+  "counts": {
+    "tests": 87,
+    "pass": 87,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "stdout": {
+    "path": "/mnt/e/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/platform-linux-final.stdout.log",
+    "sha256": "41e216ddf88d68450d2041656941601832bf9360d40823a9dd1731785c160810"
+  },
+  "stderr": {
+    "path": "/mnt/e/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/platform-linux-final.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

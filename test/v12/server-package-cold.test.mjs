@@ -43,6 +43,10 @@ test('cold installed package runs CLI server, persists pairing/OAuth and restore
   const packageRoot = path.resolve(installed), entry = path.join(packageRoot, 'dist', 'mcp-device.js');
   const packageInfo = JSON.parse(await fs.readFile(path.join(packageRoot, 'package.json'), 'utf8'));
   assert.equal(packageInfo.name, '@hcu-lab.me/mcp-device'); assert.equal(packageInfo.version, '1.0.12');
+  const palaceEntry = path.join(packageRoot,'dist','plugins','palace','cli.js');
+  const bundledSkill = await fs.readFile(path.join(packageRoot,'skills','palace-cli','SKILL.md'),'utf8');
+  assert.match(bundledSkill,/name: palace-cli/);
+  const palaceHelp = await exec(process.execPath,[palaceEntry,'--help']); assert.match(palaceHelp.stdout,/status\\|search/);
   await assert.rejects(fs.stat(path.join(packageRoot, 'src')), { code: 'ENOENT' });
   const fixture = await fs.mkdtemp(path.join(os.tmpdir(), 'v12-cold-')), home = path.join(fixture, 'home');
   const runtimeRoot = path.join(fixture, 'state'), backupRoot = path.join(fixture, 'backup'), restoredRoot = path.join(fixture, 'restored');
@@ -87,6 +91,9 @@ test('cold installed package runs CLI server, persists pairing/OAuth and restore
   const invited = JSON.parse((await cli(['admin', '--runtime-dir', runtimeRoot, 'invite', 'create', '1'])).stdout);
   assert.equal(invited.ok, true); assert.equal(invited.codes.length, 1);
   const initial = await start(runtimeRoot);
+  const livePalace = JSON.parse((await exec(process.execPath,[palaceEntry,'--runtime-dir',runtimeRoot,'status'],{cwd:home,env,timeout:20000})).stdout);
+  assert.equal(livePalace.ok,true); assert.equal(livePalace.mode,'read-only');
+  assert.ok(livePalace.totals.cards >= 0);
   assert.ok(initial.pairing?.user_code); assert.equal('device_code' in initial.pairing, false);
   const anonymous = await http('/mcp', { headers: { accept: 'application/json, text/event-stream' }, json: { jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} } }); assert.equal(anonymous.status, 401);
   const login = await http('/login', { form: { identity: email, password } }); assert.equal(login.status, 302);

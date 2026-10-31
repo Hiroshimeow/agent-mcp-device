@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "label": "native-parity-port-free-windows",
+  "cwd": "E:/git-project/agent-mcp-device-v12",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "scripts/v12/run-device-parity.mjs",
+    "--baseline",
+    "E:/git-project/agent-mcp-device",
+    "--candidate",
+    "E:/test/mcp-device-v12-e2e-20261024-g6/parity-worktree",
+    "--group",
+    "port-free",
+    "--output",
+    "E:/test/mcp-device-v12-e2e-20261024-g6/windows/parity-port-free"
+  ],
+  "startedAt": "2026-10-24T11:25:26.614Z",
+  "endedAt": "2026-10-24T11:27:36.298Z",
+  "durationMs": 129682.6352,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 1,
+  "signal": null,
+  "counts": {},
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\native-parity-port-free-windows.stdout.log",
+    "sha256": "839d4e248064d60cda1645a72b7e2b1ac4f334c743a341c859ce5a5c0ee40de7"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\native-parity-port-free-windows.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

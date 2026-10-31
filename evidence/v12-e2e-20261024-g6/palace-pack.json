@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "label": "palace-pack",
+  "cwd": "E:/test/mcp-device-v12-e2e-20261024-g6/candidate-two",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+    "pack",
+    "E:/test/mcp-device-v12-e2e-20261024-g6/candidate-two/.tmp/v12-palace-standalone/package",
+    "--json",
+    "--pack-destination",
+    "E:/test/mcp-device-v12-e2e-20261024-g6/artifacts"
+  ],
+  "startedAt": "2026-10-24T10:54:01.998Z",
+  "endedAt": "2026-10-24T10:54:03.736Z",
+  "durationMs": 1735.7892,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 0,
+  "signal": null,
+  "counts": {},
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\palace-pack.stdout.log",
+    "sha256": "bd8bca16f3ac382a09bfaf28a8dd55c6d6ac8da9c32b234106e27301564d01af"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\palace-pack.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

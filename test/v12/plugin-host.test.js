@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+import { randomUUID } from 'node:crypto';
 import { PluginHost } from '../../dist/platform/plugin-host.js';
 import { compatible } from '../../dist/platform/plugin-contract.js';
 
@@ -61,6 +62,21 @@ test('process crash and synchronous hang are isolated and bounded', { timeout: 1
   assert.equal(host.list()[0].state, 'faulted'); assert.equal(2 + 2, 4);
 });
 
+test('cooperative cancellation acknowledges the original request and keeps the process provider healthy', { timeout: 10000 }, async t => {
+  const { host, write, manifest } = await fixture(t);
+  const entry = await write('cooperative-cancel', `export const createPlugin=()=>({invoke(n,i,c){if(i!=='wait')return 'ok';return new Promise((resolve,reject)=>{const timer=setTimeout(()=>resolve('late'),5000);c.signal.addEventListener('abort',()=>{clearTimeout(timer);reject(Object.assign(new Error('cancelled'),{code:'CANCELLED'}))},{once:true})})}});`);
+  await host.install(manifest('cooperative-cancel', entry, [{ name: 'cancel.run', version: '1.0.0' }], { isolation: 'process', trusted: false, timeoutMs: 3000 }), { enabled: true });
+  await host.start();
+  const controller = new AbortController();
+  const pending = host.invoke('cancel.run', 'wait', { signal: controller.signal });
+  setTimeout(() => controller.abort(), 50);
+  await assert.rejects(pending, { code: 'CANCELLED' });
+  await new Promise(resolve => setTimeout(resolve, 150));
+  assert.equal(host.list()[0].state, 'enabled');
+  assert.deepEqual(host.capabilities(), ['cancel.run']);
+  assert.equal(await host.invoke('cancel.run', 'next'), 'ok');
+});
+
 test('ordinary domain errors preserve a cooperative provider; thrown exceptions fault only that plugin', async t => {
   const { host, write, manifest } = await fixture(t);
   const entry = await write('errors', `export const createPlugin=()=>({invoke(n,i){if(i==='invalid')throw Object.assign(new Error('input'),{code:'INVALID_ARGUMENT'});if(i==='throw')throw new Error('bug');return 'ok'}});`);
@@ -79,6 +95,45 @@ test('explicit upgrade migrates private data and failed migration rolls back', a
   const bad = await write('bad', `import fs from 'node:fs/promises';import path from 'node:path';export async function migrate(o){await fs.writeFile(path.join(o.dataRoot,'value'),'corrupted');throw new Error('migration fail')}export const createPlugin=()=>({invoke:()=>3});`);
   await assert.rejects(host.upgrade(manifest('versioned', bad, undefined, { version: '3.0.0', dataSchemaVersion: 3 })));
   assert.equal(await fs.readFile(path.join(host.dataRoot('versioned'), 'value'), 'utf8'), 'two'); assert.equal(await host.invoke('text.echo', {}), 2);
+});
+
+test('upgrade intent recovery restores or commits complete generations after process loss', async t => {
+  async function scenario(phase) {
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-v12-upgrade-recovery-'));
+    const entry1 = path.join(root, 'v1.mjs'), entry2 = path.join(root, 'v2.mjs');
+    await fs.writeFile(entry1, `export const createPlugin=()=>({invoke:()=>1});`);
+    await fs.writeFile(entry2, `export const createPlugin=()=>({invoke:()=>2});`);
+    const manifest = (entry, version) => ({ id: 'recoverable', version, dataSchemaVersion: 1, isolation: 'in-process', trusted: true, entry, capabilities: [{ name: 'recover.value', version: '1.0.0' }], timeoutMs: 1000 });
+    const first = new PluginHost({ stateRoot: root, deviceId: 'fixture' });
+    await first.install(manifest(entry1, '1.0.0'), { enabled: true });
+    await fs.mkdir(first.dataRoot('recoverable'), { recursive: true });
+    await fs.writeFile(path.join(first.dataRoot('recoverable'), 'value'), 'old');
+    await first.close();
+    const registryPath = path.join(root, 'plugins', 'registry.json');
+    const registry = JSON.parse(await fs.readFile(registryPath, 'utf8'));
+    const previous = structuredClone(registry.plugins.recoverable), next = structuredClone(previous);
+    next.manifest = manifest(entry2, '2.0.0'); next.state = 'enabled';
+    const token = randomUUID(), pluginRoot = path.join(root, 'plugins', 'recoverable');
+    const candidateName = 'upgrade-candidate-' + token, backupName = 'upgrade-backup-' + token, failedName = 'upgrade-failed-' + token;
+    const data = path.join(pluginRoot, 'data'), candidate = path.join(pluginRoot, candidateName), backup = path.join(pluginRoot, backupName);
+    await fs.cp(data, candidate, { recursive: true }); await fs.writeFile(path.join(candidate, 'value'), 'new');
+    if (phase !== 'pre-swap') {
+      await fs.rename(data, backup); if (phase !== 'swapping') await fs.rename(candidate, data);
+    }
+    if (phase === 'swapped' || phase === 'committed') {
+      registry.revision += 1; registry.plugins.recoverable = next; await fs.writeFile(registryPath, JSON.stringify(registry, null, 2) + '\n');
+    }
+    const intent = { version: 1, id: 'recoverable', token, pid: 2147483646, startedAt: Date.now(),
+      phase: phase === 'pre-swap' ? 'candidate-ready' : phase, candidate: candidateName, backup: backupName, failed: failedName, previous, next };
+    await fs.writeFile(path.join(pluginRoot, 'upgrade-intent.json'), JSON.stringify(intent, null, 2) + '\n');
+    const recovered = new PluginHost({ stateRoot: root, deviceId: 'fixture' }); await recovered.load();
+    const expected = phase === 'committed' ? 'new' : 'old';
+    assert.equal(await fs.readFile(path.join(recovered.dataRoot('recoverable'), 'value'), 'utf8'), expected);
+    assert.equal(recovered.list()[0].manifest.version, phase === 'committed' ? '2.0.0' : '1.0.0');
+    for (const name of ['upgrade-intent.json', candidateName, backupName, failedName]) await assert.rejects(fs.lstat(path.join(pluginRoot, name)), { code: 'ENOENT' });
+    await recovered.close(); await fs.rm(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 50 });
+  }
+  await scenario('pre-swap'); await scenario('swapping'); await scenario('swapped'); await scenario('committed');
 });
 
 test('uninstall tombstone survives restart; bundle does not silently reinstall', async t => {

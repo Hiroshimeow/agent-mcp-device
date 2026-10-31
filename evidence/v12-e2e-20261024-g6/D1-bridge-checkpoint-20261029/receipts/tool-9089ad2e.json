@@ -1,0 +1,10 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "[Reading 2 new lines (total: 2 lines)]\n\n{\"ready\": false, \"reason\": \"CDP_UNREACHABLE\", \"remedy\": \"Start a loopback Chrome CDP endpoint or configure M365_CDP_URL/cdp_candidates.\", \"detail\": \"http://127.0.0.1:9222=CDP_UNREACHABLE:TimeoutError; http://127.0.0.1:9223=CDP_UNREACHABLE:json/version unavailable\", \"runner_version\": \"0.2.0\", \"runner_commit\": \"6baa56c1955c\", \"cdp_url\": null, \"installation\": {\"installed\": true, \"config_path\": \"C:\\\\Users\\\\DuongNH66\\\\.m365-copilot2dom\\\\config.json\", \"runner_dir\": \"C:\\\\Users\\\\DuongNH66\\\\Desktop\\\\git\\\\M365-Copilot2DOM\", \"runner_exists\": true, \"python\": \"C:\\\\Users\\\\DuongNH66\\\\Desktop\\\\git\\\\M365-Copilot2DOM\\\\.venv\\\\Scripts\\\\python.exe\", \"python_exists\": true, \"jobs_dir\": \"C:\\\\Users\\\\DuongNH66\\\\AppData\\\\Local\\\\m365-copilot2dom\\\\jobs\", \"skill_path\": \"C:\\\\Users\\\\DuongNH66\\\\.agent\\\\skills\\\\m365\", \"skill_exists\": true, \"launcher\": \"C:\\\\Users\\\\DuongNH66\\\\.m365-copilot2dom\\\\m365.cmd\", \"launcher_exists\": true, \"cdp_candidates\": [\"http://127.0.0.1:9222\", \"http://127.0.0.1:9223\"], \"version\": \"0.2.0\", \"commit\": \"6baa56c1955c\", \"launcher_schema\": 1, \"current_launcher_schema\": 1, \"launcher_matches_current\": true, \"host\": \"LPP00374779A\", \"current_host\": \"LPP00374779A\", \"host_matches_current\": true, \"current_version\": \"0.2.0\", \"current_commit\": \"6baa56c1955c\", \"installation_matches_current\": true}}\r\n\n✅ Process completed with exit code 1 (runtime: 36.04s)"
+    }
+  ],
+  "sessionId": "remote-ea947b2f-25c8-42a0-978b-19304e57f1b1",
+  "session_id": "remote-ea947b2f-25c8-42a0-978b-19304e57f1b1"
+}

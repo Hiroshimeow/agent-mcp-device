@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "label": "review2-tsc",
+  "startedAt": "2026-10-25T00:07:35.221Z",
+  "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z",
+  "program": "node",
+  "argv": [
+    "node_modules/typescript/bin/tsc"
+  ],
+  "pid": 58516,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "stdout": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\review2-tsc.stdout.log",
+  "stderr": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\review2-tsc.stderr.log",
+  "state": "COMPLETED",
+  "endedAt": "2026-10-25T00:07:58.308Z",
+  "elapsedMs": 23088,
+  "exitCode": 0,
+  "signal": null,
+  "counts": {},
+  "stdoutSha256": "d0c78eaaa1356281e6d2c2676b7ac0fbdd6b5713e4f4475e5cfdb290b502ac6d",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "label": "palace-stage-final",
+  "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\candidate-three",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "scripts/v12/build-palace-package.mjs"
+  ],
+  "startedAt": "2026-10-24T11:10:13.955Z",
+  "endedAt": "2026-10-24T11:10:14.139Z",
+  "durationMs": 182.7115,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 0,
+  "signal": null,
+  "counts": {},
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\palace-stage-final.stdout.log",
+    "sha256": "c3ad56342578f02a73e22db5bb5046067eeb4a21c7036874c8e036ad58c655cf"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\palace-stage-final.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

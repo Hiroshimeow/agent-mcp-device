@@ -1,0 +1,21 @@
+{
+  "startedAt": "2026-10-24T11:11:39.347Z",
+  "platform": "win32",
+  "node": "v22.22.2",
+  "steps": [
+    {
+      "label": "final-cold-windows-device",
+      "exitCode": 0
+    },
+    {
+      "label": "root-suite-windows-final",
+      "exitCode": 1
+    }
+  ],
+  "status": "FAIL",
+  "error": {
+    "message": "root-suite-windows-final failed with 1",
+    "stack": "Error: root-suite-windows-final failed with 1\n    at run (E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\validate-windows-final.cjs:6:211)\n    at Object.<anonymous> (E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\validate-windows-final.cjs:10:3)\n    at Module._compile (node:internal/modules/cjs/loader:1705:14)\n    at Object..js (node:internal/modules/cjs/loader:1838:10)\n    at Module.load (node:internal/modules/cjs/loader:1441:32)\n    at Function._load (node:internal/modules/cjs/loader:1263:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49"
+  },
+  "endedAt": "2026-10-24T11:18:43.921Z"
+}

@@ -19,15 +19,22 @@ interface PendingRequest {
   resolve(value: unknown): void;
   reject(error: Error): void;
   timer: NodeJS.Timeout;
+  deadlineAt: number;
+  stderrSequence: number;
   cleanup(): void;
 }
+interface CancellingRequest { timer: NodeJS.Timeout; stderrSequence: number; }
 interface HostCall { parentId: string; controller: AbortController; cleanup(): void; }
 
 class ProcessDriver implements PluginDriver {
   private child?: ChildProcessWithoutNullStreams;
   private pending = new Map<string, PendingRequest>();
+  private cancelling = new Map<string, CancellingRequest>();
+  private cancelAcks = new Map<string, string>();
   private hostCalls = new Map<string, HostCall>();
   private buffer = '';
+  private stderrTail = '';
+  private stderrSequence = 0;
   private stopping = false;
   private closing = false;
   private stopRequest?: Promise<void>;
@@ -58,17 +65,38 @@ class ProcessDriver implements PluginDriver {
           }
           if (message?.type !== undefined && message.type !== 'response') throw new Error('Unexpected plugin frame type');
           const pending = this.pending.get(message?.id);
-          if (!pending) continue;
+          if (!pending) {
+            const responseId=String(message?.id??'');
+            const acknowledgedTarget=this.cancelAcks.get(responseId);
+            if(acknowledgedTarget){
+              // A cooperative cancel acknowledgement proves only that the child
+              // received the signal. The original work remains supervised until
+              // its own response arrives or the bounded cancellation grace ends.
+              this.cancelAcks.delete(responseId);
+              continue;
+            }
+            if(this.cancelling.has(responseId)){
+              const cancelling=this.cancelling.get(responseId);
+              if(cancelling)clearTimeout(cancelling.timer);
+              this.cancelling.delete(responseId);
+              for(const [cancelId,targetId] of this.cancelAcks)if(targetId===responseId)this.cancelAcks.delete(cancelId);
+              if(cancelling&&String(message.error?.code??'').startsWith('PLUGIN_')){
+                this.settlePluginFault(cancelling,new CapabilityError(String(message.error.code),String(message.error.message)));
+              }
+            }
+            continue;
+          }
           this.pending.delete(message.id); clearTimeout(pending.timer); pending.cleanup();
           if (message.error) {
             const error = new CapabilityError(String(message.error.code ?? 'PLUGIN_CALL_FAILED'), String(message.error.message));
-            pending.reject(error);
-            if (error.code.startsWith('PLUGIN_')) this.fail(error);
+            if (error.code.startsWith('PLUGIN_')) this.settlePluginFault(pending,error);
+            else pending.reject(error);
           } else pending.resolve(message.result);
         } catch { this.fail(new CapabilityError('PLUGIN_PROTOCOL_ERROR', 'Plugin emitted an invalid protocol frame')); return; }
       }
     });
-    this.child.stderr.resume();
+    this.child.stderr.setEncoding('utf8');
+    this.child.stderr.on('data',(text:string)=>{this.stderrSequence++;this.stderrTail=(this.stderrTail+text).slice(-4096);});
     this.child.on('error', error => this.fail(error));
     this.child.on('exit', (code, signal) => {
       if (!this.stopping) this.fail(new CapabilityError('PLUGIN_EXITED', `Plugin exited (${code ?? signal})`));
@@ -121,6 +149,7 @@ class ProcessDriver implements PluginDriver {
     // Settle ordinary callers before aborting callbacks: graceful child shutdown
     // must not race a CANCELLED response against the host's PLUGIN_STOPPED result.
     for (const pending of requests) { clearTimeout(pending.timer); pending.reject(error); pending.cleanup(); }
+    for(const cancelling of this.cancelling.values())clearTimeout(cancelling.timer);this.cancelling.clear();this.cancelAcks.clear();
     const callbacks = [...this.hostCalls.values()]; this.hostCalls.clear();
     for (const call of callbacks) call.cleanup();
   }
@@ -149,9 +178,41 @@ class ProcessDriver implements PluginDriver {
     try { await Promise.race([this.closed, new Promise<void>((_, reject) => { timer = setTimeout(() => reject(new CapabilityError('PLUGIN_TERMINATION_FAILED', 'Plugin process did not release its resources')), 5000); })]); }
     finally { if (timer) clearTimeout(timer); }
   }
+  private settlePluginFault(pending:{stderrSequence:number;reject?(error:Error):void},error:CapabilityError):void {
+    const stderr=this.child?.stderr;
+    let settled=false,deadline:NodeJS.Timeout|undefined,quiet:NodeJS.Timeout|undefined;
+    const finish=()=>{
+      if(settled)return;settled=true;
+      if(deadline)clearTimeout(deadline);if(quiet)clearTimeout(quiet);
+      stderr?.off('data',onData);
+      const diagnostic=this.diagnostic(error);
+      pending.reject?.(diagnostic);
+      this.fail(error);
+    };
+    const settleAfterQuiet=()=>{
+      if(quiet)clearTimeout(quiet);
+      // stdout and stderr are independent pipes. Give stderr a short quiet
+      // period after the fault frame so diagnostics emitted immediately before
+      // the thrown error are not lost on either Windows or POSIX scheduling.
+      quiet=setTimeout(finish,40);
+    };
+    const onData=()=>settleAfterQuiet();
+    stderr?.on('data',onData);
+    if(this.stderrSequence>pending.stderrSequence)settleAfterQuiet();
+    // Bound the diagnostic wait so a silent/broken stderr pipe cannot delay
+    // plugin fault containment indefinitely.
+    deadline=setTimeout(finish,1000);
+  }
+  private diagnostic(error:Error):Error {
+    if(!this.stderrTail.trim())return error;
+    const message=error.message+'\n[plugin stderr tail]\n'+this.stderrTail.trim();
+    const code=(error as CapabilityError).code;
+    return code?new CapabilityError(code,message):new Error(message);
+  }
   private fail(error: Error): void {
     if (this.stopping) return;
-    this.stopping = true; this.rejectAll(error); void this.terminate().catch(() => {}); this.fault(error);
+    const diagnostic=this.diagnostic(error);
+    this.stopping = true; this.rejectAll(diagnostic); void this.terminate().catch(() => {}); this.fault(diagnostic);
   }
   private request(method: string, params: unknown, signal?: AbortSignal): Promise<unknown> {
     if (signal?.aborted) return Promise.reject(new CapabilityError('CANCELLED', 'Plugin call cancelled'));
@@ -161,9 +222,29 @@ class ProcessDriver implements PluginDriver {
     const frame = JSON.stringify({ id, method, params }) + '\n';
     if (Buffer.byteLength(frame) > MAX_FRAME) return Promise.reject(new CapabilityError('PLUGIN_INPUT_LIMIT', 'Plugin request exceeds frame budget'));
     return new Promise((resolve, reject) => {
-      const onAbort = () => this.fail(new CapabilityError('CANCELLED', 'Plugin call cancelled; isolated process stopped'));
-      const timer = setTimeout(() => this.fail(new CapabilityError('PLUGIN_TIMEOUT', 'Plugin exceeded its execution deadline')), boundedTimeout(this.manifest));
-      this.pending.set(id, { method, controller, resolve, reject, timer, cleanup: () => {
+      const onAbort = () => {
+        const active=this.pending.get(id);if(!active)return;
+        this.pending.delete(id);clearTimeout(active.timer);
+        active.reject(new CapabilityError('CANCELLED','Plugin call cancelled'));
+        active.cleanup();
+        if(!this.child?.stdin.writable||this.stopping)return;
+        if(this.cancelling.size>=64){this.fail(new CapabilityError('PLUGIN_CALL_LIMIT','Too many incomplete cancelled requests'));return;}
+        // A cancelled request must not make the process deadline stricter than the
+        // request's original execution deadline. This prevents a queued cancel
+        // from killing unrelated work that was already running in the child.
+        const graceMs=Math.max(1,active.deadlineAt-Date.now());
+        const grace=setTimeout(()=>{
+          this.cancelling.delete(id);
+          this.fail(new CapabilityError('PLUGIN_TIMEOUT','Plugin did not finish cancelled work before the grace deadline'));
+        },graceMs);
+        this.cancelling.set(id,{timer:grace,stderrSequence:active.stderrSequence});
+        const cancelId=randomUUID();this.cancelAcks.set(cancelId,id);
+        const cancelFrame=JSON.stringify({id:cancelId,method:'cancel',params:{id}})+'\n';
+        this.child.stdin.write(cancelFrame,error=>{if(error)this.fail(error);});
+      };
+      const timeoutMs=boundedTimeout(this.manifest),deadlineAt=Date.now()+timeoutMs;
+      const timer = setTimeout(() => this.fail(new CapabilityError('PLUGIN_TIMEOUT', 'Plugin exceeded its execution deadline')), timeoutMs);
+      this.pending.set(id, { method, controller, resolve, reject, timer, deadlineAt, stderrSequence:this.stderrSequence, cleanup: () => {
         signal?.removeEventListener('abort', onAbort); controller.abort();
       } });
       signal?.addEventListener('abort', onAbort, { once: true });

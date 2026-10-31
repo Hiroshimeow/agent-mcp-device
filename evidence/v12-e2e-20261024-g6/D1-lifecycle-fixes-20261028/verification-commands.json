@@ -1,0 +1,52 @@
+[
+  {
+    "messageId": "68a16716",
+    "timestamp": "2026-10-28T23:36:56.031Z",
+    "command": "$d='.tmp/d1-lifecycle-20261028'; New-Item -ItemType Directory -Force \"$d/test/v12\" | Out-Null; git status --porcelain=v1 --untracked-files=all | Set-Content \"$d/git-before.txt\"; git status --porcelain=v1 --ignored --untracked-files=normal | Set-Content \"$d/git-ignored-before.txt\"; git diff --binary | Set-Content \"$d/wip-before.patch\"; & .tmp/d1-resume-20261028-0040/process-cwd.ps1 -Ids 2088,46016,38972,51328,45012 | ConvertTo-Json | Set-Content \"$d/process-cwd.json\"; Copy-Item src/platform/plugin-host.ts,src/platform/plugin-driver.ts -Destination $d; Get-ChildItem test/v12 -File | Where-Object {$_.Name -match 'cancel|driver|bundle|fault|architecture'} | Select-Object Name; Select-String -Path test/v12/d0-architecture-regressions.test.mjs -Pattern 'cancel|stderr' -Context 2,4"
+  },
+  {
+    "messageId": "c59bb312",
+    "timestamp": "2026-10-28T23:39:18.039Z",
+    "command": "$d='.tmp/d1-lifecycle-20261028'; Copy-Item package.json $d; Copy-Item test/v12/d1-lifecycle-persistence.test.mjs,test/v12/d1-cancelled-fault.test.mjs \"$d/test/v12/\"; node node_modules/typescript/bin/tsc -p tsconfig.json --outDir \"$d/dist\" --listEmittedFiles false *> \"$d/tsc-red.log\"; \"compile=$LASTEXITCODE\"; node --test \"$d/test/v12/d1-lifecycle-persistence.test.mjs\" \"$d/test/v12/d1-cancelled-fault.test.mjs\" *> \"$d/red.log\"; \"red=$LASTEXITCODE\""
+  },
+  {
+    "messageId": "474000fd",
+    "timestamp": "2026-10-28T23:40:40.037Z",
+    "command": "$d='.tmp/d1-lifecycle-20261028'; node node_modules/typescript/bin/tsc -p tsconfig.json --outDir \"$d/dist\" --listEmittedFiles false *> \"$d/tsc-green-first.log\"; \"compile=$LASTEXITCODE\"; node --test \"$d/test/v12/d1-lifecycle-persistence.test.mjs\" \"$d/test/v12/d1-cancelled-fault.test.mjs\" *> \"$d/green-first.log\"; \"test=$LASTEXITCODE\""
+  },
+  {
+    "messageId": "3caea2d6",
+    "timestamp": "2026-10-28T23:41:18.587Z",
+    "command": "$d='.tmp/d1-lifecycle-20261028'; node node_modules/typescript/bin/tsc -p tsconfig.json --outDir \"$d/dist\" --listEmittedFiles false *> \"$d/tsc-green.log\"; \"compile=$LASTEXITCODE\"; node --test \"$d/test/v12/d1-lifecycle-persistence.test.mjs\" \"$d/test/v12/d1-cancelled-fault.test.mjs\" *> \"$d/green.log\"; \"test=$LASTEXITCODE\"; Copy-Item skills \"$d/skills\" -Recurse -Force; Copy-Item test/v12/d1-closure-regressions.test.mjs,test/v12/plugin-cancellation-isolation.test.mjs,test/v12/plugin-host.test.js,test/v12/plugin-services.test.js,test/v12/plugin-bundles.test.js \"$d/test/v12/\""
+  },
+  {
+    "messageId": "84e28e82",
+    "timestamp": "2026-10-28T23:41:41.773Z",
+    "command": "$d='.tmp/d1-lifecycle-20261028'; node --test \"$d/test/v12/d1-closure-regressions.test.mjs\" \"$d/test/v12/plugin-cancellation-isolation.test.mjs\" \"$d/test/v12/plugin-host.test.js\" \"$d/test/v12/plugin-services.test.js\" \"$d/test/v12/plugin-bundles.test.js\" *> \"$d/functional.log\"; \"functional=$LASTEXITCODE\""
+  },
+  {
+    "messageId": "c783a1df",
+    "timestamp": "2026-10-28T23:43:36.709Z",
+    "command": "$d='.tmp/d1-lifecycle-20261028'; Copy-Item test/v12/d1-lifecycle-persistence.test.mjs \"$d/test/v12/\"; node --test \"$d/test/v12/d1-lifecycle-persistence.test.mjs\" *> \"$d/red-review.log\"; \"reviewRed=$LASTEXITCODE\""
+  },
+  {
+    "messageId": "4cd2df69",
+    "timestamp": "2026-10-28T23:44:05.953Z",
+    "command": "Select-String -Path test/v12/d0-architecture-regressions.test.mjs -Pattern \"test\\(\"; Get-Item .tmp/d1-lifecycle-20261028/functional.log | Select-Object Length"
+  },
+  {
+    "messageId": "e51fa94f",
+    "timestamp": "2026-10-28T23:44:24.462Z",
+    "command": "$d='.tmp/d1-lifecycle-20261028'; Copy-Item test/v12/d0-architecture-regressions.test.mjs \"$d/test/v12/\"; node node_modules/typescript/bin/tsc -p tsconfig.json --outDir \"$d/dist\" --listEmittedFiles false *> \"$d/tsc-final.log\"; \"compile=$LASTEXITCODE\"; node --test \"$d/test/v12/d1-lifecycle-persistence.test.mjs\" \"$d/test/v12/d1-cancelled-fault.test.mjs\" \"$d/test/v12/d1-closure-regressions.test.mjs\" \"$d/test/v12/plugin-cancellation-isolation.test.mjs\" \"$d/test/v12/plugin-host.test.js\" \"$d/test/v12/plugin-services.test.js\" \"$d/test/v12/plugin-bundles.test.js\" *> \"$d/functional-final.log\"; \"functional=$LASTEXITCODE\"; node --test --test-name-pattern='^(cooperative cancellation does not fault the isolated plugin process|unresponsive synchronous child is killed only at its original request deadline after cancellation)$' \"$d/test/v12/d0-architecture-regressions.test.mjs\" *> \"$d/deadline-final.log\"; \"deadline=$LASTEXITCODE\"; git diff --check *> \"$d/diff-check.log\"; \"diff=$LASTEXITCODE\""
+  },
+  {
+    "messageId": "7f5b4372",
+    "timestamp": "2026-10-28T23:46:46.926Z",
+    "command": "$d='.tmp/d1-lifecycle-20261028'; Copy-Item test/v12/d1-cancelled-fault.test.mjs \"$d/test/v12/\"; node --test \"$d/test/v12/d1-lifecycle-persistence.test.mjs\" \"$d/test/v12/d1-cancelled-fault.test.mjs\" \"$d/test/v12/d1-closure-regressions.test.mjs\" \"$d/test/v12/plugin-cancellation-isolation.test.mjs\" \"$d/test/v12/plugin-host.test.js\" \"$d/test/v12/plugin-services.test.js\" \"$d/test/v12/plugin-bundles.test.js\" *> \"$d/functional-final.log\"; \"functional=$LASTEXITCODE\"; git diff --check *> \"$d/diff-check.log\"; \"diff=$LASTEXITCODE\"; git status --porcelain=v1 --untracked-files=all | Set-Content \"$d/git-after.txt\"; git status --porcelain=v1 --ignored --untracked-files=normal | Set-Content \"$d/git-ignored-after.txt\""
+  },
+  {
+    "messageId": "1f1d24cb",
+    "timestamp": "2026-10-28T23:47:27.546Z",
+    "command": "$e='evidence/v12-e2e-20261024-g6/D1-lifecycle-fixes-20261028'; New-Item -ItemType Directory -Force \"$e/logs\" | Out-Null; Copy-Item .tmp/d1-lifecycle-20261028/*.log \"$e/logs/\"; Copy-Item C:/Users/admin/AppData/Local/Temp/acp-delegate/del_mvsre4ro_reuu.out \"$e/review-initial.md\"; Copy-Item C:/Users/admin/AppData/Local/Temp/acp-delegate/del_mvsriic0_875u.out \"$e/review-final.md\"; @'\nconst fs=require('fs'),crypto=require('crypto');const e='evidence/v12-e2e-20261024-g6/D1-lifecycle-fixes-20261028';const changed=['src/platform/plugin-host.ts','src/platform/plugin-driver.ts','test/v12/d1-lifecycle-persistence.test.mjs','test/v12/d1-cancelled-fault.test.mjs'];const hash=path=>{const b=fs.readFileSync(path);return {path,bytes:b.length,sha256:crypto.createHash('sha256').update(b).digest('hex')}};\nconst prior=JSON.parse(fs.readFileSync('evidence/v12-e2e-20261024-g6/D1-review-fixes-20261028/stable-source-manifest.json','utf8'));const paths=[...new Set([...prior.map(x=>x.path),...changed])].sort();fs.writeFileSync(e+'/stable-source-manifest.json',JSON.stringify(paths.map(hash),null,2)+'\\n');fs.writeFileSync(e+'/changed-files.json',JSON.stringify(changed.map(hash),null,2)+'\\n');console.log(changed.map(hash));console.log(hash(e+'/stable-source-manifest.json'));\nconst commands=[];for(const l of fs.readFileSync(process.env.PI_SESSION_FILE,'utf8').split('\\n').filter(Boolean)){const r=JSON.parse(l);for(const c of r.message?.content??[])if(c.type==='toolCall'&&c.name==='powershell'&&/d1-lifecycle-20261028/.test(c.arguments?.command??''))commands.push({messageId:r.id,timestamp:r.timestamp,command:c.arguments.command});}fs.writeFileSync(e+'/verification-commands.json',JSON.stringify(commands,null,2)+'\\n');\nconst before=prior.filter(x=>!changed.includes(x.path));const drift=before.filter(x=>hash(x.path).sha256!==x.sha256);fs.writeFileSync(e+'/inherited-source-comparison.json',JSON.stringify({priorFiles:prior.length,unchangedChecked:before.length,drift},null,2)+'\\n');console.log({files:paths.length,drift});\n'@ | node"
+  }
+]

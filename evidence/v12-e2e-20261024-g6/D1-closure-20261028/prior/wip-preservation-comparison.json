@@ -1,0 +1,9 @@
+{
+  "trackedDiffSectionsChanged": [
+    "diff --git a/docs/v12-platform.md b/docs/v12-platform.md",
+    "diff --git a/src/platform/plugin-host.ts b/src/platform/plugin-host.ts",
+    "diff --git a/src/plugins/palace/cli.ts b/src/plugins/palace/cli.ts",
+    "diff --git a/test/v12/plugin-services.test.js b/test/v12/plugin-services.test.js"
+  ],
+  "note": "Compares tracked dirty diffs before/after; added untracked tests recorded separately in session-files-sha256.json"
+}

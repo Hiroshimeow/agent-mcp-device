@@ -1,0 +1,803 @@
+{
+  "schemaVersion": 1,
+  "preregistrationSha256": "35c4dcb1b3d9abf2abf6279a538ef50a2dc279e439435bd91b7be95d0fdfbd2a",
+  "startedAt": "2026-10-25T07:51:22.689Z",
+  "traceIntegrity": true,
+  "candidates": [
+    {
+      "key": "s4-package-closure",
+      "family": "A",
+      "id": "k:372bf90cfcd6821f7bef7b6f5170c6203f5dcce967ada3e8636132f8a27cdf37",
+      "status": "validated",
+      "activated": true,
+      "reason": "EXECUTED_VALIDATION_PASSED",
+      "evidenceRefs": [
+        "k:35480d3bc903894277347e646181c3f248f3f1dbc4be3a8a0213b054be371fad",
+        "k:d0954e2a797c17c46d0c8af6169f619f0d2b8cb2b3f6ab085434bc9da0e4564f"
+      ],
+      "version": 2
+    },
+    {
+      "key": "s4-skill-reconcile",
+      "family": "B",
+      "id": "k:e10ca8c18e0a7949c2b11c8d83c6da3c5836602b381e7f2824717fbcf8692431",
+      "status": "validated",
+      "activated": true,
+      "reason": "EXECUTED_VALIDATION_PASSED",
+      "evidenceRefs": [
+        "k:07309e9cb6e2e1792e56c3eaa1d4803854ccf95b28e45d8c945507fe2235914e",
+        "k:db51527922529692589c724f3c580f3c482377e3f682fb1321d5bbaed5319b40",
+        "k:4fe2b4ddff5f7258a0eb7c5f0f411f80476b8fd8e5a8e65eba3375632f96d46b",
+        "k:9c13459696958549f6993d775980abbb9e603065f456706fa2a65f227f892b0b"
+      ],
+      "version": 2
+    }
+  ],
+  "queries": [
+    {
+      "id": "a1",
+      "category": "positive",
+      "query": "Missing public declaration dependency PluginContext standalone Palace",
+      "expected": "A",
+      "palace": {
+        "hit": true,
+        "returned": 5,
+        "families": [
+          "A",
+          "A",
+          "A",
+          "B",
+          "B"
+        ],
+        "summaries": [
+          "S4 trace package-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\package-types-red.stdout.log\\nOriginalSHA256: 6be78766883039672abe3878f48bf46c86e094b926a77d11f63a4346d59f101a\\nOriginalEncoding: utf8\\n\\nTAP v",
+          "S4-A: Repair standalone Palace public declaration closure without a Device runtime dependency",
+          "S4 trace package-green\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\package-closure-green-2.stdout.log\\nOriginalSHA256: 46c606f39741df88421ae9a1bca81b240f97c2cb5e10d44654faf3ca1fc93f2f\\nOriginalEncoding: utf8\\",
+          "S4 trace skill-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\skill-review2-matrix.stdout.log\\nOriginalSHA256: 59cefe09b9f460921c53f3b53a0e9b20ee95223f4fd1b3bcde9bea5adfb11e56\\nOriginalEncoding: utf8\\n\\nTAP ",
+          "S4 trace skill-green\\n\\nOriginalPath: E:/test/mcp-device-v12-e2e-20261024-g6/s4-skill-green.stdout.log\\nOriginalSHA256: ecc98b302e243a36c4616d8a2625952ef0f1fef04d31b2e894a94a089caa4324\\nOriginalEncoding: utf16le\\n\\nTAP version 13"
+        ]
+      },
+      "lexical": {
+        "hit": true,
+        "returned": 5,
+        "families": [
+          "B",
+          "B",
+          "A",
+          "A",
+          "B"
+        ],
+        "files": [
+          "skill-red.md",
+          "skill-green.md",
+          "package-red.md",
+          "package-green.md",
+          "linux-current.md"
+        ]
+      }
+    },
+    {
+      "id": "a2",
+      "category": "positive",
+      "query": "standalone public plugin types resolve without Device package",
+      "expected": "A",
+      "palace": {
+        "hit": true,
+        "returned": 5,
+        "families": [
+          "A",
+          "A",
+          "A",
+          "B",
+          "B"
+        ],
+        "summaries": [
+          "S4-A: Repair standalone Palace public declaration closure without a Device runtime dependency",
+          "S4 trace package-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\package-types-red.stdout.log\\nOriginalSHA256: 6be78766883039672abe3878f48bf46c86e094b926a77d11f63a4346d59f101a\\nOriginalEncoding: utf8\\n\\nTAP v",
+          "S4 trace package-green\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\package-closure-green-2.stdout.log\\nOriginalSHA256: 46c606f39741df88421ae9a1bca81b240f97c2cb5e10d44654faf3ca1fc93f2f\\nOriginalEncoding: utf8\\",
+          "S4 trace managed-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\managed-data-red.stdout.log\\nOriginalSHA256: 12657f11cde15f813062372a4442f893ef8a68634824af197cdadb93f15f8c53\\nOriginalEncoding: utf8\\n\\nTAP ve",
+          "S4 trace skill-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\skill-review2-matrix.stdout.log\\nOriginalSHA256: 59cefe09b9f460921c53f3b53a0e9b20ee95223f4fd1b3bcde9bea5adfb11e56\\nOriginalEncoding: utf8\\n\\nTAP "
+        ]
+      },
+      "lexical": {
+        "hit": true,
+        "returned": 5,
+        "families": [
+          "B",
+          "B",
+          "B",
+          "A",
+          "A"
+        ],
+        "files": [
+          "skill-red.md",
+          "managed-red.md",
+          "skill-green.md",
+          "package-red.md",
+          "package-green.md"
+        ]
+      }
+    },
+    {
+      "id": "a3",
+      "category": "positive",
+      "query": "NodeNext declaration resolver package closure",
+      "expected": "A",
+      "palace": {
+        "hit": true,
+        "returned": 3,
+        "families": [
+          "A",
+          "A",
+          "A"
+        ],
+        "summaries": [
+          "S4-A: Repair standalone Palace public declaration closure without a Device runtime dependency",
+          "S4 trace package-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\package-types-red.stdout.log\\nOriginalSHA256: 6be78766883039672abe3878f48bf46c86e094b926a77d11f63a4346d59f101a\\nOriginalEncoding: utf8\\n\\nTAP v",
+          "S4 trace package-green\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\package-closure-green-2.stdout.log\\nOriginalSHA256: 46c606f39741df88421ae9a1bca81b240f97c2cb5e10d44654faf3ca1fc93f2f\\nOriginalEncoding: utf8\\"
+        ]
+      },
+      "lexical": {
+        "hit": true,
+        "returned": 5,
+        "families": [
+          "B",
+          "B",
+          "A",
+          "A",
+          "B"
+        ],
+        "files": [
+          "skill-red.md",
+          "skill-green.md",
+          "package-green.md",
+          "package-red.md",
+          "managed-red.md"
+        ]
+      }
+    },
+    {
+      "id": "a4",
+      "category": "positive",
+      "query": "computed runtime imports reviewed path contract",
+      "expected": "A",
+      "palace": {
+        "hit": true,
+        "returned": 4,
+        "families": [
+          "A",
+          "A",
+          "B",
+          "B"
+        ],
+        "summaries": [
+          "S4 trace package-green\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\package-closure-green-2.stdout.log\\nOriginalSHA256: 46c606f39741df88421ae9a1bca81b240f97c2cb5e10d44654faf3ca1fc93f2f\\nOriginalEncoding: utf8\\",
+          "S4-A: Repair standalone Palace public declaration closure without a Device runtime dependency",
+          "S4 trace skill-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\skill-review2-matrix.stdout.log\\nOriginalSHA256: 59cefe09b9f460921c53f3b53a0e9b20ee95223f4fd1b3bcde9bea5adfb11e56\\nOriginalEncoding: utf8\\n\\nTAP ",
+          "S4 trace skill-green\\n\\nOriginalPath: E:/test/mcp-device-v12-e2e-20261024-g6/s4-skill-green.stdout.log\\nOriginalSHA256: ecc98b302e243a36c4616d8a2625952ef0f1fef04d31b2e894a94a089caa4324\\nOriginalEncoding: utf16le\\n\\nTAP version 13"
+        ]
+      },
+      "lexical": {
+        "hit": true,
+        "returned": 5,
+        "families": [
+          "B",
+          "B",
+          "A",
+          "B",
+          "A"
+        ],
+        "files": [
+          "managed-red.md",
+          "skill-green.md",
+          "package-green.md",
+          "skill-red.md",
+          "package-red.md"
+        ]
+      }
+    },
+    {
+      "id": "a5",
+      "category": "paraphrase",
+      "query": "public type graph escaped the standalone tarball",
+      "expected": "A",
+      "palace": {
+        "hit": true,
+        "returned": 3,
+        "families": [
+          "A",
+          "A",
+          "A"
+        ],
+        "summaries": [
+          "S4-A: Repair standalone Palace public declaration closure without a Device runtime dependency",
+          "S4 trace package-green\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\package-closure-green-2.stdout.log\\nOriginalSHA256: 46c606f39741df88421ae9a1bca81b240f97c2cb5e10d44654faf3ca1fc93f2f\\nOriginalEncoding: utf8\\",
+          "S4 trace package-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\package-types-red.stdout.log\\nOriginalSHA256: 6be78766883039672abe3878f48bf46c86e094b926a77d11f63a4346d59f101a\\nOriginalEncoding: utf8\\n\\nTAP v"
+        ]
+      },
+      "lexical": {
+        "hit": true,
+        "returned": 5,
+        "families": [
+          "B",
+          "B",
+          "B",
+          "A",
+          "A"
+        ],
+        "files": [
+          "skill-green.md",
+          "skill-red.md",
+          "managed-red.md",
+          "package-red.md",
+          "package-green.md"
+        ]
+      }
+    },
+    {
+      "id": "a6",
+      "category": "paraphrase",
+      "query": "copy transitive d.ts dependencies for Palace plugin export",
+      "expected": "A",
+      "palace": {
+        "hit": true,
+        "returned": 5,
+        "families": [
+          "A",
+          "A",
+          "B",
+          "B",
+          "B"
+        ],
+        "summaries": [
+          "S4 trace package-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\package-types-red.stdout.log\\nOriginalSHA256: 6be78766883039672abe3878f48bf46c86e094b926a77d11f63a4346d59f101a\\nOriginalEncoding: utf8\\n\\nTAP v",
+          "S4-A: Repair standalone Palace public declaration closure without a Device runtime dependency",
+          "S4 trace skill-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\skill-review2-matrix.stdout.log\\nOriginalSHA256: 59cefe09b9f460921c53f3b53a0e9b20ee95223f4fd1b3bcde9bea5adfb11e56\\nOriginalEncoding: utf8\\n\\nTAP ",
+          "S4 trace skill-green\\n\\nOriginalPath: E:/test/mcp-device-v12-e2e-20261024-g6/s4-skill-green.stdout.log\\nOriginalSHA256: ecc98b302e243a36c4616d8a2625952ef0f1fef04d31b2e894a94a089caa4324\\nOriginalEncoding: utf16le\\n\\nTAP version 13",
+          "S4 trace managed-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\managed-data-red.stdout.log\\nOriginalSHA256: 12657f11cde15f813062372a4442f893ef8a68634824af197cdadb93f15f8c53\\nOriginalEncoding: utf8\\n\\nTAP ve"
+        ]
+      },
+      "lexical": {
+        "hit": true,
+        "returned": 5,
+        "families": [
+          "B",
+          "B",
+          "B",
+          "A",
+          "A"
+        ],
+        "files": [
+          "skill-red.md",
+          "skill-green.md",
+          "managed-red.md",
+          "package-red.md",
+          "package-green.md"
+        ]
+      }
+    },
+    {
+      "id": "b1",
+      "category": "positive",
+      "query": "Palace Skill preserve user-created empty directories",
+      "expected": "B",
+      "palace": {
+        "hit": true,
+        "returned": 5,
+        "families": [
+          "B",
+          "B",
+          "B",
+          "B",
+          "B"
+        ],
+        "summaries": [
+          "S4 trace skill-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\skill-review2-matrix.stdout.log\\nOriginalSHA256: 59cefe09b9f460921c53f3b53a0e9b20ee95223f4fd1b3bcde9bea5adfb11e56\\nOriginalEncoding: utf8\\n\\nTAP ",
+          "S4 trace skill-green\\n\\nOriginalPath: E:/test/mcp-device-v12-e2e-20261024-g6/s4-skill-green.stdout.log\\nOriginalSHA256: ecc98b302e243a36c4616d8a2625952ef0f1fef04d31b2e894a94a089caa4324\\nOriginalEncoding: utf16le\\n\\nTAP version 13",
+          "S4 trace managed-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\managed-data-red.stdout.log\\nOriginalSHA256: 12657f11cde15f813062372a4442f893ef8a68634824af197cdadb93f15f8c53\\nOriginalEncoding: utf8\\n\\nTAP ve",
+          "S4-B: Reconcile Palace Skill ownership without overwriting user or foreign content",
+          "S4 trace linux-current\\n\\nOriginalPath: E:/test/mcp-device-v12-e2e-20261024-g6/linux-current-fixed.stdout.log\\nOriginalSHA256: bb0062c04c9a0d647ff55e39cd8d6484a3eb586c0af238c047016fc8fd8880a4\\nOriginalEncoding: utf16le\\n\\n/mnt/e/test/mcp-device-v12-e2e-202"
+        ]
+      },
+      "lexical": {
+        "hit": true,
+        "returned": 4,
+        "families": [
+          "B",
+          "B",
+          "B",
+          "B"
+        ],
+        "files": [
+          "skill-red.md",
+          "skill-green.md",
+          "managed-red.md",
+          "linux-current.md"
+        ]
+      }
+    },
+    {
+      "id": "b2",
+      "category": "positive",
+      "query": "Skill package relocation preserve user edits",
+      "expected": "B",
+      "palace": {
+        "hit": true,
+        "returned": 4,
+        "families": [
+          "B",
+          "B",
+          "B",
+          "B"
+        ],
+        "summaries": [
+          "S4-B: Reconcile Palace Skill ownership without overwriting user or foreign content",
+          "S4 trace skill-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\skill-review2-matrix.stdout.log\\nOriginalSHA256: 59cefe09b9f460921c53f3b53a0e9b20ee95223f4fd1b3bcde9bea5adfb11e56\\nOriginalEncoding: utf8\\n\\nTAP ",
+          "S4 trace skill-green\\n\\nOriginalPath: E:/test/mcp-device-v12-e2e-20261024-g6/s4-skill-green.stdout.log\\nOriginalSHA256: ecc98b302e243a36c4616d8a2625952ef0f1fef04d31b2e894a94a089caa4324\\nOriginalEncoding: utf16le\\n\\nTAP version 13",
+          "S4 trace managed-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\managed-data-red.stdout.log\\nOriginalSHA256: 12657f11cde15f813062372a4442f893ef8a68634824af197cdadb93f15f8c53\\nOriginalEncoding: utf8\\n\\nTAP ve"
+        ]
+      },
+      "lexical": {
+        "hit": true,
+        "returned": 5,
+        "families": [
+          "B",
+          "B",
+          "A",
+          "A",
+          "B"
+        ],
+        "files": [
+          "skill-red.md",
+          "skill-green.md",
+          "package-red.md",
+          "package-green.md",
+          "managed-red.md"
+        ]
+      }
+    },
+    {
+      "id": "b3",
+      "category": "positive",
+      "query": "foreign link must not be adopted during reconcile",
+      "expected": "B",
+      "palace": {
+        "hit": true,
+        "returned": 3,
+        "families": [
+          "B",
+          "B",
+          "B"
+        ],
+        "summaries": [
+          "S4 trace skill-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\skill-review2-matrix.stdout.log\\nOriginalSHA256: 59cefe09b9f460921c53f3b53a0e9b20ee95223f4fd1b3bcde9bea5adfb11e56\\nOriginalEncoding: utf8\\n\\nTAP ",
+          "S4 trace skill-green\\n\\nOriginalPath: E:/test/mcp-device-v12-e2e-20261024-g6/s4-skill-green.stdout.log\\nOriginalSHA256: ecc98b302e243a36c4616d8a2625952ef0f1fef04d31b2e894a94a089caa4324\\nOriginalEncoding: utf16le\\n\\nTAP version 13",
+          "S4-B: Reconcile Palace Skill ownership without overwriting user or foreign content"
+        ]
+      },
+      "lexical": {
+        "hit": true,
+        "returned": 2,
+        "families": [
+          "B",
+          "B"
+        ],
+        "files": [
+          "skill-red.md",
+          "skill-green.md"
+        ]
+      }
+    },
+    {
+      "id": "b4",
+      "category": "positive",
+      "query": "interrupted Skill publish staging recovery",
+      "expected": "B",
+      "palace": {
+        "hit": true,
+        "returned": 3,
+        "families": [
+          "B",
+          "B",
+          "B"
+        ],
+        "summaries": [
+          "S4-B: Reconcile Palace Skill ownership without overwriting user or foreign content",
+          "S4 trace skill-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\skill-review2-matrix.stdout.log\\nOriginalSHA256: 59cefe09b9f460921c53f3b53a0e9b20ee95223f4fd1b3bcde9bea5adfb11e56\\nOriginalEncoding: utf8\\n\\nTAP ",
+          "S4 trace skill-green\\n\\nOriginalPath: E:/test/mcp-device-v12-e2e-20261024-g6/s4-skill-green.stdout.log\\nOriginalSHA256: ecc98b302e243a36c4616d8a2625952ef0f1fef04d31b2e894a94a089caa4324\\nOriginalEncoding: utf16le\\n\\nTAP version 13"
+        ]
+      },
+      "lexical": {
+        "hit": true,
+        "returned": 4,
+        "families": [
+          "B",
+          "B",
+          "B",
+          "B"
+        ],
+        "files": [
+          "skill-red.md",
+          "skill-green.md",
+          "managed-red.md",
+          "linux-current.md"
+        ]
+      }
+    },
+    {
+      "id": "b5",
+      "category": "paraphrase",
+      "query": "moving package prefix keeps edited Skill files",
+      "expected": "B",
+      "palace": {
+        "hit": true,
+        "returned": 5,
+        "families": [
+          "B",
+          "B",
+          "B",
+          "B",
+          "B"
+        ],
+        "summaries": [
+          "S4 trace skill-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\skill-review2-matrix.stdout.log\\nOriginalSHA256: 59cefe09b9f460921c53f3b53a0e9b20ee95223f4fd1b3bcde9bea5adfb11e56\\nOriginalEncoding: utf8\\n\\nTAP ",
+          "S4 trace skill-green\\n\\nOriginalPath: E:/test/mcp-device-v12-e2e-20261024-g6/s4-skill-green.stdout.log\\nOriginalSHA256: ecc98b302e243a36c4616d8a2625952ef0f1fef04d31b2e894a94a089caa4324\\nOriginalEncoding: utf16le\\n\\nTAP version 13",
+          "S4-B: Reconcile Palace Skill ownership without overwriting user or foreign content",
+          "S4 trace linux-current\\n\\nOriginalPath: E:/test/mcp-device-v12-e2e-20261024-g6/linux-current-fixed.stdout.log\\nOriginalSHA256: bb0062c04c9a0d647ff55e39cd8d6484a3eb586c0af238c047016fc8fd8880a4\\nOriginalEncoding: utf16le\\n\\n/mnt/e/test/mcp-device-v12-e2e-202",
+          "S4 trace managed-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\managed-data-red.stdout.log\\nOriginalSHA256: 12657f11cde15f813062372a4442f893ef8a68634824af197cdadb93f15f8c53\\nOriginalEncoding: utf8\\n\\nTAP ve"
+        ]
+      },
+      "lexical": {
+        "hit": true,
+        "returned": 5,
+        "families": [
+          "B",
+          "B",
+          "A",
+          "A",
+          "B"
+        ],
+        "files": [
+          "skill-red.md",
+          "skill-green.md",
+          "package-red.md",
+          "package-green.md",
+          "managed-red.md"
+        ]
+      }
+    },
+    {
+      "id": "b6",
+      "category": "paraphrase",
+      "query": "reused PID must not steal Palace ownership lock",
+      "expected": "B",
+      "palace": {
+        "hit": true,
+        "returned": 3,
+        "families": [
+          "B",
+          "B",
+          "B"
+        ],
+        "summaries": [
+          "S4-B: Reconcile Palace Skill ownership without overwriting user or foreign content",
+          "S4 trace skill-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\skill-review2-matrix.stdout.log\\nOriginalSHA256: 59cefe09b9f460921c53f3b53a0e9b20ee95223f4fd1b3bcde9bea5adfb11e56\\nOriginalEncoding: utf8\\n\\nTAP ",
+          "S4 trace skill-green\\n\\nOriginalPath: E:/test/mcp-device-v12-e2e-20261024-g6/s4-skill-green.stdout.log\\nOriginalSHA256: ecc98b302e243a36c4616d8a2625952ef0f1fef04d31b2e894a94a089caa4324\\nOriginalEncoding: utf16le\\n\\nTAP version 13"
+        ]
+      },
+      "lexical": {
+        "hit": true,
+        "returned": 2,
+        "families": [
+          "B",
+          "B"
+        ],
+        "files": [
+          "skill-red.md",
+          "skill-green.md"
+        ]
+      }
+    },
+    {
+      "id": "s1",
+      "category": "stale",
+      "query": "old public declaration dependency plugin-contract missing failure",
+      "expected": "A",
+      "palace": {
+        "hit": true,
+        "returned": 4,
+        "families": [
+          "A",
+          "A",
+          "A",
+          "B"
+        ],
+        "summaries": [
+          "S4 trace package-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\package-types-red.stdout.log\\nOriginalSHA256: 6be78766883039672abe3878f48bf46c86e094b926a77d11f63a4346d59f101a\\nOriginalEncoding: utf8\\n\\nTAP v",
+          "S4-A: Repair standalone Palace public declaration closure without a Device runtime dependency",
+          "S4 trace package-green\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\package-closure-green-2.stdout.log\\nOriginalSHA256: 46c606f39741df88421ae9a1bca81b240f97c2cb5e10d44654faf3ca1fc93f2f\\nOriginalEncoding: utf8\\",
+          "S4 trace skill-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\skill-review2-matrix.stdout.log\\nOriginalSHA256: 59cefe09b9f460921c53f3b53a0e9b20ee95223f4fd1b3bcde9bea5adfb11e56\\nOriginalEncoding: utf8\\n\\nTAP "
+        ]
+      },
+      "lexical": {
+        "hit": true,
+        "returned": 5,
+        "families": [
+          "B",
+          "B",
+          "B",
+          "A",
+          "B"
+        ],
+        "files": [
+          "managed-red.md",
+          "skill-red.md",
+          "skill-green.md",
+          "package-red.md",
+          "linux-current.md"
+        ]
+      }
+    },
+    {
+      "id": "s2",
+      "category": "stale",
+      "query": "expected preserved-existing actual updated Skill regression",
+      "expected": "B",
+      "palace": {
+        "hit": true,
+        "returned": 3,
+        "families": [
+          "B",
+          "B",
+          "B"
+        ],
+        "summaries": [
+          "S4 trace skill-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\skill-review2-matrix.stdout.log\\nOriginalSHA256: 59cefe09b9f460921c53f3b53a0e9b20ee95223f4fd1b3bcde9bea5adfb11e56\\nOriginalEncoding: utf8\\n\\nTAP ",
+          "S4 trace managed-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\managed-data-red.stdout.log\\nOriginalSHA256: 12657f11cde15f813062372a4442f893ef8a68634824af197cdadb93f15f8c53\\nOriginalEncoding: utf8\\n\\nTAP ve",
+          "S4 trace skill-green\\n\\nOriginalPath: E:/test/mcp-device-v12-e2e-20261024-g6/s4-skill-green.stdout.log\\nOriginalSHA256: ecc98b302e243a36c4616d8a2625952ef0f1fef04d31b2e894a94a089caa4324\\nOriginalEncoding: utf16le\\n\\nTAP version 13"
+        ]
+      },
+      "lexical": {
+        "hit": true,
+        "returned": 5,
+        "families": [
+          "B",
+          "B",
+          "B",
+          "B",
+          "A"
+        ],
+        "files": [
+          "skill-red.md",
+          "skill-green.md",
+          "managed-red.md",
+          "linux-current.md",
+          "package-red.md"
+        ]
+      }
+    },
+    {
+      "id": "s3",
+      "category": "stale",
+      "query": "managed Palace data root ignored disabled lifecycle restriction",
+      "expected": "B",
+      "palace": {
+        "hit": true,
+        "returned": 5,
+        "families": [
+          "B",
+          "B",
+          "B",
+          "B",
+          "B"
+        ],
+        "summaries": [
+          "S4 trace skill-green\\n\\nOriginalPath: E:/test/mcp-device-v12-e2e-20261024-g6/s4-skill-green.stdout.log\\nOriginalSHA256: ecc98b302e243a36c4616d8a2625952ef0f1fef04d31b2e894a94a089caa4324\\nOriginalEncoding: utf16le\\n\\nTAP version 13",
+          "S4 trace managed-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\managed-data-red.stdout.log\\nOriginalSHA256: 12657f11cde15f813062372a4442f893ef8a68634824af197cdadb93f15f8c53\\nOriginalEncoding: utf8\\n\\nTAP ve",
+          "S4-B: Reconcile Palace Skill ownership without overwriting user or foreign content",
+          "S4 trace skill-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\skill-review2-matrix.stdout.log\\nOriginalSHA256: 59cefe09b9f460921c53f3b53a0e9b20ee95223f4fd1b3bcde9bea5adfb11e56\\nOriginalEncoding: utf8\\n\\nTAP ",
+          "S4 trace linux-current\\n\\nOriginalPath: E:/test/mcp-device-v12-e2e-20261024-g6/linux-current-fixed.stdout.log\\nOriginalSHA256: bb0062c04c9a0d647ff55e39cd8d6484a3eb586c0af238c047016fc8fd8880a4\\nOriginalEncoding: utf16le\\n\\n/mnt/e/test/mcp-device-v12-e2e-202"
+        ]
+      },
+      "lexical": {
+        "hit": true,
+        "returned": 4,
+        "families": [
+          "B",
+          "B",
+          "B",
+          "B"
+        ],
+        "files": [
+          "skill-green.md",
+          "managed-red.md",
+          "skill-red.md",
+          "linux-current.md"
+        ]
+      }
+    },
+    {
+      "id": "s4",
+      "category": "stale",
+      "query": "root-owned Skill another uid privileged install",
+      "expected": "B",
+      "palace": {
+        "hit": true,
+        "returned": 5,
+        "families": [
+          "B",
+          "B",
+          "B",
+          "B",
+          "B"
+        ],
+        "summaries": [
+          "S4 trace skill-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\skill-review2-matrix.stdout.log\\nOriginalSHA256: 59cefe09b9f460921c53f3b53a0e9b20ee95223f4fd1b3bcde9bea5adfb11e56\\nOriginalEncoding: utf8\\n\\nTAP ",
+          "S4 trace skill-green\\n\\nOriginalPath: E:/test/mcp-device-v12-e2e-20261024-g6/s4-skill-green.stdout.log\\nOriginalSHA256: ecc98b302e243a36c4616d8a2625952ef0f1fef04d31b2e894a94a089caa4324\\nOriginalEncoding: utf16le\\n\\nTAP version 13",
+          "S4 trace linux-current\\n\\nOriginalPath: E:/test/mcp-device-v12-e2e-20261024-g6/linux-current-fixed.stdout.log\\nOriginalSHA256: bb0062c04c9a0d647ff55e39cd8d6484a3eb586c0af238c047016fc8fd8880a4\\nOriginalEncoding: utf16le\\n\\n/mnt/e/test/mcp-device-v12-e2e-202",
+          "S4-B: Reconcile Palace Skill ownership without overwriting user or foreign content",
+          "S4 trace managed-red\\n\\nOriginalPath: E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\managed-data-red.stdout.log\\nOriginalSHA256: 12657f11cde15f813062372a4442f893ef8a68634824af197cdadb93f15f8c53\\nOriginalEncoding: utf8\\n\\nTAP ve"
+        ]
+      },
+      "lexical": {
+        "hit": true,
+        "returned": 4,
+        "families": [
+          "B",
+          "B",
+          "B",
+          "B"
+        ],
+        "files": [
+          "skill-red.md",
+          "skill-green.md",
+          "managed-red.md",
+          "linux-current.md"
+        ]
+      }
+    },
+    {
+      "id": "u1",
+      "category": "unrelated",
+      "query": "OAuth PKCE browser pairing refresh token",
+      "expected": null,
+      "palace": {
+        "hit": true,
+        "returned": 0,
+        "families": [],
+        "summaries": []
+      },
+      "lexical": {
+        "hit": false,
+        "returned": 2,
+        "families": [
+          "B",
+          "B"
+        ],
+        "files": [
+          "skill-red.md",
+          "skill-green.md"
+        ]
+      }
+    },
+    {
+      "id": "u2",
+      "category": "unrelated",
+      "query": "GPU VRAM ComfyUI image generation model",
+      "expected": null,
+      "palace": {
+        "hit": true,
+        "returned": 0,
+        "families": [],
+        "summaries": []
+      },
+      "lexical": {
+        "hit": true,
+        "returned": 0,
+        "families": [],
+        "files": []
+      }
+    },
+    {
+      "id": "n1",
+      "category": "no-answer",
+      "query": "PostgreSQL replication slot WAL subscriber disconnect",
+      "expected": null,
+      "palace": {
+        "hit": true,
+        "returned": 0,
+        "families": [],
+        "summaries": []
+      },
+      "lexical": {
+        "hit": true,
+        "returned": 0,
+        "families": [],
+        "files": []
+      }
+    },
+    {
+      "id": "n2",
+      "category": "no-answer",
+      "query": "Rust Cargo registry checksum mismatch sparse index",
+      "expected": null,
+      "palace": {
+        "hit": true,
+        "returned": 0,
+        "families": [],
+        "summaries": []
+      },
+      "lexical": {
+        "hit": false,
+        "returned": 2,
+        "families": [
+          "B",
+          "B"
+        ],
+        "files": [
+          "managed-red.md",
+          "skill-green.md"
+        ]
+      }
+    }
+  ],
+  "validations": [
+    {
+      "label": "package-closure",
+      "args": [
+        "--test",
+        "test/v12/palace-package-types.test.mjs"
+      ],
+      "status": 0,
+      "pass": 4,
+      "fail": 0,
+      "stdoutSha256": "800d94632faa206e84a97123fe000a02acea48f95f8d394b2c014a1c66cc8313",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ok": true
+    },
+    {
+      "label": "skill-lifecycle",
+      "args": [
+        "--test",
+        "--test-concurrency=1",
+        "test/v12/palace-skill-lifecycle.test.mjs",
+        "test/v12/palace-skill-preservation.test.mjs",
+        "test/v12/palace-skill-probe.test.mjs",
+        "test/v12/palace-skill-recovery-guards.test.mjs",
+        "test/v12/palace-skill-review-regressions.test.mjs",
+        "test/v12/palace-skill-review2.test.mjs",
+        "test/v12/palace-owner-policy.test.mjs",
+        "test/v12/palace-managed-data-root.test.mjs"
+      ],
+      "status": 0,
+      "pass": 54,
+      "fail": 0,
+      "stdoutSha256": "dab8f83feaa9cded69262cf647f0baf39d35726e27e564e24b2d4d0eefe1d584",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ok": true
+    }
+  ],
+  "correction": {
+    "parent": "k:35480d3bc903894277347e646181c3f248f3f1dbc4be3a8a0213b054be371fad",
+    "invalidated": [
+      "k:372bf90cfcd6821f7bef7b6f5170c6203f5dcce967ada3e8636132f8a27cdf37"
+    ],
+    "dependent": {
+      "id": "k:372bf90cfcd6821f7bef7b6f5170c6203f5dcce967ada3e8636132f8a27cdf37",
+      "status": "withdrawn"
+    },
+    "passed": true
+  },
+  "metrics": {
+    "palace": {
+      "recallAt5": 1,
+      "abstain": 1
+    },
+    "lexical": {
+      "recallAt5": 1,
+      "abstain": 0.5
+    }
+  },
+  "status": "PASS",
+  "endedAt": "2026-10-25T07:51:55.169Z"
+}

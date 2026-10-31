@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "label": "linux-final-validation",
+  "cwd": "E:/git-project/agent-mcp-device-v12",
+  "command": "wsl.exe",
+  "args": [
+    "-d",
+    "Ubuntu-22.04",
+    "--exec",
+    "/usr/bin/node",
+    "/mnt/e/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/validate-linux-final.mjs"
+  ],
+  "startedAt": "2026-10-24T11:11:55.007Z",
+  "endedAt": "2026-10-24T11:15:13.803Z",
+  "durationMs": 198791.8109,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 0,
+  "signal": null,
+  "counts": {
+    "tests": 1,
+    "pass": 1,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\linux-final-validation.stdout.log",
+    "sha256": "3529dd14680d36485e0e2c3880acb182d183f2c98c1b68b2546c56524197e58d"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\linux-final-validation.stderr.log",
+    "sha256": "597f4cb3802182d0bf6a65e6b60fffc4da4f7946829bc4c962113f2e2d595129"
+  }
+}

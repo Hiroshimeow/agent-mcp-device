@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "observedVia": "md.list_devices",
+  "gatewayObservedAt": "2026-10-24T11:27:09.415Z",
+  "deviceId": "desktop-b5e4iue-87cea2af",
+  "name": "g6",
+  "host": "DESKTOP-B5E4IUE",
+  "platform": "win32",
+  "online": true,
+  "agentVersion": "1.0.11",
+  "connectionEpoch": 16,
+  "usage": {
+    "connections": 354,
+    "reconnects": 353,
+    "toolCallsStarted": 81648,
+    "toolCallsSucceeded": 78977,
+    "toolCallsFailed": 2625,
+    "requestBytes": 78766307,
+    "responseBytes": 384447624,
+    "lastSeenAt": 1792841229415,
+    "lastErrorCode": null
+  },
+  "deploymentAttempted": false,
+  "accountDetailsOmitted": true
+}

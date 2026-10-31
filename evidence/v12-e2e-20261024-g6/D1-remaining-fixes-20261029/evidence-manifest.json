@@ -1,0 +1,152 @@
+[
+  {
+    "path": "changed-files.json",
+    "bytes": 1982,
+    "sha256": "654622573e4f22dd7fbeed9d18b1a65269b632fbacb511f81b2c3bb022302cb2"
+  },
+  {
+    "path": "final-integrity-check.json",
+    "bytes": 299,
+    "sha256": "4bb3cc29b041db73284d71c43603c870ec9fd0d4911dffccadba665cd912b75d"
+  },
+  {
+    "path": "final-summary.json",
+    "bytes": 540,
+    "sha256": "140983bb7190fe34e2d3711d3f5383242c2e123aa88a22d4a681fa88628a728a"
+  },
+  {
+    "path": "git-after.txt",
+    "bytes": 149431,
+    "sha256": "caf6547051536109a6ecffb73896e5cce518baec1ea50dd2f0ab01aebb7bc307"
+  },
+  {
+    "path": "git-ignored-after.txt",
+    "bytes": 36683,
+    "sha256": "1bccf9e73ae5a015a50b6b9f33b06550e0f57699b7df154691ed84729b211896"
+  },
+  {
+    "path": "HANDOFF.md",
+    "bytes": 10832,
+    "sha256": "778ed7f2249ade94a84ee393ff3020f5e25c736bc46cb485843638e2fa30e569"
+  },
+  {
+    "path": "identity-inheritance.json",
+    "bytes": 325,
+    "sha256": "74c8d6f4895bac4e76310edbc93118416b7bc3b8831c7c84474419a634189a47"
+  },
+  {
+    "path": "logs/a5-diagnostic.log",
+    "bytes": 735,
+    "sha256": "af5c8f60bb9334538e3116338af560c64e14046ac667f3ec043eaa4793b074c4"
+  },
+  {
+    "path": "logs/a5-final.log",
+    "bytes": 1314,
+    "sha256": "72cef84f457a3d0d1a437b2c3f56c407223f1575f28c633c8ee22c5ebd832ddf"
+  },
+  {
+    "path": "logs/a5-first.log",
+    "bytes": 1833,
+    "sha256": "1cf65b6313c9901ab8e025a29995cc1b3e9a9131e51ba71b32e27c74285db8a3"
+  },
+  {
+    "path": "logs/a5-repeat.log",
+    "bytes": 723,
+    "sha256": "7a4fdc55e0b709bc9e34e8b71ca8ae3ec744849c3feda53b275e22fef8bec095"
+  },
+  {
+    "path": "logs/diff-check.log",
+    "bytes": 2055,
+    "sha256": "f2ffe2c9b35a5b82612b87f751942b4e4c75e1e6c4b64d9cb05bf16e6756f1bb"
+  },
+  {
+    "path": "logs/entry-alias-red.log",
+    "bytes": 409,
+    "sha256": "55a3cf70d4b9f1b3a86be58fe8c093adf0811b81a979222975684221aba0f1c5"
+  },
+  {
+    "path": "logs/functional-final.log",
+    "bytes": 15411,
+    "sha256": "55c52e5160fc8c0d6e78c2d6aa303038776a756d78c6efddcd38ea2d6fab859c"
+  },
+  {
+    "path": "logs/functional-stage-missing-script.log",
+    "bytes": 21867,
+    "sha256": "85281cd6e3be86a617ff891ccb9f518f4d306ec726e85b0813b494a7334e06f9"
+  },
+  {
+    "path": "logs/green-first.log",
+    "bytes": 2992,
+    "sha256": "30b6bb9ddb406615e50f616858746f9c812d4ac1e75623e1e3c3c87fb9550b4b"
+  },
+  {
+    "path": "logs/red.log",
+    "bytes": 22442,
+    "sha256": "e302d24cf22877504bea1f08db07d8b0d281690914dd18b106664be38c09f200"
+  },
+  {
+    "path": "logs/stage-final.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "logs/tsc-final.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "logs/tsc-green.log",
+    "bytes": 18937,
+    "sha256": "6b007a267915a46cc0c5eb6e6f230569c27c5ee1f15a81bd0cb6a44fe7f64a86"
+  },
+  {
+    "path": "logs/tsc-red.log",
+    "bytes": 18937,
+    "sha256": "36e2fd8e3aabb3431a204e0ac203aa7707662f870e940f0707d255a6148e5057"
+  },
+  {
+    "path": "process-cwd-after.json",
+    "bytes": 257,
+    "sha256": "331d8097e8d354208044de545f36f02254fbc4a82c1e3c376a435f65df824754"
+  },
+  {
+    "path": "process-cwd-before.json",
+    "bytes": 425,
+    "sha256": "7a32197c79972a712d0b90628e66249cb9112d8afdbae1807588e5aacb99b69f"
+  },
+  {
+    "path": "review-final.md",
+    "bytes": 1802,
+    "sha256": "f6518a4003c28493304f0d16069cb6ff010bfd490b580e221976893d42cefc51"
+  },
+  {
+    "path": "source-before.json",
+    "bytes": 59177,
+    "sha256": "52fa9d32db96adbf4ff4cb574554f219e73c32fa6c2bf3de0d6a564c8589f615"
+  },
+  {
+    "path": "stable-source-manifest.json",
+    "bytes": 59329,
+    "sha256": "b3d88dd794dec9b3e8282f2e39d0759e6f5a35ee6f678e7ce43a64269632be98"
+  },
+  {
+    "path": "stage-tests.cjs",
+    "bytes": 750,
+    "sha256": "1bb5ef1e9f4a8e15804d84b4c8fceed22b5ec6c732b12db7e1068bf629b89eba"
+  },
+  {
+    "path": "verification-commands.json",
+    "bytes": 3722,
+    "sha256": "5433712d44f69b09fee70e13cb71d4678d5575dbac16c17634491cfdd9efb55c"
+  },
+  {
+    "path": "verification-stage-missing-script.json",
+    "bytes": 2797,
+    "sha256": "91e9225c71ee77c5201cbdac3356dcdf69886a8ba32cafe27fc0cef83f278e0b"
+  },
+  {
+    "path": "verify.cjs",
+    "bytes": 3081,
+    "sha256": "236b1ff7bef8fc2bc2268dbb362b2b726a7cb51afdef2dc67a55ddc873027394"
+  }
+]

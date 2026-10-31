@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 2,
+  "recordedAt": "2026-10-25T07:39:03.543Z",
+  "head": "1e454c1cdcbe3265892f751034fa389432d65405",
+  "artifacts": {
+    "device": {
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/artifacts/candidate-20261025/hcu-lab.me-mcp-device-1.0.12.tgz",
+      "sha256": "cd20147d602e9b498d6a76e6847263908940f6ded04ef04ceb74b1b402ac1970"
+    },
+    "palace": {
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/artifacts/candidate-20261025/hcu-lab.me-palace-1.0.12.tgz",
+      "sha256": "033df49857fe43f0158446a8afb9e336477a4d4d5014a37c064771b1fa3482dc"
+    }
+  },
+  "windows": {
+    "platform": {
+      "tests": 160,
+      "pass": 160,
+      "fail": 0,
+      "skipped": 0,
+      "stdout": "E:/test/mcp-device-v12-e2e-20261024-g6/completion-2026-10-24T23-18-37-628Z/platform-current-win2.stdout.log",
+      "stdoutSha256": "dd90b625023318127aab19fd2a6dc303e1a0b1fe782979e16619cee2c382cf76"
+    },
+    "server": {
+      "tests": 42,
+      "pass": 42,
+      "fail": 0,
+      "skipped": 0,
+      "stdout": "E:/test/mcp-device-v12-e2e-20261024-g6/completion-2026-10-24T23-18-37-628Z/server-current-cold.stdout.log",
+      "stdoutSha256": "e52dbc6bfd303780b3136adeccf6707e08dd346e692380dabbc355e62c178e43"
+    },
+    "coldInstall": "E:/test/mcp-device-v12-e2e-20261024-g6/final-cold-win-20261025"
+  },
+  "linux": {
+    "platform": {
+      "tests": 160,
+      "pass": 160,
+      "fail": 0,
+      "skipped": 0,
+      "stdout": "E:/test/mcp-device-v12-e2e-20261024-g6/linux-current-fixed.stdout.log",
+      "stdoutSha256": "bb0062c04c9a0d647ff55e39cd8d6484a3eb586c0af238c047016fc8fd8880a4"
+    },
+    "identity": "G6 WSL Ubuntu-22.04",
+    "coldRoot": "/var/tmp/mcp-device-v12-current-20261025b"
+  },
+  "skillMatrix": {
+    "tests": 54,
+    "pass": 54,
+    "fail": 0,
+    "skipped": 0
+  },
+  "cliLive": {
+    "status": "PASS",
+    "reads": 1000,
+    "errors": 0,
+    "appendedRecords": 151,
+    "receipt": "E:/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/live-cli-1000-current.json",
+    "receiptSha256": "911e568f3594b38fc0d2e35be8e4019250bd92fc9a224bcc7943caf70ebdea50"
+  },
+  "agent": {
+    "status": "PASS",
+    "receipt": "E:/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/real-agent-current-codex.json",
+    "receiptSha256": "77fca5e0866cfb1661e3ab4b493b8a26b40aa45dd4a8bbdf7af33acff0c79d85"
+  },
+  "parity": {
+    "receipt": "E:/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/parity-current-interpretation.json",
+    "receiptSha256": "74257766d7274df18600b73c1358fa37733d994c22aba7dc74cd02d4572e7d78",
+    "verdict": "NO_CANDIDATE_NATIVE_REGRESSION_IN_EXECUTED_FAMILIES"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "label": "server",
+  "startedAt": "2026-10-24T23:37:02.422Z",
+  "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z",
+  "program": "node",
+  "argv": [
+    "scripts/v12/run-platform-tests.mjs",
+    "--server"
+  ],
+  "pid": 29788,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "stdout": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\server.stdout.log",
+  "stderr": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\server.stderr.log",
+  "state": "COMPLETED",
+  "endedAt": "2026-10-24T23:38:29.879Z",
+  "elapsedMs": 87457,
+  "exitCode": 0,
+  "signal": null,
+  "counts": {
+    "tests": 42,
+    "pass": 42,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "stdoutSha256": "2de3446e658660e2ddd47b2be99e380ba353620226d3d176265a08476b3c8cd6",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-10-24T23:18:48.439Z",
+  "repo": "E:/git-project/agent-mcp-device-v12",
+  "target": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z",
+  "head": "1e454c1cdcbe3265892f751034fa389432d65405",
+  "branch": "feat/v12-platform-20261022",
+  "node": "v22.22.2",
+  "sourceFiles": 977,
+  "sourceHash": "35f4ac42e482f17f7c1d1c517f9a7089200868408558b39175f26a2f065fee32",
+  "dependencyTree": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\candidate-d1-224339\\node_modules",
+  "dependencyMode": "build-only; cold installs require their own dependencies",
+  "releaseVerdict": "RELEASE_BLOCKED_WITH_EVIDENCE"
+}

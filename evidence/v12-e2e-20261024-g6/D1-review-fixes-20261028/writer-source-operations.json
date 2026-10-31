@@ -1,0 +1,109 @@
+[
+  {
+    "messageId": "730e9898",
+    "timestamp": "2026-10-27T23:41:48.150Z",
+    "tool": "write",
+    "arguments": {
+      "path": "test/v12/d1-read-init-regressions.test.mjs",
+      "content": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport fs from 'node:fs/promises';\nimport os from 'node:os';\nimport path from 'node:path';\nimport {spawn,spawnSync} from 'node:child_process';\nimport {DatabaseSync} from 'node:sqlite';\nimport {PalaceStore} from '../../dist/plugins/palace/store.js';\nimport {processNamespace} from '../../dist/platform/process-identity.js';\n\nasync function fixture(t){const root=await fs.mkdtemp(path.join(os.tmpdir(),'d1-read-init-'));t.after(()=>fs.rm(root,{recursive:true,force:true,maxRetries:8,retryDelay:50}));return root;}\ntest('interrupted first WAL initialization resumes, but foreign objects remain rejected',async t=>{\n const root=await fixture(t),file=path.join(root,'palace.sqlite');\n const db=new DatabaseSync(file);db.exec('PRAGMA journal_mode=WAL');db.close();\n const store=new PalaceStore(root,'fixture');try{assert.equal(store.getMeta('schema'),'1');assert.equal(store.count(),0);}finally{store.close();}\n const foreign=path.join(root,'foreign');await fs.mkdir(foreign);const other=new DatabaseSync(path.join(foreign,'palace.sqlite'));other.exec('CREATE TABLE unrelated(value TEXT)');other.close();\n const before=await fs.readFile(path.join(foreign,'palace.sqlite'));assert.throws(()=>new PalaceStore(foreign,'fixture'),/PALACE_SCHEMA_UNSUPPORTED/);assert.deepEqual(await fs.readFile(path.join(foreign,'palace.sqlite')),before);\n});\ntest('active read inspection uses PID and namespace without spawning children, never grants takeover',async t=>{\n const root=await fixture(t),runtime=path.join(root,'runtime');await fs.mkdir(runtime);\n const child=spawn(process.execPath,['-e','setInterval(()=>{},1000)'],{stdio:'ignore',windowsHide:true});const exited=new Promise(resolve=>child.once('exit',resolve));t.after(async()=>{child.kill();await exited;});\n await fs.writeFile(path.join(runtime,'server-runtime.lock'),JSON.stringify({pid:child.pid,namespace:await processNamespace(),processBirth:'deliberately-not-birth-verified'}));\n const store=new PalaceStore(path.join(runtime,'plugins/palace/data'),'fixture');store.close();\n const hook=path.join(root,'no-spawn.cjs');await fs.writeFile(hook,`const cp=require('node:child_process');for(const key of ['spawn','spawnSync','exec','execSync','execFile','execFileSync','fork'])cp[key]=()=>{throw Error('READ_PATH_SPAWN:'+key)};require('node:module').syncBuiltinESMExports();`);\n const out=spawnSync(process.execPath,['--require',hook,path.resolve(new URL('../../dist/plugins/palace/cli.js',import.meta.url).pathname.replace(/^\\/([A-Za-z]:)/,'$1')),'--runtime-dir',runtime,'status'],{encoding:'utf8',timeout:10000,env:{...process.env,MCP_DEVICE_SKIP_SKILL_INSTALL:'1'}});\n assert.equal(out.status,0,out.stderr);const body=JSON.parse(out.stdout);assert.equal(body.runtimeActive,true);assert.equal(body.leaseVerification,'pid-namespace');assert.equal(body.writePath,null);\n});\ntest('explicit archive reads do not discover ambiguous home runtimes',async t=>{\n const root=await fixture(t),data=path.join(root,'archive');const store=new PalaceStore(data,'fixture');store.close();\n for(const runtime of [path.join(root,'.mcp-device'),path.join(root,'.mcp-device/server')]){await fs.mkdir(path.join(runtime,'plugins'),{recursive:true});await fs.writeFile(path.join(runtime,'plugins/registry.json'),JSON.stringify({plugins:{palace:{}}}));}\n const hook=path.join(root,'home.cjs');await fs.writeFile(hook,`require('node:os').homedir=()=>${JSON.stringify(root)};require('node:module').syncBuiltinESMExports();delete process.env.MCP_DEVICE_CONFIG_DIR;`);\n const out=spawnSync(process.execPath,['--require',hook,path.resolve(new URL('../../dist/plugins/palace/cli.js',import.meta.url).pathname.replace(/^\\/([A-Za-z]:)/,'$1')),'--data-root',data,'status'],{encoding:'utf8',timeout:10000,env:{...process.env,MCP_DEVICE_SKIP_SKILL_INSTALL:'1'}});\n assert.equal(out.status,0,out.stderr);assert.equal(JSON.parse(out.stdout).runtimeBinding,'unmanaged-archive');\n});\n"
+    }
+  },
+  {
+    "messageId": "f08adbc0",
+    "timestamp": "2026-10-27T23:42:31.662Z",
+    "tool": "edit",
+    "arguments": {
+      "path": "src/platform/runtime-root.ts",
+      "edits": [
+        {
+          "oldText": "import { processBirth, sameProcessNamespace, type ProcessNamespace }",
+          "newText": "import { sameProcessNamespace, type ProcessNamespace }"
+        },
+        {
+          "oldText": "leaseInspectable:boolean; }",
+          "newText": "leaseInspectable:boolean; leaseVerification:'pid-namespace'; }"
+        },
+        {
+          "oldText": "try{body=JSON.parse(await fs.readFile(file,'utf8'));}catch{return {active:false,inspectable:true};}",
+          "newText": "try{body=JSON.parse(await fs.readFile(file,'utf8'));}catch(error){return {active:false,inspectable:(error as NodeJS.ErrnoException).code==='ENOENT'};}"
+        },
+        {
+          "oldText": "  if(!body.namespace||!body.processBirth)return {active:false,inspectable:false};\n  if(!await sameProcessNamespace(body.namespace))return {active:false,inspectable:false};\n  const birth=await processBirth(pid);if(birth===null)return {active:false,inspectable:false};\n  return {active:birth===body.processBirth,inspectable:true};",
+          "newText": "  if(!await sameProcessNamespace(body.namespace))return {active:false,inspectable:false};\n  // Observation only: a reused PID can conservatively appear active. Never\n  // use this result to authorize lock recovery, takeover or mutation.\n  return {active:true,inspectable:true};"
+        },
+        {
+          "oldText": "leaseInspectable:lease.inspectable};",
+          "newText": "leaseInspectable:lease.inspectable,leaseVerification:'pid-namespace'};"
+        }
+      ]
+    }
+  },
+  {
+    "messageId": "0209d0a6",
+    "timestamp": "2026-10-27T23:42:49.682Z",
+    "tool": "edit",
+    "arguments": {
+      "path": "src/plugins/palace/cli.ts",
+      "edits": [
+        {
+          "oldText": "import { resolveRuntimeRoot } from '../../platform/runtime-root.js';\nimport { processBirth, sameProcessNamespace, type ProcessNamespace } from '../../platform/process-identity.js';",
+          "newText": "import { inspectRuntimeRoot, resolveRuntimeRoot } from '../../platform/runtime-root.js';"
+        },
+        {
+          "oldText": "  const lock=path.join(runtime,'server-runtime.lock');\n  if(!existsSync(lock))return existsSync(path.join(runtime,'runtime-control.json'))?null:false;\n  try {\n    const body=JSON.parse(readFileSync(lock,'utf8')) as {pid?:number;processBirth?:string;namespace?:ProcessNamespace};\n    const pid=Number(body.pid);if(!Number.isSafeInteger(pid)||pid<1)return null;\n    try{process.kill(pid,0);}catch(error){return (error as NodeJS.ErrnoException).code==='ESRCH'?false:null;}\n    if(!body.namespace||!await sameProcessNamespace(body.namespace))return null;\n    if(!body.processBirth)return null;\n    const birth=await processBirth(pid);if(birth===null)return null;\n    return birth===body.processBirth;\n  }catch{return null;}",
+          "newText": "  if(!existsSync(path.join(runtime,'server-runtime.lock'))&&existsSync(path.join(runtime,'runtime-control.json')))return null;\n  const inspection=await inspectRuntimeRoot(runtime);\n  return inspection.leaseInspectable?inspection.activeLease:null;"
+        },
+        {
+          "oldText": "  const selectedRuntime=await resolveRuntimeRoot(opts['runtime-dir']===undefined?undefined:String(opts['runtime-dir']));\n  const explicitDataRoot=opts['data-root']!==undefined||(opts['runtime-dir']===undefined&&process.env.PALACE_DATA_ROOT!==undefined);",
+          "newText": "  const explicitDataRoot=opts['data-root']!==undefined||(opts['runtime-dir']===undefined&&process.env.PALACE_DATA_ROOT!==undefined);\n  const selectedRuntime=explicitDataRoot?'':await resolveRuntimeRoot(opts['runtime-dir']===undefined?undefined:String(opts['runtime-dir']));"
+        },
+        {
+          "oldText": "pluginState:life.pluginState,runtimeActive:active,writePath,mutationPolicy,skillState",
+          "newText": "pluginState:life.pluginState,runtimeActive:active,leaseVerification:archive?null:'pid-namespace',writePath,mutationPolicy,skillState"
+        }
+      ]
+    }
+  },
+  {
+    "messageId": "32a50e0d",
+    "timestamp": "2026-10-27T23:42:54.549Z",
+    "tool": "edit",
+    "arguments": {
+      "path": "src/plugins/palace/store.ts",
+      "edits": [
+        {
+          "oldText": "        const hasMeta=objects.some",
+          "newText": "        // WAL mode can durably create page 1 before the first schema\n        // transaction. An empty catalog has no foreign data to overwrite.\n        if(objects.length===0)return;\n        const hasMeta=objects.some"
+        }
+      ]
+    }
+  },
+  {
+    "messageId": "d5c4e1b8",
+    "timestamp": "2026-10-27T23:44:52.309Z",
+    "tool": "edit",
+    "arguments": {
+      "path": "test/v12/d1-read-init-regressions.test.mjs",
+      "edits": [
+        {
+          "oldText": " const before=await fs.readFile(path.join(foreign,'palace.sqlite'));assert.throws(()=>new PalaceStore(foreign,'fixture'),/PALACE_SCHEMA_UNSUPPORTED/);assert.deepEqual(await fs.readFile(path.join(foreign,'palace.sqlite')),before);",
+          "newText": " const before=await fs.readFile(path.join(foreign,'palace.sqlite'));assert.throws(()=>new PalaceStore(foreign,'fixture'),/PALACE_SCHEMA_UNSUPPORTED/);assert.deepEqual(await fs.readFile(path.join(foreign,'palace.sqlite')),before);\n const deceptive=path.join(root,'deceptive');await fs.mkdir(deceptive);const foreignDb=new DatabaseSync(path.join(deceptive,'palace.sqlite'));foreignDb.exec('CREATE TABLE sqliteXforeign(value TEXT)');foreignDb.close();\n const bytes=await fs.readFile(path.join(deceptive,'palace.sqlite'));assert.throws(()=>new PalaceStore(deceptive,'fixture'),/PALACE_SCHEMA_UNSUPPORTED/);assert.deepEqual(await fs.readFile(path.join(deceptive,'palace.sqlite')),bytes);"
+        }
+      ]
+    }
+  },
+  {
+    "messageId": "73759b22",
+    "timestamp": "2026-10-27T23:45:12.412Z",
+    "tool": "edit",
+    "arguments": {
+      "path": "src/plugins/palace/store.ts",
+      "edits": [
+        {
+          "oldText": "name NOT LIKE 'sqlite_%'",
+          "newText": "name NOT GLOB 'sqlite_*'"
+        }
+      ]
+    }
+  }
+]

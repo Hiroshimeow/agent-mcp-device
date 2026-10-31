@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "label": "device-pack-final",
+  "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\candidate-three",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+    "pack",
+    "--json",
+    "--pack-destination",
+    "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\final"
+  ],
+  "startedAt": "2026-10-24T11:09:52.727Z",
+  "endedAt": "2026-10-24T11:10:13.849Z",
+  "durationMs": 21119.844699999998,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 0,
+  "signal": null,
+  "counts": {},
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\device-pack-final.stdout.log",
+    "sha256": "0a184a0224498a1226876cc39b53d66a7b856e9b56642b150dfde9168559cb58"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\device-pack-final.stderr.log",
+    "sha256": "52be248d8719c378707988a09dc45df38a8da9c905e713ff8acb068e3d7f7e3f"
+  }
+}

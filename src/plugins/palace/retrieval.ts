@@ -26,7 +26,10 @@ export function rankCandidates(cards:KnowledgeCard[],query:string,limit:number):
   if(!terms.length)return [];
   const sets=cards.map(card=>new Set(words(card.summary+' '+card.body).map(stem)));
   const frequencies=new Map(terms.map(term=>[term,sets.filter(set=>set.has(term)).length]));
-  const minimum=terms.length>=3?Math.max(2,Math.ceil(terms.length*.25)):1;
+  // FTS5/BM25 already bounds the candidate corpus. Long natural-language paraphrases
+  // should not become harder to retrieve merely because they contain more unmatched words;
+  // require two independent lexical signals, while short queries still require one.
+  const minimum=terms.length>=3?2:1;
   return cards.map((card,index)=>{
     const matched=terms.filter(term=>sets[index].has(term));
     const information=matched.reduce((score,term)=>score+Math.log(1+(cards.length+1)/((frequencies.get(term)??0)+1)),0);

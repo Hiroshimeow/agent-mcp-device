@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "checkedVia": "md.shell_execute on G6",
+  "listeners": [
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 8103,
+      "OwningProcess": 50388
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 8102,
+      "OwningProcess": 47816
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 8101,
+      "OwningProcess": 47816
+    }
+  ],
+  "candidateNodeProcesses": [],
+  "candidateProcessSelector": "Name=node.exe and command line contains mcp-device-v12-e2e-20261024-g6",
+  "limitations": "Process scan is bounded to the owned fixture marker; it does not establish absence of every unrelated process or replace soak/resource measurements.",
+  "port8104Released": true,
+  "expectedOwnersPreserved": true
+}

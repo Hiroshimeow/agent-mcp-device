@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "sourceDescription": "G6 historical local MCP Device tool-calls log; may include test/fixture calls, NOT automatically representative of G8 production traffic",
+  "sourceSha256": "064be4944b406d235e3120bc9fb2a8706947f2be5784782b09b4576b2cdef253",
+  "sourceBytes": 5059657,
+  "firstObserved": "2026-09-17T13:43:21.608Z",
+  "lastObserved": "2026-10-26T12:56:44.548Z",
+  "recordCount": 40410,
+  "parsed": 40410,
+  "failed": 0,
+  "activeMinutes": 9564,
+  "trafficPerActiveMinute": {
+    "p50": 3,
+    "p95": 12,
+    "p99": 17,
+    "peak": 31
+  },
+  "last24hActiveMinutes": 139,
+  "last24hPerActiveMinute": {
+    "p95": 13,
+    "peak": 19
+  },
+  "topMethods": [
+    {
+      "name": "read_file",
+      "calls": 15303
+    },
+    {
+      "name": "edit_block",
+      "calls": 9880
+    },
+    {
+      "name": "read_process_output",
+      "calls": 6176
+    },
+    {
+      "name": "write_file",
+      "calls": 5024
+    },
+    {
+      "name": "start_process",
+      "calls": 3295
+    },
+    {
+      "name": "interact_with_process",
+      "calls": 438
+    },
+    {
+      "name": "force_terminate",
+      "calls": 172
+    },
+    {
+      "name": "unknown-test-route",
+      "calls": 114
+    },
+    {
+      "name": "get_config",
+      "calls": 8
+    }
+  ],
+  "peakMinutes": [
+    {
+      "minute": "2026-09-27T18:39:00.000Z",
+      "calls": 31
+    },
+    {
+      "minute": "2026-09-29T04:17:00.000Z",
+      "calls": 31
+    },
+    {
+      "minute": "2026-10-04T08:01:00.000Z",
+      "calls": 26
+    }
+  ],
+  "restriction": "Do not copy user-provided args or interpret synthetic test traffic as normal production. Requires representative v11 traffic and comparative v11/v12 validation before S7 PASS."
+}

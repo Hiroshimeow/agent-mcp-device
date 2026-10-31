@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "label": "baseline-distribution",
+  "cwd": "E:/test/mcp-device-v12-e2e-20261024-g6/baseline",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "--test",
+    "test/v12/palace-distribution.test.mjs"
+  ],
+  "startedAt": "2026-10-24T10:41:18.034Z",
+  "endedAt": "2026-10-24T10:41:19.841Z",
+  "durationMs": 1804.6497000000002,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 1,
+  "signal": null,
+  "counts": {
+    "tests": 2,
+    "pass": 1,
+    "fail": 1,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\baseline-distribution.stdout.log",
+    "sha256": "046813018e962dfc10821a6fcf018c5c015f84397587f4380ef478e5d7c39231"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\baseline-distribution.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

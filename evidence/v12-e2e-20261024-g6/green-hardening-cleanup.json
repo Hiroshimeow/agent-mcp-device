@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "label": "green-hardening-cleanup",
+  "cwd": "E:/test/mcp-device-v12-e2e-20261024-g6/candidate-three",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "test/test-green-hardening.js"
+  ],
+  "startedAt": "2026-10-24T11:21:19.850Z",
+  "endedAt": "2026-10-24T11:21:21.346Z",
+  "durationMs": 1494.8433,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 0,
+  "signal": null,
+  "counts": {},
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\green-hardening-cleanup.stdout.log",
+    "sha256": "f21294c8571bfca74ecdc4d4287543d1cddf2d81f67e8fbc0924c4bb6eb64baa"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\green-hardening-cleanup.stderr.log",
+    "sha256": "e7fd281f2edd4aa4f200d7887c09d404c8f3b222cadb213655dc8c755c5f2089"
+  }
+}

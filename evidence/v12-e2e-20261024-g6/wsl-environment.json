@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "label": "wsl-environment",
+  "cwd": "E:/test/mcp-device-v12-e2e-20261024-g6",
+  "command": "wsl.exe",
+  "args": [
+    "-d",
+    "Ubuntu-22.04",
+    "--exec",
+    "/usr/bin/node",
+    "--version"
+  ],
+  "startedAt": "2026-10-24T10:41:53.801Z",
+  "endedAt": "2026-10-24T10:42:03.877Z",
+  "durationMs": 10072.789100000002,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 0,
+  "signal": null,
+  "counts": {},
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\wsl-environment.stdout.log",
+    "sha256": "b60e831541859f637d202ba6be7c23305e1f80d29ac8bc77be7d6027ff66d6d2"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\wsl-environment.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-24T10:40:33.323Z",
+  "scope": "G6 only via md",
+  "deviceId": "desktop-b5e4iue-87cea2af",
+  "host": "DESKTOP-B5E4IUE",
+  "os": "win32",
+  "arch": "x64",
+  "node": "v22.22.2",
+  "nodeExecutable": "C:\\Program Files\\nodejs\\node.exe",
+  "sourceRoot": "E:\\git-project\\agent-mcp-device-v12",
+  "head": "1e454c1cdcbe3265892f751034fa389432d65405",
+  "branch": "feat/v12-platform-20261022",
+  "status": " M package.json\n M test/v12/server-package-cold.test.mjs\n?? .tmp/\n?? evidence/v12-e2e-20261024-g6/\n?? nul\n?? scripts/v12/build-palace-package.mjs\n?? scripts/v12/install-palace-skill.cjs\n?? specs/008-v12-platform/ONE_AGENT_EXECUTION_PROMPT.md\n?? specs/008-v12-platform/V12_END_TO_END_COMPLETION_SPEC.md\n?? test/v12/palace-distribution.test.mjs\n",
+  "preservedWip": [
+    {
+      "path": "package.json",
+      "bytes": 5863,
+      "sha256": "d13e818b01224310e5c4f91025efe67516229ea45290e05d33e07b2458a99b09",
+      "mtime": "2026-10-22T18:14:40.756Z"
+    },
+    {
+      "path": "test/v12/server-package-cold.test.mjs",
+      "bytes": 13939,
+      "sha256": "2ef6ee2ebc03fc8b4d5edf667fd8586da842a919d047f06f23789ad55bb97dbd",
+      "mtime": "2026-10-22T18:17:00.262Z"
+    },
+    {
+      "path": "scripts/v12/build-palace-package.mjs",
+      "bytes": 1918,
+      "sha256": "c06375416ab76d7488124fb70b19854b29adeb2d21758a7663940a6ce4235443",
+      "mtime": "2026-10-22T18:13:25.106Z"
+    },
+    {
+      "path": "scripts/v12/install-palace-skill.cjs",
+      "bytes": 2603,
+      "sha256": "eaef6a15afd8292e8b65425e3c483ddd9e903f83a732f50eb162c6c2736928cc",
+      "mtime": "2026-10-22T18:13:55.027Z"
+    },
+    {
+      "path": "test/v12/palace-distribution.test.mjs",
+      "bytes": 5108,
+      "sha256": "2fb05f474df414256d35da018e5f1a4345ff26ebdcfa612fbc72cc6944d8c377",
+      "mtime": "2026-10-22T18:15:56.818Z"
+    },
+    {
+      "path": "specs/008-v12-platform/ONE_AGENT_EXECUTION_PROMPT.md",
+      "bytes": 5860,
+      "sha256": "ddb64872c03b6e589ac21254713bd8ef91e1bcdfd81179573125860c66a76def",
+      "mtime": "2026-10-24T09:42:04.990Z"
+    },
+    {
+      "path": "specs/008-v12-platform/V12_END_TO_END_COMPLETION_SPEC.md",
+      "bytes": 31891,
+      "sha256": "d4bde67dcb43fabc967060c4254378f1f2871d10179fedf8d4233a174f45c394",
+      "mtime": "2026-10-24T09:42:02.090Z"
+    }
+  ],
+  "untrackedPaths": [
+    ".tmp/v12-cold-20261023/fake-home/.agents/skills/palace-cli/SKILL.md",
+    ".tmp/v12-cold-20261023/fake-home/.agents/skills/palace-cli/agents/openai.yaml",
+    ".tmp/v12-cold-20261023/fake-home/.pi/agent/skills/palace-cli/SKILL.md",
+    ".tmp/v12-cold-20261023/fake-home/.pi/agent/skills/palace-cli/agents/openai.yaml",
+    ".tmp/v12-cold-20261023/installed-auto/package-lock.json",
+    ".tmp/v12-cold-20261023/installed-auto/package.json",
+    ".tmp/v12-cold-20261023/installed/package-lock.json",
+    ".tmp/v12-cold-20261023/installed/package.json",
+    ".tmp/v12-cold-20261023/pack-after.err",
+    ".tmp/v12-cold-20261023/pack-after.json",
+    ".tmp/v12-cold-20261023/pack.err",
+    ".tmp/v12-cold-20261023/pack.json",
+    ".tmp/v12-cold-20261023/palace-pack.err",
+    ".tmp/v12-cold-20261023/palace-pack.json",
+    ".tmp/v12-cold-20261023/run-cold-test.ps1",
+    ".tmp/v12-palace-standalone/cold/package-lock.json",
+    ".tmp/v12-palace-standalone/cold/package.json",
+    ".tmp/v12-palace-standalone/package/package.json",
+    ".tmp/v12-palace-standalone/package/skills/palace-cli/SKILL.md",
+    ".tmp/v12-palace-standalone/package/skills/palace-cli/agents/openai.yaml",
+    "evidence/v12-e2e-20261024-g6/capture-baseline.cjs",
+    "nul",
+    "scripts/v12/build-palace-package.mjs",
+    "scripts/v12/install-palace-skill.cjs",
+    "specs/008-v12-platform/ONE_AGENT_EXECUTION_PROMPT.md",
+    "specs/008-v12-platform/V12_END_TO_END_COMPLETION_SPEC.md",
+    "test/v12/palace-distribution.test.mjs"
+  ],
+  "sourceSnapshot": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\baseline",
+  "work": "E:/test/mcp-device-v12-e2e-20261024-g6",
+  "sourceManifestSha256": "0d55b8cb114a1246276ca8e78278cf725d5ddccc62995b2fdc0c63efac23bf89",
+  "reviewGates": {
+    "D0": "REVIEW_PENDING_G6_ONLY",
+    "D1": "NOT_RUN",
+    "D2": "NOT_RUN",
+    "D3": "NOT_RUN"
+  },
+  "observedListeners": [
+    {
+      "port": 8101,
+      "pid": 47816
+    },
+    {
+      "port": 8102,
+      "pid": 47816
+    },
+    {
+      "port": 8103,
+      "pid": 50388
+    }
+  ],
+  "testPort8104ObservedFree": true,
+  "sourceChanges": [],
+  "runtimeChanges": [],
+  "notes": [
+    "Existing .tmp/, nul and ignored runtime state left untouched.",
+    "Snapshot has existing compiled dist; freshness not yet proven.",
+    "Process-inspection request IDs 9e22f858-1b20-4fef-90e6-6197f9097ced and 7ec58b52-bf02-4c12-b92f-187173a38d72 timed out. No process terminated.",
+    "WSL Ubuntu node probe exceeded 8000 ms; Linux availability unproven.",
+    "Gateway read_text_file ignores head/tail; remainders read by bounded Node slices."
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "label": "root-suite-windows-final",
+  "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\candidate-three",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+    "test"
+  ],
+  "startedAt": "2026-10-24T11:13:30.766Z",
+  "endedAt": "2026-10-24T11:18:43.891Z",
+  "durationMs": 313122.8112,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 1,
+  "signal": null,
+  "counts": {},
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\root-suite-windows-final.stdout.log",
+    "sha256": "5a24653443c6197b59211a665c2f027cd3365346f94fe9b06930c67acfdd5132"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\root-suite-windows-final.stderr.log",
+    "sha256": "b9cf27643089c30b24ca1284394110db96b6f498d143a821cd8fc7a4f157de73"
+  }
+}

@@ -28,8 +28,13 @@ test('deterministic executable task replay compares no-Palace retries with a val
   };
   // Prior source claims are separate from held-out task IDs. A trusted runner must execute
   // the proposed recipe and inspect the resulting state before it becomes an active Skill.
-  const observation='Error SQLITE_BUSY during settlement. Fix: Set busyTimeoutMs = 250 and preserve the original idempotency key before retry.';
-  writeFileSync(join(logs,'prior.log'),observation+'\n'+observation+'\n');
+  const observationA='Error SQLITE_BUSY during settlement. Fix: Set busyTimeoutMs = 250 and preserve the original idempotency key before retry.';
+  const observationB='Resolved: independent reconnect trace completed settlement with busyTimeoutMs = 250 while the original idempotency key was reused; duplicate charge count stayed at one.';
+  const contradictory='Rejected workaround: busyTimeoutMs = 0 repeated SQLITE_BUSY and did not complete the settlement.';
+  writeFileSync(join(logs,'prior-a.log'),observationA+'\n');
+  writeFileSync(join(logs,'prior-b.log'),observationB+'\n');
+  writeFileSync(join(logs,'contradictory.log'),contradictory+'\n');
+  assert.equal(execute('negative-zero-timeout',0).postcondition,false);
   let validationCalls=0;
   const provider=createPalaceProvider({deviceId:'replay',dataRoot:join(root,'state'),sourceRoots:[logs],autoIndex:true,
     validationRunner:async card=>{
@@ -41,8 +46,20 @@ test('deterministic executable task replay compares no-Palace retries with a val
     }});
   t.after(async()=>{await provider.stop();rmSync(root,{recursive:true,force:true});});
   await provider.start();
+  await provider.invoke('knowledge.ingest',{maxFiles:8,maxRecords:64,maxBytes:1024*1024});
+  // Ingestion may propose a hypothesis candidate, but raw log text never reaches the execution
+  // validator or becomes an active Skill automatically.
+  const candidates=await provider.invoke('knowledge.skills',{includeCandidates:true});
+  assert.equal(validationCalls,0,'ingest must never execute the validation runner implicitly');
+  const observations=await provider.invoke('knowledge.list',{limit:32,maxBytes:16384});
+  const procedureIds=new Set(candidates.items.map(item=>item.id));
+  const evidence=observations.items.filter(item=>!procedureIds.has(item.id)&&item.summary.includes('250')&&!item.summary.includes('Rejected'));
+  assert.ok(evidence.length>=2,'validated procedure requires at least two independent positive source traces');
+  const promoted=await provider.invoke('knowledge.learn',{key:'explicit-settlement-retry',summary:'Validated settlement retry procedure',
+    steps:['Set busyTimeoutMs = 250 and preserve the original idempotency key before retry.'],evidenceRefs:evidence.slice(0,2).map(item=>item.id)});
+  assert.equal(promoted.activated,true);assert.equal(validationCalls,1);
   const active=await provider.invoke('knowledge.skills',{});
-  assert.equal(active.items.length,1);assert.equal(validationCalls,1);
+  assert.equal(active.items.length,1);
   const tasks=['held-out-a','held-out-b','held-out-c'];
   const baseline={taskSuccess:0,repeatedErrors:0,executionCalls:0,retrievalCalls:0,agentVisibleBytes:0,elapsedMs:0};
   let began=performance.now();

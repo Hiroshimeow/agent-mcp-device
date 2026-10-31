@@ -1,0 +1,18 @@
+{
+  "head": "18407ec562c4f2cc11ca3e8c1f69f362ee3f86c0",
+  "branch": "feat/v12-platform-20261022",
+  "sourceBeforeCount": 419,
+  "sourceAfterCount": 420,
+  "changedFiles": 9,
+  "removedFiles": [],
+  "unchangedInheritedFiles": 411,
+  "diffCheckExit": 0,
+  "reviewRun": "del_mvtni5qj_b0jj",
+  "reviewExit": 0,
+  "functional": 58,
+  "a5Modes": 3,
+  "a5Repeat": 1,
+  "mf6AuthoritativeMs": 30.1605,
+  "mf6Status": "FAIL retained, not rerun",
+  "skillSHA256": "e8fadc2ac80b686039119a73ae4dd1dfd71030161fe09d2ea316c9323a605952"
+}

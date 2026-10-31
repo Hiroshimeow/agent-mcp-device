@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "label": "package-types-red",
+  "startedAt": "2026-10-24T23:23:54.979Z",
+  "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z",
+  "program": "node",
+  "argv": [
+    "--test",
+    "test/v12/palace-package-types.test.mjs"
+  ],
+  "pid": 58452,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "stdout": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\package-types-red.stdout.log",
+  "stderr": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\package-types-red.stderr.log",
+  "state": "COMPLETED",
+  "endedAt": "2026-10-24T23:23:57.536Z",
+  "elapsedMs": 2557,
+  "exitCode": 1,
+  "signal": null,
+  "counts": {
+    "tests": 1,
+    "pass": 0,
+    "fail": 1,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "stdoutSha256": "6be78766883039672abe3878f48bf46c86e094b926a77d11f63a4346d59f101a",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

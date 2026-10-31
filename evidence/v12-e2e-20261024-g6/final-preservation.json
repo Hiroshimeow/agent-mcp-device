@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "label": "final-preservation",
+  "cwd": "E:/git-project/agent-mcp-device-v12",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "evidence/v12-e2e-20261024-g6/capture-final-preservation.cjs"
+  ],
+  "startedAt": "2026-10-24T11:28:50.968Z",
+  "endedAt": "2026-10-24T11:29:03.535Z",
+  "durationMs": 12565.4096,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 1,
+  "signal": null,
+  "counts": {},
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\final-preservation.stdout.log",
+    "sha256": "b72be59a28335f61d8aeaab219b0488dfb8b0f7babd1320dff88050ff01f2aac"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\final-preservation.stderr.log",
+    "sha256": "162ef7c4d4531b647870bdd1686fc7a1882e32ef01b55f2e743e1a5276427e52"
+  }
+}

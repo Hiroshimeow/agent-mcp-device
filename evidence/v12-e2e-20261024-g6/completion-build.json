@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "label": "build",
+  "startedAt": "2026-10-24T23:18:59.855Z",
+  "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z",
+  "program": "cmd.exe",
+  "argv": [
+    "/d",
+    "/c",
+    "npm.cmd run build"
+  ],
+  "pid": 55028,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "stdout": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\build.stdout.log",
+  "stderr": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\build.stderr.log",
+  "state": "COMPLETED",
+  "endedAt": "2026-10-24T23:19:37.929Z",
+  "elapsedMs": 38074,
+  "exitCode": 0,
+  "signal": null,
+  "counts": {},
+  "stdoutSha256": "31a88e1b1acfef73153239db4fb16d84a687eea66490a9200c337696279b39d1",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

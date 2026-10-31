@@ -1,0 +1,97 @@
+[
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-lifecycle-fixes-20261028/HANDOFF.md",
+    "bytes": 9320,
+    "sha256": "8288e0d294a325d23dc4978d0b09eb7168c0dfb0f0b8c97e42b04cabbc91851b"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-lifecycle-fixes-20261028/changed-files.json",
+    "bytes": 639,
+    "sha256": "600237fce0e984e0f2f78ec950966f860f9ab96ecb4a001580af04c58ac314e8"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-lifecycle-fixes-20261028/inherited-source-comparison.json",
+    "bytes": 66,
+    "sha256": "f5b25fad0e6c2404b67d7caa4f66ca6b48f98ecce6c4b12e416c59e387c57811"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-lifecycle-fixes-20261028/logs/deadline-final.log",
+    "bytes": 788,
+    "sha256": "726aa4b702f8eeb94f387ad9b4519ee1009ade722be8acd28d95eef7b6b5e52a"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-lifecycle-fixes-20261028/logs/diff-check.log",
+    "bytes": 2055,
+    "sha256": "f2ffe2c9b35a5b82612b87f751942b4e4c75e1e6c4b64d9cb05bf16e6756f1bb"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-lifecycle-fixes-20261028/logs/functional-final.log",
+    "bytes": 10507,
+    "sha256": "5279c80a4d2e1190c6badd88c1f97fa0b5c5398712a5b9d43de1820a5896e50f"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-lifecycle-fixes-20261028/logs/functional.log",
+    "bytes": 8603,
+    "sha256": "6b23b3793508dc580de0bdc59cbae5dfe84dc8a074850eebd55735dd93964bab"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-lifecycle-fixes-20261028/logs/green-first.log",
+    "bytes": 2404,
+    "sha256": "8ad4a199b2208a63aabcdaa3715ad57a0c380af61ad260e532072dd1774756e8"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-lifecycle-fixes-20261028/logs/green.log",
+    "bytes": 1682,
+    "sha256": "85f2f42a97fe29ff39eca2d2618ac2a633ba36ac81b0284dbf9ad6274f22035f"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-lifecycle-fixes-20261028/logs/red-review.log",
+    "bytes": 2312,
+    "sha256": "3764c0116afe8f7c30a68426c5bccb6cb3a4ecae614a3ff36298c3e9c09273b9"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-lifecycle-fixes-20261028/logs/red.log",
+    "bytes": 3683,
+    "sha256": "1e981748e446283191f18d427f45d21c546c0e2c4e145a562cf650e7a55dc600"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-lifecycle-fixes-20261028/logs/tsc-final.log",
+    "bytes": 1080,
+    "sha256": "5d8476a09a260a35e3c47a3afc537810bdd034cb8bca7d6d8e4d7bf01fc1de57"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-lifecycle-fixes-20261028/logs/tsc-green-first.log",
+    "bytes": 1080,
+    "sha256": "acb1d2649f54e2b2ad068f92605c3837c7ca50c8bff0cd4b2ede7f3a4fb73f34"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-lifecycle-fixes-20261028/logs/tsc-green.log",
+    "bytes": 1080,
+    "sha256": "9945d3b75a381429375a5dd2906ba5afa8be7a18ae4dfc197021ae7d73556145"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-lifecycle-fixes-20261028/logs/tsc-red.log",
+    "bytes": 1080,
+    "sha256": "afb3288013bcd4ebb59e721f1e4347791f65a18439997b5efc5be6a245c3a0e9"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-lifecycle-fixes-20261028/review-final.md",
+    "bytes": 1736,
+    "sha256": "424a3ecc9bf6d82995b56ed7c21a46b8aa5153981738614bae1b6cf494889e99"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-lifecycle-fixes-20261028/review-initial.md",
+    "bytes": 1134,
+    "sha256": "ce869408db21c15be91929dd1c47b22dba9b047e91256dec86eb92287f16f24b"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-lifecycle-fixes-20261028/stable-source-manifest.json",
+    "bytes": 41274,
+    "sha256": "5b9ed04d0e5efc9ac5865c7a1f9fcbe097ea663eadd4fef2cef35b3308e556b5"
+  },
+  {
+    "path": "evidence/v12-e2e-20261024-g6/D1-lifecycle-fixes-20261028/verification-commands.json",
+    "bytes": 7717,
+    "sha256": "fe8abdeddb72fa0b573e35a90901e5b636a040ef281bc36047b7cfd447acd992"
+  }
+]

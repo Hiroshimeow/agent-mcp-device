@@ -168,8 +168,10 @@ test('B -> A -> C -> A imports preserve original identity and cannot create corr
 test('automatic ingestion proposes a recurring explicit fix without trusting the source verdict',async t=>{
   const f=await fixture(t);
   const text='Error RETRYABLE_WRITE: process failed. Fix: preserve the request idempotency key before a bounded retry.';
-  writeFileSync(join(f.logs,'automatic.log'),text+'\n'+text+'\n');
+  writeFileSync(join(f.logs,'automatic-a.log'),text+'\n');
+  writeFileSync(join(f.logs,'automatic-b.log'),text+'\n');
   const p=await f.open('A',{autoIndex:true,indexBudget:{maxRecords:8,maxFiles:4,maxBytes:65536,intervalMs:60000}});
+  await p.invoke('knowledge.ingest',{maxRecords:8,maxFiles:4,maxBytes:65536});
   const candidates=await p.invoke('knowledge.skills',{includeCandidates:true});
   assert.equal(candidates.items.length,1);assert.equal(candidates.items[0].status,'hypothesis');
   assert.equal((await p.invoke('knowledge.skills',{})).items.length,0);

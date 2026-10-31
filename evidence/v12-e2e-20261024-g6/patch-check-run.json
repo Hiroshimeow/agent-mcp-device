@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "label": "patch-check-run",
+  "cwd": "E:/git-project/agent-mcp-device-v12",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "evidence/v12-e2e-20261024-g6/check-review-patch.cjs"
+  ],
+  "startedAt": "2026-10-24T11:30:28.983Z",
+  "endedAt": "2026-10-24T11:30:29.247Z",
+  "durationMs": 262.5273,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 0,
+  "signal": null,
+  "counts": {},
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\patch-check-run.stdout.log",
+    "sha256": "ebf4c9fb7444c4bcd7ecb0dec6fb6e901df2ebcb1fbb54a35b6a6ba465aa5240"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\patch-check-run.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

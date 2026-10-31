@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "product": "palace",
+  "startedAt": "2026-10-24T10:55:31.088Z",
+  "host": "DESKTOP-B5E4IUE",
+  "platform": "win32",
+  "node": "v22.22.2",
+  "artifact": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\hcu-lab.me-palace-1.0.12.tgz",
+  "artifactSha256": "db27ab6c60cbb14eb65ffd25424ed9bd867868061c332dba0d1353b9590133a6",
+  "work": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\cold-palace",
+  "checks": [
+    {
+      "name": "npm-install",
+      "passed": true,
+      "args": [
+        "install",
+        "--omit=dev",
+        "--no-audit",
+        "--no-fund",
+        "--save-exact",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\hcu-lab.me-palace-1.0.12.tgz"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 2532.4729,
+      "stdout": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\cold-palace\\npm-install.stdout.log",
+      "stdoutSha256": "da13ab9d025b19c91553bc7d4c450975d3e4e36dd7c5fef6f223f8008ba39547",
+      "stderr": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\cold-palace\\npm-install.stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "package-identity",
+      "passed": true
+    },
+    {
+      "name": "no-device-package-dependency",
+      "passed": true
+    },
+    {
+      "name": "palace-bin",
+      "args": [
+        "--help"
+      ],
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "palace [--data-root DIR|--runtime-dir DIR] status|search QUERY|read ID|skills [--project-id ID] [--limit N] [--max-bytes N] [--include-candidates] [--full]\n",
+      "stderr": "(node:22560) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+    },
+    {
+      "name": "actual-installed-cli-help",
+      "passed": true
+    },
+    {
+      "name": "skill-asset",
+      "passed": true
+    },
+    {
+      "name": "palace-bin",
+      "args": [
+        "--data-root",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\cold-palace\\fixture-data",
+        "status"
+      ],
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "{\"ok\":true,\"plugin\":\"palace\",\"mode\":\"read-only\",\"dataRoot\":\"E:\\\\test\\\\mcp-device-v12-e2e-20261024-g6\\\\windows\\\\cold-palace\\\\fixture-data\",\"totals\":{\"cards\":1,\"evidence\":1,\"versions\":1},\"counts\":[{\"kind\":\"observation\",\"status\":\"hypothesis\",\"count\":1}]}\n",
+      "stderr": "(node:78484) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+    },
+    {
+      "name": "live-read-only-status",
+      "passed": true
+    },
+    {
+      "name": "palace-bin",
+      "args": [
+        "--data-root",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\cold-palace\\fixture-data",
+        "search",
+        "COLD_PALACE_MARKER",
+        "--limit",
+        "1"
+      ],
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "{\"ok\":true,\"plugin\":\"palace\",\"mode\":\"read-only\",\"query\":\"COLD_PALACE_MARKER\",\"items\":[{\"id\":\"k:6b8cde2ead5757807f293c187c7db044914aed081ce8a92d13022efffbc23b96\",\"read_ref\":\"k:6b8cde2ead5757807f293c187c7db044914aed081ce8a92d13022efffbc23b96\",\"version\":1,\"contentHash\":\"8487902a1229dcfe2c31a98e77a6558a6f952a3404cceb4ba58c684600220dab\",\"summary\":\"Source claim: Error COLD_PALACE_MARKER: preserve source identity through package installation.\",\"status\":\"hypothesis\",\"originDeviceId\":\"cold-palace-fixture\",\"servingDeviceId\":\"cold-palace-fixture\",\"scope\":{\"visibility\":\"account\"},\"evidenceCount\":1,\"updatedAt\":1792839333978,\"lastVerifiedAt\":1792839333978}],\"returned\":1,\"candidates\":1,\"note\":\"Snapshot results; evidence bytes not reverified by read-only CLI\"}\n",
+      "stderr": "(node:61308) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+    },
+    {
+      "name": "live-search",
+      "passed": true
+    },
+    {
+      "name": "palace-bin",
+      "args": [
+        "--data-root",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\cold-palace\\fixture-data",
+        "read",
+        "k:6b8cde2ead5757807f293c187c7db044914aed081ce8a92d13022efffbc23b96"
+      ],
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "{\"ok\":true,\"plugin\":\"palace\",\"mode\":\"read-only\",\"kind\":\"observation\",\"card\":{\"id\":\"k:6b8cde2ead5757807f293c187c7db044914aed081ce8a92d13022efffbc23b96\",\"version\":1,\"contentHash\":\"8487902a1229dcfe2c31a98e77a6558a6f952a3404cceb4ba58c684600220dab\",\"summary\":\"Source claim: Error COLD_PALACE_MARKER: preserve source identity through package installation.\",\"body\":\"Error COLD_PALACE_MARKER: preserve source identity through package installation.\",\"status\":\"hypothesis\",\"originDeviceId\":\"cold-palace-fixture\",\"servingDeviceId\":\"cold-palace-fixture\",\"scope\":{\"visibility\":\"account\"},\"evidence\":[{\"id\":\"ev:8fd0397e5f0ae56279a4d306f37082a41c8862437ef9fbb295456b58dcca28fe\",\"originDeviceId\":\"cold-palace-fixture\",\"sourceId\":\"source:dea3439a66edba6ec9b39f0a65e3e359c119dcff35bcb9d97017cb3ee62a319e\",\"sourceRef\":\"0a41c31bce650b51f5ceb9f255cb9a9829b0cf4981b6be8d\",\"recordHash\":\"b098f7f375438dcbe12e4cf63e647227c167b96b084ee39c8fda402692c2f7b6\",\"kind\":\"source_trace\",\"sourceAvailable\":true,\"observedAt\":1792839333977}],\"derivedFrom\":[],\"provenance\":[\"cold-palace-fixture\"],\"updatedAt\":1792839333978,\"lastVerifiedAt\":1792839333978},\"evidenceVerifiedNow\":false,\"note\":\"Source integrity must be verified separately before treating this card as an established fact.\"}\n",
+      "stderr": "(node:48904) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+    },
+    {
+      "name": "honest-snapshot-evidence",
+      "passed": true
+    },
+    {
+      "name": "canonical-source-byte-verification",
+      "passed": true
+    },
+    {
+      "name": "palace-bin",
+      "args": [
+        "--data-root",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\cold-palace\\fixture-data",
+        "status"
+      ],
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "{\"ok\":true,\"plugin\":\"palace\",\"mode\":\"read-only\",\"dataRoot\":\"E:\\\\test\\\\mcp-device-v12-e2e-20261024-g6\\\\windows\\\\cold-palace\\\\fixture-data\",\"totals\":{\"cards\":1,\"evidence\":1,\"versions\":1},\"counts\":[{\"kind\":\"observation\",\"status\":\"hypothesis\",\"count\":1}]}\n",
+      "stderr": "(node:58096) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+    },
+    {
+      "name": "persisted-cli-after-writer-stops",
+      "passed": true
+    },
+    {
+      "name": "dependency-tree",
+      "passed": true,
+      "args": [
+        "ls",
+        "--omit=dev",
+        "--json"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 1539.2711,
+      "stdout": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\cold-palace\\dependency-tree.stdout.log",
+      "stdoutSha256": "db6a8482ea66f61d448460ede9adc0f00ea1f9684e5331948bfed98ce5994ce1",
+      "stderr": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\cold-palace\\dependency-tree.stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "packageRoot": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\cold-palace\\node_modules\\@hcu-lab.me\\palace",
+  "version": "1.0.12",
+  "skillDiscoveryFiles": [
+    {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\cold-palace\\agent-home\\.agents\\skills\\palace-cli\\SKILL.md",
+      "exists": false
+    },
+    {
+      "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\cold-palace\\agent-home\\.pi\\agent\\skills\\palace-cli\\SKILL.md",
+      "exists": false
+    }
+  ],
+  "status": "PASS",
+  "endedAt": "2026-10-24T10:55:36.331Z"
+}

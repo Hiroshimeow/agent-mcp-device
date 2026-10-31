@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 2,
+  "recordedAt": "2026-10-26T14:06:23.747Z",
+  "reviews": [
+    {
+      "gate": "D0",
+      "status": "PASS_HISTORICAL_ARCHITECTURE",
+      "turnId": "2e4a9646-m365-worker-20261024-212628-17acf0e4",
+      "verifiedModelLabel": "Opus 5.5",
+      "verdict": "PASS"
+    },
+    {
+      "gate": "D1",
+      "status": "AMEND_FRESH_REVIEW_PENDING",
+      "turnId": "2e4a9646-m365-worker-20261025-164417-e6b74a82",
+      "verifiedModelLabel": "Opus 5.5",
+      "verdict": "AMEND"
+    },
+    {
+      "gate": "D2",
+      "status": "REVIEW_PENDING",
+      "turnId": null,
+      "verifiedModelLabel": null,
+      "verdict": null
+    },
+    {
+      "gate": "D3",
+      "status": "REVIEW_PENDING",
+      "turnId": null,
+      "verifiedModelLabel": null,
+      "verdict": null
+    }
+  ],
+  "packet": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\pi-g6-2080-20261026\\review-packet-20261026\\REVIEW_PACKET.md",
+  "packetSent": false,
+  "restriction": "No FJP execution from Pi; no authorized independent reviewer tool in terminal."
+}

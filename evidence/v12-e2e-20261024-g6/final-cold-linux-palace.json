@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "label": "final-cold-linux-palace",
+  "cwd": "/mnt/e/git-project/agent-mcp-device-v12",
+  "command": "/usr/bin/node",
+  "args": [
+    "/mnt/e/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/cold-install.mjs",
+    "palace",
+    "/mnt/e/test/mcp-device-v12-e2e-20261024-g6/artifacts/final/hcu-lab.me-palace-1.0.12.tgz",
+    "/var/tmp/mcp-device-v12-e2e-20261024-g6/final/palace",
+    "/mnt/e/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/final-package"
+  ],
+  "startedAt": "2026-10-24T11:13:54.910Z",
+  "endedAt": "2026-10-24T11:13:57.302Z",
+  "durationMs": 2387.715366,
+  "node": "v22.21.0",
+  "platform": "linux",
+  "exitCode": 0,
+  "signal": null,
+  "counts": {},
+  "stdout": {
+    "path": "/mnt/e/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/final-cold-linux-palace.stdout.log",
+    "sha256": "d2ff57de0c6d3a362a993184ec6896467625edc74fe59b3daea23bbf28d95454"
+  },
+  "stderr": {
+    "path": "/mnt/e/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/final-cold-linux-palace.stderr.log",
+    "sha256": "28e15033961208429f4add4ce26a50c767dba309914a9ed1d6f8bf33a51be330"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "label": "snapshot-three",
+  "cwd": "E:/git-project/agent-mcp-device-v12",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "evidence/v12-e2e-20261024-g6/create-candidate-three.cjs"
+  ],
+  "startedAt": "2026-10-24T11:07:36.023Z",
+  "endedAt": "2026-10-24T11:07:38.341Z",
+  "durationMs": 2316.0162,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 0,
+  "signal": null,
+  "counts": {},
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\snapshot-three.stdout.log",
+    "sha256": "9d8632151ed1d8b4cb2c00250dca3dc53a356eed77d0a787301b5cfe649d2c74"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\snapshot-three.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

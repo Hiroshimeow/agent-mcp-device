@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "label": "skill-review2-matrix",
+  "startedAt": "2026-10-25T00:13:38.681Z",
+  "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z",
+  "program": "node",
+  "argv": [
+    "--test",
+    "--test-concurrency=1",
+    "test/v12/palace-skill-lifecycle.test.mjs",
+    "test/v12/palace-skill-preservation.test.mjs",
+    "test/v12/palace-skill-probe.test.mjs",
+    "test/v12/palace-skill-recovery-guards.test.mjs",
+    "test/v12/palace-skill-review-regressions.test.mjs",
+    "test/v12/palace-skill-review2.test.mjs",
+    "test/v12/palace-owner-policy.test.mjs"
+  ],
+  "pid": 59720,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "stdout": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\skill-review2-matrix.stdout.log",
+  "stderr": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\skill-review2-matrix.stderr.log",
+  "state": "COMPLETED",
+  "endedAt": "2026-10-25T00:14:00.699Z",
+  "elapsedMs": 22019,
+  "exitCode": 1,
+  "signal": null,
+  "counts": {
+    "tests": 48,
+    "pass": 47,
+    "fail": 1,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "stdoutSha256": "59cefe09b9f460921c53f3b53a0e9b20ee95223f4fd1b3bcde9bea5adfb11e56",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "label": "live-cli-1000-windows-final",
+  "cwd": "E:/git-project/agent-mcp-device-v12",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\live-cli-1000.mjs",
+    "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\final\\cold-device\\node_modules\\@hcu-lab.me\\mcp-device",
+    "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\cold-palace\\node_modules\\@hcu-lab.me\\palace",
+    "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\final\\live-cli-1000",
+    "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\live-cli-1000-windows-final-result.json"
+  ],
+  "startedAt": "2026-10-24T11:26:25.602Z",
+  "endedAt": "2026-10-24T11:27:24.297Z",
+  "durationMs": 58693.0533,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 0,
+  "signal": null,
+  "counts": {},
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\live-cli-1000-windows-final.stdout.log",
+    "sha256": "c9296317ad6434c5d6f73919539bec4ba1584c7911a2ffaed0a35b16a356b85e"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\live-cli-1000-windows-final.stderr.log",
+    "sha256": "0217302c54003c74484847b1a640ab6741b35cfbf92671d73daee85bbe8d66f6"
+  }
+}

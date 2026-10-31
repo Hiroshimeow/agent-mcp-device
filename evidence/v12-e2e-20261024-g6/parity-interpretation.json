@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-24T11:33:52.300Z",
+  "rawSummary": {
+    "passed": 35,
+    "failed": 6,
+    "notRunFamilies": [
+      "native.docx_pdf_batch",
+      "native.pdf",
+      "device.broker",
+      "device.identity_pairing",
+      "device.transport",
+      "device.lifecycle",
+      "device.package_cli",
+      "context.surface",
+      "context.retrieval",
+      "context.graph_index",
+      "context.persistence",
+      "context.capture",
+      "palace.p1",
+      "device.remote_hygiene"
+    ],
+    "parityMeaning": "Only the listed executed suites, targets and fingerprints are evidenced. Core behavioral comparison is present only when its explicit comparator result is listed. No production or unlisted-platform acceptance."
+  },
+  "reportedRows": 41,
+  "excludedFromAcceptance": [
+    {
+      "target": "baseline",
+      "test": "test/test-error-sanitization.js",
+      "reason": "DIRECT URL/path guard is false; no test body ran. The file also copies sanitizer logic instead of importing the production implementation."
+    },
+    {
+      "target": "candidate",
+      "test": "test/test-error-sanitization.js",
+      "reason": "DIRECT URL/path guard is false; no test body ran. The file also copies sanitizer logic instead of importing the production implementation."
+    }
+  ],
+  "pairedFailures": [
+    {
+      "test": "test/test-edit-block-occurrences.js",
+      "baseline": "FAIL",
+      "candidate": "FAIL"
+    },
+    {
+      "test": "test/test-allowed-directories.js",
+      "baseline": "FAIL",
+      "candidate": "FAIL"
+    },
+    {
+      "test": "test/test-symlink-security.js",
+      "baseline": "FAIL",
+      "candidate": "FAIL"
+    }
+  ],
+  "coreComparatorStatus": "PASS",
+  "verdict": "FAIL_INCOMPLETE_PARITY",
+  "waiver": false,
+  "note": "35 reported PASS rows include 2 no-ops; do not claim 35 executed production checks. Matching failures are evidence of pre-existing/harness issues, not a waiver or proof of full parity."
+}

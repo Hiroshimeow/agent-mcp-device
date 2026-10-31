@@ -1,0 +1,4067 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-24T23:26:51.833Z",
+  "root": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z",
+  "node": "v22.22.2",
+  "platform": "win32",
+  "buildReceipt": "completion-build.json",
+  "steps": [
+    {
+      "label": "trust-preflight",
+      "program": "C:\\Program Files\\nodejs\\node.exe",
+      "args": [
+        "scripts/verify-production-trust.cjs"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z",
+      "startedAt": "2026-10-24T23:26:51.834Z",
+      "endedAt": "2026-10-24T23:26:51.980Z",
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\trust-preflight.stdout.log",
+      "stderr": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\trust-preflight.stderr.log"
+    },
+    {
+      "label": "assemble-palace",
+      "program": "C:\\Program Files\\nodejs\\node.exe",
+      "args": [
+        "scripts/v12/build-palace-package.mjs"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z",
+      "startedAt": "2026-10-24T23:26:51.983Z",
+      "endedAt": "2026-10-24T23:26:53.569Z",
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\assemble-palace.stdout.log",
+      "stderr": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\assemble-palace.stderr.log"
+    },
+    {
+      "label": "pack-mcp-device",
+      "program": "C:\\WINDOWS\\system32\\cmd.exe",
+      "args": [
+        "/d",
+        "/c",
+        "npm.cmd pack E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z --ignore-scripts --json --pack-destination E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z",
+      "startedAt": "2026-10-24T23:26:53.571Z",
+      "endedAt": "2026-10-24T23:27:19.294Z",
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\pack-mcp-device.stdout.log",
+      "stderr": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\pack-mcp-device.stderr.log"
+    },
+    {
+      "label": "pack-palace",
+      "program": "C:\\WINDOWS\\system32\\cmd.exe",
+      "args": [
+        "/d",
+        "/c",
+        "npm.cmd pack E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\.tmp\\v12-palace-standalone\\package --ignore-scripts --json --pack-destination E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z",
+      "startedAt": "2026-10-24T23:27:19.305Z",
+      "endedAt": "2026-10-24T23:27:21.562Z",
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\pack-palace.stdout.log",
+      "stderr": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\pack-palace.stderr.log"
+    },
+    {
+      "label": "install-mcp-device",
+      "program": "C:\\WINDOWS\\system32\\cmd.exe",
+      "args": [
+        "/d",
+        "/c",
+        "npm.cmd install --prefix E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-mcp-device\\prefix --omit=dev --ignore-scripts=false --no-audit --no-fund E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\hcu-lab.me-mcp-device-1.0.12.tgz"
+      ],
+      "cwd": "E:/test/mcp-device-v12-e2e-20261024-g6",
+      "startedAt": "2026-10-24T23:27:21.572Z",
+      "endedAt": "2026-10-24T23:29:39.400Z",
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\install-mcp-device.stdout.log",
+      "stderr": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\install-mcp-device.stderr.log"
+    },
+    {
+      "label": "help-mcp-device",
+      "program": "C:\\Program Files\\nodejs\\node.exe",
+      "args": [
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-mcp-device\\prefix\\node_modules\\@hcu-lab.me\\mcp-device\\dist\\plugins\\palace\\cli.js",
+        "--help"
+      ],
+      "cwd": "E:/test/mcp-device-v12-e2e-20261024-g6",
+      "startedAt": "2026-10-24T23:29:39.404Z",
+      "endedAt": "2026-10-24T23:29:39.650Z",
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\help-mcp-device.stdout.log",
+      "stderr": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\help-mcp-device.stderr.log"
+    },
+    {
+      "label": "skill-mcp-device",
+      "program": "C:\\Program Files\\nodejs\\node.exe",
+      "args": [
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-mcp-device\\prefix\\node_modules\\@hcu-lab.me\\mcp-device\\dist\\plugins\\palace\\cli.js",
+        "skill",
+        "status"
+      ],
+      "cwd": "E:/test/mcp-device-v12-e2e-20261024-g6",
+      "startedAt": "2026-10-24T23:29:39.654Z",
+      "endedAt": "2026-10-24T23:29:40.066Z",
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\skill-mcp-device.stdout.log",
+      "stderr": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\skill-mcp-device.stderr.log"
+    },
+    {
+      "label": "sbom-mcp-device",
+      "program": "C:\\WINDOWS\\system32\\cmd.exe",
+      "args": [
+        "/d",
+        "/c",
+        "npm.cmd sbom --sbom-format cyclonedx --omit=dev --prefix E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-mcp-device\\prefix"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-mcp-device\\prefix",
+      "startedAt": "2026-10-24T23:29:40.074Z",
+      "endedAt": "2026-10-24T23:29:46.300Z",
+      "exitCode": 1,
+      "signal": null,
+      "stdout": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\sbom-mcp-device.stdout.log",
+      "stderr": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\sbom-mcp-device.stderr.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "product": "mcp-device",
+      "file": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\hcu-lab.me-mcp-device-1.0.12.tgz",
+      "bytes": 2139826,
+      "sha256": "f54807566a0b073b85e0bc9e19703c7ef888da8047d372f2bc3e2258dd3322a0",
+      "entryCount": 745,
+      "files": [
+        {
+          "path": "LICENSE",
+          "size": 1128,
+          "mode": 420
+        },
+        {
+          "path": "README.md",
+          "size": 4554,
+          "mode": 420
+        },
+        {
+          "path": "config/revoked-approvals.json",
+          "size": 4,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/config/mcp-servers.example.toml",
+          "size": 1571,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/config/mcp-servers.toml",
+          "size": 1563,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/contracts/device-public-contract-v1.json",
+          "size": 20807,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/account-http.mjs",
+          "size": 10422,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/account-store.mjs",
+          "size": 13639,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/admin.mjs",
+          "size": 3077,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/auth-session.mjs",
+          "size": 17032,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/authenticated-mcp-wrapper.mjs",
+          "size": 53194,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/benchmark-command.mjs",
+          "size": 431,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/benchmark-mcp-catalog.mjs",
+          "size": 6532,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/catalog-budget.mjs",
+          "size": 3269,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/check-device-public-contract.mjs",
+          "size": 932,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/custom-tools/index.mjs",
+          "size": 10299,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/custom-tools/path-utils.mjs",
+          "size": 4537,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/custom-tools/response-utils.mjs",
+          "size": 1325,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/dashboard-http.mjs",
+          "size": 43323,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/device-access-policy.mjs",
+          "size": 9256,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/device-admin.mjs",
+          "size": 2080,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/device-audit.mjs",
+          "size": 2295,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/device-broker.mjs",
+          "size": 67277,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/device-execution-tool-definitions.mjs",
+          "size": 8841,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/device-inventory.mjs",
+          "size": 5289,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/device-pairing-http.mjs",
+          "size": 7174,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/device-pairing-store.mjs",
+          "size": 10097,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/device-public-contract.mjs",
+          "size": 6435,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/device-release.mjs",
+          "size": 3441,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/device-secure-transport.mjs",
+          "size": 4595,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/device-store.mjs",
+          "size": 13908,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/device-usage.mjs",
+          "size": 29366,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/embedded-device.mjs",
+          "size": 5065,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/enduser-ui.mjs",
+          "size": 4296,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/external-tool-broker.mjs",
+          "size": 7425,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/GATEWAY-LICENSE.txt",
+          "size": 800,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/oauth-authorization-server.mjs",
+          "size": 18961,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/operator-dashboard-http.mjs",
+          "size": 8471,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/project-inspection.mjs",
+          "size": 9163,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/projects/project-id.mjs",
+          "size": 2273,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/projects/trusted-roots-projects.mjs",
+          "size": 13115,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/prompts/index.mjs",
+          "size": 4678,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/remote-process-sessions.mjs",
+          "size": 2696,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/remote-tool-result.mjs",
+          "size": 420,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/resources/index.mjs",
+          "size": 8709,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/runtime-profile.mjs",
+          "size": 1778,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/shell-tool-descriptor.mjs",
+          "size": 840,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skill-source-safety.mjs",
+          "size": 1879,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/_upstream_licenses/anthropic-THIRD_PARTY_NOTICES.md",
+          "size": 46566,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/_upstream_licenses/hallmark-LICENSE.txt",
+          "size": 1099,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/_upstream_licenses/ponytail-LICENSE.txt",
+          "size": 1092,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/_upstream_licenses/stitch-skills-LICENSE.txt",
+          "size": 11474,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/_upstream_licenses/superpowers-LICENSE.txt",
+          "size": 1091,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/algorithmic-art/LICENSE.txt",
+          "size": 11546,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/algorithmic-art/SKILL.md",
+          "size": 20173,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/algorithmic-art/templates/generator_template.js",
+          "size": 8048,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/algorithmic-art/templates/viewer.html",
+          "size": 21442,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/brainstorming/scripts/frame-template.html",
+          "size": 8307,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/brainstorming/scripts/helper.js",
+          "size": 5615,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/brainstorming/scripts/server.cjs",
+          "size": 26416,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/brainstorming/scripts/start-server.sh",
+          "size": 6908,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/brainstorming/scripts/stop-server.sh",
+          "size": 3263,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/brainstorming/SKILL.md",
+          "size": 17548,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/brainstorming/spec-document-reviewer-prompt.md",
+          "size": 1747,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/brainstorming/visual-companion.md",
+          "size": 13413,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/brand-guidelines/LICENSE.txt",
+          "size": 11546,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/brand-guidelines/SKILL.md",
+          "size": 2308,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/csharp/claude-api/batches.md",
+          "size": 425,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/csharp/claude-api/files-api.md",
+          "size": 925,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/csharp/claude-api/README.md",
+          "size": 18779,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/csharp/claude-api/streaming.md",
+          "size": 817,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/csharp/claude-api/tool-use.md",
+          "size": 6166,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/curl/examples.md",
+          "size": 9449,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/curl/managed-agents.md",
+          "size": 9120,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/go/claude-api/files-api.md",
+          "size": 959,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/go/claude-api/README.md",
+          "size": 7948,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/go/claude-api/streaming.md",
+          "size": 1080,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/go/claude-api/tool-use.md",
+          "size": 8636,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/go/managed-agents/README.md",
+          "size": 19501,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/java/claude-api/files-api.md",
+          "size": 1225,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/java/claude-api/README.md",
+          "size": 11546,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/java/claude-api/streaming.md",
+          "size": 683,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/java/claude-api/tool-use.md",
+          "size": 9749,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/java/managed-agents/README.md",
+          "size": 17385,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/LICENSE.txt",
+          "size": 11546,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/php/claude-api/batches.md",
+          "size": 460,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/php/claude-api/files-api.md",
+          "size": 489,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/php/claude-api/README.md",
+          "size": 6287,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/php/claude-api/streaming.md",
+          "size": 707,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/php/claude-api/tool-use.md",
+          "size": 8334,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/php/managed-agents/README.md",
+          "size": 13954,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/python/claude-api/batches.md",
+          "size": 5780,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/python/claude-api/files-api.md",
+          "size": 4663,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/python/claude-api/README.md",
+          "size": 20440,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/python/claude-api/sdk-upgrade.md",
+          "size": 29002,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/python/claude-api/streaming.md",
+          "size": 6710,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/python/claude-api/tool-use.md",
+          "size": 19891,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/python/managed-agents/README.md",
+          "size": 10676,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/ruby/claude-api/README.md",
+          "size": 4605,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/ruby/claude-api/streaming.md",
+          "size": 249,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/ruby/claude-api/tool-use.md",
+          "size": 1102,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/ruby/managed-agents/README.md",
+          "size": 10844,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/admin-api.md",
+          "size": 11783,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/agent-design.md",
+          "size": 8837,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/anthropic-cli.md",
+          "size": 18431,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/claude-platform-on-aws.md",
+          "size": 4471,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/cost-optimization.md",
+          "size": 45192,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/error-codes.md",
+          "size": 15736,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/live-sources.md",
+          "size": 22725,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/managed-agents-api-reference.md",
+          "size": 34413,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/managed-agents-client-patterns.md",
+          "size": 12263,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/managed-agents-core.md",
+          "size": 32932,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/managed-agents-environments.md",
+          "size": 12879,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/managed-agents-events.md",
+          "size": 25245,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/managed-agents-memory.md",
+          "size": 11355,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/managed-agents-multiagent.md",
+          "size": 26454,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/managed-agents-onboarding.md",
+          "size": 10536,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/managed-agents-outcomes.md",
+          "size": 7352,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/managed-agents-overview.md",
+          "size": 13242,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/managed-agents-scheduled-deployments.md",
+          "size": 8890,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/managed-agents-self-hosted-sandboxes.md",
+          "size": 28129,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/managed-agents-tools.md",
+          "size": 36156,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/managed-agents-webhooks.md",
+          "size": 11464,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/model-migration.md",
+          "size": 246735,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/models.md",
+          "size": 14078,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/platform-availability.md",
+          "size": 5587,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/prompt-audit.md",
+          "size": 35189,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/prompt-caching.md",
+          "size": 31376,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/token-counting.md",
+          "size": 1653,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/shared/tool-use-concepts.md",
+          "size": 35816,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/SKILL.md",
+          "size": 85989,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/typescript/claude-api/batches.md",
+          "size": 2696,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/typescript/claude-api/files-api.md",
+          "size": 2480,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/typescript/claude-api/README.md",
+          "size": 15536,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/typescript/claude-api/streaming.md",
+          "size": 6003,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/typescript/claude-api/tool-use.md",
+          "size": 19463,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/claude-api/typescript/managed-agents/README.md",
+          "size": 10187,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/dispatching-parallel-agents/SKILL.md",
+          "size": 6078,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/enhance-prompt/README.md",
+          "size": 1222,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/enhance-prompt/references/KEYWORDS.md",
+          "size": 2799,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/enhance-prompt/SKILL.md",
+          "size": 6878,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/executing-plans/scripts/task-done",
+          "size": 1722,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/executing-plans/scripts/task-start",
+          "size": 991,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/executing-plans/SKILL.md",
+          "size": 20329,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/extract-design-md/examples/DESIGN.md",
+          "size": 7169,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/extract-design-md/references/angular.md",
+          "size": 5359,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/extract-design-md/references/plain-css.md",
+          "size": 4152,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/extract-design-md/references/react-tailwind.md",
+          "size": 4740,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/extract-design-md/references/svelte.md",
+          "size": 2815,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/extract-design-md/references/vue.md",
+          "size": 3184,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/extract-design-md/SKILL.md",
+          "size": 13940,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/finishing-a-development-branch/SKILL.md",
+          "size": 7781,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/frontend-design/LICENSE.txt",
+          "size": 10351,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/frontend-design/SKILL.md",
+          "size": 9464,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/anti-patterns.md",
+          "size": 26094,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/assets.md",
+          "size": 25738,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/color.md",
+          "size": 4434,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/component-cookbook.md",
+          "size": 31240,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/c1-outlined-chip.md",
+          "size": 476,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/c2-inline-form-as-cta.md",
+          "size": 688,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/c3-typographic-link.md",
+          "size": 288,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/c4-sticky-bottom-bar.md",
+          "size": 687,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/f1-bento-grid.md",
+          "size": 802,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/f2-sticky-scroll-stack.md",
+          "size": 919,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/f3-tabular-spec-sheet.md",
+          "size": 430,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/f4-step-sequence.md",
+          "size": 459,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/f5-annotated-screenshot.md",
+          "size": 421,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/f6-product-card-grid.md",
+          "size": 2770,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/ft1-mast-headed.md",
+          "size": 514,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/ft2-inline-rule-single-line.md",
+          "size": 372,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/ft3-index-style-category-list.md",
+          "size": 495,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/ft4-dense-typographic.md",
+          "size": 511,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/ft5-statement.md",
+          "size": 1324,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/ft6-letter-close.md",
+          "size": 1138,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/ft7-newsletter-first.md",
+          "size": 1782,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/ft8-marquee-scroll.md",
+          "size": 1525,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/h1-marquee.md",
+          "size": 522,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/h2-split-diptych.md",
+          "size": 615,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/h3-quote-led.md",
+          "size": 431,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/h4-stat-led.md",
+          "size": 523,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/h5-letter-hero.md",
+          "size": 372,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/h6-photographic-fold.md",
+          "size": 602,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/h7-demo-video-clipped-by-viewport-edge.md",
+          "size": 1640,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/h8-mockup-split-browser-framed.md",
+          "size": 1332,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/h9-custom-illustration-centerpiece.md",
+          "size": 1506,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/n1-wordmark-2-links.md",
+          "size": 400,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/n1b-saas-three-section.md",
+          "size": 3082,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/n2-floating-chip.md",
+          "size": 631,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/n3-side-rail.md",
+          "size": 550,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/n4-hidden-behind-k.md",
+          "size": 382,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/n5-floating-pill.md",
+          "size": 1446,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/n6-newspaper-masthead.md",
+          "size": 1643,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/n7-brutal-slab.md",
+          "size": 1402,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/n8-terminal-command.md",
+          "size": 1672,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/n9-edge-aligned-minimal.md",
+          "size": 885,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/n10-floating-on-scroll-morph.md",
+          "size": 1406,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/n11-mega-menu.md",
+          "size": 3195,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/n12-banner-retract.md",
+          "size": 2892,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/n13-inline-cmdk-pill.md",
+          "size": 3353,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/s1-left-margin-numbered.md",
+          "size": 510,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/s2-hanging.md",
+          "size": 370,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/s3-sticky-pinned.md",
+          "size": 1198,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/s4-inline-no-break.md",
+          "size": 449,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/s5-bottom-anchored.md",
+          "size": 371,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/t1-pull-quote-with-marginalia.md",
+          "size": 477,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/t2-logo-wall-hairline.md",
+          "size": 752,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/t3-single-huge-quote.md",
+          "size": 501,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/components/t4-numbered-stat-strip.md",
+          "size": 484,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/contract.md",
+          "size": 2052,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/copy.md",
+          "size": 12443,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/custom-craft.md",
+          "size": 34759,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/custom-theme.md",
+          "size": 24408,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/design-md.md",
+          "size": 6962,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/export-formats.md",
+          "size": 14949,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/floating-nav.md",
+          "size": 5355,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/genres/atmospheric.md",
+          "size": 5144,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/genres/editorial.md",
+          "size": 4193,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/genres/modern-minimal.md",
+          "size": 4907,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/genres/playful.md",
+          "size": 5288,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/hero-enrichment.md",
+          "size": 32698,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/imagery-kit.md",
+          "size": 8714,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/interaction-and-states.md",
+          "size": 13745,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/layout-and-space.md",
+          "size": 6878,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/macrostructures.md",
+          "size": 11686,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/macrostructures/01-bento-grid.md",
+          "size": 1871,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/macrostructures/02-long-document.md",
+          "size": 1756,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/macrostructures/03-marquee-hero.md",
+          "size": 1676,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/macrostructures/04-stat-led.md",
+          "size": 2154,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/macrostructures/05-workbench.md",
+          "size": 1722,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/macrostructures/06-conversational-faq.md",
+          "size": 1654,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/macrostructures/07-manifesto.md",
+          "size": 1743,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/macrostructures/08-photographic.md",
+          "size": 1525,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/macrostructures/09-quote-led.md",
+          "size": 1849,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/macrostructures/10-specimen.md",
+          "size": 1646,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/macrostructures/11-catalogue.md",
+          "size": 1209,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/macrostructures/12-letter.md",
+          "size": 1276,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/macrostructures/13-index-first.md",
+          "size": 1231,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/macrostructures/14-narrative-workflow.md",
+          "size": 1451,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/macrostructures/15-split-studio.md",
+          "size": 1359,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/macrostructures/16-feature-stack.md",
+          "size": 1409,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/macrostructures/17-type-specimen.md",
+          "size": 1294,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/macrostructures/18-portfolio-grid.md",
+          "size": 1080,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/macrostructures/19-map-diagram.md",
+          "size": 1292,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/macrostructures/20-ecosystem-index.md",
+          "size": 1232,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/macrostructures/21-component-playground.md",
+          "size": 1194,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/microinteractions.md",
+          "size": 20275,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/motion.md",
+          "size": 4449,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/preview-examples.md",
+          "size": 2883,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/responsive.md",
+          "size": 6056,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/slop-test.md",
+          "size": 31257,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/structure.md",
+          "size": 15874,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/study.md",
+          "size": 43148,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/themes/carnival.md",
+          "size": 19908,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/themes/cobalt.md",
+          "size": 11476,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/themes/grid.md",
+          "size": 14725,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/themes/hum.md",
+          "size": 32711,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/themes/lumen.md",
+          "size": 28649,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/typography.md",
+          "size": 18624,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/upstream/recipes.md",
+          "size": 13649,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/upstream/study-examples.md",
+          "size": 12559,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/upstream/tokens.css",
+          "size": 56880,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/verbs/audit.md",
+          "size": 2828,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/references/verbs/redesign.md",
+          "size": 14118,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/hallmark/SKILL.md",
+          "size": 67955,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/human-comms/SKILL.md",
+          "size": 1760,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/index.mjs",
+          "size": 15707,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/internal-comms/examples/3p-updates.md",
+          "size": 3320,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/internal-comms/examples/company-newsletter.md",
+          "size": 3360,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/internal-comms/examples/faq-answers.md",
+          "size": 2395,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/internal-comms/examples/general-comms.md",
+          "size": 617,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/internal-comms/LICENSE.txt",
+          "size": 11546,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/internal-comms/SKILL.md",
+          "size": 1543,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/mcp-adapter.mjs",
+          "size": 2611,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/mcp-builder/LICENSE.txt",
+          "size": 11546,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/mcp-builder/reference/evaluation.md",
+          "size": 22264,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/mcp-builder/reference/mcp_best_practices.md",
+          "size": 7579,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/mcp-builder/reference/node_mcp_server.md",
+          "size": 29519,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/mcp-builder/reference/python_mcp_server.md",
+          "size": 25817,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/mcp-builder/scripts/connections.py",
+          "size": 5026,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/mcp-builder/scripts/evaluation.py",
+          "size": 12952,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/mcp-builder/scripts/example_evaluation.xml",
+          "size": 1216,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/mcp-builder/scripts/requirements.txt",
+          "size": 31,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/mcp-builder/SKILL.md",
+          "size": 9328,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/ponytail-audit/SKILL.md",
+          "size": 1693,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/ponytail-debt/SKILL.md",
+          "size": 1747,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/ponytail-gain/SKILL.md",
+          "size": 2023,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/ponytail-help/SKILL.md",
+          "size": 2867,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/ponytail-review/SKILL.md",
+          "size": 2440,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/ponytail/SKILL.md",
+          "size": 6757,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/README.md",
+          "size": 3693,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/receiving-code-review/SKILL.md",
+          "size": 6203,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/requesting-code-review/code-reviewer.md",
+          "size": 6449,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/requesting-code-review/SKILL.md",
+          "size": 2977,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/skill-creator/agents/analyzer.md",
+          "size": 10650,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/skill-creator/agents/comparator.md",
+          "size": 7489,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/skill-creator/agents/grader.md",
+          "size": 9272,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/skill-creator/assets/eval_review.html",
+          "size": 7204,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/skill-creator/eval-viewer/generate_review.py",
+          "size": 16836,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/skill-creator/eval-viewer/viewer.html",
+          "size": 46323,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/skill-creator/LICENSE.txt",
+          "size": 11546,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/skill-creator/references/schemas.md",
+          "size": 12491,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/skill-creator/scripts/__init__.py",
+          "size": 0,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/skill-creator/scripts/aggregate_benchmark.py",
+          "size": 14787,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/skill-creator/scripts/generate_report.py",
+          "size": 13173,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/skill-creator/scripts/improve_description.py",
+          "size": 11363,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/skill-creator/scripts/package_skill.py",
+          "size": 4370,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/skill-creator/scripts/quick_validate.py",
+          "size": 4074,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/skill-creator/scripts/run_eval.py",
+          "size": 11774,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/skill-creator/scripts/run_loop.py",
+          "size": 13933,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/skill-creator/scripts/utils.py",
+          "size": 1708,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/skill-creator/SKILL.md",
+          "size": 33653,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/slack-gif-creator/core/easing.py",
+          "size": 6499,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/slack-gif-creator/core/frame_composer.py",
+          "size": 4724,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/slack-gif-creator/core/gif_builder.py",
+          "size": 10116,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/slack-gif-creator/core/validators.py",
+          "size": 3921,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/slack-gif-creator/LICENSE.txt",
+          "size": 11546,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/slack-gif-creator/requirements.txt",
+          "size": 69,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/slack-gif-creator/SKILL.md",
+          "size": 8095,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/sources.json",
+          "size": 15574,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/sources.lock.json",
+          "size": 15699,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/subagent-driven-development/implementer-prompt.md",
+          "size": 6335,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/subagent-driven-development/re-review-prompt.md",
+          "size": 4761,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/subagent-driven-development/scripts/review-package",
+          "size": 2082,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/subagent-driven-development/scripts/sdd-workspace",
+          "size": 3347,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/subagent-driven-development/scripts/task-brief",
+          "size": 1365,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/subagent-driven-development/SKILL.md",
+          "size": 32741,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/subagent-driven-development/task-reviewer-prompt.md",
+          "size": 9031,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/systematic-debugging/condition-based-waiting-example.ts",
+          "size": 5054,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/systematic-debugging/condition-based-waiting.md",
+          "size": 3516,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/systematic-debugging/CREATION-LOG.md",
+          "size": 4257,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/systematic-debugging/defense-in-depth.md",
+          "size": 3650,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/systematic-debugging/find-polluter.sh",
+          "size": 1986,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/systematic-debugging/root-cause-tracing.md",
+          "size": 5321,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/systematic-debugging/SKILL.md",
+          "size": 9465,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/systematic-debugging/test-academic.md",
+          "size": 653,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/systematic-debugging/test-pressure-1.md",
+          "size": 1900,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/systematic-debugging/test-pressure-2.md",
+          "size": 2283,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/systematic-debugging/test-pressure-3.md",
+          "size": 2692,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/test-driven-development/SKILL.md",
+          "size": 9578,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/test-driven-development/writing-good-tests.md",
+          "size": 8268,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/theme-factory/LICENSE.txt",
+          "size": 11546,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/theme-factory/SKILL.md",
+          "size": 3070,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/theme-factory/theme-showcase.pdf",
+          "size": 124310,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/theme-factory/themes/arctic-frost.md",
+          "size": 563,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/theme-factory/themes/botanical-garden.md",
+          "size": 538,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/theme-factory/themes/desert-rose.md",
+          "size": 515,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/theme-factory/themes/forest-canopy.md",
+          "size": 525,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/theme-factory/themes/golden-hour.md",
+          "size": 547,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/theme-factory/themes/midnight-galaxy.md",
+          "size": 532,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/theme-factory/themes/modern-minimalist.md",
+          "size": 568,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/theme-factory/themes/ocean-depths.md",
+          "size": 574,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/theme-factory/themes/sunset-boulevard.md",
+          "size": 577,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/theme-factory/themes/tech-innovation.md",
+          "size": 566,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/using-git-worktrees/SKILL.md",
+          "size": 6813,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/verification-before-completion/SKILL.md",
+          "size": 3646,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/web-artifacts-builder/LICENSE.txt",
+          "size": 11546,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/web-artifacts-builder/scripts/bundle-artifact.sh",
+          "size": 1570,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/web-artifacts-builder/scripts/init-artifact.sh",
+          "size": 10246,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/web-artifacts-builder/scripts/shadcn-components.tar.gz",
+          "size": 19967,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/web-artifacts-builder/SKILL.md",
+          "size": 3051,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/webapp-testing/examples/console_logging.py",
+          "size": 1061,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/webapp-testing/examples/element_discovery.py",
+          "size": 1502,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/webapp-testing/examples/static_html_automation.py",
+          "size": 985,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/webapp-testing/LICENSE.txt",
+          "size": 11546,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/webapp-testing/scripts/with_server.py",
+          "size": 3798,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/webapp-testing/SKILL.md",
+          "size": 4008,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/writing-plans/plan-document-reviewer-prompt.md",
+          "size": 1713,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/writing-plans/SKILL.md",
+          "size": 9092,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/writing-skills/anthropic-best-practices.md",
+          "size": 46197,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/writing-skills/examples/CLAUDE_MD_TESTING.md",
+          "size": 5423,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/writing-skills/graphviz-conventions.dot",
+          "size": 6141,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/writing-skills/persuasion-principles.md",
+          "size": 5901,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/writing-skills/render-graphs.js",
+          "size": 4968,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/writing-skills/SKILL.md",
+          "size": 26418,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/skills/writing-skills/testing-skills-with-subagents.md",
+          "size": 12558,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/smoke-mcp-schemas.mjs",
+          "size": 1863,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/surface-config.mjs",
+          "size": 1369,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/sync-skills.mjs",
+          "size": 15895,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/tool-metrics.mjs",
+          "size": 2415,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/tool-risk.mjs",
+          "size": 5280,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/tool-surface-stability.mjs",
+          "size": 1068,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/upstreams/catalog-cache.mjs",
+          "size": 707,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/upstreams/config.mjs",
+          "size": 8385,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/upstreams/diagnostics.mjs",
+          "size": 1030,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/upstreams/http-client.mjs",
+          "size": 2899,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/upstreams/manager.mjs",
+          "size": 23068,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/upstreams/names.mjs",
+          "size": 2135,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/upstreams/presets.mjs",
+          "size": 2163,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/upstreams/resource-uri.mjs",
+          "size": 1292,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/upstreams/stdio-client.mjs",
+          "size": 2646,
+          "mode": 420
+        },
+        {
+          "path": "control-plane/scripts/workspace-registry.mjs",
+          "size": 5093,
+          "mode": 420
+        },
+        {
+          "path": "dist/bootstrap.d.ts",
+          "size": 11,
+          "mode": 420
+        },
+        {
+          "path": "dist/bootstrap.js",
+          "size": 1123,
+          "mode": 420
+        },
+        {
+          "path": "dist/command-manager.d.ts",
+          "size": 311,
+          "mode": 420
+        },
+        {
+          "path": "dist/command-manager.js",
+          "size": 10668,
+          "mode": 420
+        },
+        {
+          "path": "dist/config-field-definitions.d.ts",
+          "size": 2362,
+          "mode": 420
+        },
+        {
+          "path": "dist/config-field-definitions.js",
+          "size": 1986,
+          "mode": 420
+        },
+        {
+          "path": "dist/config-manager.d.ts",
+          "size": 3558,
+          "mode": 420
+        },
+        {
+          "path": "dist/config-manager.js",
+          "size": 13626,
+          "mode": 420
+        },
+        {
+          "path": "dist/config.d.ts",
+          "size": 275,
+          "mode": 420
+        },
+        {
+          "path": "dist/config.js",
+          "size": 574,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/authorization.d.ts",
+          "size": 406,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/authorization.js",
+          "size": 3503,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/capture.d.ts",
+          "size": 2253,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/capture.js",
+          "size": 10150,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/cli.d.ts",
+          "size": 1949,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/cli.js",
+          "size": 13896,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/device-adapter.d.ts",
+          "size": 2656,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/device-adapter.js",
+          "size": 4153,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/gateway.d.ts",
+          "size": 12889,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/gateway.js",
+          "size": 2437,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/graph.d.ts",
+          "size": 2194,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/graph.js",
+          "size": 11385,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/importer.d.ts",
+          "size": 316,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/importer.js",
+          "size": 3902,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/indexer.d.ts",
+          "size": 529,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/indexer.js",
+          "size": 4152,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/migrations/index.d.ts",
+          "size": 296,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/migrations/index.js",
+          "size": 5868,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/redact.d.ts",
+          "size": 493,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/redact.js",
+          "size": 2457,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/repositories.d.ts",
+          "size": 395,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/repositories.js",
+          "size": 1998,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/search.d.ts",
+          "size": 1558,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/search.js",
+          "size": 13773,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/service.d.ts",
+          "size": 8776,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/service.js",
+          "size": 8341,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/store.d.ts",
+          "size": 6646,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/store.js",
+          "size": 41252,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/text.d.ts",
+          "size": 300,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/text.js",
+          "size": 609,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/tool-contract.d.ts",
+          "size": 19368,
+          "mode": 420
+        },
+        {
+          "path": "dist/context/tool-contract.js",
+          "size": 4318,
+          "mode": 420
+        },
+        {
+          "path": "dist/custom-stdio.d.ts",
+          "size": 1887,
+          "mode": 420
+        },
+        {
+          "path": "dist/custom-stdio.js",
+          "size": 13525,
+          "mode": 420
+        },
+        {
+          "path": "dist/data/official-app-ca.pem",
+          "size": 656,
+          "mode": 420
+        },
+        {
+          "path": "dist/data/onboarding-prompts.json",
+          "size": 3686,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/core.d.ts",
+          "size": 1325,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/core.js",
+          "size": 2859,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/device-state.d.ts",
+          "size": 294,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/device-state.js",
+          "size": 585,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/device-status.d.ts",
+          "size": 2458,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/device-status.js",
+          "size": 7965,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/device.d.ts",
+          "size": 734,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/device.js",
+          "size": 16677,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/execution-engine.d.ts",
+          "size": 5434,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/execution-engine.js",
+          "size": 5703,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/gateway-channel.d.ts",
+          "size": 2571,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/gateway-channel.js",
+          "size": 26428,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/gateway-config.d.ts",
+          "size": 1103,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/gateway-config.js",
+          "size": 7658,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/gateway-identity.d.ts",
+          "size": 923,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/gateway-identity.js",
+          "size": 6524,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/gateway-pairing.d.ts",
+          "size": 882,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/gateway-pairing.js",
+          "size": 4360,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/gateway-secure-transport.d.ts",
+          "size": 1131,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/gateway-secure-transport.js",
+          "size": 4637,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/gateway-tool-adapter.d.ts",
+          "size": 1176,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/gateway-tool-adapter.js",
+          "size": 13937,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/gateway-url-policy.d.ts",
+          "size": 189,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/gateway-url-policy.js",
+          "size": 1776,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/linux-service.d.ts",
+          "size": 2154,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/linux-service.js",
+          "size": 12397,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/official-trust.d.ts",
+          "size": 1191,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/official-trust.js",
+          "size": 3620,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/project-inspection.d.ts",
+          "size": 88,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/project-inspection.js",
+          "size": 7963,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/runtime-owner.d.ts",
+          "size": 1630,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/runtime-owner.js",
+          "size": 7482,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/self-update.d.ts",
+          "size": 4163,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/self-update.js",
+          "size": 31898,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/update-helper.cjs",
+          "size": 11747,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/windows-service.d.ts",
+          "size": 1678,
+          "mode": 420
+        },
+        {
+          "path": "dist/device/windows-service.js",
+          "size": 9093,
+          "mode": 420
+        },
+        {
+          "path": "dist/distribution.d.ts",
+          "size": 287,
+          "mode": 420
+        },
+        {
+          "path": "dist/distribution.js",
+          "size": 989,
+          "mode": 420
+        },
+        {
+          "path": "dist/error-handlers.d.ts",
+          "size": 260,
+          "mode": 420
+        },
+        {
+          "path": "dist/error-handlers.js",
+          "size": 412,
+          "mode": 420
+        },
+        {
+          "path": "dist/handlers/edit-search-handlers.d.ts",
+          "size": 205,
+          "mode": 420
+        },
+        {
+          "path": "dist/handlers/edit-search-handlers.js",
+          "size": 205,
+          "mode": 420
+        },
+        {
+          "path": "dist/handlers/filesystem-handlers.d.ts",
+          "size": 1228,
+          "mode": 420
+        },
+        {
+          "path": "dist/handlers/filesystem-handlers.js",
+          "size": 19351,
+          "mode": 420
+        },
+        {
+          "path": "dist/handlers/history-handlers.d.ts",
+          "size": 559,
+          "mode": 420
+        },
+        {
+          "path": "dist/handlers/history-handlers.js",
+          "size": 2229,
+          "mode": 420
+        },
+        {
+          "path": "dist/handlers/index.d.ts",
+          "size": 241,
+          "mode": 420
+        },
+        {
+          "path": "dist/handlers/index.js",
+          "size": 292,
+          "mode": 420
+        },
+        {
+          "path": "dist/handlers/process-handlers.d.ts",
+          "size": 275,
+          "mode": 420
+        },
+        {
+          "path": "dist/handlers/process-handlers.js",
+          "size": 419,
+          "mode": 420
+        },
+        {
+          "path": "dist/handlers/search-handlers.d.ts",
+          "size": 611,
+          "mode": 420
+        },
+        {
+          "path": "dist/handlers/search-handlers.js",
+          "size": 11394,
+          "mode": 420
+        },
+        {
+          "path": "dist/handlers/terminal-handlers.d.ts",
+          "size": 743,
+          "mode": 420
+        },
+        {
+          "path": "dist/handlers/terminal-handlers.js",
+          "size": 1150,
+          "mode": 420
+        },
+        {
+          "path": "dist/index.d.ts",
+          "size": 45,
+          "mode": 420
+        },
+        {
+          "path": "dist/index.js",
+          "size": 6730,
+          "mode": 420
+        },
+        {
+          "path": "dist/log-palace/cli.d.ts",
+          "size": 265,
+          "mode": 420
+        },
+        {
+          "path": "dist/log-palace/cli.js",
+          "size": 4183,
+          "mode": 420
+        },
+        {
+          "path": "dist/log-palace/formats.d.ts",
+          "size": 803,
+          "mode": 420
+        },
+        {
+          "path": "dist/log-palace/formats.js",
+          "size": 5530,
+          "mode": 420
+        },
+        {
+          "path": "dist/log-palace/store.d.ts",
+          "size": 3444,
+          "mode": 420
+        },
+        {
+          "path": "dist/log-palace/store.js",
+          "size": 45587,
+          "mode": 420
+        },
+        {
+          "path": "dist/mcp-device.d.ts",
+          "size": 45,
+          "mode": 420
+        },
+        {
+          "path": "dist/mcp-device.js",
+          "size": 1743,
+          "mode": 420
+        },
+        {
+          "path": "dist/npm-scripts/remote.d.ts",
+          "size": 587,
+          "mode": 420
+        },
+        {
+          "path": "dist/npm-scripts/remote.js",
+          "size": 15872,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/activity-journal.d.ts",
+          "size": 567,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/activity-journal.js",
+          "size": 3804,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/cli.d.ts",
+          "size": 88,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/cli.js",
+          "size": 16771,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/device-runtime.d.ts",
+          "size": 616,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/device-runtime.js",
+          "size": 5103,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/knowledge-contract.d.ts",
+          "size": 1341,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/knowledge-contract.js",
+          "size": 51,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/knowledge-mcp.d.ts",
+          "size": 927,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/knowledge-mcp.js",
+          "size": 7516,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/knowledge-router.d.ts",
+          "size": 1848,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/knowledge-router.js",
+          "size": 19538,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/plugin-child.d.ts",
+          "size": 11,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/plugin-child.js",
+          "size": 5262,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/plugin-contract.d.ts",
+          "size": 2647,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/plugin-contract.js",
+          "size": 3420,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/plugin-driver.d.ts",
+          "size": 497,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/plugin-driver.js",
+          "size": 18542,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/plugin-host.d.ts",
+          "size": 2067,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/plugin-host.js",
+          "size": 31691,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/plugin-services.d.ts",
+          "size": 707,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/plugin-services.js",
+          "size": 1624,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/runtime-lease.d.ts",
+          "size": 226,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/runtime-lease.js",
+          "size": 4980,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/state-backup.d.ts",
+          "size": 2256,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/state-backup.js",
+          "size": 19783,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/cli.d.ts",
+          "size": 31,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/cli.js",
+          "size": 16637,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/index.d.ts",
+          "size": 449,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/index.js",
+          "size": 31650,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/plugin.d.ts",
+          "size": 393,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/plugin.js",
+          "size": 2145,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/retrieval.d.ts",
+          "size": 221,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/retrieval.js",
+          "size": 2604,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/skill-manager.d.ts",
+          "size": 547,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/skill-manager.js",
+          "size": 38604,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/sources.d.ts",
+          "size": 935,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/sources.js",
+          "size": 6550,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/store.d.ts",
+          "size": 2638,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/store.js",
+          "size": 13553,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/types.d.ts",
+          "size": 2250,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/types.js",
+          "size": 11,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/util.d.ts",
+          "size": 880,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/util.js",
+          "size": 3047,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/reference/plugin.d.ts",
+          "size": 244,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/reference/plugin.js",
+          "size": 746,
+          "mode": 420
+        },
+        {
+          "path": "dist/search-manager.d.ts",
+          "size": 4806,
+          "mode": 420
+        },
+        {
+          "path": "dist/search-manager.js",
+          "size": 40729,
+          "mode": 420
+        },
+        {
+          "path": "dist/server.d.ts",
+          "size": 1803,
+          "mode": 420
+        },
+        {
+          "path": "dist/server.js",
+          "size": 80760,
+          "mode": 420
+        },
+        {
+          "path": "dist/terminal-manager.d.ts",
+          "size": 4574,
+          "mode": 420
+        },
+        {
+          "path": "dist/terminal-manager.js",
+          "size": 34572,
+          "mode": 420
+        },
+        {
+          "path": "dist/tool-dispatcher.d.ts",
+          "size": 345,
+          "mode": 420
+        },
+        {
+          "path": "dist/tool-dispatcher.js",
+          "size": 10257,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/config.d.ts",
+          "size": 2808,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/config.js",
+          "size": 10709,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/edit.d.ts",
+          "size": 1653,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/edit.js",
+          "size": 25306,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/filesystem.d.ts",
+          "size": 3878,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/filesystem.js",
+          "size": 41725,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/fuzzySearch.d.ts",
+          "size": 784,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/fuzzySearch.js",
+          "size": 3395,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/fuzzySearchCore.d.ts",
+          "size": 1884,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/fuzzySearchCore.js",
+          "size": 5160,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/improved-process-tools.d.ts",
+          "size": 880,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/improved-process-tools.js",
+          "size": 25936,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/mime-types.d.ts",
+          "size": 189,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/mime-types.js",
+          "size": 887,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/pdf/extract-images.d.ts",
+          "size": 1242,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/pdf/extract-images.js",
+          "size": 5811,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/pdf/index.d.ts",
+          "size": 406,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/pdf/index.js",
+          "size": 178,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/pdf/lib/pdf2md.d.ts",
+          "size": 1034,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/pdf/lib/pdf2md.js",
+          "size": 3097,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/pdf/manipulations.d.ts",
+          "size": 704,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/pdf/manipulations.js",
+          "size": 4454,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/pdf/markdown.d.ts",
+          "size": 1123,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/pdf/markdown.js",
+          "size": 10299,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/pdf/utils.d.ts",
+          "size": 558,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/pdf/utils.js",
+          "size": 1274,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/process.d.ts",
+          "size": 183,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/process.js",
+          "size": 1899,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/prompts.d.ts",
+          "size": 676,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/prompts.js",
+          "size": 10024,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/schemas.d.ts",
+          "size": 18997,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/schemas.js",
+          "size": 10562,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/usage.d.ts",
+          "size": 167,
+          "mode": 420
+        },
+        {
+          "path": "dist/tools/usage.js",
+          "size": 649,
+          "mode": 420
+        },
+        {
+          "path": "dist/types.d.ts",
+          "size": 2492,
+          "mode": 420
+        },
+        {
+          "path": "dist/types.js",
+          "size": 11,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/config-editor/config-editor-runtime.js",
+          "size": 441433,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/config-editor/index.html",
+          "size": 350,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/config-editor/src/app.d.ts",
+          "size": 1465,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/config-editor/src/app.js",
+          "size": 31913,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/config-editor/src/array-modal.d.ts",
+          "size": 702,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/config-editor/src/array-modal.js",
+          "size": 7617,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/config-editor/src/main.d.ts",
+          "size": 11,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/config-editor/src/main.js",
+          "size": 81,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/config-editor/styles.css",
+          "size": 12304,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/contracts.d.ts",
+          "size": 702,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/contracts.js",
+          "size": 748,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/index.html",
+          "size": 516,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/preview-runtime.js",
+          "size": 1197195,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/shared/preview-file-types.d.ts",
+          "size": 364,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/shared/preview-file-types.js",
+          "size": 1401,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/app.d.ts",
+          "size": 289,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/app.js",
+          "size": 28019,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/components/code-viewer.d.ts",
+          "size": 304,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/components/code-viewer.js",
+          "size": 2283,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/components/highlighting.d.ts",
+          "size": 140,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/components/highlighting.js",
+          "size": 2271,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/components/html-renderer.d.ts",
+          "size": 179,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/components/html-renderer.js",
+          "size": 2346,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/components/markdown-renderer.d.ts",
+          "size": 65,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/components/markdown-renderer.js",
+          "size": 2488,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/directory-controller.d.ts",
+          "size": 481,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/directory-controller.js",
+          "size": 10599,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/document-layout.d.ts",
+          "size": 708,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/document-layout.js",
+          "size": 8121,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/document-outline.d.ts",
+          "size": 617,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/document-outline.js",
+          "size": 4590,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/document-workspace.d.ts",
+          "size": 667,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/document-workspace.js",
+          "size": 1176,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/file-type-handlers.d.ts",
+          "size": 504,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/file-type-handlers.js",
+          "size": 4778,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/host/external-actions.d.ts",
+          "size": 536,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/host/external-actions.js",
+          "size": 2541,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/host/selection-context.d.ts",
+          "size": 435,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/host/selection-context.js",
+          "size": 4149,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/image-preview.d.ts",
+          "size": 233,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/image-preview.js",
+          "size": 706,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/main.d.ts",
+          "size": 11,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/main.js",
+          "size": 213,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/markdown/conflict-dialog.d.ts",
+          "size": 1744,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/markdown/conflict-dialog.js",
+          "size": 7246,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/markdown/controller.d.ts",
+          "size": 2579,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/markdown/controller.js",
+          "size": 46017,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/markdown/editor.d.ts",
+          "size": 5683,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/markdown/editor.js",
+          "size": 70759,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/markdown/linking.d.ts",
+          "size": 691,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/markdown/linking.js",
+          "size": 7804,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/markdown/outline.d.ts",
+          "size": 154,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/markdown/outline.js",
+          "size": 624,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/markdown/parser.d.ts",
+          "size": 1091,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/markdown/parser.js",
+          "size": 1293,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/markdown/preview.d.ts",
+          "size": 78,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/markdown/preview.js",
+          "size": 692,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/markdown/slugify.d.ts",
+          "size": 196,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/markdown/slugify.js",
+          "size": 999,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/markdown/utils.d.ts",
+          "size": 95,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/markdown/utils.js",
+          "size": 438,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/model.d.ts",
+          "size": 1087,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/model.js",
+          "size": 11,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/panel-actions.d.ts",
+          "size": 945,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/panel-actions.js",
+          "size": 7905,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/path-utils.d.ts",
+          "size": 451,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/path-utils.js",
+          "size": 2345,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/payload-utils.d.ts",
+          "size": 861,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/payload-utils.js",
+          "size": 4633,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/types.d.ts",
+          "size": 53,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/src/types.js",
+          "size": 11,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/file-preview/styles.css",
+          "size": 36388,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/resources.d.ts",
+          "size": 759,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/resources.js",
+          "size": 3700,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/shared/compact-row.d.ts",
+          "size": 315,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/shared/compact-row.js",
+          "size": 999,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/shared/escape-html.d.ts",
+          "size": 127,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/shared/escape-html.js",
+          "size": 283,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/shared/host-context.d.ts",
+          "size": 643,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/shared/host-context.js",
+          "size": 1892,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/shared/tool-bridge.d.ts",
+          "size": 935,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/shared/tool-bridge.js",
+          "size": 4799,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/shared/tool-shell.d.ts",
+          "size": 945,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/shared/tool-shell.js",
+          "size": 4104,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/shared/ui-event-tracker.d.ts",
+          "size": 475,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/shared/ui-event-tracker.js",
+          "size": 850,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/shared/widget-state.d.ts",
+          "size": 1471,
+          "mode": 420
+        },
+        {
+          "path": "dist/ui/shared/widget-state.js",
+          "size": 5459,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/ab-test.d.ts",
+          "size": 459,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/ab-test.js",
+          "size": 3589,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/capture.d.ts",
+          "size": 753,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/capture.js",
+          "size": 1400,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/dockerPrompt.d.ts",
+          "size": 626,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/dockerPrompt.js",
+          "size": 3059,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/feature-flags.d.ts",
+          "size": 377,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/feature-flags.js",
+          "size": 515,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/files/base.d.ts",
+          "size": 5242,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/files/base.js",
+          "size": 130,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/files/binary.d.ts",
+          "size": 793,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/files/binary.js",
+          "size": 2176,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/files/docx.d.ts",
+          "size": 2095,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/files/docx.js",
+          "size": 29982,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/files/excel.d.ts",
+          "size": 942,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/files/excel.js",
+          "size": 18081,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/files/factory.d.ts",
+          "size": 1594,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/files/factory.js",
+          "size": 4337,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/files/image.d.ts",
+          "size": 722,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/files/image.js",
+          "size": 2351,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/files/index.d.ts",
+          "size": 376,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/files/index.js",
+          "size": 442,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/files/pdf.d.ts",
+          "size": 1035,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/files/pdf.js",
+          "size": 5120,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/files/text.d.ts",
+          "size": 2324,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/files/text.js",
+          "size": 16814,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/fuzzySearchLogger.d.ts",
+          "size": 832,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/fuzzySearchLogger.js",
+          "size": 4527,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/lineEndingHandler.d.ts",
+          "size": 644,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/lineEndingHandler.js",
+          "size": 2167,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/logger.d.ts",
+          "size": 1332,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/logger.js",
+          "size": 2554,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/mcp-ui-ab-test.d.ts",
+          "size": 733,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/mcp-ui-ab-test.js",
+          "size": 2275,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/open-browser.d.ts",
+          "size": 314,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/open-browser.js",
+          "size": 1493,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/output-budget.d.ts",
+          "size": 181,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/output-budget.js",
+          "size": 550,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/process-detection.d.ts",
+          "size": 734,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/process-detection.js",
+          "size": 4756,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/ripgrep-resolver.d.ts",
+          "size": 327,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/ripgrep-resolver.js",
+          "size": 2880,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/system-info.d.ts",
+          "size": 1959,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/system-info.js",
+          "size": 28652,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/toolHistory.d.ts",
+          "size": 2579,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/toolHistory.js",
+          "size": 9071,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/trackTools.d.ts",
+          "size": 248,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/trackTools.js",
+          "size": 3637,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/unsupportedParams.d.ts",
+          "size": 1313,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/unsupportedParams.js",
+          "size": 3021,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/usageTracker.d.ts",
+          "size": 3910,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/usageTracker.js",
+          "size": 19205,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/welcome-onboarding.d.ts",
+          "size": 481,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/welcome-onboarding.js",
+          "size": 4563,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/withTimeout.d.ts",
+          "size": 1583,
+          "mode": 420
+        },
+        {
+          "path": "dist/utils/withTimeout.js",
+          "size": 3583,
+          "mode": 420
+        },
+        {
+          "path": "dist/version.d.ts",
+          "size": 41,
+          "mode": 420
+        },
+        {
+          "path": "dist/version.js",
+          "size": 33,
+          "mode": 420
+        },
+        {
+          "path": "package.json",
+          "size": 5863,
+          "mode": 420
+        },
+        {
+          "path": "scripts/v12/install-palace-skill.cjs",
+          "size": 935,
+          "mode": 420
+        },
+        {
+          "path": "skills/mcp-device-context/SKILL.md",
+          "size": 2854,
+          "mode": 420
+        },
+        {
+          "path": "skills/palace-cli/agents/openai.yaml",
+          "size": 124,
+          "mode": 420
+        },
+        {
+          "path": "skills/palace-cli/SKILL.md",
+          "size": 3673,
+          "mode": 420
+        }
+      ]
+    },
+    {
+      "product": "palace",
+      "file": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\artifacts\\completion-2026-10-24T23-18-37-628Z\\hcu-lab.me-palace-1.0.12.tgz",
+      "bytes": 49557,
+      "sha256": "1be1d4ff69eb86ce5f29af74f81db9652394e9c76e8597328439398305a9fdc4",
+      "entryCount": 33,
+      "files": [
+        {
+          "path": "LICENSE",
+          "size": 1128,
+          "mode": 420
+        },
+        {
+          "path": "dist/config.js",
+          "size": 574,
+          "mode": 420
+        },
+        {
+          "path": "dist/log-palace/cli.d.ts",
+          "size": 265,
+          "mode": 420
+        },
+        {
+          "path": "dist/log-palace/cli.js",
+          "size": 4183,
+          "mode": 420
+        },
+        {
+          "path": "dist/log-palace/formats.d.ts",
+          "size": 803,
+          "mode": 420
+        },
+        {
+          "path": "dist/log-palace/formats.js",
+          "size": 5530,
+          "mode": 420
+        },
+        {
+          "path": "dist/log-palace/store.d.ts",
+          "size": 3444,
+          "mode": 420
+        },
+        {
+          "path": "dist/log-palace/store.js",
+          "size": 45587,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/plugin-contract.d.ts",
+          "size": 2647,
+          "mode": 420
+        },
+        {
+          "path": "dist/platform/plugin-services.d.ts",
+          "size": 707,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/cli.d.ts",
+          "size": 31,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/cli.js",
+          "size": 16637,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/index.d.ts",
+          "size": 449,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/index.js",
+          "size": 31650,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/plugin.d.ts",
+          "size": 393,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/plugin.js",
+          "size": 2145,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/retrieval.d.ts",
+          "size": 221,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/retrieval.js",
+          "size": 2604,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/skill-manager.d.ts",
+          "size": 547,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/skill-manager.js",
+          "size": 38604,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/sources.d.ts",
+          "size": 935,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/sources.js",
+          "size": 6550,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/store.d.ts",
+          "size": 2638,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/store.js",
+          "size": 13553,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/types.d.ts",
+          "size": 2250,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/types.js",
+          "size": 11,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/util.d.ts",
+          "size": 880,
+          "mode": 420
+        },
+        {
+          "path": "dist/plugins/palace/util.js",
+          "size": 3047,
+          "mode": 420
+        },
+        {
+          "path": "package.json",
+          "size": 922,
+          "mode": 420
+        },
+        {
+          "path": "palace.plugin.json",
+          "size": 1269,
+          "mode": 420
+        },
+        {
+          "path": "scripts/install-palace-skill.cjs",
+          "size": 935,
+          "mode": 420
+        },
+        {
+          "path": "skills/palace-cli/agents/openai.yaml",
+          "size": 124,
+          "mode": 420
+        },
+        {
+          "path": "skills/palace-cli/SKILL.md",
+          "size": 3673,
+          "mode": 420
+        }
+      ]
+    }
+  ],
+  "installs": [
+    {
+      "product": "mcp-device",
+      "fixture": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-mcp-device",
+      "home": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-mcp-device\\home",
+      "prefix": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-mcp-device\\prefix",
+      "packageRoot": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-mcp-device\\prefix\\node_modules\\@hcu-lab.me\\mcp-device",
+      "version": "1.0.12",
+      "packageLockSha256": "b0bd856ea9c6b3412a1f16c1bd71d4749ecab4ce6f533c0a3b0d8297a1034637",
+      "skillStates": [
+        {
+          "target": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-mcp-device\\home\\.agents\\skills\\palace-cli",
+          "state": "owned-pristine"
+        },
+        {
+          "target": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z-cold-mcp-device\\home\\.pi\\agent\\skills\\palace-cli",
+          "state": "owned-pristine"
+        }
+      ]
+    }
+  ],
+  "status": "FAIL",
+  "error": "Error: sbom-mcp-device failed: npm error code EINVALIDPURLTYPE\nnpm error Invalid type \"range\" of package \"prefix@\": Purl can only be generated for \"version\" types.\nnpm error A complete log of this run can be found in: C:\\Users\\admin\\AppData\\Local\\npm-cache\\_logs\\2026-10-24T23_29_41_233Z-debug-0.log\n\n    at run (E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-package.cjs:17:25)\n    at npm (E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-package.cjs:20:50)\n    at Object.<anonymous> (E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-package.cjs:39:4)\n    at Module._compile (node:internal/modules/cjs/loader:1705:14)\n    at Object..js (node:internal/modules/cjs/loader:1838:10)\n    at Module.load (node:internal/modules/cjs/loader:1441:32)\n    at Function._load (node:internal/modules/cjs/loader:1263:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)",
+  "endedAt": "2026-10-24T23:29:46.304Z"
+}

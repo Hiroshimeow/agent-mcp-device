@@ -1,0 +1,854 @@
+{
+  "schemaVersion": 1,
+  "status": "NOT_READY_FOR_SUBMISSION",
+  "observedAt": "2026-10-27T23:43:57.3312835Z",
+  "scope": "Bounded index, not comprehensive source freeze. Existing inputs read/hash only; no execution. Absolute paths require same private filesystem. No raw process arguments or provider bodies copied.",
+  "items": [
+    {
+      "id": "status",
+      "path": "E:/git-project/agent-mcp-device-v12/docs/STATUS.md",
+      "bytes": 3098,
+      "sha256": "fc9152655b447abda6df400b6eb2f873fea5d13087e3fee59384985f1213466a",
+      "classification": "REPOSITORY_GUIDANCE",
+      "scope": "Not runtime truth",
+      "expectedSha256": null
+    },
+    {
+      "id": "completion-spec",
+      "path": "E:/git-project/agent-mcp-device-v12/specs/008-v12-platform/V12_END_TO_END_COMPLETION_SPEC.md",
+      "bytes": 31891,
+      "sha256": "d4bde67dcb43fabc967060c4254378f1f2871d10179fedf8d4233a174f45c394",
+      "classification": "REQUIREMENTS",
+      "scope": "Not accepted evidence",
+      "expectedSha256": null
+    },
+    {
+      "id": "previous-handoff",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/HANDOFF_20261027_TO_NEXT_SESSION.md",
+      "bytes": 10721,
+      "sha256": "ab97a7fc739b1f9e45a6e09f88d24a73230d43ab3a130ceb9cd50ab2e4bba32b",
+      "classification": "HISTORICAL",
+      "scope": "Superseded by D1 completion and current instruction",
+      "expectedSha256": null
+    },
+    {
+      "id": "downstream-research",
+      "path": "C:/Users/admin/AppData/Local/Temp/acp-delegate/del_mvqv8ux3_rs1m.out",
+      "bytes": 12177,
+      "sha256": "cd9d2e9a7bbc17f1732acd648b0ef36eb7846e13b810df68ea5987a61c06e4ed",
+      "classification": "HISTORICAL_READ_ONLY_RESEARCH",
+      "scope": "Reuse only; readiness not proven",
+      "expectedSha256": null
+    },
+    {
+      "id": "d1-handoff",
+      "path": "E:/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/D1-closure-20261028/HANDOFF.md",
+      "bytes": 16230,
+      "sha256": "2ea9a017f7d471f90cb0d08f2ac09cd00d1619a2cfc8c4ed93598db2ff5fdc3d",
+      "classification": "D1_REVIEWED_SNAPSHOT",
+      "scope": "Existing receipt only; not fresh execution or current writer freeze",
+      "expectedSha256": null
+    },
+    {
+      "id": "d1-receipt",
+      "path": "E:/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/D1-closure-20261028/receipt.json",
+      "bytes": 1397,
+      "sha256": "9b4672a498e4640bfe1a1b2b85de8dae4cd574c63aa54473d48d1a0c44977f04",
+      "classification": "D1_REVIEWED_SNAPSHOT",
+      "scope": "Existing receipt only; not fresh execution or current writer freeze",
+      "expectedSha256": null
+    },
+    {
+      "id": "d1-source-manifest",
+      "path": "E:/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/D1-closure-20261028/source-manifest.json",
+      "bytes": 42096,
+      "sha256": "4ecfc0343e767ac34651de7d06fb68e09a16e3720e854348febdfce8429701b2",
+      "classification": "D1_REVIEWED_SNAPSHOT",
+      "scope": "Existing receipt only; not fresh execution or current writer freeze",
+      "expectedSha256": null
+    },
+    {
+      "id": "d1-final-probe",
+      "path": "E:/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/D1-closure-20261028/prior/final-installed-probe-receipt.json",
+      "bytes": 10578,
+      "sha256": "8dda40f3406c25c94a474641d2990ebf34eaa29ceeaf136108ef79f952492278",
+      "classification": "D1_REVIEWED_SNAPSHOT",
+      "scope": "Existing receipt only; not fresh execution or current writer freeze",
+      "expectedSha256": null
+    },
+    {
+      "id": "d1-final-matrix",
+      "path": "E:/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/D1-closure-20261028/prior/final-reviewer-matrix.log",
+      "bytes": 13907,
+      "sha256": "2f2e077fee6c9c980e881c84c6a01a9b3281db1933f623598dfb0aca5d425c06",
+      "classification": "D1_REVIEWED_SNAPSHOT",
+      "scope": "Existing receipt only; not fresh execution or current writer freeze",
+      "expectedSha256": null
+    },
+    {
+      "id": "d1-diagnostic",
+      "path": "E:/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/D1-closure-20261028/resume/diagnostic-receipt.json",
+      "bytes": 144221,
+      "sha256": "d8f4548810fc6f3de3f4ee831b75db8e7054a60535cb70b4aef0d21148864530",
+      "classification": "D1_REVIEWED_SNAPSHOT",
+      "scope": "Existing receipt only; not fresh execution or current writer freeze",
+      "expectedSha256": null
+    },
+    {
+      "id": "d1-functional",
+      "path": "E:/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/D1-closure-20261028/resume/functional-final.log",
+      "bytes": 22301,
+      "sha256": "3a3587ca0dd111595943624cba0d540b4f0747a5015545f50f3c5632ed4fd8bd",
+      "classification": "D1_REVIEWED_SNAPSHOT",
+      "scope": "Existing receipt only; not fresh execution or current writer freeze",
+      "expectedSha256": null
+    },
+    {
+      "id": "d1-nonperformance",
+      "path": "E:/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/D1-closure-20261028/resume/nonperformance-final.log",
+      "bytes": 6398,
+      "sha256": "125b8685dc090b67dc8ff631953978f3072e541cf756ec5363a85495e0ff0eeb",
+      "classification": "D1_REVIEWED_SNAPSHOT",
+      "scope": "Existing receipt only; not fresh execution or current writer freeze",
+      "expectedSha256": null
+    },
+    {
+      "id": "d1-lock-cancel",
+      "path": "E:/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/D1-closure-20261028/resume/lock-cancel-final.log",
+      "bytes": 1442,
+      "sha256": "0bfcec74665a512f5aeba45630a199b70e02af5379b79fc8a2bedf2da6735b7b",
+      "classification": "D1_REVIEWED_SNAPSHOT",
+      "scope": "Existing receipt only; not fresh execution or current writer freeze",
+      "expectedSha256": null
+    },
+    {
+      "id": "d1-review-summary",
+      "path": "E:/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/D1-closure-20261028/M365-D1-response-183b8083.md",
+      "bytes": 4111,
+      "sha256": "7ec5374119dbdbb0ac0334acd3826199ee1294b4fccfd7ca6c336137ad1e6ac1",
+      "classification": "D1_REVIEWED_SNAPSHOT",
+      "scope": "Existing receipt only; not fresh execution or current writer freeze",
+      "expectedSha256": null
+    },
+    {
+      "id": "d1-review-provenance",
+      "path": "E:/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/D1-closure-20261028/d1-bridge-submission-20261028.json",
+      "bytes": 2621,
+      "sha256": "010bfda60dcbf985b82214352c6dba15b8dce2a6850a3d6647ad49eb8e9b8988",
+      "classification": "D1_REVIEWED_SNAPSHOT",
+      "scope": "Existing receipt only; not fresh execution or current writer freeze",
+      "expectedSha256": null
+    },
+    {
+      "id": "d1-evidence-manifest",
+      "path": "E:/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/D1-closure-20261028/evidence-manifest.json",
+      "bytes": 7821,
+      "sha256": "95da38523d1788f3a3af4fe6e4907a0d67afbe1d0623b275a3327fbe7001e158",
+      "classification": "D1_REVIEWED_SNAPSHOT",
+      "scope": "Manifest checked only for indexed D1 entries, not every member",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-v2-protocol",
+      "path": "E:/git-project/agent-mcp-device-v12/.tmp/ab-v2-consolidated-20261027/PROTOCOL_PREREGISTRATION_TEMPLATE.md",
+      "bytes": 19537,
+      "sha256": "47c99783bcd54e3897ec4f27c91ab4b217f7f5ce3850232dd1e677269a23174c",
+      "classification": "UNSEALED_DRAFT",
+      "scope": "All later sealing/execution prerequisites remain pending",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-v2-correction",
+      "path": "E:/git-project/agent-mcp-device-v12/.tmp/ab-v2-consolidated-20261027/CORRECTION_VALIDATION.md",
+      "bytes": 9162,
+      "sha256": "acf55fc6a5b5ad03f81982dc3fb17783d75dc2e66a814f9b208e03f60c4b64b5",
+      "classification": "UNSEALED_DRAFT",
+      "scope": "All later sealing/execution prerequisites remain pending",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-v2-unresolved",
+      "path": "E:/git-project/agent-mcp-device-v12/.tmp/ab-v2-consolidated-20261027/UNRESOLVED_INPUTS.md",
+      "bytes": 6848,
+      "sha256": "23354f14ee2932d82e2814ad50d46b37ac965166dac1c770ef82c66efd11e224",
+      "classification": "UNSEALED_DRAFT",
+      "scope": "All later sealing/execution prerequisites remain pending",
+      "expectedSha256": null
+    },
+    {
+      "id": "procedure-audit",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/pi-g6-2080-20261026/procedure-audit-1793022735395/receipt.json",
+      "bytes": 3617,
+      "sha256": "ceaa061e29be34790f037f4589f7ac3e04ffd12f9b0351c85b4c877eeef67b86",
+      "classification": "HISTORICAL",
+      "scope": "Not acceptance for D1-reviewed or current source",
+      "expectedSha256": null
+    },
+    {
+      "id": "procedure-preregistered",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/pi-g6-2080-20261026/procedure-audit-1793022735395/preregistered-check.json",
+      "bytes": 2339,
+      "sha256": "33d3f3964fbf9249a792f03827428c9d57e9f2ea9c4d266d72c4fa40358b7928",
+      "classification": "HISTORICAL",
+      "scope": "Not acceptance for D1-reviewed or current source",
+      "expectedSha256": null
+    },
+    {
+      "id": "procedure-validation-raw",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/pi-g6-2080-20261026/procedure-audit-1793022735395/validation.stdout.log",
+      "bytes": 998,
+      "sha256": "e88fa838441ed45e3a18c3aefa8ecb1c7627f7e4c43840a23501deae657ca96a",
+      "classification": "HISTORICAL",
+      "scope": "Not acceptance for D1-reviewed or current source",
+      "expectedSha256": null
+    },
+    {
+      "id": "procedure-independent-raw",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/pi-g6-2080-20261026/procedure-audit-1793022735395/independent.stdout.log",
+      "bytes": 997,
+      "sha256": "aa33b251c7b76d9f82b692c74657f74f7f85f94db1b57188345a5953ae75d1e8",
+      "classification": "HISTORICAL",
+      "scope": "Not acceptance for D1-reviewed or current source",
+      "expectedSha256": null
+    },
+    {
+      "id": "s4-historical-result",
+      "path": "E:/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/S4-real-trace-validation.json",
+      "bytes": 30679,
+      "sha256": "6e02568f79b0acb15557b9dae6b0e1459dbcfb676f5711e2679c2e6222103f34",
+      "classification": "HISTORICAL",
+      "scope": "Not acceptance for D1-reviewed or current source",
+      "expectedSha256": null
+    },
+    {
+      "id": "s4-raw-result",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/s4-real-traces-v1b/result.json",
+      "bytes": 30679,
+      "sha256": "6e02568f79b0acb15557b9dae6b0e1459dbcfb676f5711e2679c2e6222103f34",
+      "classification": "HISTORICAL",
+      "scope": "Not acceptance for D1-reviewed or current source",
+      "expectedSha256": null
+    },
+    {
+      "id": "soak-receipt",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/pi-g6-2080-20261026/soak-24h-20261026T1342/receipt.json",
+      "bytes": 1774,
+      "sha256": "c9ab3675380ab1e1ea0b001800ce2e35484e0884eb7f526deab6f5a71ae97b5f",
+      "classification": "HISTORICAL",
+      "scope": "Not acceptance for D1-reviewed or current source",
+      "expectedSha256": null
+    },
+    {
+      "id": "soak-owner",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/pi-g6-2080-20261026/soak-24h-20261026T1342/owner.json",
+      "bytes": 455,
+      "sha256": "1c43d8a74ac3adb996a7df215325f150178a96fe12ac8ca35d88ac47bd29e9f7",
+      "classification": "HISTORICAL",
+      "scope": "Not acceptance for D1-reviewed or current source",
+      "expectedSha256": null
+    },
+    {
+      "id": "soak-raw-progress",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/pi-g6-2080-20261026/soak-24h-20261026T1342/progress.jsonl",
+      "bytes": 3278197,
+      "sha256": "457473371b165a0af1d241236529ab74b7fdd4da9b24e6b13ff665f07e9f9a2a",
+      "classification": "HISTORICAL",
+      "scope": "Not acceptance for D1-reviewed or current source",
+      "expectedSha256": null
+    },
+    {
+      "id": "agent-disposition",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/pi-g6-2080-20261026/final-skill-agent-1793023278515/independent-disposition.json",
+      "bytes": 1050,
+      "sha256": "805c24b28d9a2eb8f19c0068fb5a5756a30d47f598ff7e72a2ef39c64647f1a3",
+      "classification": "HISTORICAL",
+      "scope": "Not acceptance for D1-reviewed or current source",
+      "expectedSha256": null
+    },
+    {
+      "id": "candidate-build",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/pi-g6-2080-20261026/candidate-2026-10-26T13-38-22-991Z/build-receipt.json",
+      "bytes": 1372,
+      "sha256": "478c56b64c78a76a2ff7f745b6557c40a54a20ad8a314930f531d870038e5e42",
+      "classification": "HISTORICAL",
+      "scope": "Not acceptance for D1-reviewed or current source",
+      "expectedSha256": null
+    },
+    {
+      "id": "candidate-audit",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/pi-g6-2080-20261026/candidate-2026-10-26T13-38-22-991Z/artifact-audit/receipt.json",
+      "bytes": 3152,
+      "sha256": "989357fd2dc2460c03f70ee294d2b62a35e296e2ea952221a2433a087424f98e",
+      "classification": "HISTORICAL",
+      "scope": "Not acceptance for D1-reviewed or current source",
+      "expectedSha256": null
+    },
+    {
+      "id": "candidate-windows",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/pi-g6-2080-20261026/candidate-2026-10-26T13-38-22-991Z/windows-gates/receipt.json",
+      "bytes": 5673,
+      "sha256": "4d88db2e5e0569e5142be7edb35b95b52f4b87f6ddab30e3158a7e33d896dcad",
+      "classification": "HISTORICAL",
+      "scope": "Not acceptance for D1-reviewed or current source",
+      "expectedSha256": null
+    },
+    {
+      "id": "candidate-linux",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/pi-g6-2080-20261026/candidate-2026-10-26T13-38-22-991Z/linux-gates/receipt.json",
+      "bytes": 93,
+      "sha256": "34eaa85a47a7011b2c5417de477050823307c3c426de0782689063b863f849ee",
+      "classification": "HISTORICAL",
+      "scope": "Not acceptance for D1-reviewed or current source",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-historical-summary",
+      "path": "E:/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/actual-token-ab.json",
+      "bytes": 1770,
+      "sha256": "4c38f9b4f0773eb94fbcca87ca892198931cd15e0657b771b747e2c9a7b74db4",
+      "classification": "HISTORICAL",
+      "scope": "Not acceptance for D1-reviewed or current source",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-raw-results",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/results.jsonl",
+      "bytes": 53907,
+      "sha256": "fc7d188e9a9d018c852db4cbd17bd644dc8de8bb66895a07ddf2620b033d06f1",
+      "classification": "HISTORICAL",
+      "scope": "Not acceptance for D1-reviewed or current source",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-run-ledger",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/run-ledger.jsonl",
+      "bytes": 21116,
+      "sha256": "c8a6fa0eb257ffdb50912d5aa031cdeb95ff2a31fe9d2bed67ce2614422cbefd",
+      "classification": "HISTORICAL",
+      "scope": "Not acceptance for D1-reviewed or current source",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-original-summary",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/summary.json",
+      "bytes": 13970,
+      "sha256": "79bbc4bcb0b1d348fe1e68d2c2602b7bc7c5805dd636fd1ad5cd3f29e06f2be2",
+      "classification": "HISTORICAL",
+      "scope": "Not acceptance for D1-reviewed or current source",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-independent-verification",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/independent-verification.json",
+      "bytes": 865,
+      "sha256": "d7885f217a305d57d66dbd7ed56f4007a5d7a5c0530f948d6a85d43bbc8d3ea8",
+      "classification": "HISTORICAL",
+      "scope": "Not acceptance for D1-reviewed or current source",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-audit",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/pi-g6-2080-20261026/benchmark-audit.json",
+      "bytes": 30117,
+      "sha256": "85408caffab1240704cf38f8206742ae6e9367cbee1e35ba33d81ec7c8f7dd66",
+      "classification": "HISTORICAL",
+      "scope": "Not acceptance for D1-reviewed or current source",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-scope-diagnosis",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/pi-g6-2080-20261026/memory-research/benchmark-scope-diagnosis.json",
+      "bytes": 15368,
+      "sha256": "2c201d411d82ebb606e4d94c331ebf96dfc9c5405709b5c2d0d44d2d1b1c2073",
+      "classification": "HISTORICAL",
+      "scope": "Not acceptance for D1-reviewed or current source",
+      "expectedSha256": null
+    },
+    {
+      "id": "trace-red",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/completion-2026-10-24T23-18-37-628Z/package-types-red.stdout.log",
+      "bytes": 1007,
+      "sha256": "6be78766883039672abe3878f48bf46c86e094b926a77d11f63a4346d59f101a",
+      "classification": "HISTORICAL_ONE_INCIDENT",
+      "scope": "Original bytes, not independent incident from green",
+      "expectedSha256": "6be78766883039672abe3878f48bf46c86e094b926a77d11f63a4346d59f101a"
+    },
+    {
+      "id": "trace-green",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/completion-2026-10-24T23-18-37-628Z/package-closure-green-2.stdout.log",
+      "bytes": 997,
+      "sha256": "46c606f39741df88421ae9a1bca81b240f97c2cb5e10d44654faf3ca1fc93f2f",
+      "classification": "HISTORICAL_ONE_INCIDENT",
+      "scope": "Original bytes, same engineering incident as red",
+      "expectedSha256": "46c606f39741df88421ae9a1bca81b240f97c2cb5e10d44654faf3ca1fc93f2f"
+    },
+    {
+      "id": "historical-device-package",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/pi-g6-2080-20261026/candidate-2026-10-26T13-38-22-991Z/artifacts/hcu-lab.me-mcp-device-1.0.12.tgz",
+      "bytes": 2157078,
+      "sha256": "8307a856353e64da7e2912f3d7c584a9b2ee3eccc7df578f325185421edec324",
+      "classification": "HISTORICAL_20261026",
+      "scope": "Not AB v1e or current candidate",
+      "expectedSha256": "8307a856353e64da7e2912f3d7c584a9b2ee3eccc7df578f325185421edec324"
+    },
+    {
+      "id": "historical-palace-package",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/pi-g6-2080-20261026/candidate-2026-10-26T13-38-22-991Z/artifacts/hcu-lab.me-palace-1.0.12.tgz",
+      "bytes": 62906,
+      "sha256": "609a228b80063d2c53dd4d63cbe834afe4cf3dc8277d483e23cdf6a01db56a7f",
+      "classification": "HISTORICAL_20261026",
+      "scope": "Not AB v1e or current candidate",
+      "expectedSha256": "609a228b80063d2c53dd4d63cbe834afe4cf3dc8277d483e23cdf6a01db56a7f"
+    },
+    {
+      "id": "ab-device-package",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/artifacts/final-current/hcu-lab.me-mcp-device-1.0.12.tgz",
+      "bytes": 2155786,
+      "sha256": "bf575c83646dfd98ad09ffad2cfab6324d085f17544793ce8301f67a39053cdf",
+      "classification": "AB_V1E_OLDER_ARTIFACTS",
+      "scope": "Actual historical A/B binding only",
+      "expectedSha256": "bf575c83646dfd98ad09ffad2cfab6324d085f17544793ce8301f67a39053cdf"
+    },
+    {
+      "id": "ab-palace-package",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/artifacts/final-current/hcu-lab.me-palace-1.0.12.tgz",
+      "bytes": 62090,
+      "sha256": "60a9054a2e5e3b6917d26903b18046921319a299778595891430b5f88f5176b1",
+      "classification": "AB_V1E_OLDER_ARTIFACTS",
+      "scope": "Actual historical A/B binding only",
+      "expectedSha256": "60a9054a2e5e3b6917d26903b18046921319a299778595891430b5f88f5176b1"
+    },
+    {
+      "id": "ab-events-01",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/01/events.jsonl",
+      "bytes": 16279,
+      "sha256": "5eb2aa0c982ba6c3309afd19fdc7a5324ff05ecf5683eb2dae528ac2ccbd3a96",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-02",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/02/events.jsonl",
+      "bytes": 16115,
+      "sha256": "e31426c294105b059cba2a9b710fca01c36824cd47b522d37a54b442d8277fa8",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-03",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/03/events.jsonl",
+      "bytes": 14884,
+      "sha256": "96d232c42d128055e21b45c7c3a56d8bf1e04f0e74f5a4aa99b99b9c2ed7e8be",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-04",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/04/events.jsonl",
+      "bytes": 28090,
+      "sha256": "135427e512a5f978f29ccbeb9882d1dbf1986beb2ff391bfffdf4c206626e7de",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-05",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/05/events.jsonl",
+      "bytes": 15692,
+      "sha256": "9189428c5a739efd8680ecb40da1ec1dc08e8847041ba81e133d31a7f6ebf0ca",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-06",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/06/events.jsonl",
+      "bytes": 28982,
+      "sha256": "615df6cb9166acd183f145e803b806018395a6e8a5ed00ebdd8fed2bdce07ea7",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-07",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/07/events.jsonl",
+      "bytes": 21319,
+      "sha256": "36e43a87a9393f61835298a010c15a3fe14ab034b40e28f51c8c46217b2d8089",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-08",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/08/events.jsonl",
+      "bytes": 24720,
+      "sha256": "b919a252231b5e5ebac67c524fc167e446233e4a16f9c333452c3ba9582b60dc",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-09",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/09/events.jsonl",
+      "bytes": 24146,
+      "sha256": "ce65a995877cecf31d987b80eacce3d07ce4335a6f22269435ce60a5d1ce38a5",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-10",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/10/events.jsonl",
+      "bytes": 15048,
+      "sha256": "3dd30100eab90b9a8a768128b9e56ef59d47b8163d0d9b08fb1b823a6f847937",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-11",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/11/events.jsonl",
+      "bytes": 15461,
+      "sha256": "97df8b276a8a1b8ab050a6a32b2dd281f4cd4cd15fb9ffe87a0e05c391326b2d",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-12",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/12/events.jsonl",
+      "bytes": 214622,
+      "sha256": "bf9a8d110e138902051a3784f19d71c1277677bd48cd8b3074dbb87c2d050592",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-13",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/13/events.jsonl",
+      "bytes": 23482,
+      "sha256": "d0c6aef6a5bac24762546bf313b641ed3f647ec9c8445cd015081d8ea553a4e9",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-14",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/14/events.jsonl",
+      "bytes": 9708,
+      "sha256": "758c03ac2f96c015cdd2a83d47b681c7de930322a49ec5b1eb512e0cd7c9663f",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-15",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/15/events.jsonl",
+      "bytes": 13667,
+      "sha256": "8ee8483cd3b956a5e48fe1d8c3e8402f06d36a5ffc57c1d9e4fbc1669fe34e7e",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-16",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/16/events.jsonl",
+      "bytes": 18419,
+      "sha256": "30fd2126df80719e733bba5629f2f33b45b07142c219148b43a35157de2dc230",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-17",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/17/events.jsonl",
+      "bytes": 25212,
+      "sha256": "f2b88da5e0d57e887076a18eb25651a70264316b6852ce9e3a041b8756cbbc1c",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-18",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/18/events.jsonl",
+      "bytes": 12878,
+      "sha256": "2fa2829a3e6b48eb58039e9ea04d9ab0a1a19be040ec25dee2c0c80e42f59def",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-19",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/19/events.jsonl",
+      "bytes": 26048,
+      "sha256": "6c11dc0225b6dad5e7e9e7027f2490fad87d807b7ff7491ba00b1ea1044bf749",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-20",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/20/events.jsonl",
+      "bytes": 14331,
+      "sha256": "1ce373a48964646e30c9b25014c0554932dc6a42a2323c7f5384a33303c77f03",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-21",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/21/events.jsonl",
+      "bytes": 12350,
+      "sha256": "669a7513cfab089ad35b718e83347c141d3639d815da0e56088582c4cfae925f",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-22",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/22/events.jsonl",
+      "bytes": 21994,
+      "sha256": "06b6a9804676a8181d580d5d6df238e17723b4760d839c2adf11651620f43e9e",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-23",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/23/events.jsonl",
+      "bytes": 19380,
+      "sha256": "770d986566c87c9a53e0d6404734b4b10c6835c3bee40c246bdc8e9beb9c5a74",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-24",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/24/events.jsonl",
+      "bytes": 31834,
+      "sha256": "a79a4d3a217a41040374721578b4166b0717fdf830f6e2c193cbb143e1e8eb62",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-25",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/25/events.jsonl",
+      "bytes": 14683,
+      "sha256": "6689fedb0cf3f0643ede968f65f2326e50e53a08dec5ebc9a096e1091033e975",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-26",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/26/events.jsonl",
+      "bytes": 21974,
+      "sha256": "2432e60a9b0019d99abb16b9e8ebc9e038a6af746c7c97d6f7abf4c84bb96828",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-27",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/27/events.jsonl",
+      "bytes": 212968,
+      "sha256": "27551c9bd61f92097094232f9664684a15b9a2b2a98f16fff47a3a637fc14f68",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-28",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/28/events.jsonl",
+      "bytes": 28802,
+      "sha256": "a2b0e1f30d0824ca26ed74cea312ce028f626dd680d78971ea22400b0bc662a5",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-29",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/29/events.jsonl",
+      "bytes": 24632,
+      "sha256": "ee25a74392698225274ec0b710bc80d3b2fd2cc57657b162b400ef0928ffe645",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-30",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/30/events.jsonl",
+      "bytes": 14480,
+      "sha256": "2ca9010248d916b0667194d1bb254a6ccea9340c01da27eb85d2c0260e5ed9e5",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-31",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/31/events.jsonl",
+      "bytes": 3928,
+      "sha256": "e6341b550446de49acc6a2d20c2210376a21340dbdc241e8133793f6f06df461",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-32",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/32/events.jsonl",
+      "bytes": 3917,
+      "sha256": "61641afa4e654b9f066562e87dbc73c941e6d2feb563ac111439ab02cafe8be2",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-33",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/33/events.jsonl",
+      "bytes": 4362,
+      "sha256": "b098888e78e8de15727b13dbfe81f894e4eecdacdeae98f5902e5400d134a2c2",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-34",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/34/events.jsonl",
+      "bytes": 4603,
+      "sha256": "144fc97aaabb2a181c2cfb2fcbc4629a098c88d8f062d4b628758729b8b4b0e1",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-35",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/35/events.jsonl",
+      "bytes": 15448,
+      "sha256": "80876731bee4417bd7f2a14d7f71c2f983112515cb1fdb0e17b538699c113f0b",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-36",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/36/events.jsonl",
+      "bytes": 33628,
+      "sha256": "f8ebe76b13d4527aeb85ac162780a9c71a707467311d80fb854552cbf876a570",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-37",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/37/events.jsonl",
+      "bytes": 2556,
+      "sha256": "1a90d5d9b1e85b79442a4d0e728ecba3a2d865268ad4a00894ea8dded5c78f61",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-38",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/38/events.jsonl",
+      "bytes": 24908,
+      "sha256": "0d64f8bb9d1bd7762dead4032b4b604077d9065622899eda3895249c470fdb18",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-39",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/39/events.jsonl",
+      "bytes": 18246,
+      "sha256": "19ba43b52900b58825ffd718529c6b15da0f25e1b4b97d20255fff898917eccd",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-40",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/40/events.jsonl",
+      "bytes": 210229,
+      "sha256": "f800b5de34ae81b195d695fe0dbf32cd574af93c91308bb61f196985f7337ed7",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-41",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/41/events.jsonl",
+      "bytes": 34069,
+      "sha256": "a2b4b65481cb330fe01951edb24a1489631b96815919a9b6abab77e81e403e81",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-42",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/42/events.jsonl",
+      "bytes": 13175,
+      "sha256": "73b2bd67c092438fffada697c2bddec9debd957b251c3e2b82266aa158e607c2",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-43",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/43/events.jsonl",
+      "bytes": 21277,
+      "sha256": "b0046a33ed7cfb81470e4568d13f006f6606b837abb874fd429287db27e298cf",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-44",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/44/events.jsonl",
+      "bytes": 14959,
+      "sha256": "022277ee88b481d70bd0001c925400a7200529e67b8cf7d7c52162e12a73ede1",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-45",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/45/events.jsonl",
+      "bytes": 12989,
+      "sha256": "e76e9767d54ec747ed845d10f5c3bd3ab86d91b956976fa5e764e135da7498db",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-46",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/46/events.jsonl",
+      "bytes": 17903,
+      "sha256": "24e702a27990ef1d22a8e6daa954f3f02c17d9e57e142f8174194f7b0f0e4873",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-47",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/47/events.jsonl",
+      "bytes": 18429,
+      "sha256": "861fa5aa52175c2ce128dc35fbc0cd67d54ce778f8d75561fc2e881e39b10710",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    },
+    {
+      "id": "ab-events-48",
+      "path": "E:/test/mcp-device-v12-e2e-20261024-g6/token-ab-v1e-final/runs/48/events.jsonl",
+      "bytes": 14630,
+      "sha256": "e8ebed1ae4817a0f1027002e1031274dab59736eec84c6af3151d8413347e630",
+      "classification": "HISTORICAL_RAW_PROVIDER_EVENTS",
+      "scope": "Hash only; no bodies copied, telemetry not recomputed",
+      "expectedSha256": null
+    }
+  ]
+}

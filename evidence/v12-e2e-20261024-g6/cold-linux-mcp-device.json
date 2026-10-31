@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "product": "mcp-device",
+  "startedAt": "2026-10-24T10:58:15.200Z",
+  "host": "DESKTOP-B5E4IUE",
+  "platform": "linux",
+  "node": "v22.21.0",
+  "artifact": "/mnt/e/test/mcp-device-v12-e2e-20261024-g6/artifacts/hcu-lab.me-mcp-device-1.0.12.tgz",
+  "artifactSha256": "c79440a2d2636365486ebc9a43f6a38b2e25cbe6785ded6969123855f3c09206",
+  "work": "/tmp/mcp-device-v12-e2e-20261024-g6/cold-device",
+  "checks": [
+    {
+      "name": "npm-install",
+      "passed": true,
+      "args": [
+        "install",
+        "--omit=dev",
+        "--no-audit",
+        "--no-fund",
+        "--save-exact",
+        "/mnt/e/test/mcp-device-v12-e2e-20261024-g6/artifacts/hcu-lab.me-mcp-device-1.0.12.tgz"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 48750.058493,
+      "stdout": "/tmp/mcp-device-v12-e2e-20261024-g6/cold-device/npm-install.stdout.log",
+      "stdoutSha256": "5db406a3571e5ce238396d7bb21356eaf68d34076eeb7af979ab1639368e4969",
+      "stderr": "/tmp/mcp-device-v12-e2e-20261024-g6/cold-device/npm-install.stderr.log",
+      "stderrSha256": "dfb442c2bed25264d8715eef8aba3cd720d12ebf8fbd53cb1b5b3afd0c3140dc"
+    },
+    {
+      "name": "package-identity",
+      "passed": true
+    },
+    {
+      "name": "palace-bin",
+      "args": [
+        "--help"
+      ],
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "palace [--data-root DIR|--runtime-dir DIR] status|search QUERY|read ID|skills [--project-id ID] [--limit N] [--max-bytes N] [--include-candidates] [--full]\n",
+      "stderr": "(node:1845) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+    },
+    {
+      "name": "actual-installed-cli-help",
+      "passed": true
+    },
+    {
+      "name": "skill-asset",
+      "passed": true
+    },
+    {
+      "name": "default-skill-installation",
+      "passed": true
+    },
+    {
+      "name": "palace-bin",
+      "args": [
+        "--data-root",
+        "/tmp/mcp-device-v12-e2e-20261024-g6/cold-device/fixture-data",
+        "status"
+      ],
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "{\"ok\":true,\"plugin\":\"palace\",\"mode\":\"read-only\",\"dataRoot\":\"/tmp/mcp-device-v12-e2e-20261024-g6/cold-device/fixture-data\",\"totals\":{\"cards\":1,\"evidence\":1,\"versions\":1},\"counts\":[{\"kind\":\"observation\",\"status\":\"hypothesis\",\"count\":1}]}\n",
+      "stderr": "(node:1852) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+    },
+    {
+      "name": "live-read-only-status",
+      "passed": true
+    },
+    {
+      "name": "palace-bin",
+      "args": [
+        "--data-root",
+        "/tmp/mcp-device-v12-e2e-20261024-g6/cold-device/fixture-data",
+        "search",
+        "COLD_PALACE_MARKER",
+        "--limit",
+        "1"
+      ],
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "{\"ok\":true,\"plugin\":\"palace\",\"mode\":\"read-only\",\"query\":\"COLD_PALACE_MARKER\",\"items\":[{\"id\":\"k:37dcd763fcc1e4f1c801733cf88f9a15061d39f974d960cc96f1c75abbae8e41\",\"read_ref\":\"k:37dcd763fcc1e4f1c801733cf88f9a15061d39f974d960cc96f1c75abbae8e41\",\"version\":1,\"contentHash\":\"da47d91fd42420b4baf566385f8994c57d64101cc0d57bb364730d212b9672e4\",\"summary\":\"Source claim: Error COLD_PALACE_MARKER: preserve source identity through package installation.\",\"status\":\"hypothesis\",\"originDeviceId\":\"cold-mcp-device-fixture\",\"servingDeviceId\":\"cold-mcp-device-fixture\",\"scope\":{\"visibility\":\"account\"},\"evidenceCount\":1,\"updatedAt\":1792839544280,\"lastVerifiedAt\":1792839544280}],\"returned\":1,\"candidates\":1,\"note\":\"Snapshot results; evidence bytes not reverified by read-only CLI\"}\n",
+      "stderr": "(node:1859) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+    },
+    {
+      "name": "live-search",
+      "passed": true
+    },
+    {
+      "name": "palace-bin",
+      "args": [
+        "--data-root",
+        "/tmp/mcp-device-v12-e2e-20261024-g6/cold-device/fixture-data",
+        "read",
+        "k:37dcd763fcc1e4f1c801733cf88f9a15061d39f974d960cc96f1c75abbae8e41"
+      ],
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "{\"ok\":true,\"plugin\":\"palace\",\"mode\":\"read-only\",\"kind\":\"observation\",\"card\":{\"id\":\"k:37dcd763fcc1e4f1c801733cf88f9a15061d39f974d960cc96f1c75abbae8e41\",\"version\":1,\"contentHash\":\"da47d91fd42420b4baf566385f8994c57d64101cc0d57bb364730d212b9672e4\",\"summary\":\"Source claim: Error COLD_PALACE_MARKER: preserve source identity through package installation.\",\"body\":\"Error COLD_PALACE_MARKER: preserve source identity through package installation.\",\"status\":\"hypothesis\",\"originDeviceId\":\"cold-mcp-device-fixture\",\"servingDeviceId\":\"cold-mcp-device-fixture\",\"scope\":{\"visibility\":\"account\"},\"evidence\":[{\"id\":\"ev:ac1012e40e42c4c1f8fbbfcde5b0c424db8f8db7c0006561be41d2be4874890a\",\"originDeviceId\":\"cold-mcp-device-fixture\",\"sourceId\":\"source:07a0c19d07c24255b59597a99f0d05f42ce3af7900893cf0b808ecef1f6bb8eb\",\"sourceRef\":\"7dace6fecdc5c5931ee366b5e2999055cad752b5003c87cb\",\"recordHash\":\"b098f7f375438dcbe12e4cf63e647227c167b96b084ee39c8fda402692c2f7b6\",\"kind\":\"source_trace\",\"sourceAvailable\":true,\"observedAt\":1792839544279}],\"derivedFrom\":[],\"provenance\":[\"cold-mcp-device-fixture\"],\"updatedAt\":1792839544280,\"lastVerifiedAt\":1792839544280},\"evidenceVerifiedNow\":false,\"note\":\"Source integrity must be verified separately before treating this card as an established fact.\"}\n",
+      "stderr": "(node:1866) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+    },
+    {
+      "name": "honest-snapshot-evidence",
+      "passed": true
+    },
+    {
+      "name": "canonical-source-byte-verification",
+      "passed": true
+    },
+    {
+      "name": "palace-bin",
+      "args": [
+        "--data-root",
+        "/tmp/mcp-device-v12-e2e-20261024-g6/cold-device/fixture-data",
+        "status"
+      ],
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "{\"ok\":true,\"plugin\":\"palace\",\"mode\":\"read-only\",\"dataRoot\":\"/tmp/mcp-device-v12-e2e-20261024-g6/cold-device/fixture-data\",\"totals\":{\"cards\":1,\"evidence\":1,\"versions\":1},\"counts\":[{\"kind\":\"observation\",\"status\":\"hypothesis\",\"count\":1}]}\n",
+      "stderr": "(node:1873) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+    },
+    {
+      "name": "persisted-cli-after-writer-stops",
+      "passed": true
+    },
+    {
+      "name": "dependency-tree",
+      "passed": true,
+      "args": [
+        "ls",
+        "--omit=dev",
+        "--json"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 884.8567600000024,
+      "stdout": "/tmp/mcp-device-v12-e2e-20261024-g6/cold-device/dependency-tree.stdout.log",
+      "stdoutSha256": "f1cc8cbe6449b78f314ed8742a09f2c782a82b2865de32f79fa1d69038e2fe2d",
+      "stderr": "/tmp/mcp-device-v12-e2e-20261024-g6/cold-device/dependency-tree.stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "packageRoot": "/tmp/mcp-device-v12-e2e-20261024-g6/cold-device/node_modules/@hcu-lab.me/mcp-device",
+  "version": "1.0.12",
+  "skillDiscoveryFiles": [
+    {
+      "path": "/tmp/mcp-device-v12-e2e-20261024-g6/cold-device/agent-home/.agents/skills/palace-cli/SKILL.md",
+      "exists": true
+    },
+    {
+      "path": "/tmp/mcp-device-v12-e2e-20261024-g6/cold-device/agent-home/.pi/agent/skills/palace-cli/SKILL.md",
+      "exists": true
+    }
+  ],
+  "status": "PASS",
+  "endedAt": "2026-10-24T10:59:05.510Z"
+}

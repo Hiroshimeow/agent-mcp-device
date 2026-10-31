@@ -1,0 +1,50 @@
+[
+  {
+    "path": "src/platform/plugin-host.ts",
+    "priorSha256": "dac542586332b502dd8402b5ec1f9d31ee05b751d6550b65ce10ae70a4d8f83b",
+    "currentSha256": "dac542586332b502dd8402b5ec1f9d31ee05b751d6550b65ce10ae70a4d8f83b",
+    "unchanged": true
+  },
+  {
+    "path": "src/plugins/palace/cli.ts",
+    "priorSha256": "86c04cf593219cf0d1479e33ba976da35d69fc39defc629f452b9d97f486b1fc",
+    "currentSha256": "86c04cf593219cf0d1479e33ba976da35d69fc39defc629f452b9d97f486b1fc",
+    "unchanged": true
+  },
+  {
+    "path": "docs/v12-platform.md",
+    "priorSha256": "0b1b3ea41f8bbb280ed11d3c3cb3428a437518b9c502a887fbd8a6079ec981f6",
+    "currentSha256": "0b1b3ea41f8bbb280ed11d3c3cb3428a437518b9c502a887fbd8a6079ec981f6",
+    "unchanged": true
+  },
+  {
+    "path": "test/v12/d1-closure-regressions.test.mjs",
+    "priorSha256": "fc1da7b9fae88266efb88464e1a292155e1fb196ba5bb910d98db928eb8f4225",
+    "currentSha256": "fc1da7b9fae88266efb88464e1a292155e1fb196ba5bb910d98db928eb8f4225",
+    "unchanged": true
+  },
+  {
+    "path": "test/v12/d1-opus-round2-regressions.test.mjs",
+    "priorSha256": "a15d94414b6951aee69654fe750787f8d5017f0010f7aacf7104f1f41c3acd66",
+    "currentSha256": "0f520464c4fdf1d7c9f3699f640a51eb354095e21474e792a423f72269f4e2bb",
+    "unchanged": false
+  },
+  {
+    "path": "test/v12/palace-wal-recovery.test.mjs",
+    "priorSha256": "e8da292a42df71b7c3f04d3c25f2c04ee2fbd0add330bfd1934e38df95334461",
+    "currentSha256": "e8da292a42df71b7c3f04d3c25f2c04ee2fbd0add330bfd1934e38df95334461",
+    "unchanged": true
+  },
+  {
+    "path": "test/v12/device-cold-local.test.mjs",
+    "priorSha256": "af42925754e611d45f755380f18d2f9b79e3fcabd5cc4cfe0eda7686468f2f03",
+    "currentSha256": "af42925754e611d45f755380f18d2f9b79e3fcabd5cc4cfe0eda7686468f2f03",
+    "unchanged": true
+  },
+  {
+    "path": "test/v12/plugin-services.test.js",
+    "priorSha256": "a59045166ce2ed20ba70cd756bc97cb65cd20ce92b77d6cb102e6b341149ef39",
+    "currentSha256": "a59045166ce2ed20ba70cd756bc97cb65cd20ce92b77d6cb102e6b341149ef39",
+    "unchanged": true
+  }
+]

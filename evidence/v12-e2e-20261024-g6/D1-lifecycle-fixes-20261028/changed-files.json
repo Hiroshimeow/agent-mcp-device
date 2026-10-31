@@ -1,0 +1,22 @@
+[
+  {
+    "path": "src/platform/plugin-host.ts",
+    "bytes": 40724,
+    "sha256": "20386c60d53353e298391add540705f44165e5dde18f701e1a0e5569e25e07da"
+  },
+  {
+    "path": "src/platform/plugin-driver.ts",
+    "bytes": 20463,
+    "sha256": "82dc6d58f2fad5cccbad19880a65a6c9c2d68ea672a3717625af784f34971b4e"
+  },
+  {
+    "path": "test/v12/d1-lifecycle-persistence.test.mjs",
+    "bytes": 4829,
+    "sha256": "305b758a9b208080226023057ac3ab14b25e4f6bd51c261606d3c6cae2bb012e"
+  },
+  {
+    "path": "test/v12/d1-cancelled-fault.test.mjs",
+    "bytes": 2213,
+    "sha256": "64fe6e0e0898744f34003f7beca8d5b7b2871b3a8d4cbc9fca010bd14ac8b91b"
+  }
+]

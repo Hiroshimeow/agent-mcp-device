@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "label": "cold-palace-windows",
+  "cwd": "E:/git-project/agent-mcp-device-v12",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "evidence/v12-e2e-20261024-g6/cold-install.mjs",
+    "palace",
+    "E:/test/mcp-device-v12-e2e-20261024-g6/artifacts/hcu-lab.me-palace-1.0.12.tgz",
+    "E:/test/mcp-device-v12-e2e-20261024-g6/windows/cold-palace",
+    "E:/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6"
+  ],
+  "startedAt": "2026-10-24T10:55:30.999Z",
+  "endedAt": "2026-10-24T10:55:36.354Z",
+  "durationMs": 5352.8892000000005,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 0,
+  "signal": null,
+  "counts": {},
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\cold-palace-windows.stdout.log",
+    "sha256": "9a26ea3e27d0cbc2ead1e535de71d388a09a6ee7ceb9c765386155ff0711085c"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\cold-palace-windows.stderr.log",
+    "sha256": "4d4834ca670ab44ba16395d9a5496faa259deee547068d42a23cdd7364836c91"
+  }
+}

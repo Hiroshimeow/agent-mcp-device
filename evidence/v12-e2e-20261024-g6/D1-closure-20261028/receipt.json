@@ -1,0 +1,47 @@
+{
+  "recordedAt": "2026-10-28T00:57:52.0681524+09:00",
+  "verdict": "RELEASE_BLOCKED_WITH_EVIDENCE",
+  "d1": "AMEND",
+  "mf6Performance": "FAIL",
+  "repo": "E:/git-project/agent-mcp-device-v12",
+  "head": "18407ec562c4f2cc11ca3e8c1f69f362ee3f86c0",
+  "branch": "feat/v12-platform-20261022",
+  "node": "v22.22.2",
+  "sourceManifestSha256": "4ecfc0343e767ac34651de7d06fb68e09a16e3720e854348febdfce8429701b2",
+  "sourceSnapshot": "E:/git-project/agent-mcp-device-v12/.tmp/d1-resume-20261028-0040/source-snapshot.zip",
+  "sourceSnapshotSha256": "dbd5579efe6d427e87cf2087763ceb9d09e01ad078c2f07aedcdf92aa72c044a",
+  "sourceFiles": 263,
+  "sourceHashMismatches": 0,
+  "testMirrorMismatches": 0,
+  "compileExit": 0,
+  "functional": {
+    "pass": 82,
+    "fail": 0,
+    "skip": 1
+  },
+  "nonperformance": {
+    "pass": 22,
+    "fail": 0,
+    "skip": 1,
+    "acceptanceBenchmarkDeselected": true
+  },
+  "retainedBenchmark": {
+    "normalP95Ms": 362.1103,
+    "rerunAfterDiagnostic": false,
+    "marginalP95Ms": 30.1605,
+    "samplesPerArm": 200,
+    "thresholdMs": 20,
+    "skipP95Ms": 331.9498
+  },
+  "defenderGuard": {
+    "tests": 3,
+    "redExit": 1,
+    "exclusions": "UNKNOWN",
+    "greenExit": 0,
+    "livePreconditionPass": true
+  },
+  "newM365Submission": false,
+  "newCandidateBuild": false,
+  "newABExecution": false,
+  "productionChange": false
+}

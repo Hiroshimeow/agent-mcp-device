@@ -1,0 +1,658 @@
+[
+  {
+    "target": "baseline",
+    "test": "test/test-file-handlers.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-6b5105876d33\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-6b5105876d33.stdout.log",
+    "sha256": "e8ce92e8ef2f0961eaef557aa03cbdfaeef69314310328944f882d0312bec082"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-file-handlers.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-6b5105876d33\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-6b5105876d33.stderr.log",
+    "sha256": "94d20da4d1faf6cd8b2220a9d32183a15cc0e85f059b4369c7b5229c1781d5d4"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-negative-offset-readfile.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-3806c2eb11a2\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-3806c2eb11a2.stdout.log",
+    "sha256": "6f7954b1ffe468fbe6d5ec55715a3d57dc75cf285c9f098d5ff8bf15c9de189c"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-negative-offset-readfile.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-3806c2eb11a2\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-3806c2eb11a2.stderr.log",
+    "sha256": "30aeebd4231b19efc0c834f430cb7ccf7b5d0d7125a1047d8bbbb30fc1e5204d"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-line-count.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-2a0cce3cf958\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-2a0cce3cf958.stdout.log",
+    "sha256": "ed7a11f797dd64a213dc4560a4a71e246c34a4667f6b18148fd57f01a90ecd83"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-line-count.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-2a0cce3cf958\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-2a0cce3cf958.stderr.log",
+    "sha256": "de830c4f76017dc11f95c667bba57caae8fb2f06a6077ce07f4c9b1918c4aafe"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-directory-creation.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-09b0942866fb\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-09b0942866fb.stdout.log",
+    "sha256": "c541d691768982b6bf281261bed9bd3a952e5427f33c2c05249827aeaf815a9a"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-directory-creation.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-09b0942866fb\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-09b0942866fb.stderr.log",
+    "sha256": "bd76a48ce17e133e3b0fb9daa59ba2c8921337e42e0f79d08c9a5813b37e3a37"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-edit-block-occurrences.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-94fac10cf566\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-94fac10cf566.stdout.log",
+    "sha256": "fcff0ca656850ab4d9523d29c96387afa6850cbc9a21947857320660c1abd320"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-edit-block-occurrences.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-94fac10cf566\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-94fac10cf566.stderr.log",
+    "sha256": "0ca62b0590cb377fbdbfa85246395879b3650d8988a6f03144489dad2b4a37ee"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-edit-block-line-endings.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-a931557826b3\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-a931557826b3.stdout.log",
+    "sha256": "569e21411797da2e8a80d1aa6c1d21b2b53fde5cfdff0df8cf497e684aefee08"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-edit-block-line-endings.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-a931557826b3\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-a931557826b3.stderr.log",
+    "sha256": "a3e15fc63221e0a0f8ed60b6b00b127e05175a71cbe7e9fb7884abce6c7e066a"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-excel-files.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-71aa6bc6a172\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-71aa6bc6a172.stdout.log",
+    "sha256": "a3855278ff424d4dbceeb1a382ecbf32ab55c7a76f0d017174bc25269e8962e1"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-excel-files.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-71aa6bc6a172\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-71aa6bc6a172.stderr.log",
+    "sha256": "df68bc55186fc6c3143f8fc2729756ee80f317e67bcf34435f5e3cf9828f7787"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-search-code.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-fdb6580420a2\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-fdb6580420a2.stdout.log",
+    "sha256": "80449aaac221b9a545930a8bd5f66799f0cb575c7046dd48046efc0eb810362b"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-search-code.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-fdb6580420a2\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-fdb6580420a2.stderr.log",
+    "sha256": "ae724a7a0fede709f7de28d102b3a27557f6e50fdf1448e4c80a9d8eab751454"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-search-code-edge-cases.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-ba0f62f93f34\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-ba0f62f93f34.stdout.log",
+    "sha256": "327b45c583ed2a572a7c55ca8fa3621d95cad38389b5f84bf7da2f4b90d52e5c"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-search-code-edge-cases.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-ba0f62f93f34\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-ba0f62f93f34.stderr.log",
+    "sha256": "cc757c3428cb05a78443f2b55196b3289532f61617c48d1eb2037b3908aac94e"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-literal-search.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-b1f3bff68920\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-b1f3bff68920.stdout.log",
+    "sha256": "4c2e9850faf85d4346f497dec3e481495601bf91d661e402d9b85e316c8350b8"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-literal-search.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-b1f3bff68920\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-b1f3bff68920.stderr.log",
+    "sha256": "f7288b4711cbc5722aeea8283c67b9e4bd87eadc4e89f99eada1be28c018c470"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-process-pagination.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-5f4fa6afec88\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-5f4fa6afec88.stdout.log",
+    "sha256": "437cd1ed084842f21e27f389a6cc5f406105b9b4d63290496c24b588c3863dff"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-process-pagination.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-5f4fa6afec88\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-5f4fa6afec88.stderr.log",
+    "sha256": "0d93615593cf1e7a3d6d0b85fc5784c9defcfe06b33b327e828453b421e42b3f"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-read-completed-process.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-a01f5aefb4f7\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-a01f5aefb4f7.stdout.log",
+    "sha256": "77c00a551eb0e39e54571a5de63a0f767318a79b309081d1d53b541afc7806f2"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-read-completed-process.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-a01f5aefb4f7\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-a01f5aefb4f7.stderr.log",
+    "sha256": "23a6df4a96c9429076ddc12b9ea2750e12b96b35e2b86ba3aee2203d4957b584"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-pid-collision-guard.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-14304a152346\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-14304a152346.stdout.log",
+    "sha256": "1fbff529759b17aea273204c7f0a81eacdc85d2ecb48205b1bb31f3d02dc93e3"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-pid-collision-guard.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-14304a152346\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-14304a152346.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-allowed-directories.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-e2300fd9438a\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-e2300fd9438a.stdout.log",
+    "sha256": "3c518cec9fa2a98674d644a1ddeb2324e725471a34de1a742d3210e9226376a0"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-allowed-directories.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-e2300fd9438a\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-e2300fd9438a.stderr.log",
+    "sha256": "fd10cc0326aa35756f229008167aaa4107ada66c2fe3b660772e77472ccaf09a"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-symlink-security.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-a2bd16570c96\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-a2bd16570c96.stdout.log",
+    "sha256": "d1da2b14abc3f1146d64102b18a7af823e71d9ead82925f2704c4b880135c4a9"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-symlink-security.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-a2bd16570c96\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-a2bd16570c96.stderr.log",
+    "sha256": "379f090fedc094b36d7c7f0c32465225aa2ebbb233f87d077c52e95a8645ce8a"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-error-sanitization.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-ccae5a052160\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-ccae5a052160.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-error-sanitization.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-ccae5a052160\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-ccae5a052160.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-green-hardening.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-2fac774b9c65\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-2fac774b9c65.stdout.log",
+    "sha256": "f21294c8571bfca74ecdc4d4287543d1cddf2d81f67e8fbc0924c4bb6eb64baa"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-green-hardening.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-2fac774b9c65\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-2fac774b9c65.stderr.log",
+    "sha256": "2bd680bee7246097dd3263606d36ca0f01191ec4f1acbdac48aa1ef18b4ce66e"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-nonblocking-config-save.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-ceb291d82a5a\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-ceb291d82a5a.stdout.log",
+    "sha256": "7fec215f6b489c4c82c14d534fc22fa2319af7515b14b8766ddc2a72fed8154d"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-nonblocking-config-save.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-ceb291d82a5a\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-ceb291d82a5a.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-local-feature-flags.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-24b74cb56748\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-24b74cb56748.stdout.log",
+    "sha256": "303718ec0dece4fe0669bca00d2171325c9b161d3c1bd334e4344539ad11dae0"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-local-feature-flags.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-24b74cb56748\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-24b74cb56748.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-remote-startup-no-child.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-8ed0a3c541af\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-8ed0a3c541af.stdout.log",
+    "sha256": "ef8cd14c44e65600d9dba6b44a63bd7e91a9e77e49ad9086030f1174f4cff11d"
+  },
+  {
+    "target": "baseline",
+    "test": "test/test-remote-startup-no-child.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-8ed0a3c541af\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\b-8ed0a3c541af.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-file-handlers.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-6b5105876d33\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-6b5105876d33.stdout.log",
+    "sha256": "34d6361396aabed94c14a1abe458c7401b928203ce3976174fef777dad6c1b7c"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-file-handlers.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-6b5105876d33\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-6b5105876d33.stderr.log",
+    "sha256": "0254f82a13cba5b87a059c548d75f4cc3111c2a746a0a6043b59b8fa4db971ba"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-negative-offset-readfile.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-3806c2eb11a2\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-3806c2eb11a2.stdout.log",
+    "sha256": "fabd5586b2759fae2841673ab95fe0dcae6ade1ac33af7516c386236cf7af264"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-negative-offset-readfile.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-3806c2eb11a2\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-3806c2eb11a2.stderr.log",
+    "sha256": "9d134471edafcebe723b22da7a6e7d117e296a8c6982bfa22b638ede0d60eecc"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-line-count.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-2a0cce3cf958\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-2a0cce3cf958.stdout.log",
+    "sha256": "ed7a11f797dd64a213dc4560a4a71e246c34a4667f6b18148fd57f01a90ecd83"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-line-count.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-2a0cce3cf958\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-2a0cce3cf958.stderr.log",
+    "sha256": "360032a14e6016a946b8c260f663df3ed0117aa55353b279dd18c626cc8e4630"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-directory-creation.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-09b0942866fb\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-09b0942866fb.stdout.log",
+    "sha256": "3184718e1ee3e32211628a3168c539cecba976a678020371b0140a2d6c4caefc"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-directory-creation.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-09b0942866fb\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-09b0942866fb.stderr.log",
+    "sha256": "e9c5228bab5edfccce0b1fd89769cedf8bdadfeb17342b2083d69f49b6d6451b"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-edit-block-occurrences.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-94fac10cf566\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-94fac10cf566.stdout.log",
+    "sha256": "fcff0ca656850ab4d9523d29c96387afa6850cbc9a21947857320660c1abd320"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-edit-block-occurrences.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-94fac10cf566\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-94fac10cf566.stderr.log",
+    "sha256": "b78407fe224ada5549c3b05f635c502e04f5756a4ad0442ff7cbddb7181ce1a0"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-edit-block-line-endings.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-a931557826b3\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-a931557826b3.stdout.log",
+    "sha256": "41775edfcbfad85e5e316016e3d623eb0d48a4097dc59519864b9efe3c14ee3c"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-edit-block-line-endings.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-a931557826b3\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-a931557826b3.stderr.log",
+    "sha256": "fa8de2aae83bc6d66b5f0a8dd42dd7e8f2d3f2629ea6040b21a3d1d6d981523c"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-excel-files.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-71aa6bc6a172\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-71aa6bc6a172.stdout.log",
+    "sha256": "fa7419069f16c719598578a6bd0f86fb3a9938a0c0b22cc2eccf5de111e19112"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-excel-files.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-71aa6bc6a172\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-71aa6bc6a172.stderr.log",
+    "sha256": "f6b5b8e36fb6c3590f66f7436c3405bfc6a20e32d9472c59d16e372c9029cbf1"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-search-code.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-fdb6580420a2\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-fdb6580420a2.stdout.log",
+    "sha256": "80449aaac221b9a545930a8bd5f66799f0cb575c7046dd48046efc0eb810362b"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-search-code.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-fdb6580420a2\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-fdb6580420a2.stderr.log",
+    "sha256": "d4ec3a32a7841112d8ec50030b7cafe9c1f5a9e59629764adc7d9747ca0481e6"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-search-code-edge-cases.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-ba0f62f93f34\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-ba0f62f93f34.stdout.log",
+    "sha256": "ac41eedf375be86b655822138ceb88435fbf5cc9fcc56ec4ea42b8065fa78529"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-search-code-edge-cases.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-ba0f62f93f34\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-ba0f62f93f34.stderr.log",
+    "sha256": "85f225d4bbc9766d34a0152f6119cc644127aaf4e0265c2de04ad07ac167f60c"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-literal-search.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-b1f3bff68920\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-b1f3bff68920.stdout.log",
+    "sha256": "4c2e9850faf85d4346f497dec3e481495601bf91d661e402d9b85e316c8350b8"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-literal-search.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-b1f3bff68920\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-b1f3bff68920.stderr.log",
+    "sha256": "56ad825b8f21094298e13dc26885f2ed16f0a45524b4a2dfe8a8f0e788f9412a"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-process-pagination.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-5f4fa6afec88\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-5f4fa6afec88.stdout.log",
+    "sha256": "280f39d100343259374138647d421979302f49a2d7f8fb33e94da6b39bb45cb3"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-process-pagination.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-5f4fa6afec88\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-5f4fa6afec88.stderr.log",
+    "sha256": "33895412ee80b0484821efd425da97ea823cc846b72997c8b9f5326e72221b66"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-read-completed-process.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-a01f5aefb4f7\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-a01f5aefb4f7.stdout.log",
+    "sha256": "c4f8b41c1da9c8a244ed54ffab9d74be8026862ab870850dbe9f76ec6f4f7536"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-read-completed-process.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-a01f5aefb4f7\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-a01f5aefb4f7.stderr.log",
+    "sha256": "e1e070b6125488a0609932e907bdbd2576f0151339523af1326bfd13363afeba"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-pid-collision-guard.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-14304a152346\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-14304a152346.stdout.log",
+    "sha256": "1fbff529759b17aea273204c7f0a81eacdc85d2ecb48205b1bb31f3d02dc93e3"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-pid-collision-guard.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-14304a152346\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-14304a152346.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-allowed-directories.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-e2300fd9438a\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-e2300fd9438a.stdout.log",
+    "sha256": "e6dcf9ccfcd259a10e6f1e8474a330e6789cfdaf28e846e64a917bad155cb1e5"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-allowed-directories.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-e2300fd9438a\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-e2300fd9438a.stderr.log",
+    "sha256": "db3b6e20f18b9c5ea5ce1a77e197d051e7d19f87fec882b1b19e63b1ff96bf61"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-symlink-security.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-a2bd16570c96\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-a2bd16570c96.stdout.log",
+    "sha256": "d1da2b14abc3f1146d64102b18a7af823e71d9ead82925f2704c4b880135c4a9"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-symlink-security.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-a2bd16570c96\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-a2bd16570c96.stderr.log",
+    "sha256": "34d66a1e23f20d6e1cf91ecce0682d071cbd94f93feaadc236f38f32390cb375"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-error-sanitization.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-ccae5a052160\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-ccae5a052160.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-error-sanitization.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-ccae5a052160\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-ccae5a052160.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-green-hardening.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-2fac774b9c65\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-2fac774b9c65.stdout.log",
+    "sha256": "f21294c8571bfca74ecdc4d4287543d1cddf2d81f67e8fbc0924c4bb6eb64baa"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-green-hardening.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-2fac774b9c65\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-2fac774b9c65.stderr.log",
+    "sha256": "d712791d04af77077d12752dea0006f5607e1cdc5f33f98167c89dd4bbcd2dae"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-nonblocking-config-save.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-ceb291d82a5a\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-ceb291d82a5a.stdout.log",
+    "sha256": "cd49795789a74db6b5f4a0d13cd83fe040a5ff16aab0f57d5a2efda6c433ced4"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-nonblocking-config-save.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-ceb291d82a5a\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-ceb291d82a5a.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-local-feature-flags.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-24b74cb56748\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-24b74cb56748.stdout.log",
+    "sha256": "303718ec0dece4fe0669bca00d2171325c9b161d3c1bd334e4344539ad11dae0"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-local-feature-flags.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-24b74cb56748\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-24b74cb56748.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-remote-startup-no-child.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-8ed0a3c541af\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-8ed0a3c541af.stdout.log",
+    "sha256": "e27390c2b293df70e85b4a14a73b2250a749343e12846c99b5d707694e2bd515"
+  },
+  {
+    "target": "candidate",
+    "test": "test/test-remote-startup-no-child.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-8ed0a3c541af\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-8ed0a3c541af.stderr.log",
+    "sha256": "646a0cb55f8719bdfec14f393d3759c0beb07371260bfee76d201b0f581d6ae6"
+  },
+  {
+    "target": "comparator",
+    "test": "test/v12/device-core-parity.test.js",
+    "kind": "stdout",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-80fd8490d012\\stdout.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-80fd8490d012.stdout.log",
+    "sha256": "dc82b27d84f6f804faa1544f0cd8dcd0971195d8a9a18673fa7b31fb1fc8b4e5"
+  },
+  {
+    "target": "comparator",
+    "test": "test/v12/device-core-parity.test.js",
+    "kind": "stderr",
+    "source": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-80fd8490d012\\stderr.log",
+    "copy": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\parity-logs\\c-80fd8490d012.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

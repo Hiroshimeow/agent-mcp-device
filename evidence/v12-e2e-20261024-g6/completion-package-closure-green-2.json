@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "label": "package-closure-green-2",
+  "startedAt": "2026-10-24T23:26:01.999Z",
+  "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z",
+  "program": "node",
+  "argv": [
+    "--test",
+    "test/v12/palace-package-types.test.mjs"
+  ],
+  "pid": 15640,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "stdout": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\package-closure-green-2.stdout.log",
+  "stderr": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\completion-2026-10-24T23-18-37-628Z\\package-closure-green-2.stderr.log",
+  "state": "COMPLETED",
+  "endedAt": "2026-10-24T23:26:04.734Z",
+  "elapsedMs": 2735,
+  "exitCode": 0,
+  "signal": null,
+  "counts": {
+    "tests": 4,
+    "pass": 4,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "stdoutSha256": "46c606f39741df88421ae9a1bca81b240f97c2cb5e10d44654faf3ca1fc93f2f",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

@@ -1,0 +1,61 @@
+{
+  "authorization": "Current user autonomous sole source/test writer; no candidate rebuild until D1 PASS",
+  "head": "18407ec562c4f2cc11ca3e8c1f69f362ee3f86c0",
+  "branch": "feat/v12-platform-20261022",
+  "status": "COHERENT_SOURCE_MILESTONE_COMPLETE; D1_AMEND",
+  "mf6": {
+    "authoritativeMs": 30.1605,
+    "thresholdMs": 20,
+    "state": "FAIL",
+    "newMeasurementEligible": false
+  },
+  "tests": [
+    {
+      "stage": "initial red",
+      "log": "logs/red.log",
+      "exit": 1,
+      "pass": 0,
+      "fail": 3
+    },
+    {
+      "stage": "green",
+      "log": "logs/green.log",
+      "exit": 0,
+      "pass": 3,
+      "fail": 0
+    },
+    {
+      "stage": "foreign prefix red",
+      "log": "logs/red-foreign-prefix.log",
+      "exit": 1,
+      "pass": 2,
+      "fail": 1
+    },
+    {
+      "stage": "final focused",
+      "log": "logs/focused-final.log",
+      "exit": 0,
+      "pass": 13,
+      "fail": 0
+    },
+    {
+      "stage": "additional read functional with unintended performance sampling",
+      "log": "logs/read-functional-final.log",
+      "exit": 0,
+      "pass": 22,
+      "fail": 0,
+      "skip": 1,
+      "acceptance": "FUNCTIONAL_ONLY; PERFORMANCE_OBSERVATION_INELIGIBLE"
+    }
+  ],
+  "compile": {
+    "command": "node node_modules/typescript/bin/tsc -p tsconfig.json --outDir .tmp/d1-review-fixes-20261028/dist --listEmittedFiles false",
+    "exit": 0,
+    "log": "logs/tsc-final.log"
+  },
+  "diffCheckExit": 0,
+  "remaining": "See REVIEW-DISPOSITION.md and HANDOFF.md",
+  "manifest": "stable-source-manifest.json",
+  "scope": "prior263-file source manifest path set plus new regression; inherited WIP preserved; not full worktree/release/candidate",
+  "prohibitedActionsPerformed": []
+}

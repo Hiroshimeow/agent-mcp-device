@@ -1,0 +1,8 @@
+const fs=require('fs'),path=require('path'),crypto=require('crypto'),{spawnSync}=require('child_process'),assert=require('assert/strict');
+const root='E:/git-project/agent-mcp-device-v12',work='E:/test/mcp-device-v12-e2e-20261024-g6',evidence=path.join(root,'evidence/v12-e2e-20261024-g6'),target=path.join(work,'patch-verification');
+assert.equal(fs.existsSync(target),false);fs.mkdirSync(target);
+const before=JSON.parse(fs.readFileSync(path.join(evidence,'source-manifest-before.json'),'utf8')),check=JSON.parse(fs.readFileSync(path.join(evidence,'preservation-and-diff.json'),'utf8'));
+for(const file of check.changedSinceStart){const source=path.join(work,'baseline',file),expected=before.find(x=>x.path===file),bytes=fs.readFileSync(source);assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),expected.sha256,file);const dest=path.join(target,file);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.writeFileSync(dest,bytes,{flag:'wx'});}
+const r=spawnSync('git',['apply','--check','--whitespace=error',check.patch.path],{cwd:target,encoding:'utf8',windowsHide:true});
+const result={checkedAt:new Date().toISOString(),cwd:target,originalFiles:check.changedSinceStart,patch:check.patch.path,patchSha256:check.patch.sha256,exitCode:r.status,stdout:r.stdout,stderr:r.stderr,applied:false,status:r.status===0?'PASS':'FAIL',priorCheck:'The TDD baseline already held the new test files; the earlier check could not add them. This check uses their verified absent-before state.'};
+fs.writeFileSync(path.join(evidence,'patch-check.json'),JSON.stringify(result,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(result));process.exitCode=r.status??1;

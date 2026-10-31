@@ -1,0 +1,62 @@
+[
+  {
+    "name": "tsc-final",
+    "started": "2026-10-29T14:30:43.798Z",
+    "executable": "C:\\Program Files\\nodejs\\node.exe",
+    "args": [
+      "node_modules/typescript/bin/tsc",
+      "--outDir",
+      ".tmp/d1-remaining-20261029/dist",
+      "--listEmittedFiles",
+      "false",
+      "--diagnostics",
+      "false",
+      "--extendedDiagnostics",
+      "false"
+    ],
+    "cwd": "E:\\git-project\\agent-mcp-device-v12",
+    "timeout": 180000,
+    "exit": 0,
+    "signal": null,
+    "error": null
+  },
+  {
+    "name": "stage-final",
+    "started": "2026-10-29T14:30:58.710Z",
+    "executable": "C:\\Program Files\\nodejs\\node.exe",
+    "args": [
+      ".tmp/d1-remaining-20261029/stage-tests.cjs"
+    ],
+    "cwd": "E:\\git-project\\agent-mcp-device-v12",
+    "timeout": 180000,
+    "exit": 0,
+    "signal": null,
+    "error": null
+  },
+  {
+    "name": "functional-final",
+    "started": "2026-10-29T14:30:58.883Z",
+    "executable": "C:\\Program Files\\nodejs\\node.exe",
+    "args": [
+      "--test",
+      "--test-concurrency=1",
+      "--test-name-pattern=^(?:fault remediation|unrelated ENOENT|upgrade-required remediation|Skill guidance|quick probe canonicalizes|automatic Skill reconcile|explicit Skill install and forced|killed writer schema|crashed owned schema|read-only recovery fallback|process plugin faults persist|upgrade intent is visible|pending registry persistence|faulted dependency stays|missing-entry upgrade remediation|failed fault persistence|failed activation save|unpersisted startup fault|POSIX registry rename|interrupted first WAL|active read inspection|explicit archive reads|cancel acknowledgement|old incomplete plugin registry|plugin registry repair|wrong-schema WAL|non-empty SQLite|Device bundled Palace uninstall|real PluginHost lifecycle|an alias to a managed|a separately copied archive|metadata probes do not hash|an aged or abandoned lock|a recent active installer|explicit prune deletes|abandon-pending records|full status diagnoses|D1 B1|D1 B2|D1 B3|D1 M1|D1 M2|D1 M4|D1 B4|a legacy owned copy|an unchanged legacy copy)",
+      "test/v12/d1-remaining-regressions.test.mjs",
+      "test/v12/palace-wal-recovery.test.mjs",
+      "test/v12/d1-opus-round2-regressions.test.mjs",
+      "test/v12/d1-closure-regressions.test.mjs",
+      "test/v12/d1-read-init-regressions.test.mjs",
+      "test/v12/d1-lifecycle-persistence.test.mjs",
+      "test/v12/d1-opus-regressions.test.mjs",
+      "test/v12/palace-managed-data-root.test.mjs",
+      "test/v12/palace-skill-probe.test.mjs",
+      "test/v12/palace-skill-review2.test.mjs",
+      "test/v12/palace-skill-preservation.test.mjs"
+    ],
+    "cwd": "E:\\git-project\\agent-mcp-device-v12\\.tmp\\d1-remaining-20261029",
+    "timeout": 180000,
+    "exit": 1,
+    "signal": null,
+    "error": null
+  }
+]

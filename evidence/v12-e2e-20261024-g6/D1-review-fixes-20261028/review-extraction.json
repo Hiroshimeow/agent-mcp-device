@@ -1,0 +1,11 @@
+{
+  "source": "C:/Users/admin/AppData/Local/Temp/acp-delegate/del_mvqvpu3w_1qdu.session.jsonl",
+  "messageId": "4364116c",
+  "timestamp": "2026-10-27T16:36:54.483Z",
+  "wrapperRemoved": "[Reading 150 lines from start (total: 150 lines, 0 remaining)]\n\n",
+  "bytes": 13882,
+  "sha256": "5043be6f052e26f46448152d3b836b2a819e0173863c4e4019f188999febb794",
+  "remoteReportedBytes": 13883,
+  "remoteReportedSha256": "e901a780bb44e8f345c81a78edaee3fe37af712bb38178d9b971defceb2eafd8",
+  "limitation": "Exact UTF-8 encoding of decoded device tool response text, wrapper removed; not verified byte-for-byte copy of remote response.md."
+}

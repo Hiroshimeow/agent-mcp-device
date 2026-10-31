@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "label": "release-contracts-final",
+  "cwd": "E:/test/mcp-device-v12-e2e-20261024-g6/candidate-three",
+  "command": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "--test",
+    "--test-concurrency=1",
+    "test/test-canonical-release-cleanup.js",
+    "test/test-mcp-device-branding.js",
+    "test/test-version-consistency.js"
+  ],
+  "startedAt": "2026-10-24T11:09:26.512Z",
+  "endedAt": "2026-10-24T11:09:30.364Z",
+  "durationMs": 3849.5508,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 0,
+  "signal": null,
+  "counts": {
+    "tests": 3,
+    "pass": 3,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\release-contracts-final.stdout.log",
+    "sha256": "b300f7f9d55287d4ddc6e1e3fa38ea2e8c06eef7c200a9df2f2ced8d76aff20b"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\release-contracts-final.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

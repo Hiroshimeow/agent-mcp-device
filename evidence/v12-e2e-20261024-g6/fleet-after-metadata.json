@@ -1,0 +1,184 @@
+{
+  "schemaVersion": 1,
+  "observedVia": "md.list_devices",
+  "scope": "Inventory metadata only; all execution remained on G6",
+  "truncated": false,
+  "devices": [
+    {
+      "deviceId": "0c6a0797215e-6d2dae4e",
+      "name": "docker",
+      "host": "0c6a0797215e",
+      "os": "linux",
+      "arch": "x64",
+      "online": true,
+      "agentVersion": "1.0.11",
+      "connectionEpoch": 58,
+      "gatewayObservedAt": "2026-10-24T11:26:57.096Z",
+      "usage": {
+        "connections": 84317,
+        "reconnects": 84316,
+        "toolCallsStarted": 791,
+        "toolCallsSucceeded": 756,
+        "toolCallsFailed": 20,
+        "requestBytes": 657804,
+        "responseBytes": 2451330,
+        "lastSeenAt": 1792841217096,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "deviceId": "desktop-b5e4iue-87cea2af",
+      "name": "g6",
+      "host": "DESKTOP-B5E4IUE",
+      "os": "win32",
+      "arch": "x64",
+      "online": true,
+      "agentVersion": "1.0.11",
+      "connectionEpoch": 16,
+      "gatewayObservedAt": "2026-10-24T11:27:09.415Z",
+      "usage": {
+        "connections": 354,
+        "reconnects": 353,
+        "toolCallsStarted": 81648,
+        "toolCallsSucceeded": 78977,
+        "toolCallsFailed": 2625,
+        "requestBytes": 78766307,
+        "responseBytes": 384447624,
+        "lastSeenAt": 1792841229415,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "deviceId": "dl-boxii-92c0beaa",
+      "name": "a5",
+      "host": "DL-BoxII",
+      "os": "linux",
+      "arch": "x64",
+      "online": true,
+      "agentVersion": "1.0.11",
+      "connectionEpoch": 49,
+      "gatewayObservedAt": "2026-10-24T11:26:53.946Z",
+      "usage": {
+        "connections": 683,
+        "reconnects": 682,
+        "toolCallsStarted": 191,
+        "toolCallsSucceeded": 175,
+        "toolCallsFailed": 11,
+        "requestBytes": 147732,
+        "responseBytes": 558299,
+        "lastSeenAt": 1792841213946,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "deviceId": "hp450-79844b90",
+      "name": "g8",
+      "host": "HP450",
+      "os": "linux",
+      "arch": "x64",
+      "online": true,
+      "agentVersion": "1.0.11",
+      "connectionEpoch": 45,
+      "gatewayObservedAt": "2026-10-24T11:27:07.575Z",
+      "usage": {
+        "connections": 137499,
+        "reconnects": 137498,
+        "toolCallsStarted": 3794,
+        "toolCallsSucceeded": 3525,
+        "toolCallsFailed": 66,
+        "requestBytes": 3828637,
+        "responseBytes": 14061865,
+        "lastSeenAt": 1792841227575,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "deviceId": "lppduongnh66-1-7337f19f",
+      "name": "fjp",
+      "host": "LPP00374779A",
+      "os": "win32",
+      "arch": "x64",
+      "online": true,
+      "agentVersion": "1.0.10",
+      "connectionEpoch": 55,
+      "gatewayObservedAt": "2026-10-24T11:27:04.633Z",
+      "usage": {
+        "connections": 356,
+        "reconnects": 355,
+        "toolCallsStarted": 30174,
+        "toolCallsSucceeded": 29573,
+        "toolCallsFailed": 588,
+        "requestBytes": 35699024,
+        "responseBytes": 110520027,
+        "lastSeenAt": 1792841224634,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "deviceId": "univ2019-03-6d9cfff7",
+      "name": "r28-nspawn",
+      "host": "univ2019-03",
+      "os": "linux",
+      "arch": "x64",
+      "online": true,
+      "agentVersion": "1.0.10",
+      "connectionEpoch": 18,
+      "gatewayObservedAt": "2026-10-24T11:27:08.078Z",
+      "usage": {
+        "connections": 63121,
+        "reconnects": 63120,
+        "toolCallsStarted": 272,
+        "toolCallsSucceeded": 254,
+        "toolCallsFailed": 2,
+        "requestBytes": 223378,
+        "responseBytes": 452539,
+        "lastSeenAt": 1792841228078,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "deviceId": "univ2019-03-d1c55794",
+      "name": "r28",
+      "host": "univ2019-03",
+      "os": "linux",
+      "arch": "x64",
+      "online": true,
+      "agentVersion": "1.0.11",
+      "connectionEpoch": 54,
+      "gatewayObservedAt": "2026-10-24T11:27:02.880Z",
+      "usage": {
+        "connections": 313,
+        "reconnects": 312,
+        "toolCallsStarted": 253,
+        "toolCallsSucceeded": 235,
+        "toolCallsFailed": 16,
+        "requestBytes": 170972,
+        "responseBytes": 830196,
+        "lastSeenAt": 1792841222880,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "deviceId": "z0003210299-2de3addc",
+      "name": "z99",
+      "host": "z0003210299",
+      "os": "win32",
+      "arch": "x64",
+      "online": false,
+      "agentVersion": "1.0.10",
+      "connectionEpoch": 0,
+      "gatewayObservedAt": "1970-01-01T00:00:00.000Z",
+      "usage": {
+        "connections": 171,
+        "reconnects": 170,
+        "toolCallsStarted": 666,
+        "toolCallsSucceeded": 628,
+        "toolCallsFailed": 37,
+        "requestBytes": 586022,
+        "responseBytes": 2716771,
+        "lastSeenAt": 1792232789459,
+        "lastErrorCode": "TOOL_EXECUTION_FAILED"
+      }
+    }
+  ]
+}

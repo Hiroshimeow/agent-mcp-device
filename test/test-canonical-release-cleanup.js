@@ -111,6 +111,8 @@ const brandSurfaceFiles = [
 for (const rel of brandSurfaceFiles) {
   let content = read(rel);
   for (const literal of allowedIdentityLiterals) content = content.split(literal).join(' '.repeat(literal.length));
+  // Palace must recognize existing source-format directories without adopting their product branding.
+  if (rel === 'src/plugins/palace/sources.ts') content = content.split("'.claude'").join("'source-format'");
   const matches = content.match(forbiddenBrandPattern) || [];
   assert.deepEqual(matches, [], `${rel} exposes legacy/vendor branding: ${matches.join(', ')}`);
 }

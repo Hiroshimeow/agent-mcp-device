@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "status": "PASS",
+  "type": "real-Codex-native-Skill-E2E-current-artifact",
+  "recordedAt": "2026-10-25T07:38:46.624Z",
+  "model": "gpt-6.1-sol",
+  "sandbox": "danger-full-access isolated read-only fixture",
+  "artifactDeviceSha256": "cd20147d602e9b498d6a76e6847263908940f6ded04ef04ceb74b1b402ac1970",
+  "artifactPalaceSha256": "033df49857fe43f0158446a8afb9e336477a4d4d5014a37c064771b1fa3482dc",
+  "skillPath": "E:/test/mcp-device-v12-e2e-20261024-g6/final-cold-win-20261025/device-home/.agents/skills/palace-cli/SKILL.md",
+  "checks": {
+    "skillDiscovered": true,
+    "skillRead": true,
+    "palaceStatusOk": true,
+    "palaceSearch": true,
+    "palaceRead": true,
+    "validatedOnlyCheck": true,
+    "originalTracesRead": true,
+    "abstainedFromFalseValidation": true
+  },
+  "usage": {
+    "input_tokens": 342503,
+    "cached_input_tokens": 304384,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1549,
+    "reasoning_output_tokens": 245
+  },
+  "final": "The failure was a packaging omission: PalaceΓÇÖs public `plugin.d.ts` referenced `../../platform/plugin-contract.js`, but the standalone package omitted the transitive declarations needed to resolve `PluginContext`. The recorded failure is in [01-public-types-red.log](source-traces/01-public-types-red.log).\n\nThe fix added build-time declaration closure: TypeScriptΓÇÖs parser and NodeNext resolver copy canonical declaration dependencies, then verify package-contained runtime/type imports and reject unreviewed computed imports. It preserved the public plugin export without adding a Device runtime dependency. See [03-closure-implementation.mjs](source-traces/03-closure-implementation.mjs) and [05-standalone-builder.mjs](source-traces/05-standalone-builder.mjs).\n\nIndependent verification traversed the exported declarations separately and checked rejection of escaping imports, correct handling of comments/strings, and rejection of unreviewed computed imports. [04-independent-closure-check.test.mjs](source-traces/04-independent-closure-check.test.mjs) defines these checks; [02-public-types-and-closure-green.log](source-traces/02-public-types-and-closure-green.log) records **4 passing, 0 failing**.\n\n**Palace has no genuinely validated reusable procedure for this incident.** The selected card is `observed`, `palace skills` returned none, and [incident.md](source-traces/incident.md) explicitly distinguishes these observations from a validated procedure. I read all original traces; I did not rerun tests or modify anything.",
+  "eventsSha256": "16e79987033c3a3af9e6d2f5d1640f699c3aa95858b4553df98d1cbd9ec361ad",
+  "pass": true
+}

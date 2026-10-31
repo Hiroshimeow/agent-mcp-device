@@ -1,0 +1,27 @@
+[
+  {
+    "messageId": "83c0ff7d",
+    "timestamp": "2026-10-27T23:41:57.725Z",
+    "command": "$d='.tmp/d1-review-fixes-20261028'; New-Item -ItemType Directory -Force \"$d/test/v12\" | Out-Null; Copy-Item test/v12/d1-read-init-regressions.test.mjs \"$d/test/v12/\"; node node_modules/typescript/bin/tsc -p tsconfig.json --outDir \"$d/dist\" --listEmittedFiles false *> \"$d/tsc-red.log\"; node --test \"$d/test/v12/d1-read-init-regressions.test.mjs\" *> \"$d/red.log\"; Write-Output \"redExit=$LASTEXITCODE\""
+  },
+  {
+    "messageId": "24b0d03d",
+    "timestamp": "2026-10-27T23:43:02.948Z",
+    "command": "$d='.tmp/d1-review-fixes-20261028'; node node_modules/typescript/bin/tsc -p tsconfig.json --outDir \"$d/dist\" --listEmittedFiles false *> \"$d/tsc-green.log\"; Write-Output \"tsc=$LASTEXITCODE\"; node --test \"$d/test/v12/d1-read-init-regressions.test.mjs\" *> \"$d/green.log\"; Write-Output \"green=$LASTEXITCODE\"; Select-String -Path src/platform/plugin-host.ts,src/platform/plugin-driver.ts -Pattern 'markFault|cancelling.get|cancelling.has|registrySavePending' -Context 2,7; Select-String -Path src/plugins/palace/skill-manager.ts -Pattern 'QuickProbe|canonical|service|systemprofile' -Context 2,4"
+  },
+  {
+    "messageId": "d10bd8f7",
+    "timestamp": "2026-10-27T23:44:57.733Z",
+    "command": "$d='.tmp/d1-review-fixes-20261028'; Copy-Item test/v12/d1-read-init-regressions.test.mjs \"$d/test/v12/\"; node --test \"$d/test/v12/d1-read-init-regressions.test.mjs\" *> \"$d/red-foreign-prefix.log\"; Write-Output \"exit=$LASTEXITCODE\""
+  },
+  {
+    "messageId": "41c5c661",
+    "timestamp": "2026-10-27T23:45:23.219Z",
+    "command": "$d='.tmp/d1-review-fixes-20261028'; Copy-Item package.json \"$d/\"; Copy-Item skills \"$d/skills\" -Recurse -Force; Copy-Item test/v12/* \"$d/test/v12/\" -Recurse -Force; node node_modules/typescript/bin/tsc -p tsconfig.json --outDir \"$d/dist\" --listEmittedFiles false *> \"$d/tsc-final.log\"; Write-Output \"tsc=$LASTEXITCODE\"; node --test \"$d/test/v12/d1-read-init-regressions.test.mjs\" \"$d/test/v12/palace-wal-recovery.test.mjs\" \"$d/test/v12/d1-closure-regressions.test.mjs\" *> \"$d/focused-final.log\"; Write-Output \"tests=$LASTEXITCODE\"; Select-String -Path scripts/*skill*,src/plugins/palace/skill-manager.ts -Pattern 'systemprofile|ServiceProfiles|reconcilePalaceSkill|unsafe-parent' -Context 2,4; git show -s --format=fuller HEAD"
+  },
+  {
+    "messageId": "d994c0e8",
+    "timestamp": "2026-10-27T23:48:04.087Z",
+    "command": "$d='.tmp/d1-review-fixes-20261028'; node --test --test-name-pattern='^(?!actual Palace CLI process probe)' \"$d/test/v12/d1-opus-round2-regressions.test.mjs\" \"$d/test/v12/palace-cli-contract.test.mjs\" \"$d/test/v12/palace-managed-data-root.test.mjs\" \"$d/test/v12/palace-process-identity.test.mjs\" *> \"$d/read-functional-final.log\"; Write-Output \"functional=$LASTEXITCODE\"; Get-ChildItem evidence/v12-e2e-20261024-g6/D1-closure-20261028 -Recurse -Filter lock-cancel-final.log | Select-Object FullName; Select-String -Path .tmp/d1-review-fixes-20261028/git-before.txt -Pattern 'feat/|[0-9a-f]{40}' | Select-Object -First 4"
+  }
+]

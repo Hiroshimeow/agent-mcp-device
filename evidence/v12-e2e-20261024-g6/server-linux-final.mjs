@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {spawnSync} from 'node:child_process';
+import assert from 'node:assert/strict';
+const evidence='/mnt/e/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6',base='/var/tmp/mcp-device-v12-e2e-20261024-g6/final';
+assert.equal(JSON.parse(fs.readFileSync(path.join(evidence,'server-suite-windows-final.json'),'utf8')).exitCode,0);
+assert.ok(fs.existsSync(path.join(base,'platform/dist/mcp-device.js')),'Linux persistent snapshot must still exist');
+const env={...process.env,MCP_V12_COLD_PACKAGE_ROOT:path.join(base,'mcp-device/node_modules/@hcu-lab.me/mcp-device')};
+const r=spawnSync(process.execPath,[path.join(evidence,'run-command.cjs'),'server-suite-linux-final',path.join(base,'platform'),'node','scripts/v12/run-platform-tests.mjs','--server'],{env,stdio:'inherit'});
+process.exitCode=r.status??1;

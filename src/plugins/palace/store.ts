@@ -1,11 +1,36 @@
 import { DatabaseSync } from 'node:sqlite';
-import { mkdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { chmodSync, copyFileSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, readlinkSync, rmSync, statfsSync, statSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
+import { basename, join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import type { KnowledgeCard, KnowledgeEvidence, KnowledgeStatus } from './types.js';
 import { cardHash, canonical, preview } from './util.js';
-import { queryTerms } from './retrieval.js';
+import { queryTerms, rankCandidates } from './retrieval.js';
 
 type Row = Record<string,unknown>;
+// A dead PID is sufficient only in the same host/boot/PID namespace. Live or
+// uninspectable owners (including reused PIDs) are deliberately preserved.
+function schemaProbeNamespace():string|null{
+  try{return JSON.stringify(process.platform==='linux'
+    ?[process.platform,os.hostname(),readFileSync('/proc/sys/kernel/random/boot_id','utf8').trim(),readlinkSync('/proc/self/ns/pid')]
+    :[process.platform,os.hostname()]);}catch{return null;}
+}
+function cleanAbandonedSchemaProbes(dataRoot:string):void{
+  const namespace=schemaProbeNamespace();if(!namespace)return;
+  for(const name of readdirSync(dataRoot)){
+    if(!/^\.schema-probe-[A-Za-z0-9]+$/.test(name))continue;
+    const directory=join(dataRoot,name),marker=join(directory,'owner.json');
+    try{
+      const stat=lstatSync(directory),ownerStat=lstatSync(marker);
+      if(!stat.isDirectory()||stat.isSymbolicLink()||!ownerStat.isFile()||ownerStat.isSymbolicLink()||ownerStat.size>4096)continue;
+      const owner=JSON.parse(readFileSync(marker,'utf8'));
+      if(owner.version!==1||owner.directory!==name||owner.namespace!==namespace||!Number.isSafeInteger(owner.pid)||owner.pid<1)continue;
+      try{process.kill(owner.pid,0);continue;}catch(error){if((error as NodeJS.ErrnoException).code!=='ESRCH')continue;}
+      if(readdirSync(directory).some(file=>!['owner.json','palace.sqlite','palace.sqlite-wal','palace.sqlite-shm'].includes(file)||lstatSync(join(directory,file)).isSymbolicLink()))continue;
+      rmSync(directory,{recursive:true,force:true});
+    }catch{ /* Uncertain ownership or cleanup errors never authorize deletion. */ }
+  }
+}
 export interface EvidenceLocation {
   evidence: KnowledgeEvidence;
   type: 'p1' | 'file' | 'managed' | 'remote';
@@ -13,28 +38,117 @@ export interface EvidenceLocation {
   sourceRef?: string;
   bytes?: number;
 }
+export interface PalaceQueryInput {
+  query?:string;projectId?:string;includeInactive?:boolean;kind?:string;status?:string;
+  limit:number;cursor?:string;visibility?:string;
+}
+export function queryPalaceCards(db:DatabaseSync,deviceId:string,input:PalaceQueryInput):KnowledgeCard[] {
+  const tokens=queryTerms(input.query??'');
+  if(tokens.length>24)throw new Error('QUERY_TOO_LARGE');
+  const args:(string|number)[]=[];
+  let sql='SELECT c.json FROM cards c ';
+  if(tokens.length) {
+    sql+='JOIN card_fts ON card_fts.id=c.id WHERE card_fts MATCH ?';
+    args.push(tokens.map(x=>'"'+x.replace(/"/g,'""')+'"').join(' OR '));
+  } else sql+='WHERE 1=1';
+  if(!input.includeInactive)sql+=" AND c.status NOT IN ('stale','superseded','withdrawn')";
+  if(input.projectId) {sql+=" AND (c.project_id=? OR c.visibility='account')";args.push(input.projectId);}
+  else sql+=" AND c.visibility<>'project'";
+  if(input.visibility) {sql+=' AND c.visibility=?';args.push(input.visibility);}
+  if(input.kind){sql+=' AND c.kind=?';args.push(input.kind);}
+  if(input.status){sql+=' AND c.status=?';args.push(input.status);}
+  if(input.cursor){sql+=' AND c.id>?';args.push(input.cursor);}
+  // FTS relevance defines the candidate corpus; status is only a tie-breaker.
+  // Otherwise a large validated set can evict the actually relevant observed
+  // card before rankCandidates ever sees it.
+  sql+=tokens.length?" ORDER BY bm25(card_fts), CASE c.status WHEN 'validated' THEN 0 WHEN 'observed' THEN 1 ELSE 2 END,c.id":" ORDER BY c.id";
+  sql+=' LIMIT ?';args.push(input.limit);
+  return (db.prepare(sql).all(...args) as Row[]).map(row=>{
+    const card=JSON.parse(String(row.json)) as KnowledgeCard;if(deviceId)card.servingDeviceId=deviceId;return card;
+  });
+}
+export function searchPalaceCards(db:DatabaseSync,deviceId:string,input:PalaceQueryInput&{query:string;resultLimit:number;lookahead?:boolean}):{items:KnowledgeCard[];candidates:number} {
+  // Pagination lookahead must not change the candidate corpus or its scoring frequencies.
+  const candidateLimit=Math.min(200,Math.max(40,input.resultLimit*8));
+  const candidates=queryPalaceCards(db,deviceId,{...input,limit:candidateLimit});
+  return {items:rankCandidates(candidates,input.query,input.resultLimit+(input.lookahead?1:0)),candidates:candidates.length};
+}
 export class PalaceStore {
   readonly db: DatabaseSync;
   constructor(readonly dataRoot: string,readonly deviceId: string) {
     mkdirSync(dataRoot,{recursive:true});
-    this.db=new DatabaseSync(join(dataRoot,'palace.sqlite'));
-    this.db.exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=3000");
-    this.db.exec(
-      'CREATE TABLE IF NOT EXISTS meta(key TEXT PRIMARY KEY,value TEXT NOT NULL);'+
-      'CREATE TABLE IF NOT EXISTS cards(id TEXT PRIMARY KEY,version INTEGER NOT NULL,status TEXT NOT NULL,kind TEXT NOT NULL,'+
-      'project_id TEXT,visibility TEXT NOT NULL,summary TEXT NOT NULL,body TEXT NOT NULL,json TEXT NOT NULL);'+
-      'CREATE TABLE IF NOT EXISTS versions(id TEXT NOT NULL,version INTEGER NOT NULL,json TEXT NOT NULL,PRIMARY KEY(id,version));'+
-      'CREATE TABLE IF NOT EXISTS evidence(id TEXT PRIMARY KEY,json TEXT NOT NULL);'+
-      'CREATE TABLE IF NOT EXISTS card_evidence(card_id TEXT NOT NULL,evidence_id TEXT NOT NULL,PRIMARY KEY(card_id,evidence_id));'+
-      'CREATE INDEX IF NOT EXISTS evidence_cards ON card_evidence(evidence_id,card_id);'+
-      'CREATE TABLE IF NOT EXISTS derivations(parent TEXT NOT NULL,child TEXT NOT NULL,PRIMARY KEY(parent,child));'+
-      'CREATE TABLE IF NOT EXISTS documents(path TEXT PRIMARY KEY,hash TEXT NOT NULL,card_id TEXT NOT NULL);'+
-      'CREATE TABLE IF NOT EXISTS observation_keys(key TEXT PRIMARY KEY,card_id TEXT NOT NULL);'+
-      'CREATE VIRTUAL TABLE IF NOT EXISTS card_fts USING fts5(id UNINDEXED,summary,body);'
-    );
-    const schema=this.getMeta('schema');
-    if(schema && schema!=='1') {this.db.close();throw new Error('PALACE_SCHEMA_UNSUPPORTED');}
-    this.setMeta('schema','1');
+    cleanAbandonedSchemaProbes(dataRoot);
+    const filename=join(dataRoot,'palace.sqlite');
+    // Compatibility is established before a writer can run WAL recovery,
+    // checkpoint, PRAGMA changes, or DDL. A clean database can be inspected
+    // through immutable=1 without SQLite touching shared-memory bytes. A
+    // non-empty WAL is exceptional; probe an external stable snapshot instead.
+    if(existsSync(filename)&&statSync(filename).size>0){
+      const check=(probe:DatabaseSync)=>{
+        const objects=probe.prepare("SELECT name,type FROM sqlite_master WHERE name NOT GLOB 'sqlite_*' LIMIT 2").all() as Row[];
+        // WAL mode can durably create page 1 before the first schema
+        // transaction. An empty catalog has no foreign data to overwrite.
+        if(objects.length===0)return;
+        const hasMeta=objects.some(row=>String(row.name)==='meta'&&String(row.type)==='table')
+          ||Boolean((probe.prepare("SELECT 1 AS present FROM sqlite_master WHERE type='table' AND name='meta'").get() as Row|undefined)?.present);
+        if(!hasMeta)throw new Error('PALACE_SCHEMA_UNSUPPORTED');
+        const schema=String((probe.prepare('SELECT value FROM meta WHERE key=?').get('schema') as Row|undefined)?.value??'');
+        if(schema!=='1')throw new Error('PALACE_SCHEMA_UNSUPPORTED');
+      };
+      const wal=filename+'-wal',shm=filename+'-shm',walBytes=existsSync(wal)?statSync(wal).size:0;
+      if(walBytes===0){
+        const uri=pathToFileURL(filename).href+'?immutable=1';
+        const probe=new DatabaseSync(uri,{readOnly:true});try{check(probe);}finally{probe.close();}
+      }else{
+        // A read-only WAL connection may rebuild shared-memory read marks, but
+        // must not checkpoint or modify durable main/WAL bytes.
+        const durable=()=>[filename,wal].map(file=>{const stat=statSync(file,{bigint:true});return [file,stat.size.toString(),stat.mtimeNs.toString()].join('|');}).join('\n');
+        const before=durable();
+        try{
+          const probe=new DatabaseSync(filename,{readOnly:true});try{check(probe);}finally{probe.close();}
+          if(durable()!==before)throw new Error('PALACE_SCHEMA_BUSY');
+        }catch(error){
+          const message=String((error as {code?:string;message?:string}).code??'')+' '+String((error as Error).message??error);
+          if(!/SQLITE_READONLY_RECOVERY|SQLITE_CANTOPEN|readonly.*recover|unable to open database/i.test(message))throw error;
+          const mainBytes=statSync(filename).size,required=mainBytes+walBytes;
+          const space=statfsSync(dataRoot),available=Number(space.bavail)*Number(space.bsize);
+          if(!Number.isFinite(available)||available<required+1024*1024)throw new Error('PALACE_SCHEMA_SNAPSHOT_SPACE');
+          const snapshot=mkdtempSync(join(dataRoot,'.schema-probe-')),copy=join(snapshot,'palace.sqlite');
+          const snapshotBefore=durable();
+          try{
+            chmodSync(snapshot,0o700);
+            writeFileSync(join(snapshot,'owner.json'),JSON.stringify({version:1,directory:basename(snapshot),pid:process.pid,namespace:schemaProbeNamespace()}),{flag:'wx',mode:0o600});
+            copyFileSync(filename,copy);copyFileSync(wal,copy+'-wal');
+            if(durable()!==snapshotBefore)throw new Error('PALACE_SCHEMA_BUSY');
+            const probe=new DatabaseSync(copy,{readOnly:true});try{check(probe);}finally{probe.close();}
+            if(durable()!==snapshotBefore)throw new Error('PALACE_SCHEMA_BUSY');
+          }finally{rmSync(snapshot,{recursive:true,force:true});}
+        }
+
+      }
+    }
+    this.db=new DatabaseSync(filename);
+    try {
+      this.db.exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=3000");
+      this.db.exec('BEGIN IMMEDIATE');
+      try {
+        this.db.exec(
+          'CREATE TABLE IF NOT EXISTS meta(key TEXT PRIMARY KEY,value TEXT NOT NULL);'+
+          'CREATE TABLE IF NOT EXISTS cards(id TEXT PRIMARY KEY,version INTEGER NOT NULL,status TEXT NOT NULL,kind TEXT NOT NULL,'+
+          'project_id TEXT,visibility TEXT NOT NULL,summary TEXT NOT NULL,body TEXT NOT NULL,json TEXT NOT NULL);'+
+          'CREATE TABLE IF NOT EXISTS versions(id TEXT NOT NULL,version INTEGER NOT NULL,json TEXT NOT NULL,PRIMARY KEY(id,version));'+
+          'CREATE TABLE IF NOT EXISTS evidence(id TEXT PRIMARY KEY,json TEXT NOT NULL);'+
+          'CREATE TABLE IF NOT EXISTS card_evidence(card_id TEXT NOT NULL,evidence_id TEXT NOT NULL,PRIMARY KEY(card_id,evidence_id));'+
+          'CREATE INDEX IF NOT EXISTS evidence_cards ON card_evidence(evidence_id,card_id);'+
+          'CREATE TABLE IF NOT EXISTS derivations(parent TEXT NOT NULL,child TEXT NOT NULL,PRIMARY KEY(parent,child));'+
+          'CREATE TABLE IF NOT EXISTS documents(path TEXT PRIMARY KEY,hash TEXT NOT NULL,card_id TEXT NOT NULL);'+
+          'CREATE TABLE IF NOT EXISTS observation_keys(key TEXT PRIMARY KEY,card_id TEXT NOT NULL);'+
+          'CREATE VIRTUAL TABLE IF NOT EXISTS card_fts USING fts5(id UNINDEXED,summary,body);'
+        );
+        this.setMeta('schema','1');
+        this.db.exec('COMMIT');
+      } catch(error) {this.db.exec('ROLLBACK');throw error;}
+    } catch(error) {this.db.close();throw error;}
   }
   close(): void { this.db.exec('PRAGMA wal_checkpoint(TRUNCATE)');this.db.close(); }
   atomic<T>(fn:()=>T):T {
@@ -136,26 +250,8 @@ export class PalaceStore {
       return [...new Set(affected)];
     });
   }
-  query(input:{query?:string;projectId?:string;includeInactive?:boolean;kind?:string;status?:string;limit:number;cursor?:string;visibility?:string}):KnowledgeCard[] {
-    const tokens=queryTerms(input.query??'');
-    if(tokens.length>24)throw new Error('QUERY_TOO_LARGE');
-    const args:(string|number)[]=[];
-    let sql='SELECT c.json FROM cards c ';
-    if(tokens.length) {
-      sql+='JOIN card_fts ON card_fts.id=c.id WHERE card_fts MATCH ?';
-      args.push(tokens.map(x=>'"'+x.replace(/"/g,'""')+'"').join(' OR '));
-    } else sql+='WHERE 1=1';
-    if(!input.includeInactive)sql+=" AND c.status NOT IN ('stale','superseded','withdrawn')";
-    if(input.projectId) {sql+=" AND (c.project_id=? OR c.visibility='account')";args.push(input.projectId);}
-    else sql+=" AND c.visibility<>'project'";
-    if(input.visibility) {sql+=' AND c.visibility=?';args.push(input.visibility);}
-    if(input.kind){sql+=' AND c.kind=?';args.push(input.kind);}
-    if(input.status){sql+=' AND c.status=?';args.push(input.status);}
-    if(input.cursor){sql+=' AND c.id>?';args.push(input.cursor);}
-    sql+=tokens.length?" ORDER BY CASE c.status WHEN 'validated' THEN 0 WHEN 'observed' THEN 1 ELSE 2 END, bm25(card_fts),c.id":" ORDER BY c.id";
-    sql+=' LIMIT ?';args.push(input.limit);
-    return (this.db.prepare(sql).all(...args) as Row[]).map(row=>{const card=JSON.parse(String(row.json)) as KnowledgeCard;card.servingDeviceId=this.deviceId;return card;});
-  }
+  query(input:PalaceQueryInput):KnowledgeCard[] {return queryPalaceCards(this.db,this.deviceId,input);}
+  search(input:PalaceQueryInput&{query:string;resultLimit:number;lookahead?:boolean}):{items:KnowledgeCard[];candidates:number}{return searchPalaceCards(this.db,this.deviceId,input);}
   count():number {return Number((this.db.prepare('SELECT count(*) n FROM cards').get() as Row).n);}
   importCard(incoming:KnowledgeCard):{imported:boolean;deduplicated:boolean;card:KnowledgeCard} {
     const existing=this.get(incoming.id);

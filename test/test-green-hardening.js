@@ -2,6 +2,7 @@ import assert from 'assert';
 import fs from 'fs/promises';
 import os from 'os';
 import path from 'path';
+import { once } from 'node:events';
 
 // Self-sandbox even when this file is run directly instead of through
 // test/run-all-tests.js. No test may touch the user's real ~/.mcp-device.
@@ -87,7 +88,10 @@ try {
   assert(liveSession, 'background session must remain registered');
   liveSession.process.emit('error', new Error('synthetic late error'));
   assert(terminals.sessions.has(background.pid), 'late error must not retire a live session');
-  terminals.forceTerminate(background.pid);
+  // forceTerminate signals asynchronously; Windows still owns the fixture cwd until close.
+  const backgroundClosed = once(liveSession.process, 'close', { signal: AbortSignal.timeout(5000) });
+  assert.equal(terminals.forceTerminate(background.pid), true);
+  await backgroundClosed;
 
   // 5) Remote inherited read_file URL support must fail closed before any fetch.
   process.env.MCP_DEVICE_REMOTE = 'true';

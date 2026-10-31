@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "label": "cold-palace-linux",
+  "cwd": "E:/git-project/agent-mcp-device-v12",
+  "command": "wsl.exe",
+  "args": [
+    "-d",
+    "Ubuntu-22.04",
+    "--exec",
+    "/usr/bin/node",
+    "/mnt/e/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6/cold-install.mjs",
+    "palace",
+    "/mnt/e/test/mcp-device-v12-e2e-20261024-g6/artifacts/hcu-lab.me-palace-1.0.12.tgz",
+    "/tmp/mcp-device-v12-e2e-20261024-g6/cold-palace",
+    "/mnt/e/git-project/agent-mcp-device-v12/evidence/v12-e2e-20261024-g6"
+  ],
+  "startedAt": "2026-10-24T10:55:52.318Z",
+  "endedAt": "2026-10-24T10:56:08.368Z",
+  "durationMs": 16047.3472,
+  "node": "v22.22.2",
+  "platform": "win32",
+  "exitCode": 0,
+  "signal": null,
+  "counts": {},
+  "stdout": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\cold-palace-linux.stdout.log",
+    "sha256": "17d318e2d5cfa13921dcd58b17f209f10499c0d88546874463e3db84ecaeffde"
+  },
+  "stderr": {
+    "path": "E:\\git-project\\agent-mcp-device-v12\\evidence\\v12-e2e-20261024-g6\\cold-palace-linux.stderr.log",
+    "sha256": "ab3309bcaebd7e6bed350c9d8017d04553ee21c6638980eaee288b98ea7dbb98"
+  }
+}

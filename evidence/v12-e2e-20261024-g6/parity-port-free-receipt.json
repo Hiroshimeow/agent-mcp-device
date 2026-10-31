@@ -1,0 +1,801 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-24T11:25:26.713Z",
+  "node": "v22.22.2",
+  "machine": "DESKTOP-B5E4IUE",
+  "platform": "win32",
+  "group": "port-free",
+  "targetMode": "both",
+  "only": "",
+  "requestedTest": "",
+  "baseline": {
+    "path": "E:\\git-project\\agent-mcp-device",
+    "expectedSha": "1df22e6bca3e4f5fa7bfd94f814c1b7409fd7848",
+    "dependencies": "E:\\git-project\\agent-mcp-device\\node_modules",
+    "sha": "1df22e6bca3e4f5fa7bfd94f814c1b7409fd7848",
+    "distFingerprint": {
+      "version.js": "991fd19729c8159d849668f22a561dd264a555fdc343672afb0e0ee5180b7602",
+      "tool-dispatcher.js": "9ca3ddbf2feb67bac37b00b54f46a358f8c9be551bb294c50b0a690cb3d1920e",
+      "device/gateway-tool-adapter.js": "a250de965bcd31d46f84ec6b0497815e4790ef0979f5769ae66ffc6000274639",
+      "context/device-adapter.js": "d0ed515edf6756b6e48baf1e95aeb71473da1189352031a0a7ff3275ae98dc0d",
+      "log-palace/store.js": "5281586a501247377cfe6e5cb5063abd3d135a7fdf1ed96ac0c155ad1989d8bb"
+    }
+  },
+  "candidate": {
+    "path": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\parity-worktree",
+    "dependencies": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\parity-worktree\\node_modules",
+    "sha": "1e454c1cdcbe3265892f751034fa389432d65405",
+    "distFingerprint": {
+      "version.js": "3ebe1c687505e85f99d1380c0b85ef96ae30ec553af9ccaf94a625a57b87a738",
+      "tool-dispatcher.js": "9ca3ddbf2feb67bac37b00b54f46a358f8c9be551bb294c50b0a690cb3d1920e",
+      "device/gateway-tool-adapter.js": "a250de965bcd31d46f84ec6b0497815e4790ef0979f5769ae66ffc6000274639",
+      "context/device-adapter.js": "d0ed515edf6756b6e48baf1e95aeb71473da1189352031a0a7ff3275ae98dc0d",
+      "log-palace/store.js": "c91879f528b796f18cdcf8017396f92d45b26cd3cd912f2f6f14b156f4396278"
+    }
+  },
+  "results": [
+    {
+      "label": "baseline",
+      "test": "test/test-file-handlers.js",
+      "entrypointMode": "EXPORTED_RUNNER",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-6b5105876d33\\invoke-exported-suite.mjs"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\baseline",
+      "startedAt": "2026-10-24T11:25:27.967Z",
+      "durationMs": 2851,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-6b5105876d33\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-6b5105876d33\\stderr.log"
+    },
+    {
+      "label": "baseline",
+      "test": "test/test-negative-offset-readfile.js",
+      "entrypointMode": "EXPORTED_RUNNER",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-3806c2eb11a2\\invoke-exported-suite.mjs"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\baseline",
+      "startedAt": "2026-10-24T11:25:30.876Z",
+      "durationMs": 2063,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-3806c2eb11a2\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-3806c2eb11a2\\stderr.log"
+    },
+    {
+      "label": "baseline",
+      "test": "test/test-line-count.js",
+      "entrypointMode": "DIRECT",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "test/test-line-count.js"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\baseline",
+      "startedAt": "2026-10-24T11:25:32.984Z",
+      "durationMs": 2167,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-2a0cce3cf958\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-2a0cce3cf958\\stderr.log"
+    },
+    {
+      "label": "baseline",
+      "test": "test/test-directory-creation.js",
+      "entrypointMode": "EXPORTED_RUNNER",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-09b0942866fb\\invoke-exported-suite.mjs"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\baseline",
+      "startedAt": "2026-10-24T11:25:35.210Z",
+      "durationMs": 1903,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-09b0942866fb\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-09b0942866fb\\stderr.log"
+    },
+    {
+      "label": "baseline",
+      "test": "test/test-edit-block-occurrences.js",
+      "entrypointMode": "EXPORTED_RUNNER",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-94fac10cf566\\invoke-exported-suite.mjs"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\baseline",
+      "startedAt": "2026-10-24T11:25:37.170Z",
+      "durationMs": 1865,
+      "exitCode": 1,
+      "signal": null,
+      "status": "FAIL",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-94fac10cf566\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-94fac10cf566\\stderr.log"
+    },
+    {
+      "label": "baseline",
+      "test": "test/test-edit-block-line-endings.js",
+      "entrypointMode": "EXPORTED_RUNNER",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-a931557826b3\\invoke-exported-suite.mjs"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\baseline",
+      "startedAt": "2026-10-24T11:25:39.090Z",
+      "durationMs": 1955,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-a931557826b3\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-a931557826b3\\stderr.log"
+    },
+    {
+      "label": "baseline",
+      "test": "test/test-excel-files.js",
+      "entrypointMode": "EXPORTED_RUNNER",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-71aa6bc6a172\\invoke-exported-suite.mjs"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\baseline",
+      "startedAt": "2026-10-24T11:25:41.095Z",
+      "durationMs": 2194,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-71aa6bc6a172\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-71aa6bc6a172\\stderr.log"
+    },
+    {
+      "label": "baseline",
+      "test": "test/test-search-code.js",
+      "entrypointMode": "EXPORTED_RUNNER",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-fdb6580420a2\\invoke-exported-suite.mjs"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\baseline",
+      "startedAt": "2026-10-24T11:25:43.346Z",
+      "durationMs": 3633,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-fdb6580420a2\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-fdb6580420a2\\stderr.log"
+    },
+    {
+      "label": "baseline",
+      "test": "test/test-search-code-edge-cases.js",
+      "entrypointMode": "EXPORTED_RUNNER",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-ba0f62f93f34\\invoke-exported-suite.mjs"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\baseline",
+      "startedAt": "2026-10-24T11:25:47.041Z",
+      "durationMs": 3366,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-ba0f62f93f34\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-ba0f62f93f34\\stderr.log"
+    },
+    {
+      "label": "baseline",
+      "test": "test/test-literal-search.js",
+      "entrypointMode": "EXPORTED_RUNNER",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-b1f3bff68920\\invoke-exported-suite.mjs"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\baseline",
+      "startedAt": "2026-10-24T11:25:50.463Z",
+      "durationMs": 4048,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-b1f3bff68920\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-b1f3bff68920\\stderr.log"
+    },
+    {
+      "label": "baseline",
+      "test": "test/test-process-pagination.js",
+      "entrypointMode": "DIRECT",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "test/test-process-pagination.js"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\baseline",
+      "startedAt": "2026-10-24T11:25:54.551Z",
+      "durationMs": 8809,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-5f4fa6afec88\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-5f4fa6afec88\\stderr.log"
+    },
+    {
+      "label": "baseline",
+      "test": "test/test-read-completed-process.js",
+      "entrypointMode": "DIRECT",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "test/test-read-completed-process.js"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\baseline",
+      "startedAt": "2026-10-24T11:26:03.405Z",
+      "durationMs": 5635,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-a01f5aefb4f7\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-a01f5aefb4f7\\stderr.log"
+    },
+    {
+      "label": "baseline",
+      "test": "test/test-pid-collision-guard.js",
+      "entrypointMode": "DIRECT",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "test/test-pid-collision-guard.js"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\baseline",
+      "startedAt": "2026-10-24T11:26:09.091Z",
+      "durationMs": 317,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-14304a152346\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-14304a152346\\stderr.log"
+    },
+    {
+      "label": "baseline",
+      "test": "test/test-allowed-directories.js",
+      "entrypointMode": "EXPORTED_RUNNER",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-e2300fd9438a\\invoke-exported-suite.mjs"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\baseline",
+      "startedAt": "2026-10-24T11:26:09.462Z",
+      "durationMs": 2224,
+      "exitCode": 1,
+      "signal": null,
+      "status": "FAIL",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-e2300fd9438a\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-e2300fd9438a\\stderr.log"
+    },
+    {
+      "label": "baseline",
+      "test": "test/test-symlink-security.js",
+      "entrypointMode": "EXPORTED_RUNNER",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-a2bd16570c96\\invoke-exported-suite.mjs"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\baseline",
+      "startedAt": "2026-10-24T11:26:11.746Z",
+      "durationMs": 2095,
+      "exitCode": 1,
+      "signal": null,
+      "status": "FAIL",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-a2bd16570c96\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-a2bd16570c96\\stderr.log"
+    },
+    {
+      "label": "baseline",
+      "test": "test/test-error-sanitization.js",
+      "entrypointMode": "DIRECT",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "test/test-error-sanitization.js"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\baseline",
+      "startedAt": "2026-10-24T11:26:13.893Z",
+      "durationMs": 139,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-ccae5a052160\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-ccae5a052160\\stderr.log"
+    },
+    {
+      "label": "baseline",
+      "test": "test/test-green-hardening.js",
+      "entrypointMode": "DIRECT",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "test/test-green-hardening.js"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\baseline",
+      "startedAt": "2026-10-24T11:26:14.083Z",
+      "durationMs": 2044,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-2fac774b9c65\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-2fac774b9c65\\stderr.log"
+    },
+    {
+      "label": "baseline",
+      "test": "test/test-nonblocking-config-save.js",
+      "entrypointMode": "DIRECT",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "test/test-nonblocking-config-save.js"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\baseline",
+      "startedAt": "2026-10-24T11:26:16.131Z",
+      "durationMs": 446,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-ceb291d82a5a\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-ceb291d82a5a\\stderr.log"
+    },
+    {
+      "label": "baseline",
+      "test": "test/test-local-feature-flags.js",
+      "entrypointMode": "DIRECT",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "test/test-local-feature-flags.js"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\baseline",
+      "startedAt": "2026-10-24T11:26:16.600Z",
+      "durationMs": 114,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-24b74cb56748\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-24b74cb56748\\stderr.log"
+    },
+    {
+      "label": "baseline",
+      "test": "test/test-remote-startup-no-child.js",
+      "entrypointMode": "DIRECT",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "test/test-remote-startup-no-child.js"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\baseline",
+      "startedAt": "2026-10-24T11:26:16.747Z",
+      "durationMs": 756,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-8ed0a3c541af\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\b-8ed0a3c541af\\stderr.log"
+    },
+    {
+      "label": "candidate",
+      "test": "test/test-file-handlers.js",
+      "entrypointMode": "EXPORTED_RUNNER",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-6b5105876d33\\invoke-exported-suite.mjs"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\candidate",
+      "startedAt": "2026-10-24T11:26:18.638Z",
+      "durationMs": 2904,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-6b5105876d33\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-6b5105876d33\\stderr.log"
+    },
+    {
+      "label": "candidate",
+      "test": "test/test-negative-offset-readfile.js",
+      "entrypointMode": "EXPORTED_RUNNER",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-3806c2eb11a2\\invoke-exported-suite.mjs"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\candidate",
+      "startedAt": "2026-10-24T11:26:21.596Z",
+      "durationMs": 1899,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-3806c2eb11a2\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-3806c2eb11a2\\stderr.log"
+    },
+    {
+      "label": "candidate",
+      "test": "test/test-line-count.js",
+      "entrypointMode": "DIRECT",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "test/test-line-count.js"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\candidate",
+      "startedAt": "2026-10-24T11:26:23.499Z",
+      "durationMs": 2165,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-2a0cce3cf958\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-2a0cce3cf958\\stderr.log"
+    },
+    {
+      "label": "candidate",
+      "test": "test/test-directory-creation.js",
+      "entrypointMode": "EXPORTED_RUNNER",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-09b0942866fb\\invoke-exported-suite.mjs"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\candidate",
+      "startedAt": "2026-10-24T11:26:25.672Z",
+      "durationMs": 2672,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-09b0942866fb\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-09b0942866fb\\stderr.log"
+    },
+    {
+      "label": "candidate",
+      "test": "test/test-edit-block-occurrences.js",
+      "entrypointMode": "EXPORTED_RUNNER",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-94fac10cf566\\invoke-exported-suite.mjs"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\candidate",
+      "startedAt": "2026-10-24T11:26:28.416Z",
+      "durationMs": 3074,
+      "exitCode": 1,
+      "signal": null,
+      "status": "FAIL",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-94fac10cf566\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-94fac10cf566\\stderr.log"
+    },
+    {
+      "label": "candidate",
+      "test": "test/test-edit-block-line-endings.js",
+      "entrypointMode": "EXPORTED_RUNNER",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-a931557826b3\\invoke-exported-suite.mjs"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\candidate",
+      "startedAt": "2026-10-24T11:26:31.552Z",
+      "durationMs": 2613,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-a931557826b3\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-a931557826b3\\stderr.log"
+    },
+    {
+      "label": "candidate",
+      "test": "test/test-excel-files.js",
+      "entrypointMode": "EXPORTED_RUNNER",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-71aa6bc6a172\\invoke-exported-suite.mjs"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\candidate",
+      "startedAt": "2026-10-24T11:26:34.232Z",
+      "durationMs": 3113,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-71aa6bc6a172\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-71aa6bc6a172\\stderr.log"
+    },
+    {
+      "label": "candidate",
+      "test": "test/test-search-code.js",
+      "entrypointMode": "EXPORTED_RUNNER",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-fdb6580420a2\\invoke-exported-suite.mjs"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\candidate",
+      "startedAt": "2026-10-24T11:26:37.418Z",
+      "durationMs": 6653,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-fdb6580420a2\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-fdb6580420a2\\stderr.log"
+    },
+    {
+      "label": "candidate",
+      "test": "test/test-search-code-edge-cases.js",
+      "entrypointMode": "EXPORTED_RUNNER",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-ba0f62f93f34\\invoke-exported-suite.mjs"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\candidate",
+      "startedAt": "2026-10-24T11:26:44.134Z",
+      "durationMs": 7545,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-ba0f62f93f34\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-ba0f62f93f34\\stderr.log"
+    },
+    {
+      "label": "candidate",
+      "test": "test/test-literal-search.js",
+      "entrypointMode": "EXPORTED_RUNNER",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-b1f3bff68920\\invoke-exported-suite.mjs"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\candidate",
+      "startedAt": "2026-10-24T11:26:51.747Z",
+      "durationMs": 8834,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-b1f3bff68920\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-b1f3bff68920\\stderr.log"
+    },
+    {
+      "label": "candidate",
+      "test": "test/test-process-pagination.js",
+      "entrypointMode": "DIRECT",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "test/test-process-pagination.js"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\candidate",
+      "startedAt": "2026-10-24T11:27:00.639Z",
+      "durationMs": 12150,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-5f4fa6afec88\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-5f4fa6afec88\\stderr.log"
+    },
+    {
+      "label": "candidate",
+      "test": "test/test-read-completed-process.js",
+      "entrypointMode": "DIRECT",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "test/test-read-completed-process.js"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\candidate",
+      "startedAt": "2026-10-24T11:27:12.795Z",
+      "durationMs": 5413,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-a01f5aefb4f7\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-a01f5aefb4f7\\stderr.log"
+    },
+    {
+      "label": "candidate",
+      "test": "test/test-pid-collision-guard.js",
+      "entrypointMode": "DIRECT",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "test/test-pid-collision-guard.js"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\candidate",
+      "startedAt": "2026-10-24T11:27:18.213Z",
+      "durationMs": 384,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-14304a152346\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-14304a152346\\stderr.log"
+    },
+    {
+      "label": "candidate",
+      "test": "test/test-allowed-directories.js",
+      "entrypointMode": "EXPORTED_RUNNER",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-e2300fd9438a\\invoke-exported-suite.mjs"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\candidate",
+      "startedAt": "2026-10-24T11:27:18.667Z",
+      "durationMs": 2916,
+      "exitCode": 1,
+      "signal": null,
+      "status": "FAIL",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-e2300fd9438a\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-e2300fd9438a\\stderr.log"
+    },
+    {
+      "label": "candidate",
+      "test": "test/test-symlink-security.js",
+      "entrypointMode": "EXPORTED_RUNNER",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-a2bd16570c96\\invoke-exported-suite.mjs"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\candidate",
+      "startedAt": "2026-10-24T11:27:21.662Z",
+      "durationMs": 2772,
+      "exitCode": 1,
+      "signal": null,
+      "status": "FAIL",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-a2bd16570c96\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-a2bd16570c96\\stderr.log"
+    },
+    {
+      "label": "candidate",
+      "test": "test/test-error-sanitization.js",
+      "entrypointMode": "DIRECT",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "test/test-error-sanitization.js"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\candidate",
+      "startedAt": "2026-10-24T11:27:24.440Z",
+      "durationMs": 130,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-ccae5a052160\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-ccae5a052160\\stderr.log"
+    },
+    {
+      "label": "candidate",
+      "test": "test/test-green-hardening.js",
+      "entrypointMode": "DIRECT",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "test/test-green-hardening.js"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\candidate",
+      "startedAt": "2026-10-24T11:27:24.576Z",
+      "durationMs": 1845,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-2fac774b9c65\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-2fac774b9c65\\stderr.log"
+    },
+    {
+      "label": "candidate",
+      "test": "test/test-nonblocking-config-save.js",
+      "entrypointMode": "DIRECT",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "test/test-nonblocking-config-save.js"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\candidate",
+      "startedAt": "2026-10-24T11:27:26.425Z",
+      "durationMs": 442,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-ceb291d82a5a\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-ceb291d82a5a\\stderr.log"
+    },
+    {
+      "label": "candidate",
+      "test": "test/test-local-feature-flags.js",
+      "entrypointMode": "DIRECT",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "test/test-local-feature-flags.js"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\candidate",
+      "startedAt": "2026-10-24T11:27:26.871Z",
+      "durationMs": 108,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-24b74cb56748\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-24b74cb56748\\stderr.log"
+    },
+    {
+      "label": "candidate",
+      "test": "test/test-remote-startup-no-child.js",
+      "entrypointMode": "DIRECT",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "test/test-remote-startup-no-child.js"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\candidate",
+      "startedAt": "2026-10-24T11:27:27.017Z",
+      "durationMs": 456,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-8ed0a3c541af\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-8ed0a3c541af\\stderr.log"
+    },
+    {
+      "label": "comparator",
+      "test": "test/v12/device-core-parity.test.js",
+      "entrypointMode": "DIRECT",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "--test",
+        "test/v12/device-core-parity.test.js"
+      ],
+      "cwd": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\workspaces\\candidate",
+      "startedAt": "2026-10-24T11:27:27.510Z",
+      "durationMs": 8767,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "timedOut": false,
+      "stdoutPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-80fd8490d012\\stdout.log",
+      "stderrPath": "E:\\test\\mcp-device-v12-e2e-20261024-g6\\windows\\parity-port-free\\runs\\c-80fd8490d012\\stderr.log"
+    }
+  ],
+  "productionVerified": false,
+  "socketsAllowed": false,
+  "completedAt": "2026-10-24T11:27:36.279Z",
+  "summary": {
+    "passed": 35,
+    "failed": 6,
+    "notRunFamilies": [
+      "native.docx_pdf_batch",
+      "native.pdf",
+      "device.broker",
+      "device.identity_pairing",
+      "device.transport",
+      "device.lifecycle",
+      "device.package_cli",
+      "context.surface",
+      "context.retrieval",
+      "context.graph_index",
+      "context.persistence",
+      "context.capture",
+      "palace.p1",
+      "device.remote_hygiene"
+    ],
+    "parityMeaning": "Only the listed executed suites, targets and fingerprints are evidenced. Core behavioral comparison is present only when its explicit comparator result is listed. No production or unlisted-platform acceptance."
+  }
+}
