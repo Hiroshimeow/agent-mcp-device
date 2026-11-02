@@ -13,14 +13,15 @@ assert.match(versionSource, new RegExp(`VERSION = ['\"]${pkg.version.replace(/\\
 assert.equal(pkg.author, 'Hirohimeow');
 assert.equal(pkg.bin?.['mcp-device'], 'dist/mcp-device.js');
 assert.equal(pkg.bin?.md, 'dist/mcp-device.js');
-assert.equal(pkg.bin?.palace, 'dist/plugins/palace/cli.js');
-assert.deepEqual(Object.keys(pkg.bin || {}).sort(), ['mcp-device', 'md', 'palace']);
+assert.equal(pkg.bin?.palace, undefined);
+assert.deepEqual(Object.keys(pkg.bin || {}).sort(), ['mcp-device', 'md']);
 assert.equal(pkg.mcpName, undefined);
 assert.equal(pkg.repository?.url, 'git+https://github.com/Hiroshimeow/agent-mcp-device.git');
 assert.deepEqual(pkg.files, [
-  'dist', 'config/revoked-approvals.json', 'skills/mcp-device-context', 'skills/palace-cli',
-  'control-plane/scripts', 'control-plane/config', 'control-plane/contracts', 'scripts/v12/install-palace-skill.cjs'
-], 'v12 ships the runtime, control plane, local skills and the owned Palace Skill installer; no upstream marketing assets');
+  'dist', '!dist/plugins/palace', 'config/revoked-approvals.json', 'skills/mcp-device-context',
+  'SECURITY.md', 'PRIVACY.md',
+  'control-plane/scripts', 'control-plane/config', 'control-plane/contracts'
+], 'Core ships native runtime, control plane and Context; optional Palace is separate');
 for (const name of ['release:dry', 'release:mcp', 'release:alpha', 'release:skip-mcp', 'build:mcpb', 'validate:tools', 'open-chat', 'setup', 'setup:debug', 'remove']) {
   assert.equal(pkg.scripts?.[name], undefined, `upstream product script ${name} must not remain in MCP Device`);
 }
@@ -30,8 +31,7 @@ assert.equal(pkg.scripts?.['release:major'], 'node scripts/release.js major');
 assert.equal(pkg.scripts?.version, 'node scripts/sync-version.js && git add src/version.ts package-lock.json');
 assert.equal(pkg.scripts?.start, 'node dist/mcp-device.js');
 assert.equal(pkg.scripts?.['start:debug'], 'node --inspect-brk=9229 dist/mcp-device.js');
-assert.equal(pkg.scripts?.postinstall, 'node scripts/v12/install-palace-skill.cjs',
-  'v12 installs its Palace Skill through the explicit local installer; install-time telemetry remains absent');
+assert.equal(pkg.scripts?.postinstall, undefined, 'Core installation never reconciles Palace Skills');
 assert.equal(fs.existsSync(new URL('../scripts/release.js', import.meta.url)), true);
 assert.equal(fs.existsSync(new URL('../scripts/publish-release.cjs', import.meta.url)), false);
 assert.equal(fs.existsSync(new URL('../scripts/build-mcpb.cjs', import.meta.url)), false);

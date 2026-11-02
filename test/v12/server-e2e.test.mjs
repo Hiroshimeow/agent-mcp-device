@@ -215,7 +215,7 @@ test('one server on 8104 preserves account/OAuth/pairing and dispatches through 
     import('../../dist/device/gateway-identity.js'),
     import('../../control-plane/scripts/authenticated-mcp-wrapper.mjs'),
     import('../../dist/platform/plugin-host.js'),
-    import('../../dist/distribution.js'),
+    import('./optional-palace-fixture.mjs'),
     import('../../dist/platform/knowledge-mcp.js')
   ]);
   const identity = new GatewayDeviceIdentity(path.join(stateRoot, 'device-identity.json'));

@@ -8,7 +8,7 @@ import {createHash} from 'node:crypto';
 import {pathToFileURL,fileURLToPath} from 'node:url';
 import {PalaceStore} from '../../dist/plugins/palace/store.js';
 import {PluginHost} from '../../dist/platform/plugin-host.js';
-import {bundledPluginManifests} from '../../dist/distribution.js';
+import {bundledPluginManifests} from './optional-palace-fixture.mjs';
 
 const packageRoot=fileURLToPath(new URL('../../',import.meta.url));
 const cli=path.join(packageRoot,'dist/plugins/palace/cli.js');

@@ -1,20 +1,24 @@
 import path from 'node:path';
 import { createDeviceCore, type DeviceCore, type DeviceCoreOptions } from '../device/core.js';
-import { bundledPluginManifests } from '../distribution.js';
 import { PluginHost } from './plugin-host.js';
 import { ActivityJournal } from './activity-journal.js';
 import { compatible, CapabilityError, type Capability } from './plugin-contract.js';
+import type { DevicePluginPolicy } from './plugin-policy.js';
 
 export interface PlatformDeviceCore extends DeviceCore {
   readonly plugins: PluginHost;
   readonly capabilityContracts: Capability[];
   onCapabilitiesChanged(listener: () => void): () => void;
 }
-export async function createPlatformDeviceCore(options: DeviceCoreOptions & { projectRoots?: string[]; sourceRoots?: string[]; bundledPlugins?: boolean; exposeKnowledgeMcp?: boolean }): Promise<PlatformDeviceCore> {
+export async function createPlatformDeviceCore(options: DeviceCoreOptions & { projectRoots?: string[]; sourceRoots?: string[]; bundledPlugins?: boolean; pluginPolicy?: DevicePluginPolicy; exposeKnowledgeMcp?: boolean }): Promise<PlatformDeviceCore> {
   const core = await createDeviceCore(options);
   const activity = new ActivityJournal(core.stateRoot, core.deviceId, core.runtimeInstanceId);
   const plugins = new PluginHost({ stateRoot: core.stateRoot, deviceId: core.deviceId, projectRoots: options.projectRoots ?? options.allowedRoots ?? [], sourceRoots: options.sourceRoots ?? [path.join(core.stateRoot, 'logs')] });
-  try { if (options.bundledPlugins !== false) await plugins.ensureBundled(bundledPluginManifests()); await plugins.start(); }
+  try {
+    // Core never provisions optional plugins. Legacy distribution-enabled Palace
+    // needs one explicit enable; manual installs and explicit intent are durable.
+    await plugins.start({ skipIds: ['palace'] });
+  }
   catch (error) { process.stderr.write(`[plugins] Native Device Core remains available: ${(error as Error).message}\n`); }
   let closed = false;
   let closeRequest: Promise<void> | undefined;

@@ -5,16 +5,17 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawn } from 'node:child_process';
 import { CapabilityError, type PluginManifest } from './plugin-contract.js';
 import { resolveRuntimeRoot } from './runtime-root.js';
+import { resolveDevicePluginPolicy } from './plugin-policy.js';
 
 const packageRoot = fileURLToPath(new URL('../../', import.meta.url));
 const usage = `MCP Device 1.0.12
-  mcp-device start                         Existing Device-only runtime
+  mcp-device start                          Core-only Device runtime
   mcp-device device [start|status|...]      Alias for the Device-only commands
-  mcp-device server [--runtime-dir DIR] [--host HOST] [--port PORT] [--loopback-port PORT] [--public-url URL] [--skill-root DIR] [--allow-http-lan] [--legacy-knowledge-mcp]
+  mcp-device server [--runtime-dir DIR] [--host HOST] [--port PORT] [--loopback-port PORT] [--public-url URL] [--skill-root DIR] [--allow-http-lan] [--legacy-knowledge-mcp] [--plugin-policy bundled|core-first]
   mcp-device admin [--runtime-dir DIR] account|invite ...
   mcp-device plugins [--runtime-dir DIR] list|install|enable|disable|uninstall|purge|upgrade|configure ...
-  mcp-device plugins install palace --bundled --enable  Reinstall bundled Palace after an uninstall
-  mcp-device plugins upgrade palace --bundled  Upgrade the bundled Palace contract safely
+  mcp-device plugins install /path/to/palace.plugin.json --enable  Explicit optional Palace installation
+  mcp-device plugins upgrade /path/to/palace.plugin.json  Upgrade an optional plugin safely
   mcp-device plugins repair-lock              Recover a proved-abandoned/incomplete registry lock
   mcp-device knowledge [--runtime-dir DIR] search|list|read|ingest|learn|correct|skills [JSON]
   mcp-device state backup|verify|restore|migrate [--source DIR] [--backup DIR] [--target DIR]
@@ -26,11 +27,13 @@ Server clients, including localhost, use the ordinary account/OAuth and Device p
 Install/upgrade takes a local plugin manifest JSON. Disable/uninstall retain plugin data.
 Purge is a separate explicit operation for a disabled plugin. Admin passwords come from HCU_ADMIN_PASSWORD.
 State migration defaults to a reviewable dry run; --apply writes only a new target after verified backups.
+Core includes no bundled plugins or Palace Skill integration. Legacy --plugin-policy values
+are accepted for compatibility; neither value installs or automatically enables Palace.
 `;
 interface Parsed { values: Record<string, string[]>; flags: Set<string>; positional: string[]; }
 function parse(argv: string[]): Parsed {
   const values: Record<string, string[]> = {}, flags = new Set<string>(), positional: string[] = [];
-  const valued = new Set(['runtime-dir', 'host', 'port', 'loopback-port', 'public-url', 'skill-root', 'project-root', 'source-root', 'config', 'source', 'backup', 'target', 'device-root', 'gateway-root']);
+  const valued = new Set(['runtime-dir', 'host', 'port', 'loopback-port', 'public-url', 'skill-root', 'project-root', 'source-root', 'plugin-policy', 'config', 'source', 'backup', 'target', 'device-root', 'gateway-root']);
   const switches = new Set(['help', 'enable', 'bundled', 'apply', 'json', 'allow-http-lan', 'legacy-knowledge-mcp']);
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
@@ -47,6 +50,7 @@ function parse(argv: string[]): Parsed {
   return { values, flags, positional };
 }
 const one = (args: Parsed, key: string, fallback?: string): string | undefined => args.values[key]?.[args.values[key].length - 1] ?? fallback;
+
 function stateRoot(args: Parsed, serverDefault = false): string {
   return path.resolve(one(args, 'runtime-dir', process.env.MCP_DEVICE_CONFIG_DIR || path.join(os.homedir(), '.mcp-device', ...(serverDefault ? ['server'] : [])))!);
 }
@@ -115,10 +119,9 @@ async function knowledgeCli(args: Parsed): Promise<void> {
   try {
     const { GatewayDeviceIdentity } = await import('../device/gateway-identity.js');
     const { PluginHost } = await import('./plugin-host.js');
-    const { bundledPluginManifests } = await import('../distribution.js');
     const record = await new GatewayDeviceIdentity(path.join(root, 'gateway-identity.json')).loadOrCreate();
     host = new PluginHost({ stateRoot: root, deviceId: record.deviceId, projectRoots: args.values['project-root']?.map(item => path.resolve(item)), sourceRoots: args.values['source-root']?.map(item => path.resolve(item)) ?? [path.join(root, 'logs')] });
-    await host.ensureBundled(bundledPluginManifests()); await host.start(); print(await host.invoke('knowledge.' + action, input));
+    await host.start({ skipIds: ['palace'] }); print(await host.invoke('knowledge.' + action, input));
   } finally { await host?.close(); await release(); }
 }
 
@@ -165,7 +168,11 @@ async function serverCli(args: Parsed): Promise<void> {
     const record = await identity.loadOrCreate();
     const { createPlatformDeviceCore } = await import('./device-runtime.js');
     const legacyKnowledgeMcp = args.flags.has('legacy-knowledge-mcp');
-    core = await createPlatformDeviceCore({ deviceId: record.deviceId, stateRoot: root, projectRoots: args.values['project-root']?.map(item => path.resolve(item)), sourceRoots: args.values['source-root']?.map(item => path.resolve(item)), exposeKnowledgeMcp: legacyKnowledgeMcp });
+    const cliPluginPolicy = one(args, 'plugin-policy');
+    const selectedPluginPolicy = cliPluginPolicy === undefined
+      ? (config.pluginPolicy === undefined ? resolveDevicePluginPolicy([], process.env) : resolveDevicePluginPolicy(['--plugin-policy', String(config.pluginPolicy)], {}))
+      : resolveDevicePluginPolicy(['--plugin-policy', cliPluginPolicy], {});
+    core = await createPlatformDeviceCore({ deviceId: record.deviceId, stateRoot: root, projectRoots: args.values['project-root']?.map(item => path.resolve(item)), sourceRoots: args.values['source-root']?.map(item => path.resolve(item)), pluginPolicy: selectedPluginPolicy, exposeKnowledgeMcp: legacyKnowledgeMcp });
     const { createPlatformTools } = await import('./knowledge-mcp.js');
     const { startServerRuntime } = await import(pathToFileURL(path.join(packageRoot, 'control-plane', 'scripts', 'authenticated-mcp-wrapper.mjs')).href);
     const configPath = typeof config.configPath === 'string' ? path.resolve(path.dirname(path.resolve(one(args, 'config')!)), config.configPath) : undefined;

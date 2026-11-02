@@ -10,7 +10,7 @@ import {PluginHost} from '../../dist/platform/plugin-host.js';
 import {processBirth,processNamespace} from '../../dist/platform/process-identity.js';
 import {PalaceStore} from '../../dist/plugins/palace/store.js';
 import {reconcilePalaceSkill} from '../../dist/plugins/palace/skill-manager.js';
-import {bundledPluginManifests} from '../../dist/distribution.js';
+import {bundledPluginManifests} from './optional-palace-fixture.mjs';
 
 const hashFile=async f=>createHash('sha256').update(await fs.readFile(f)).digest('hex');
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -79,11 +79,12 @@ test('Device bundled Palace uninstall remediation reinstalls tombstone and prese
  const marker=path.join(host.dataRoot('palace'),'d1-marker');await fs.writeFile(marker,'keep');await host.uninstall('palace');await host.close();
  const palaceCli=path.resolve('dist/plugins/palace/cli.js'),deviceCli=path.resolve('dist/mcp-device.js');
  const status=spawnSync(process.execPath,[palaceCli,'--runtime-dir',root,'status'],{encoding:'utf8'});
- assert.equal(status.status,1,status.stderr);const failure=JSON.parse(status.stdout);assert.equal(failure.code,'PALACE_UNINSTALLED');assert.match(failure.remediation,/install palace --bundled --enable/);
- const repair=spawnSync(process.execPath,[deviceCli,'plugins','--runtime-dir',root,'install','palace','--bundled','--enable'],{encoding:'utf8'});
+ assert.equal(status.status,1,status.stderr);const failure=JSON.parse(status.stdout);assert.equal(failure.code,'PALACE_UNINSTALLED');assert.match(failure.remediation,/palace\.plugin\.json.*--enable/);
+ const manifestFile=path.join(root,'palace.plugin.json');await fs.writeFile(manifestFile,JSON.stringify(palace));
+ const repair=spawnSync(process.execPath,[deviceCli,'plugins','--runtime-dir',root,'install',manifestFile,'--enable'],{encoding:'utf8'});
  assert.equal(repair.status,0,repair.stderr);
  const check=new PluginHost({stateRoot:root,deviceId:'d1'});await check.load();const record=check.list().find(x=>x.manifest.id==='palace');
- assert.equal(record.installed,true);assert.equal(record.enabled,true);assert.equal(record.installationSource,'distribution');assert.equal(await fs.readFile(marker,'utf8'),'keep');await check.close();
+ assert.equal(record.installed,true);assert.equal(record.enabled,true);assert.equal(record.installationSource,'manual');assert.equal(await fs.readFile(marker,'utf8'),'keep');await check.close();
  const after=spawnSync(process.execPath,[palaceCli,'--runtime-dir',root,'status'],{encoding:'utf8'});assert.equal(after.status,0,after.stderr);assert.equal(JSON.parse(after.stdout).ok,true);
 });
 

@@ -1,25 +1,18 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { randomUUID } from 'node:crypto';
 import { CapabilityError } from './plugin-contract.js';
 import { probeRuntimeOwner } from '../device/runtime-owner.js';
-import { processBirth, processNamespace } from './process-identity.js';
+import { coordinationObservation, coordinationOwnerAbandoned, createCoordinationLock, releaseCoordinationLock, repairCoordinationLock } from './coordination-lock.js';
 
 /** No listener is created and no prior runtime is stopped by taking this lease. */
 export async function acquireServerLease(stateRoot: string, options: { allowDeviceOwnerPid?: number } = {}): Promise<() => Promise<void>> {
   stateRoot = path.resolve(stateRoot);
   await fs.mkdir(stateRoot, { recursive: true });
-  const filename = path.join(stateRoot, 'server-runtime.lock'), token = randomUUID();
+  const filename = path.join(stateRoot, 'server-runtime.lock');
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      const handle = await fs.open(filename, 'wx', 0o600);
-      const [birth, namespace] = await Promise.all([processBirth(process.pid), processNamespace()]);
-      try { await handle.writeFile(JSON.stringify({ pid: process.pid, token, startedAt: Date.now(), ...(birth ? { processBirth: birth } : {}), ...(namespace ? { namespace } : {}) }) + '\n'); await handle.sync(); }
-      finally { await handle.close(); }
-      const release = async () => {
-        try { const current = JSON.parse(await fs.readFile(filename, 'utf8')); if (current.token === token) await fs.unlink(filename); }
-        catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
-      };
+      const lock = await createCoordinationLock(filename);
+      const release = () => releaseCoordinationLock(lock, filename);
       try {
         // Device-only v11 uses a named pipe / Unix socket. Holding the common
         // lease first also serializes new Device, server and maintenance starts.
@@ -34,27 +27,17 @@ export async function acquireServerLease(stateRoot: string, options: { allowDevi
       } catch (error) { await release(); throw error; }
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error;
-      let previous: { pid?: number; token?: string };
-      try { previous = JSON.parse(await fs.readFile(filename, 'utf8')); }
-      catch { throw new CapabilityError('RUNTIME_LOCK_INVALID', 'Runtime lease is unreadable; inspect the stopped runtime before recovering it'); }
-      if (!Number.isSafeInteger(previous.pid) || (previous.pid ?? 0) < 1) throw new CapabilityError('RUNTIME_LOCK_INVALID', 'Runtime lease does not identify a valid process');
-      try { process.kill(previous.pid!, 0); }
-      catch (probe) {
-        if ((probe as NodeJS.ErrnoException).code === 'ESRCH') {
-          const recovery = filename + '.recovery';
-          let recoveryHandle;
-          try { recoveryHandle = await fs.open(recovery, 'wx', 0o600); }
-          catch { throw new CapabilityError('RUNTIME_RECOVERY_BUSY', 'Another process is recovering a stale runtime lease'); }
-          try {
-            try {
-              const current = JSON.parse(await fs.readFile(filename, 'utf8'));
-              if (current.token === previous.token && current.pid === previous.pid) await fs.unlink(filename);
-            } catch (read) { if ((read as NodeJS.ErrnoException).code !== 'ENOENT') throw read; }
-          } finally { await recoveryHandle.close(); await fs.unlink(recovery); }
-          continue;
-        }
+      const previous = await coordinationObservation(filename);
+      if (!previous) continue;
+      if (!previous.body) throw new CapabilityError('RUNTIME_LOCK_INVALID', 'Runtime lease does not identify a valid process and token; inspect the stopped runtime before recovering it');
+      if (await coordinationOwnerAbandoned(previous.body)) {
+        await repairCoordinationLock(filename, {
+          codes: { busy: 'RUNTIME_RECOVERY_BUSY', active: 'RUNTIME_ALREADY_RUNNING', recoveryRequired: 'RUNTIME_RECOVERY_BUSY' },
+          messagePrefix: 'Runtime lease', retainAbandoned: false
+        });
+        continue;
       }
-      throw new CapabilityError('RUNTIME_ALREADY_RUNNING', `This state directory is already owned by PID ${previous.pid}`);
+      throw new CapabilityError('RUNTIME_ALREADY_RUNNING', `This state directory is already owned by PID ${previous.body.pid}`);
     }
   }
   throw new CapabilityError('RUNTIME_ALREADY_RUNNING', 'Another process acquired this runtime state');

@@ -6,6 +6,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { syncBuiltinESMExports } from 'node:module';
 import { LocalExecutionEngine } from '../dist/device/execution-engine.js';
+import { resolveDevicePluginPolicy } from '../dist/platform/plugin-policy.js';
 
 async function testRemoteStartupHasZeroChildren() {
     console.log('Testing remote startup generations, zero child spawns, and uninitialized shutdown...');
@@ -53,7 +54,7 @@ async function testRemoteStartupHasZeroChildren() {
             async stop() {}
         }
         const dependencies = {
-            randomUUID, path, LocalExecutionEngine, GatewayDeviceChannel: Channel,
+            randomUUID, path, LocalExecutionEngine, resolveDevicePluginPolicy, GatewayDeviceChannel: Channel,
             loadFixtureConfig: async () => ({ CONFIG_DIR: fixtureStateRoot }),
             acquireServerLease: async (root, options) => {
                 assert.equal(options.allowDeviceOwnerPid, process.pid);

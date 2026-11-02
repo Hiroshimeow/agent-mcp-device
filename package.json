@@ -16,18 +16,18 @@
   },
   "bin": {
     "mcp-device": "dist/mcp-device.js",
-    "md": "dist/mcp-device.js",
-    "palace": "dist/plugins/palace/cli.js"
+    "md": "dist/mcp-device.js"
   },
   "files": [
     "dist",
+    "!dist/plugins/palace",
     "config/revoked-approvals.json",
     "skills/mcp-device-context",
-    "skills/palace-cli",
+    "SECURITY.md",
+    "PRIVACY.md",
     "control-plane/scripts",
     "control-plane/config",
-    "control-plane/contracts",
-    "scripts/v12/install-palace-skill.cjs"
+    "control-plane/contracts"
   ],
   "scripts": {
     "device:install": "cd src/device && npm install",
@@ -46,7 +46,6 @@
     "start": "node dist/mcp-device.js",
     "start:debug": "node --inspect-brk=9229 dist/mcp-device.js",
     "prepack": "node scripts/verify-production-trust.cjs",
-    "postinstall": "node scripts/v12/install-palace-skill.cjs",
     "build:palace": "npm run build && node scripts/v12/build-palace-package.mjs --stable",
     "pack:palace": "npm run build:palace && npm pack .tmp/v12-palace-standalone/package --pack-destination .tmp/v12-palace-standalone",
     "prepare": "npm run build",

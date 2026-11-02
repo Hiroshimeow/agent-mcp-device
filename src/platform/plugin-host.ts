@@ -6,7 +6,7 @@ import { createPluginDriver, type PluginDriver } from './plugin-driver.js';
 import { coordinationOwnerAbandoned, processAppearsDead, repairCoordinationLock, withCoordinationLock } from './coordination-lock.js';
 import { processBirth, processNamespace, type ProcessNamespace } from './process-identity.js';
 
-type StoredPluginRecord = PluginRecord & { settings?: Record<string, unknown>; lifecycleToken?: string };
+type StoredPluginRecord = PluginRecord & { settings?: Record<string, unknown>; lifecycleToken?: string; explicitlyEnabled?: boolean };
 interface Registry { version: 1; revision: number; plugins: Record<string, StoredPluginRecord>; }
 type UpgradePhase = 'preparing' | 'candidate-ready' | 'swapping' | 'swapped' | 'rollback' | 'committed';
 interface UpgradeIntent {
@@ -61,6 +61,8 @@ async function writeJsonAtomic(filename: string, value: unknown): Promise<void> 
 export class PluginHost {
   private registry: Registry = { version: 1, revision: 0, plugins: {} };
   private drivers = new Map<string, PluginDriver>();
+  private driverIntent = new WeakMap<PluginDriver, Pick<StoredPluginRecord, 'manifest' | 'settings' | 'lifecycleToken'>>();
+  private refreshedRevision = -1;
   // Faulted or disabled drivers remain owned until process/resource release is proved.
   private ownedDrivers = new Map<PluginDriver, string>();
   private dependencies = new Map<string, Map<string, DependencyBinding>>();
@@ -68,6 +70,7 @@ export class PluginHost {
   private refreshTimer?: NodeJS.Timeout;
   private registrySavePending = false;
   private pendingFaults = new Map<string, { previous: StoredPluginRecord; fault: StoredPluginRecord }>();
+  private startupSkipIds = new Set<string>();
   private operations: Promise<unknown> = Promise.resolve();
   private listeners = new Set<() => void>();
   readonly root: string;
@@ -232,12 +235,15 @@ export class PluginHost {
       validateManifest(manifest); await this.load();
       const prior = this.registry.plugins[manifest.id];
       if (prior?.installed) {
-        if (prior.manifest.version === manifest.version && prior.manifest.entry === manifest.entry) return;
+        if (prior.manifest.version === manifest.version && prior.manifest.entry === manifest.entry) {
+          if (options.enabled === true) await this.enableInstalled(manifest.id);
+          return;
+        }
         throw new CapabilityError('PLUGIN_UPGRADE_REQUIRED', 'Use upgrade to replace an installed plugin');
       }
-      this.registry.plugins[manifest.id] = { manifest: structuredClone(manifest), installed: true, installationSource: options.installationSource ?? 'manual', enabled: options.enabled ?? false, schemaVersion: prior?.schemaVersion ?? manifest.dataSchemaVersion, state: options.enabled ? 'installed' : 'disabled', settings: options.settings ?? prior?.settings };
+      this.registry.plugins[manifest.id] = { manifest: structuredClone(manifest), installed: true, installationSource: options.installationSource ?? 'manual', enabled: options.enabled ?? false, explicitlyEnabled: options.enabled === true, schemaVersion: prior?.schemaVersion ?? manifest.dataSchemaVersion, state: options.enabled ? 'installed' : 'disabled', settings: options.settings ?? prior?.settings, lifecycleToken: randomUUID() };
       await this.save();
-      if (this.started && options.enabled) await this.activate(manifest.id, new Set());
+      if (this.started && options.enabled) await this.activate(manifest.id, new Set(), true);
     });
   }
   async ensureBundled(manifests: PluginManifest[]): Promise<void> {
@@ -340,8 +346,10 @@ export class PluginHost {
         && this.dependenciesAvailable(binding.providerId, next);
     });
   }
-  private async activate(id: string, visiting: Set<string>): Promise<void> {
+  private async activate(id: string, visiting: Set<string>, explicit = false): Promise<void> {
     const record = this.registry.plugins[id];
+    if (!explicit && !this.mayAutoActivate(id, record))
+      throw new CapabilityError('PLUGIN_DISABLED', `Plugin ${id} is suppressed by the active startup policy`);
     if (record?.bundleUpgradeRequired) throw new CapabilityError('PLUGIN_UPGRADE_REQUIRED', 'Explicitly upgrade the changed bundled plugin before enabling it');
     if (record?.state === 'faulted') throw new CapabilityError('PLUGIN_FAULTED', record.error ?? 'Explicitly enable the faulted plugin before retrying it');
     if (this.drivers.has(id)) { this.assertDependencyPath(id, visiting); return; }
@@ -351,9 +359,10 @@ export class PluginHost {
     const bindings = new Map<string, DependencyBinding>();
     try {
       for (const requirement of record.manifest.requires ?? []) {
-        const providers = this.candidates(requirement.name, requirement.version, false).filter(c => ['provider', 'fallback'].includes(c.capability.role ?? 'provider'));
+        const providers = this.candidates(requirement.name, requirement.version, false)
+          .filter(c => ['provider', 'fallback'].includes(c.capability.role ?? 'provider') && this.mayAutoActivate(c.id, this.registry.plugins[c.id]));
         if (!providers.length) throw new CapabilityError('CAPABILITY_DEPENDENCY_MISSING', `No compatible provider for ${requirement.name}`);
-        const provider = providers[0]; await this.activate(provider.id, next);
+        const provider = providers[0]; await this.activate(provider.id, next, false);
         const providerDriver = this.drivers.get(provider.id);
         if (!providerDriver || !this.dependenciesAvailable(provider.id)) throw new CapabilityError('CAPABILITY_DEPENDENCY_UNAVAILABLE', 'Required provider is unavailable');
         bindings.set(requirement.name, { providerId: provider.id, driver: providerDriver, requiredVersion: requirement.version });
@@ -373,6 +382,8 @@ export class PluginHost {
         // augmenters/observers or select a new edge during an active invocation.
         return binding.driver.invoke(name, input, options.signal);
       });
+      // Pin what this generation actually consumed, independent of later loads.
+      this.driverIntent.set(driver, structuredClone({ manifest: record.manifest, settings: record.settings, lifecycleToken: record.lifecycleToken }));
       this.dependencies.set(id, bindings); this.drivers.set(id, driver); this.ownedDrivers.set(driver, id);
       await driver.start(); record.state = 'enabled'; record.schemaVersion = record.manifest.dataSchemaVersion; delete record.error;
       try{await this.save();this.registrySavePending=false;}
@@ -392,6 +403,11 @@ export class PluginHost {
   private async stopOwnedDrivers(id: string): Promise<void> {
     await Promise.all([...this.ownedDrivers].filter(([, owner]) => owner === id).map(([driver]) => this.stopDriver(driver)));
   }
+  private mayAutoActivate(id: string, record: StoredPluginRecord | undefined): boolean {
+    if (!this.startupSkipIds.has(id)) return true;
+    return Boolean(record?.enabled && (record.explicitlyEnabled === true || record.installationSource === 'manual'
+      || (record.explicitlyEnabled === undefined && record.lifecycleToken)));
+  }
   private async markFault(id: string, error: Error): Promise<void> {
     const driver = this.drivers.get(id); this.drivers.delete(id); this.dependencies.delete(id);
     if (driver) this.notifyCapabilitiesChanged();
@@ -409,9 +425,12 @@ export class PluginHost {
       if (!this.dependenciesAvailable(dependent)) await this.markFault(dependent, new CapabilityError('CAPABILITY_DEPENDENCY_UNAVAILABLE', `A required capability became unavailable`));
     }
   }
-  async start(): Promise<void> {
-    await this.load(); this.started = true;
-    for (const [id, record] of Object.entries(this.registry.plugins)) if (record.installed && record.enabled && record.state !== 'faulted') await this.activate(id, new Set()).catch(() => {});
+  async start(options: { skipIds?: string[] } = {}): Promise<void> {
+    const startupSkipIds = new Set(options.skipIds ?? []);
+    await this.load();
+    this.startupSkipIds = startupSkipIds;
+    this.started = true;
+    for (const [id, record] of Object.entries(this.registry.plugins)) if (record.installed && record.enabled && record.state !== 'faulted' && this.mayAutoActivate(id, record)) await this.activate(id, new Set()).catch(() => {});
     // Lifecycle changes from the CLI are atomically picked up without a second runtime.
     this.refreshTimer = setInterval(() => { void this.serial(() => this.refresh()).catch(() => {}); }, 1000); this.refreshTimer.unref();
   }
@@ -425,26 +444,37 @@ export class PluginHost {
         this.registrySavePending=false;
       }
     }
-    const previous = this.registry; await this.load();
+    await this.load();
     if(this.pendingFaults.size){
       try{await this.save();this.registrySavePending=false;}
       catch{this.registrySavePending=true;}
     }
-    if (previous.revision === this.registry.revision) return;
+    if (this.refreshedRevision === this.registry.revision) return;
     for (const [id, driver] of [...this.drivers]) {
       const current = this.registry.plugins[id];
-      if (!current?.installed || !current.enabled || current.state === 'faulted' || current.bundleUpgradeRequired || JSON.stringify(current.manifest) !== JSON.stringify(previous.plugins[id]?.manifest)) {
+      if (!current?.installed || !current.enabled || current.state === 'faulted' || current.bundleUpgradeRequired
+        || !sameValue(this.driverIntent.get(driver), { manifest: current.manifest, settings: current.settings, lifecycleToken: current.lifecycleToken })) {
         this.drivers.delete(id); this.dependencies.delete(id); this.notifyCapabilitiesChanged(); await this.stopDriver(driver);
       } else current.state = 'enabled';
     }
-    for (const [id, current] of Object.entries(this.registry.plugins)) if (current.installed && current.enabled && current.state !== 'faulted' && !this.drivers.has(id)) await this.activate(id, new Set()).catch(() => {});
+    for (const [id, current] of Object.entries(this.registry.plugins)) if (current.installed && current.enabled && current.state !== 'faulted' && !this.drivers.has(id)
+      && this.mayAutoActivate(id, current)) await this.activate(id, new Set()).catch(() => {});
     for (const id of [...this.drivers.keys()]) {
       if (!this.dependenciesAvailable(id)) await this.markFault(id, new CapabilityError('CAPABILITY_DEPENDENCY_UNAVAILABLE', 'A provider was disabled by another local process'));
     }
+    this.refreshedRevision = this.registry.revision;
     this.notifyCapabilitiesChanged();
   }
   async enable(id: string): Promise<void> {
-    return this.serial(async () => { await this.load(); const record = this.registry.plugins[id]; if (!record?.installed) throw new CapabilityError('PLUGIN_NOT_INSTALLED', 'Plugin is not installed'); if (record.bundleUpgradeRequired) throw new CapabilityError('PLUGIN_UPGRADE_REQUIRED', 'Explicitly upgrade the changed bundled plugin before enabling it'); record.enabled = true; record.state = 'installed'; record.lifecycleToken = randomUUID(); delete record.error; await this.save(); if (this.started) await this.activate(id, new Set()); });
+    return this.serial(async () => { await this.load(); await this.enableInstalled(id); });
+  }
+  private async enableInstalled(id: string): Promise<void> {
+    const record = this.registry.plugins[id];
+    if (!record?.installed) throw new CapabilityError('PLUGIN_NOT_INSTALLED', 'Plugin is not installed');
+    if (record.bundleUpgradeRequired) throw new CapabilityError('PLUGIN_UPGRADE_REQUIRED', 'Explicitly upgrade the changed bundled plugin before enabling it');
+    record.enabled = true; record.explicitlyEnabled = true; record.state = 'installed'; record.lifecycleToken = randomUUID(); delete record.error;
+    await this.save();
+    if (this.started) await this.activate(id, new Set(), true);
   }
   async disable(id: string): Promise<void> {
     return this.serial(async () => { await this.load(); const record = this.registry.plugins[id]; if (!record) throw new CapabilityError('PLUGIN_NOT_FOUND', 'Unknown plugin'); const driver=this.drivers.get(id);this.drivers.delete(id); this.dependencies.delete(id);if(driver)this.notifyCapabilitiesChanged(); await this.stopOwnedDrivers(id); record.enabled = false; record.state = 'disabled'; record.lifecycleToken = randomUUID(); delete record.error; await this.save(); for (const dependent of [...this.drivers.keys()]) { if (!this.dependenciesAvailable(dependent)) await this.markFault(dependent, new CapabilityError('CAPABILITY_DEPENDENCY_UNAVAILABLE', 'Required provider disabled')); } });

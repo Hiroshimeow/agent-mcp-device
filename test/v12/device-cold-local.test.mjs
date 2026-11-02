@@ -20,11 +20,11 @@ import assert from 'node:assert/strict';import fs from 'node:fs/promises';import
 const root=${JSON.stringify(root)},mode=${JSON.stringify(mode)};os.homedir=()=>root;syncBuiltinESMExports();
 const listen=net.Server.prototype.listen;net.Server.prototype.listen=function(...args){assert.equal(typeof args[0],'string','cold fixture must never open a TCP listener');return listen.apply(this,args);};
 process.env.MCP_DEVICE_CONFIG_DIR=path.join(root,'.mcp-device');process.env.MCP_GATEWAY_URL='http://127.0.0.1:1';process.env.MCP_DEVICE_SKIP_SKILL_INSTALL='1';
-const [{MCPDevice},{PluginHost},{bundledPluginManifests},{GatewayDeviceIdentity},{probeRuntimeOwner}]=await Promise.all(['device/device.js','platform/plugin-host.js','distribution.js','device/gateway-identity.js','device/runtime-owner.js'].map(x=>import(${JSON.stringify(dist)}+x)));
+const [{MCPDevice},{PluginHost},{palacePluginManifest},{GatewayDeviceIdentity},{probeRuntimeOwner}]=await Promise.all(['device/device.js','platform/plugin-host.js','plugins/palace/manifest.js','device/gateway-identity.js','device/runtime-owner.js'].map(x=>import(${JSON.stringify(dist)}+x)));
 const state=process.env.MCP_DEVICE_CONFIG_DIR,workspace=path.join(root,'workspace');await fs.mkdir(workspace,{recursive:true});
 await fs.mkdir(path.join(state,'logs'),{recursive:true});await fs.writeFile(path.join(state,'logs/shell-fixture.log'),'Error A5_DEVICE_SHELL_MARKER: preserve original evidence during repair.\\n');
 const seed=new PluginHost({stateRoot:state,deviceId:'cold-device-fixture'});
-await seed.install(bundledPluginManifests().find(x=>x.id==='palace'),{enabled:mode!=='disabled',settings:{autoIndex:false,discoverKnownSources:false}});await seed.close();
+await seed.install(palacePluginManifest(),{enabled:mode!=='disabled',settings:{autoIndex:false,discoverKnownSources:false}});await seed.close();
 if(mode==='faulted'){const registry=JSON.parse(await fs.readFile(seed.registryPath,'utf8'));registry.revision++;registry.plugins.palace.state='faulted';registry.plugins.palace.error='PLUGIN_START_FAILED: cold persisted fault';await fs.writeFile(seed.registryPath,JSON.stringify(registry));}
 // The enrollment fixture exists only below this test's disposable home.
 await fs.writeFile(path.join(state,'gateway-config.json'),JSON.stringify({version:1,gatewayUrl:'http://127.0.0.1:1',allowedRoots:[workspace],proxy:{mode:'direct'},securityProtocolFloor:1}));
@@ -42,12 +42,10 @@ try{
   const pid=core.plugins.drivers.get('palace').child.pid;assert.notEqual(pid,process.pid);assert.doesNotThrow(()=>process.kill(pid,0));
   // Real Device shell adapter; only command shims point at the isolated compile.
   // No package install, live runtime, remote transport, or source-root mutation.
-  const bin=path.join(workspace,'bin');await fs.mkdir(bin);
-  for(const [name,module] of [['palace','plugins/palace/cli.js'],['mcp-device','mcp-device.js']]){
-   const target=new URL(module,${JSON.stringify(dist)});const file=decodeURIComponent(target.pathname).replace(/^\\/([A-Za-z]:)/,'$1');
-   const shim=path.join(bin,name+(process.platform==='win32'?'.cmd':''));
-   await fs.writeFile(shim,process.platform==='win32'?'@echo off\\r\\n"'+process.execPath+'" "'+file+'" %*\\r\\n':'#!/bin/sh\\nexec "'+process.execPath+'" "'+file+'" "$@"\\n');if(process.platform!=='win32')await fs.chmod(shim,0o700);
-  }
+  const bin=path.join(workspace,'bin');
+  const {writeCommandShims}=await import(${JSON.stringify(new URL('./command-shims-fixture.mjs',import.meta.url).href)});
+  const {fileURLToPath}=await import('node:url');
+  await writeCommandShims(bin,[['palace','plugins/palace/cli.js'],['mcp-device','mcp-device.js']].map(([name,module])=>[name,fileURLToPath(new URL(module,${JSON.stringify(dist)}))]));
   process.env.PATH=bin+path.delimiter+process.env.PATH;
   const shell=async command=>{const out=await core.invoke('shell_execute',{command,working_directory:workspace,timeout_ms:10000});assert.equal(out.timedOut,false);return out;};
   console.log('A5_STAGE:ingest');await core.invoke('knowledge.ingest',{});console.log('A5_STAGE:shell');

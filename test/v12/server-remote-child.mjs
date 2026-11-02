@@ -14,7 +14,7 @@ const [{ createPlatformDeviceCore }, { GatewayDeviceIdentity }, { GatewayDeviceC
   import('../../dist/device/gateway-identity.js'),
   import('../../dist/device/gateway-channel.js'),
   import('../../dist/platform/plugin-host.js'),
-  import('../../dist/distribution.js')
+  import('./optional-palace-fixture.mjs')
 ]);
 const identity = new GatewayDeviceIdentity(path.join(stateRoot, 'device-identity.json'));
 const record = await identity.loadOrCreate();

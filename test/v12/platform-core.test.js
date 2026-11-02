@@ -4,7 +4,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { PluginHost } from '../../dist/platform/plugin-host.js';
-import { bundledPluginManifests } from '../../dist/distribution.js';
+import { bundledPluginManifests } from './optional-palace-fixture.mjs';
 
 test('bundled provider lifecycle and fatal plugin leave the actual shared Device Core functional', { timeout: 30000 }, async t => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'v12-platform-core-'));

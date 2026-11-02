@@ -23,6 +23,7 @@ function commandName(): string {
 function printRemoteUsage(): void {
     console.log([
         'Usage: mcp-device [command]',
+        'Core-only distribution; optional plugins require explicit install/enable.',
         '',
         'Commands: start, login, logout, status, install, stop, uninstall'
     ].join('\n'));

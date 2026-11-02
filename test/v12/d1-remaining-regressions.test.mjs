@@ -14,7 +14,7 @@ for(const source of ['distribution','manual'])test(`fault remediation inspects m
  const root=await fixture(t),entry=path.join(root,'missing-provider.mjs');
  const body=await status(root,{installed:true,enabled:true,state:'faulted',installationSource:source,error:'PLUGIN_START_FAILED: module import failed',manifest:{entry}});
  assert.equal(body.code,'PALACE_FAULTED');assert.match(body.remediation,/Stop the runtime/);assert.match(body.remediation,/must not stop the runtime itself/);
- if(source==='distribution')assert.match(body.remediation,/upgrade palace --bundled/);else{assert.doesNotMatch(body.remediation,/--bundled/);assert.match(body.remediation,/reviewed.*manifest/i);}
+ if(source==='distribution')assert.match(body.remediation,/upgrade .*palace\.plugin\.json/);else{assert.doesNotMatch(body.remediation,/--bundled/);assert.match(body.remediation,/reviewed.*manifest/i);}
 });
 test('unrelated ENOENT with existing entry recommends enable, not a package replacement',async t=>{
  const root=await fixture(t),entry=path.join(root,'provider.mjs');await fs.writeFile(entry,'export {};');

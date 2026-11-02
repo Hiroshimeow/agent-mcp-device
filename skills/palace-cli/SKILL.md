@@ -5,7 +5,7 @@ description: Use Palace's local CLI to retrieve evidence-backed project or devic
 
 # Palace CLI — evidence-first recall
 
-Palace is an optional plugin, enabled by default with MCP Device or installed separately as `@hcu-lab.me/palace`. Its local **CLI**, not an MCP knowledge endpoint, is the operational interface.
+Palace is an optional, separately installed package, `@hcu-lab.me/palace`. Core MCP Device does not include or automatically enable it. Register the installed package's `palace.plugin.json` explicitly with `mcp-device plugins install /absolute/path/to/palace.plugin.json --enable`. Its local **CLI**, not an MCP knowledge endpoint, is the operational interface.
 
 ## Availability first
 

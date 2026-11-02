@@ -67,13 +67,11 @@ function lifecycle(runtime:string,explicitDataRoot:boolean,pkg:{packageName:stri
   if(existsSync(path.join(runtime,'plugins','palace','upgrade-intent.json')))
     return {pluginState:'upgrade-in-progress',available:false,code:'PALACE_UPGRADE_IN_PROGRESS',remediation:`Finish or recover the Palace upgrade with mcp-device plugins --runtime-dir "${runtime}" list before using Palace.`};
   if(!record.installed||record.state==='uninstalled'){
-    const remediation=pkg.packageName==='@hcu-lab.me/mcp-device'
-      ? `Run mcp-device plugins --runtime-dir "${runtime}" install palace --bundled --enable.`
-      : `Register the standalone package with an existing Device host: mcp-device plugins --runtime-dir "${runtime}" install "${path.join(pkg.installPath,'palace.plugin.json')}" --enable. A standalone host without mcp-device has no mutation/re-registration path.`;
+    const remediation=`Register the separately installed Palace package with an existing Device host: mcp-device plugins --runtime-dir "${runtime}" install "${path.join(pkg.installPath,'palace.plugin.json')}" --enable. Use the reviewed standalone manifest; Core has no bundled Palace. A standalone host without mcp-device has no mutation/re-registration path.`;
     return {pluginState:'uninstalled',available:false,code:'PALACE_UNINSTALLED',remediation};
   }
   const stopWarning='An agent must not stop the runtime itself; report this prerequisite to the operator.';
-  if(record.bundleUpgradeRequired)return {pluginState:'upgrade-required',available:false,code:'PALACE_UPGRADE_REQUIRED',remediation:`Stop the runtime, then run mcp-device plugins --runtime-dir "${runtime}" upgrade palace --bundled. ${stopWarning}`};
+  if(record.bundleUpgradeRequired)return {pluginState:'upgrade-required',available:false,code:'PALACE_UPGRADE_REQUIRED',remediation:`Stop the runtime, then run mcp-device plugins --runtime-dir "${runtime}" upgrade "${path.join(pkg.installPath,'palace.plugin.json')}" using the reviewed standalone manifest. ${stopWarning}`};
   if(!record.enabled||record.state==='disabled')return {pluginState:'disabled',available:false,code:'PALACE_DISABLED',remediation:`Run mcp-device plugins --runtime-dir "${runtime}" enable palace.`};
   if(record.state==='faulted'){
     const recordedError=String(record.error??'PLUGIN_FAULT: no recorded diagnostic');
@@ -86,7 +84,7 @@ function lifecycle(runtime:string,explicitDataRoot:boolean,pkg:{packageName:stri
     let recovery=`Inspect the recorded fault and its inputs, then run mcp-device plugins --runtime-dir "${runtime}" enable palace.`;
     if(missingEntry){
       recovery=record.installationSource==='distribution'
-        ?`Stop the runtime, then run mcp-device plugins --runtime-dir "${runtime}" upgrade palace --bundled. ${stopWarning}`
+        ?`Stop the runtime, then run mcp-device plugins --runtime-dir "${runtime}" upgrade "${path.join(pkg.installPath,'palace.plugin.json')}" using the reviewed standalone manifest. ${stopWarning}`
         :`Stop the runtime and restore the manually installed package using its reviewed manifest. After restoring, run mcp-device plugins --runtime-dir "${runtime}" enable palace. Do not substitute the bundled distribution. ${stopWarning}`;
     }
     return {pluginState:'faulted',available:false,code:'PALACE_FAULTED',recordedError,remediation:`Recorded fault: ${recordedError}. ${recovery}`};

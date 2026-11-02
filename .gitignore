@@ -79,3 +79,15 @@ runtime/
 /evidence/v12-e2e-20261024-g6/before-*
 /evidence/v12-e2e-20261024-g6/branding-before.js
 /evidence/v12-e2e-20261024-g6/cli-live-final.jsonl
+
+# Obsolete internal planning/review transport (private hash-verified copies retained)
+/docs/v12-tasks-123.md
+/specs/008-v12-platform/ONE_AGENT_EXECUTION_PROMPT.md
+/evidence/v12-e2e-20261024-g6/D0-opus-round-*-prompt.md
+/evidence/v12-e2e-20261024-g6/D0-opus-round-*-state.json
+/evidence/v12-e2e-20261024-g6/D0-review-packet.md
+/evidence/v12-e2e-20261024-g6/D1-opus-prompt.md
+/evidence/v12-e2e-20261024-g6/D1-opus-state.json
+/evidence/v12-e2e-20261024-g6/D1-bridge-checkpoint-20261029/
+/evidence/v12-e2e-20261024-g6/D1-review-current/manifest.json
+/evidence/v12-e2e-20261024-g6/D2-D3-draft-preparation-20261027T161442Z-b17317e6/

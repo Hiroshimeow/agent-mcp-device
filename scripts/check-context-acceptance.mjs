@@ -31,9 +31,12 @@ for (const file of docs) {
   }
 }
 const pkg = JSON.parse(read('package.json')), lock = JSON.parse(read('package-lock.json'));
-if (pkg.version !== '1.0.11' || lock.version !== pkg.version || lock.packages[''].version !== pkg.version) errors.push('Version identity mismatch');
+// SemVer 2.0.0: numeric identifiers have no leading zeroes; build metadata may.
+const semver = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*)(?:\.(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*))*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
+if (typeof pkg.version !== 'string' || !semver.test(pkg.version) || /\s/.test(pkg.version) || lock.version !== pkg.version || lock.packages[''].version !== pkg.version) errors.push('Version identity mismatch');
 if (pkg.engines.node !== '>=22.13.0' || lock.packages[''].engines.node !== pkg.engines.node) errors.push('Node floor mismatch');
-if (!read('src/version.ts').includes("'1.0.11'")) errors.push('Runtime version mismatch');
+const runtime = read('src/version.ts').trim().match(/^export const VERSION = (['"])([0-9A-Za-z.+-]+)\1;$/);
+if (!runtime || runtime[2] !== pkg.version) errors.push('Runtime version mismatch');
 console.log(JSON.stringify({ kind: 'implementation-consistency-not-independent-review', requirements: requirements.length,
   success_criteria: criteria.length, tasks: ids.length, checked_tasks: [...tasks.matchAll(/^- \[[xX]\] T/gm)].length,
   passed: errors.length === 0, errors }, null, 2));

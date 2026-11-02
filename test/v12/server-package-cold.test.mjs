@@ -43,10 +43,10 @@ test('cold installed package runs CLI server, persists pairing/OAuth and restore
   const packageRoot = path.resolve(installed), entry = path.join(packageRoot, 'dist', 'mcp-device.js');
   const packageInfo = JSON.parse(await fs.readFile(path.join(packageRoot, 'package.json'), 'utf8'));
   assert.equal(packageInfo.name, '@hcu-lab.me/mcp-device'); assert.equal(packageInfo.version, '1.0.12');
-  const palaceEntry = path.join(packageRoot,'dist','plugins','palace','cli.js');
-  const bundledSkill = await fs.readFile(path.join(packageRoot,'skills','palace-cli','SKILL.md'),'utf8');
-  assert.match(bundledSkill,/name: palace-cli/);
-  const palaceHelp = await exec(process.execPath,[palaceEntry,'--help']); assert.match(palaceHelp.stdout,/status\\|search/);
+  assert.equal(packageInfo.bin.palace,undefined);
+  assert.equal(packageInfo.scripts.postinstall,undefined);
+  await assert.rejects(fs.stat(path.join(packageRoot,'dist/plugins/palace')),{code:'ENOENT'});
+  await assert.rejects(fs.stat(path.join(packageRoot,'skills/palace-cli')),{code:'ENOENT'});
   await assert.rejects(fs.stat(path.join(packageRoot, 'src')), { code: 'ENOENT' });
   const fixture = await fs.mkdtemp(path.join(os.tmpdir(), 'v12-cold-')), home = path.join(fixture, 'home');
   const runtimeRoot = path.join(fixture, 'state'), backupRoot = path.join(fixture, 'backup'), restoredRoot = path.join(fixture, 'restored');
@@ -91,9 +91,8 @@ test('cold installed package runs CLI server, persists pairing/OAuth and restore
   const invited = JSON.parse((await cli(['admin', '--runtime-dir', runtimeRoot, 'invite', 'create', '1'])).stdout);
   assert.equal(invited.ok, true); assert.equal(invited.codes.length, 1);
   const initial = await start(runtimeRoot);
-  const livePalace = JSON.parse((await exec(process.execPath,[palaceEntry,'--runtime-dir',runtimeRoot,'status'],{cwd:home,env,timeout:20000})).stdout);
-  assert.equal(livePalace.ok,true); assert.equal(livePalace.mode,'read-only');
-  assert.ok(livePalace.totals.cards >= 0);
+  for(const item of ['plugins/palace','palace-skill'])await assert.rejects(fs.stat(path.join(runtimeRoot,item)),{code:'ENOENT'});
+  for(const item of ['.agents/skills/palace-cli','.pi/agent/skills/palace-cli'])await assert.rejects(fs.stat(path.join(home,item)),{code:'ENOENT'});
   assert.ok(initial.pairing?.user_code); assert.equal('device_code' in initial.pairing, false);
   const anonymous = await http('/mcp', { headers: { accept: 'application/json, text/event-stream' }, json: { jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} } }); assert.equal(anonymous.status, 401);
   const login = await http('/login', { form: { identity: email, password } }); assert.equal(login.status, 302);
@@ -113,16 +112,16 @@ test('cold installed package runs CLI server, persists pairing/OAuth and restore
   let capabilities;
   for (let tries = 0; tries < 60; tries++) {
     capabilities = await rpc(tokens.access_token, 'tools/call', { name: 'capability.list', arguments: { device_id: initial.device_id } });
-    if (capabilities.result?.structuredContent?.capabilities?.includes('knowledge.search')) break;
+    if (capabilities.result?.structuredContent?.capabilities?.includes('read_text_file')) break;
     await new Promise(resolve => setTimeout(resolve, 100));
   }
-  assert.ok(capabilities.result.structuredContent.capabilities.includes('knowledge.search'));
-  assert.ok(capabilities.result.structuredContent.contracts.some(contract => contract.name === 'knowledge.search' && contract.version === '1.0.0'));
+  assert.ok(capabilities.result.structuredContent.capabilities.includes('read_text_file'));
+  assert.equal(capabilities.result.structuredContent.capabilities.includes('knowledge.search'),false);
   const filename = path.join(home, 'cold-file.txt');
   const write = await rpc(tokens.access_token, 'tools/call', { name: 'write_file', arguments: { device_id: initial.device_id, path: filename, content: 'package-local-core' } }); assert.notEqual(write.result?.isError, true);
   assert.equal(await fs.readFile(filename, 'utf8'), 'package-local-core');
   const found = await rpc(tokens.access_token, 'tools/call', { name: 'knowledge.search', arguments: { device_id: initial.device_id, query: 'cold package fixture' } });
-  assert.ok(found.result.structuredContent.items.length > 0, 'Bundled enabled Palace indexes the known isolated source automatically');
+  assert.equal(found.result.structuredContent.items.length,0,'Core does not create a local Palace provider');
   const identity = JSON.parse(await fs.readFile(path.join(runtimeRoot, 'gateway-identity.json'), 'utf8')); assert.equal(identity.enrolled, true);
   await stop();
   await assert.rejects(fs.stat(path.join(runtimeRoot, 'server-runtime.lock')), { code: 'ENOENT' });
@@ -134,10 +133,9 @@ test('cold installed package runs CLI server, persists pairing/OAuth and restore
   const restarted = await start(restoredRoot); assert.equal(restarted.device_id, initial.device_id); assert.equal(restarted.pairing, undefined);
   const refresh = await http('/token', { form: { grant_type: 'refresh_token', client_id: tokens.client_id, refresh_token: tokens.refresh_token } }); assert.equal(refresh.status, 200);
   const fresh = await refresh.json();
-  const after = await rpc(fresh.access_token, 'tools/call', { name: 'knowledge.search', arguments: { device_id: initial.device_id, query: 'cold package fixture' } }); assert.ok(after.result.structuredContent.items.length > 0);
-  const selected = await rpc(fresh.access_token, 'tools/call', { name: 'knowledge.read', arguments: { device_id: initial.device_id, ref: found.result.structuredContent.items[0].read_ref, evidence: true } }); assert.notEqual(selected.result.isError, true);
-  assert.ok(selected.result.structuredContent.evidence.some(item => item.verifiedBytes));
+  const after = await rpc(fresh.access_token, 'tools/call', { name: 'knowledge.search', arguments: { device_id: initial.device_id, query: 'cold package fixture' } }); assert.equal(after.result.structuredContent.items.length,0);
+  await assert.rejects(fs.stat(path.join(restoredRoot,'plugins/palace')),{code:'ENOENT'});
   const read = await rpc(fresh.access_token, 'tools/call', { name: 'read_text_file', arguments: { device_id: initial.device_id, path: filename } }); assert.notEqual(read.result.isError, true);
   await stop();
-  t.diagnostic(JSON.stringify({ version: '1.0.12', install: 'npm-tarball-production-dependencies', defaultPalace: true, oauthRefreshAfterRestore: true, pairedIdentityPreserved: true, exactEvidenceAfterRestore: true, listener: base }));
+  t.diagnostic(JSON.stringify({ version: '1.0.12', install: 'npm-tarball-production-dependencies', defaultPalace: false, oauthRefreshAfterRestore: true, pairedIdentityPreserved: true, nativeReadAfterRestore: true, listener: base }));
 });

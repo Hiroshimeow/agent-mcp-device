@@ -27,8 +27,8 @@ await fs.copyFile(path.join(root,'dist','config.js'),path.join(output,'dist','co
 await fs.copyFile(path.join(root,'LICENSE'),path.join(output,'LICENSE'));
 await fs.mkdir(path.join(output,'scripts'),{recursive:true});
 await fs.copyFile(path.join(root,'scripts','v12','install-palace-skill.cjs'),path.join(output,'scripts','install-palace-skill.cjs'));
-const capabilities=['knowledge.search','knowledge.list','knowledge.read','knowledge.stat','knowledge.import','knowledge.ingest','knowledge.correct','knowledge.learn','knowledge.skills'].map(name=>({name,version:'1.0.0',role:'provider',priority:100}));
-const pluginManifest={id:'palace',version:pkg.version,dataSchemaVersion:1,isolation:'process',entry:'dist/plugins/palace/plugin.js',timeoutMs:30000,capabilities};
+const { palacePluginManifest } = await import(new URL('../../dist/plugins/palace/manifest.js', import.meta.url));
+const pluginManifest={...palacePluginManifest(),version:pkg.version,entry:'dist/plugins/palace/plugin.js'};
 await fs.writeFile(path.join(output,'palace.plugin.json'),JSON.stringify(pluginManifest,null,2)+'\n');
 const manifest={
   name:'@hcu-lab.me/palace',version:pkg.version,type:'module',license:pkg.license||'MIT',

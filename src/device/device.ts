@@ -12,6 +12,7 @@ import { pairGatewayDevice } from './gateway-pairing.js';
 import { bootstrapOfficialGatewayTrust } from './official-trust.js';
 import { GatewayDeviceStatusStore } from './device-status.js';
 import { createPlatformDeviceCore as createDeviceCore, type PlatformDeviceCore as DeviceCore } from '../platform/device-runtime.js';
+import { resolveDevicePluginPolicy } from '../platform/plugin-policy.js';
 import { RuntimeOwner, acquireRuntimeOwner, type RuntimeOwnerStatus } from './runtime-owner.js';
 import { acquireServerLease } from '../platform/runtime-lease.js';
 import {
@@ -133,7 +134,8 @@ export class MCPDevice {
             // Local providers start before pairing; local indexing needs no account session.
             this.core = await createDeviceCore({
                 deviceId: identityRecord.deviceId,
-                allowedRoots: gatewayConfig.allowedRoots
+                allowedRoots: gatewayConfig.allowedRoots,
+                pluginPolicy: resolveDevicePluginPolicy(process.argv)
             });
             const enrollmentCredential = String(
                 process.env.MCP_GATEWAY_ENROLLMENT_TOKEN || process.env.MCP_DEVICE_ENROLLMENT_TOKEN || ''

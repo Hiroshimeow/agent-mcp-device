@@ -10,6 +10,7 @@ Node 22.13 or newer is required, including built-in SQLite/FTS5. Acceptance uses
 
 ```text
 mcp-device start
+mcp-device start  # Core-only by default; no Palace provisioning
 mcp-device device start
 mcp-device device status
 mcp-device server --runtime-dir <server-state> --host 127.0.0.1 --port 8104
@@ -20,6 +21,8 @@ mcp-device --help
 
 Server state defaults to `~/.mcp-device/server`; legacy Device state defaults remain `~/.mcp-device`. An explicit `--runtime-dir` selects platform command state. `MCP_DEVICE_CONFIG_DIR` is also accepted by platform commands and the native execution configuration; it must be set before native modules load. Legacy Device identity and service configuration retain their existing path rules. Server starts the native modules only after selecting its state root. `--skill-root DIR` selects the single server-global Skill catalog shared by authenticated accounts; when omitted, an existing `~/.mcp-device/skills` directory is preferred for legacy/shared-team compatibility, otherwise the bundled distribution Skills are used. `MCP_SKILL_ROOT` is the service-friendly equivalent.
 
+The public Device artifact is Core-only regardless of CLI, environment, service registration or server config. Legacy `--plugin-policy bundled|core-first`, `MCP_DEVICE_PLUGIN_POLICY` and server `pluginPolicy` inputs are validated compatibility no-ops: neither value changes provisioning. Selection/validation precedence is Device CLI over environment, and server CLI over config over environment; an invalid selected value fails, but overridden lower-priority values are not validated. No transient flag needs propagation to services or self-update. Existing automatic distribution-enabled Palace records stay retained and inert until explicit enable; manual enabled installations and recorded explicit enable intent survive restart. Core never repins Palace to its own package tree.
+
 `--allow-http-lan` is an explicit trusted-LAN opt-in. It requires an explicit `--public-url http://...` and permits that non-loopback HTTP URL to be used as the OAuth issuer/resource base. Without the flag, non-loopback OAuth issuers remain HTTPS-only. This changes transport policy only; account authentication, Device ownership, pairing and cross-account isolation remain unchanged.
 
 TODO: external MCP upstreams are currently server-global. Before relying on upstreams in multi-account deployments, add per-upstream ownership (`owner_account_id`) with private-by-default visibility and explicit sharing. Shared server Skills remain intentionally cross-account.
@@ -29,6 +32,12 @@ Server is a foreground process. Stop it with Ctrl-C or the supervising process m
 The state root contains identity, pairing/account state, the Gateway SQLite database, plugin registry/private data, a persisted knowledge-reference signing key and bounded activity records. Concurrent server, Device and maintenance processes cannot take the same state lease. Existing Device RuntimeOwner IPC is also checked. An unresponsive legacy control file requires inspection; maintenance does not silently stop another runtime or discard the control state.
 
 The local execution owner does not connect to its own WebSocket or spawn another Device MCP server. A Palace worker process is plugin isolation, not a second Device runtime. Remote Devices continue using their authenticated GatewayDeviceChannel and reconnect/session-epoch contracts.
+
+### Linux and WSL runtime path limitations
+
+Legacy Device ownership uses a pathname Unix socket under `HOME/.mcp-device`, independently of `MCP_DEVICE_CONFIG_DIR`. A long HOME can exceed the operating system's socket pathname limit and fail startup with `EINVAL`; there is currently no shorter-path fallback or dedicated length diagnostic. In the measured WSL2 Linux environment, a 107-byte socket pathname bound successfully and a 108-byte pathname did not. These are environment measurements, not a portable path-length guarantee.
+
+WSL DrvFS (`/mnt/c`, `/mnt/e`) pathname sockets also failed with `ENOTSUP` in that environment, even below the measured length limit. For new isolated WSL installations, use a short HOME on the native Linux filesystem. Changing only `--runtime-dir` or `MCP_DEVICE_CONFIG_DIR` does not relocate legacy Device ownership. Do not move an existing identity or delete ownership state as a workaround; plan any existing-state relocation separately with a verified backup.
 
 ## Account, OAuth and pairing
 
@@ -56,7 +65,7 @@ Upstream configuration is selected consistently for both workspace and external 
 
 ## Plugin lifecycle
 
-Palace is supplied by the official distribution and initially installed and enabled. The Device Core has no Palace dependency. A disabled, uninstalled, crashed or incompatible provider loses its advertised capabilities while native file/process tools remain available. Uninstall leaves a tombstone, so later starts do not silently reinstall the plugin. Disable and uninstall preserve private data; purge is a separate explicit command for a disabled plugin.
+Palace is optional and separately packaged. Install its reviewed `palace.plugin.json` explicitly with `--enable` to opt in. Core has no Palace dependency or installer. A disabled, uninstalled, crashed or incompatible provider loses its advertised capabilities while native file/process tools remain available. Uninstall leaves a tombstone, so later starts do not silently reinstall the plugin. Disable and uninstall preserve private data; purge is a separate explicit command for a disabled plugin.
 
 ```text
 mcp-device plugins --runtime-dir <state> list
@@ -66,15 +75,31 @@ mcp-device plugins --runtime-dir <state> uninstall palace
 mcp-device plugins --runtime-dir <state> install <manifest.json> --enable
 mcp-device plugins --runtime-dir <state> configure <plugin-id> <settings.json>
 mcp-device plugins --runtime-dir <state> upgrade <manifest.json>
-mcp-device plugins --runtime-dir <state> upgrade palace --bundled
+mcp-device plugins --runtime-dir <state> upgrade /path/to/palace.plugin.json
 mcp-device plugins --runtime-dir <state> purge <plugin-id>
 ```
 
-Configure requires a disabled plugin. Upgrade and purge require stopped runtime ownership so that migration/deletion cannot race a live provider. Upgrade works on a private copy and restores the previous manifest/data if validation or migration fails. An external manifest becomes a user-managed (`manual`) registration and is not reclaimed by the bundled distribution. `--bundled` explicitly restores the distribution source. A version-only distribution update with the same capabilities and data schema is re-pinned without a data migration; capability or schema changes remain gated behind explicit upgrade. Registry writes use revision checks, a tokenized exclusive lock and a stale-lock recovery lock; another runtime sees enabled-capability changes through refresh notifications.
+Configure requires a disabled plugin. Upgrade and purge require stopped runtime ownership so that migration/deletion cannot race a live provider. Upgrade works on a private copy and restores the previous manifest/data if validation or migration fails. An external manifest becomes a user-managed (`manual`) registration. Core has no bundled Palace manifest; the generic host retains bundled-contract handling for other distributions and fixtures. Registry writes use revision checks, a tokenized exclusive lock and a stale-lock recovery lock; another runtime sees enabled-capability changes through refresh notifications.
 
 The host is capability-oriented: providers, ordered augmenters, observers and fallback providers compose through versioned contracts. Dependencies resolve to healthy compatible providers and are pinned during an activation. A plugin can invoke its declared dependencies through scoped host services. Dependency loss invalidates dependent providers. Faults are sticky across startup, refresh and dependency activation: none of these automatically restarts a faulted provider. After inspecting the recorded error, explicitly run `mcp-device plugins --runtime-dir <state> enable <plugin-id>` to retry; faulted dependents also require explicit enable after their provider recovers. Missing-entry/bundled upgrades require a stopped runtime; an agent reports that prerequisite and must not stop the runtime itself. Process isolation supports Node workers and external JSONL executables; explicitly trusted cooperative plugins may use the in-process path. See the [plugin contract](../specs/008-v12-platform/plugin-contract.md) for the API, cancellation, frame limits and examples.
 
 Public MCP `capability.list` reports an owned Device's available capabilities and versions. `capability.call` invokes an advertised non-knowledge plugin contract through the normal authenticated Device dispatcher. It does not expose private knowledge import; knowledge exchange uses the three public contracts below.
+
+### Migrating an old bundled Palace installation
+
+On replacement of the old Device package with Core, the old bundled entry disappears (`dist/plugins/palace/plugin.js`). Registry, private data and identity retention is not executable continuity. Automatic distribution records remain suppressed without creating a missing-entry fault; an old explicitly enabled record is eligible to start but faults if its entry is gone. Enabling the old path alone cannot repair that missing code.
+
+Continuing Palace is optional. Separately install a reviewed compatible `@hcu-lab.me/palace` package in a location independent of the replaced Core package (for example an approved local tarball, or a pinned published version when available). This source candidate does not imply that version is published. Core does not download, silently repin, or automatically migrate it. Existing Skill files/ownership ledgers are retained; any standalone package lifecycle-script Skill integration belongs to that optional installation.
+
+Have the operator stop the Device/server through its existing supervisor; agents must not stop it as a side effect of migration. Preserve a verified stopped-state backup of the same runtime root, including identity, registry and plugin data. With the runtime stopped, replace the existing registration using the separate package's actual manifest, not `install` or `--bundled`:
+
+```text
+mcp-device plugins --runtime-dir <state> list
+mcp-device plugins --runtime-dir <state> upgrade <separate-package>/palace.plugin.json
+mcp-device plugins --runtime-dir <state> enable palace
+```
+
+Upgrade validates the real separate entry on a private data copy and records a manual registration; explicit enable records retry/activation intent, including for previously faulted installations. It does not replace the Device identity. Restart under operator control, then check `palace status --runtime-dir <state>` and the expected knowledge capabilities. If Palace is not wanted, leave automatic records inert or explicitly disable the old registration; do not purge data. Disabled records stay disabled unless explicitly enabled, and uninstalled tombstones are not reinstalled by this procedure. Stop and inspect any failed upgrade rather than deleting state or changing identity.
 
 ## Knowledge federation
 
@@ -96,9 +121,9 @@ Read performs an on-demand origin metadata check when available. An unavailable 
 
 ## Palace CLI, package and Skill lifecycle
 
-The MCP Device package keeps the stable `palace` command required by the CLI-first contract. The independent `@hcu-lab.me/palace` package exposes the same command and canonical compiled implementation when installed in a standalone or separate npm prefix. Installing both root packages into the same global prefix is unsupported because npm cannot give one executable name two owners; npm must fail with `EEXIST`, and `--force` is unsupported. The standalone package includes `LICENSE`, `palace.plugin.json`, its Skill installer and a closed import graph. A manifest installed or upgraded from that package is recorded as a manual PluginHost source.
+Only the separate `@hcu-lab.me/palace` package owns the `palace` command. Core excludes optional Palace implementation, executable, Skill assets and installer. `npm run build:palace` builds the standalone package from the same canonical source, including `LICENSE`, `palace.plugin.json`, its Skill installer and a closed import graph. Register the installed manifest explicitly: `mcp-device plugins install /absolute/path/to/palace.plugin.json --enable`. This records a manual PluginHost source; Core package updates do not upgrade that separate package.
 
-Palace Skill files are user-home package assets, not per-runtime plugin state. A per-user ownership ledger records every package owner and the installed baseline hashes. Installation uses plain copied files by default, stages replacements outside agent discovery roots, publishes by rename, and recovers recorded interrupted updates. A pristine managed copy can upgrade or relocate; a modified or foreign same-name Skill is preserved. The final pristine owner may remove the managed Skill, while another installed owner keeps it available. Ordinary `palace` reads are metadata-only and never reconcile Skill files. If lifecycle scripts were skipped, `palace status`/`palace skill status` reports the missing Skill and the exact recovery command `palace skill install`; starting the Device/server runtime also performs a non-blocking reconciliation. Explicit inspection and repair are available through `palace skill status|install|repair|remove|adopt|prune`.
+Palace Skill files belong to the optional package, not Core or per-runtime plugin state. A per-user ownership ledger records package owners and baseline hashes. The standalone installer preserves modified or foreign Skills. Ordinary `palace` reads are metadata-only. If lifecycle scripts were skipped, use `palace skill install`; Core installation/start/service/update never reconciles those files. Explicit inspection and repair remain available through `palace skill status|install|repair|remove|adopt|prune`. Existing Skill files and ownership ledgers are not purged by Core.
 
 Every agent workflow starts with `palace status`. The response identifies the package, version, install path, runtime root, plugin state and write policy. Without an explicit root, the CLI and `mcp-device plugins|knowledge` use the same resolver: explicit argument, then `MCP_DEVICE_CONFIG_DIR`, then active lease, then a single Palace registry; ambiguous roots fail typed instead of guessing. Disabled, uninstalled, faulted, upgrade-in-progress or upgrade-required runtimes return typed actionable limitations. Lifecycle status is emitted as structured JSON on stdout even when the exit code is 1; malformed arguments, unsafe paths and SQLite/open failures are structured JSON on stderr. Palace knowledge operations are read-only. `palace skill install|repair|remove|adopt|prune` mutate only the user-home Skill ownership state. When a Device runtime is stopped, knowledge mutation uses `mcp-device knowledge --runtime-dir <state> ...` under the exclusive server lease; a standalone Palace installation without `mcp-device` has no mutation path. The Skill never stops the runtime by itself.
 
@@ -155,6 +180,6 @@ npm run test:parity -- --group port-free --output <isolated-evidence-dir>
 npm run test:v12:server
 ```
 
-Server acceptance owns port 8104 for its duration. The cold-package test additionally requires `MCP_V12_COLD_PACKAGE_ROOT` pointing at the package inside an isolated production-dependency npm installation. It verifies the installed entry point, default enabled Palace, normal pairing/OAuth, native execution, backup/restore, retained identity and refresh-token continuity.
+Server acceptance owns port 8104 for its duration. The cold-package test additionally requires `MCP_V12_COLD_PACKAGE_ROOT` pointing at the package inside an isolated production-dependency npm installation. Core package inventory and startup checks are separate from optional Palace fixtures and historical bundled-product receipts; neither substitutes for fresh normal pairing/OAuth, backup/restore and identity-continuity acceptance.
 
 On the current G6 test machine, port 8103 belongs to an existing audit process and is preserved. G8 ports 8102 (production) and 8101 (backup) are outside these tests. No production rollout is authorized by source acceptance.

@@ -75,8 +75,9 @@ test('platform plugins and knowledge commands default to the server state root',
   assert.equal(plugins.status,0,plugins.stderr);
   assert.equal(path.resolve(JSON.parse(plugins.stdout).runtime_dir),path.resolve(home,'.mcp-device','server'));
   const knowledge=spawnSync(process.execPath,[deviceEntry,'knowledge','list','{}'],{env,encoding:'utf8',timeout:30000});
-  assert.equal(knowledge.status,0,knowledge.stderr);
-  await fs.access(path.join(home,'.mcp-device','server','plugins','registry.json'));
+  assert.equal(knowledge.status,1,knowledge.stderr);
+  assert.match(knowledge.stderr,/CAPABILITY_UNAVAILABLE/);
+  await assert.rejects(fs.stat(path.join(home,'.mcp-device','server','plugins','registry.json')),{code:'ENOENT'});
   await assert.rejects(fs.stat(path.join(home,'.mcp-device','plugins','registry.json')),{code:'ENOENT'});
 });
 

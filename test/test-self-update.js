@@ -248,6 +248,18 @@ async function runHelperCase({ failInstall, stripPath = false }) {
     ""
   ].join('\n'));
 
+  const retainedFiles = {
+    'gateway-config.json': JSON.stringify({ version: 1, pluginPolicy: 'core-first' }),
+    'plugins/registry.json': JSON.stringify({ version: 1, revision: 2, plugins: { palace: { enabled: true, explicitlyEnabled: true, installationSource: 'manual' } } }),
+    'plugins/palace/data/retained.txt': 'KEEP_PALACE_DATA',
+    'gateway-identity.json': 'KEEP_IDENTITY',
+    'palace-skill/owners.json': 'KEEP_SKILL_LEDGER'
+  };
+  for (const [name, body] of Object.entries(retainedFiles)) {
+    const file = path.join(home, '.mcp-device', name);
+    await fs.mkdir(path.dirname(file), { recursive: true });
+    await fs.writeFile(file, body);
+  }
   const state = {
     schema: 1,
     requestId: failInstall ? 'helper-fail' : 'helper-ok',
@@ -322,6 +334,10 @@ async function runHelperCase({ failInstall, stripPath = false }) {
     );
   }
 
+  for (const [name, body] of Object.entries(retainedFiles)) {
+    assert.equal(await fs.readFile(path.join(home, '.mcp-device', name), 'utf8'), body,
+      'update/rollback must preserve ' + name);
+  }
   await fs.rm(home, { recursive: true, force: true });
 }
 

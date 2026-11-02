@@ -42,4 +42,10 @@ git show 0ad01ba82e28a7e394e4e9410b04e7d12c424c01:evidence/v12-e2e-20261024-g6/D
 
 Verdicts, handoffs, receipts, hash manifests, structured test results, active specs, `evidence/context`, and executable benchmark/test sources remain tracked. Links from historical manifests to untracked transport files require the retained local checkout or the historical commit above; they are not promises that every payload is present in a fresh checkout. Local preservation verification is recorded in `.tmp/cleanup-b-preservation.json` with a per-file SHA-256. No runtime operation, test acceptance, release approval, registry publication or rollout is implied.
 
+## Core-only public source preparation
+
+Obsolete task 1–3 notes, the superseded single-agent execution prompt, reviewer prompts/session transport, bridge recovery packets and unexecuted D2/D3 draft packets are removed from the proposed public index only. Their exact local copies and per-file hashes are preserved privately outside this repository; originals remain locally ignored. Original committed bytes remain readable with `git show d6b6ea85f1f8496e161ef0e8a833b56edfd16e5f:<path>`. Historical receipt links to those packets require that historical snapshot or the private archive, not a fresh public checkout.
+
+Active governing documents, accepted evidence, Spec 002 regression fixtures, executable benchmark sources/data, product contracts and Skills remain tracked. Dirty evidence and release ledgers are not part of the product staging allowlist. This preparation grants no commit, push, publication, tag, deployment or service-operation authorization and makes no release-readiness claim.
+
 This document does not grant permission to delete auth/identity state, protected execution artifacts or production-linked config just because a filename is under `logs/`.

@@ -83,14 +83,26 @@ export async function releaseCoordinationLock(lock:{handle:FileHandle;token:stri
     if(current?.body?.token===lock.token)await fs.unlink(filename);
   }catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;}
 }
-async function recoverObserved(lockPath:string,recoveryPath:string,observed:CoordinationObservation,options:CoordinationOptions,allowIncomplete:boolean):Promise<boolean>{
+async function recoverObserved(lockPath:string,recoveryPath:string,observed:CoordinationObservation,options:CoordinationOptions,allowIncomplete:boolean,depth=0):Promise<boolean>{
   const recoveryToken=randomUUID();let recovery:{handle:FileHandle;token:string}|undefined;
   try{recovery=await createCoordinationLock(recoveryPath,recoveryToken);}
-  catch(error){if((error as NodeJS.ErrnoException).code==='EEXIST')return false;throw error;}
+  catch(error){
+    if((error as NodeJS.ErrnoException).code!=='EEXIST')throw error;
+    // Recovery is itself crashable. Serialize reclamation of its abandoned
+    // generation with another guard, never an unguarded read-then-unlink.
+    // Unknown/incomplete guards remain fail-closed, including explicit repair.
+    if(depth>=8)return false;
+    const guard=await coordinationObservation(recoveryPath);
+    if(!guard?.body||!await coordinationOwnerAbandoned(guard.body))return false;
+    if(!await recoverObserved(recoveryPath,recoveryPath+'.recovery',guard,options,false,depth+1))return false;
+    try{recovery=await createCoordinationLock(recoveryPath,recoveryToken);}
+    catch(retry){if((retry as NodeJS.ErrnoException).code==='EEXIST')return false;throw retry;}
+  }
   try{
     const current=await coordinationObservation(lockPath);if(!current)return true;
     const same=current.mtimeMs===observed.mtimeMs&&current.size===observed.size
-      &&current.body?.token===observed.body?.token&&current.body?.pid===observed.body?.pid&&current.body?.processBirth===observed.body?.processBirth;
+      &&current.body?.token===observed.body?.token&&current.body?.pid===observed.body?.pid&&current.body?.processBirth===observed.body?.processBirth
+      &&JSON.stringify(current.body?.namespace)===JSON.stringify(observed.body?.namespace);
     if(!same)return false;
     if(current.body){
       if(!await coordinationOwnerAbandoned(current.body))return false;
